@@ -8,7 +8,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-border/50 bg-background/50 backdrop-blur-sm">
       <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center gap-2 no-underline mb-4">
@@ -53,6 +53,31 @@ export default function Footer() {
               <li><Link href="/dashboard" className="hover:text-primary transition-colors">{t.common.dashboard}</Link></li>
               <li><Link href="/dashboard" className="hover:text-primary transition-colors">{t.footer.myCharts}</Link></li>
               <li><Link href="/dashboard" className="hover:text-primary transition-colors">{t.footer.aiReadings}</Link></li>
+            </ul>
+          </div>
+
+          {/* Partner Sites */}
+          <div>
+            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">Další projekty</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>
+                <a href="https://cajovny-praha.cz" target="_blank" rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors">
+                  Čajovny Praha
+                </a>
+              </li>
+              <li>
+                <a href="https://katastr-online.cz" target="_blank" rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors">
+                  Katastr Online
+                </a>
+              </li>
+              <li>
+                <a href="https://akcni-letenky.com" target="_blank" rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors">
+                  Akční Letenky
+                </a>
+              </li>
             </ul>
           </div>
         </div>

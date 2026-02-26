@@ -205,3 +205,6 @@
 - [x] CENTER_DESCRIPTIONS přidan do hdContent.ts s českými popisy všech 9 center
 - [ ] Přeložit inkarnační kříž sekci do češtiny
 - [x] Přidat tlačítko pro stažení AI rozboru (.txt)
+
+## Footer Partner Links
+- [x] Přidat sekci "Další projekty" do footeru s odkazy: cajovny-praha.cz, katastr-online.cz, akcni-letenky.com
