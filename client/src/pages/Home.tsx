@@ -29,138 +29,8 @@ const scaleIn = {
   }),
 };
 
-// ─── Inline SVG aura figures for each type ──────────────────────────────────
-// Each type has a silhouette + geometric aura shape + glow color
-
-function GeneratorFigure() {
-  return (
-    <svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      {/* Glow */}
-      <circle cx="60" cy="90" r="55" fill="#F97316" fillOpacity="0.18" />
-      {/* Flower of Life circles */}
-      {[0, 60, 120, 180, 240, 300].map((angle, i) => {
-        const rad = (angle * Math.PI) / 180;
-        const cx = 60 + 22 * Math.cos(rad);
-        const cy = 90 + 22 * Math.sin(rad);
-        return <circle key={i} cx={cx} cy={cy} r="22" stroke="#F97316" strokeWidth="1" strokeOpacity="0.5" />;
-      })}
-      <circle cx="60" cy="90" r="22" stroke="#F97316" strokeWidth="1" strokeOpacity="0.5" />
-      {/* Body silhouette */}
-      <ellipse cx="60" cy="38" rx="10" ry="10" fill="#F97316" />
-      <rect x="50" y="50" width="20" height="35" rx="4" fill="#F97316" />
-      <rect x="38" y="52" width="10" height="28" rx="4" fill="#F97316" />
-      <rect x="72" y="52" width="10" height="28" rx="4" fill="#F97316" />
-      <rect x="50" y="85" width="8" height="32" rx="4" fill="#F97316" />
-      <rect x="62" y="85" width="8" height="32" rx="4" fill="#F97316" />
-      {/* Diamond icon below */}
-      <polygon points="60,140 67,150 60,160 53,150" stroke="#F97316" strokeWidth="1.5" fill="none" strokeOpacity="0.7" />
-    </svg>
-  );
-}
-
-function ManifestingGeneratorFigure() {
-  return (
-    <svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      {/* Glow */}
-      <circle cx="60" cy="90" r="55" fill="#EF4444" fillOpacity="0.18" />
-      {/* Starburst lines */}
-      {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => {
-        const rad = (angle * Math.PI) / 180;
-        return (
-          <line
-            key={i}
-            x1={60 + 28 * Math.cos(rad)}
-            y1={90 + 28 * Math.sin(rad)}
-            x2={60 + 52 * Math.cos(rad)}
-            y2={90 + 52 * Math.sin(rad)}
-            stroke="#EF4444"
-            strokeWidth="1"
-            strokeOpacity="0.5"
-          />
-        );
-      })}
-      <circle cx="60" cy="90" r="28" stroke="#EF4444" strokeWidth="1" strokeOpacity="0.4" />
-      {/* Body silhouette */}
-      <ellipse cx="60" cy="38" rx="10" ry="10" fill="#EF4444" />
-      <rect x="50" y="50" width="20" height="35" rx="4" fill="#EF4444" />
-      <rect x="38" y="52" width="10" height="28" rx="4" fill="#EF4444" />
-      <rect x="72" y="52" width="10" height="28" rx="4" fill="#EF4444" />
-      <rect x="50" y="85" width="8" height="32" rx="4" fill="#EF4444" />
-      <rect x="62" y="85" width="8" height="32" rx="4" fill="#EF4444" />
-      {/* Diamond icon below */}
-      <polygon points="60,140 68,150 60,160 52,150" stroke="#EF4444" strokeWidth="1.5" fill="none" strokeOpacity="0.7" />
-      <polygon points="60,143 65,150 60,157 55,150" stroke="#EF4444" strokeWidth="1" fill="none" strokeOpacity="0.4" />
-    </svg>
-  );
-}
-
-function ProjectorFigure() {
-  return (
-    <svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      {/* Glow */}
-      <circle cx="60" cy="90" r="55" fill="#8B5CF6" fillOpacity="0.2" />
-      {/* Concentric circles */}
-      {[52, 42, 32].map((r, i) => (
-        <circle key={i} cx="60" cy="90" r={r} stroke="#8B5CF6" strokeWidth="1" strokeOpacity={0.3 + i * 0.15} />
-      ))}
-      {/* Body silhouette */}
-      <ellipse cx="60" cy="38" rx="10" ry="10" fill="#8B5CF6" />
-      <rect x="50" y="50" width="20" height="35" rx="4" fill="#8B5CF6" />
-      <rect x="38" y="52" width="10" height="28" rx="4" fill="#8B5CF6" />
-      <rect x="72" y="52" width="10" height="28" rx="4" fill="#8B5CF6" />
-      <rect x="50" y="85" width="8" height="32" rx="4" fill="#8B5CF6" />
-      <rect x="62" y="85" width="8" height="32" rx="4" fill="#8B5CF6" />
-      {/* Diamond icon below */}
-      <polygon points="60,140 68,150 60,160 52,150" stroke="#8B5CF6" strokeWidth="1.5" fill="none" strokeOpacity="0.7" />
-      <polygon points="60,143 65,150 60,157 55,150" stroke="#8B5CF6" strokeWidth="1" fill="none" strokeOpacity="0.4" />
-      <polygon points="60,146 62,150 60,154 58,150" stroke="#8B5CF6" strokeWidth="1" fill="none" strokeOpacity="0.3" />
-    </svg>
-  );
-}
-
-function ManifestorFigure() {
-  return (
-    <svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      {/* Glow */}
-      <circle cx="60" cy="90" r="55" fill="#10B981" fillOpacity="0.18" />
-      {/* Star of David / hexagram */}
-      <polygon points="60,40 80,75 40,75" stroke="#10B981" strokeWidth="1.2" fill="none" strokeOpacity="0.5" transform="translate(0,15)" />
-      <polygon points="60,140 80,105 40,105" stroke="#10B981" strokeWidth="1.2" fill="none" strokeOpacity="0.5" transform="translate(0,-15)" />
-      <circle cx="60" cy="90" r="35" stroke="#10B981" strokeWidth="1" strokeOpacity="0.3" />
-      {/* Body silhouette */}
-      <ellipse cx="60" cy="38" rx="10" ry="10" fill="#10B981" />
-      <rect x="50" y="50" width="20" height="35" rx="4" fill="#10B981" />
-      <rect x="38" y="52" width="10" height="28" rx="4" fill="#10B981" />
-      <rect x="72" y="52" width="10" height="28" rx="4" fill="#10B981" />
-      <rect x="50" y="85" width="8" height="32" rx="4" fill="#10B981" />
-      <rect x="62" y="85" width="8" height="32" rx="4" fill="#10B981" />
-      {/* Diamond icon below */}
-      <polygon points="60,140 68,150 60,160 52,150" stroke="#10B981" strokeWidth="1.5" fill="none" strokeOpacity="0.7" />
-    </svg>
-  );
-}
-
-function ReflectorFigure() {
-  return (
-    <svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      {/* Glow */}
-      <circle cx="60" cy="90" r="55" fill="#94A3B8" fillOpacity="0.18" />
-      {/* Concentric rings */}
-      {[52, 44, 36, 28].map((r, i) => (
-        <circle key={i} cx="60" cy="90" r={r} stroke="#94A3B8" strokeWidth="1" strokeOpacity={0.2 + i * 0.1} strokeDasharray="4 3" />
-      ))}
-      {/* Body silhouette */}
-      <ellipse cx="60" cy="38" rx="10" ry="10" fill="#94A3B8" />
-      <rect x="50" y="50" width="20" height="35" rx="4" fill="#94A3B8" />
-      <rect x="38" y="52" width="10" height="28" rx="4" fill="#94A3B8" />
-      <rect x="72" y="52" width="10" height="28" rx="4" fill="#94A3B8" />
-      <rect x="50" y="85" width="8" height="32" rx="4" fill="#94A3B8" />
-      <rect x="62" y="85" width="8" height="32" rx="4" fill="#94A3B8" />
-      {/* Diamond icon below */}
-      <polygon points="60,140 68,150 60,160 52,150" stroke="#94A3B8" strokeWidth="1.5" fill="none" strokeOpacity="0.7" />
-    </svg>
-  );
-}
+// ─── CDN image URLs for each type ────────────────────────────────────────────
+// Generator (orange), MG (orange-red), Projector (purple), Manifestor (green), Reflector (grey)
 
 const TYPES_DATA = [
   {
@@ -169,19 +39,17 @@ const TYPES_DATA = [
     pct: "37%",
     label: "populace",
     color: "bg-amber-50 border-amber-200",
-    pctColor: "text-amber-500",
-    Figure: GeneratorFigure,
-    bgGlow: "bg-amber-100/60",
+    pctColor: "text-orange-500",
+    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/YQwMAkcCPxCmYdpb.png",
   },
   {
     name: "Manifesting Generator",
-    czechName: "MANIFESTUJÍCÍ\nGENERATOR",
+    czechName: "MANIFESTUJÍ CÍ\nGENERATOR",
     pct: "33%",
     label: "populace",
     color: "bg-red-50 border-red-200",
     pctColor: "text-red-500",
-    Figure: ManifestingGeneratorFigure,
-    bgGlow: "bg-red-100/60",
+    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/eCElowlfUpvpUEgd.png",
   },
   {
     name: "Projector",
@@ -190,8 +58,7 @@ const TYPES_DATA = [
     label: "populace",
     color: "bg-violet-50 border-violet-200",
     pctColor: "text-violet-500",
-    Figure: ProjectorFigure,
-    bgGlow: "bg-violet-100/60",
+    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/sANQFuVQUjwYhHFL.png",
   },
   {
     name: "Manifestor",
@@ -200,8 +67,7 @@ const TYPES_DATA = [
     label: "populace",
     color: "bg-emerald-50 border-emerald-200",
     pctColor: "text-emerald-500",
-    Figure: ManifestorFigure,
-    bgGlow: "bg-emerald-100/60",
+    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/NUWIRYzSOureZciJ.png",
   },
   {
     name: "Reflector",
@@ -210,12 +76,9 @@ const TYPES_DATA = [
     label: "populace",
     color: "bg-slate-50 border-slate-200",
     pctColor: "text-slate-500",
-    Figure: ReflectorFigure,
-    bgGlow: "bg-slate-100/60",
+    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/nnUNeeSzmRQbFJRT.png",
   },
 ];
-
-const BENEFIT_ICONS = [Eye, Shield, Lightbulb, Heart, Leaf];
 
 const BENEFITS = [
   { icon: Eye, label: "Poznejte sebe sama" },
@@ -360,8 +223,13 @@ export default function Home() {
                 className="flex flex-col items-center gap-3"
               >
                 {/* Aura figure */}
-                <div className={`w-full aspect-[3/4] rounded-2xl ${tp.bgGlow} flex items-center justify-center p-2`}>
-                  <tp.Figure />
+                <div className="w-full aspect-[3/4] flex items-center justify-center">
+                  <img
+                    src={tp.imgUrl}
+                    alt={tp.czechName}
+                    className="w-full h-full object-contain drop-shadow-sm"
+                    loading="lazy"
+                  />
                 </div>
                 {/* Type name */}
                 <p className="text-[10px] md:text-xs font-bold text-foreground tracking-wide text-center whitespace-pre-line leading-tight">
@@ -371,27 +239,29 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Population stats cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-            {TYPES_DATA.filter(tp => tp.name !== "Manifestor").map((tp, i) => (
+          {/* Population stats cards — all 5 types */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-4xl mx-auto">
+            {TYPES_DATA.map((tp, i) => (
               <motion.div
                 key={tp.name}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-30px" }}
-                custom={i + 5}
-                variants={scaleIn}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08, duration: 0.4 }}
                 whileHover={{ scale: 1.04, y: -2 }}
-                className={`rounded-2xl p-5 border text-center transition-shadow hover:shadow-md cursor-default ${tp.color}`}
+                className={`rounded-2xl p-4 border text-center transition-shadow hover:shadow-md cursor-default ${tp.color}`}
               >
-                <p className="text-sm text-muted-foreground mb-1">
-                  {tp.name === "Manifesting Generator" ? "Manifestující" : tp.name === "Projector" ? "Projektor" : tp.name === "Reflector" ? "Reflektor" : tp.name}
+                <p className="text-xs text-muted-foreground mb-1 leading-tight">
+                  {tp.name === "Generator" ? "Generator" :
+                   tp.name === "Manifesting Generator" ? "Manifestující" :
+                   tp.name === "Projector" ? "Projektor" :
+                   tp.name === "Manifestor" ? "Manifestor" : "Reflektor"}
                 </p>
-                <p className={`text-3xl font-bold ${tp.pctColor} leading-none`}>{tp.pct}</p>
+                <p className={`text-2xl md:text-3xl font-bold ${tp.pctColor} leading-none`}>{tp.pct}</p>
                 {tp.name === "Manifesting Generator" && (
-                  <p className="text-xs text-muted-foreground mt-0.5">Generator</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Generator</p>
                 )}
-                <p className="text-xs text-muted-foreground mt-1">{tp.label}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">{tp.label}</p>
               </motion.div>
             ))}
           </div>
