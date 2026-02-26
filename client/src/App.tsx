@@ -5,31 +5,50 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import { lazy, Suspense } from "react";
 
-function Router() {
-  // make sure to consider if you need authentication for certain routes
+const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
+const ChartResult = lazy(() => import("./pages/ChartResult"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const ChartComparison = lazy(() => import("./pages/ChartComparison"));
+const Transits = lazy(() => import("./pages/Transits"));
+const IChing = lazy(() => import("./pages/IChing"));
+const Celebrities = lazy(() => import("./pages/Celebrities"));
+
+function PageLoader() {
   return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <p className="text-muted-foreground font-serif text-lg">Načítání...</p>
+      </div>
+    </div>
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
+function Router() {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/calculate" component={ChartCalculator} />
+        <Route path="/chart/:id" component={ChartResult} />
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/compare" component={ChartComparison} />
+        <Route path="/transits" component={Transits} />
+        <Route path="/iching" component={IChing} />
+        <Route path="/celebrities" component={Celebrities} />
+        <Route path="/404" component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
+  );
+}
 
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
           <Router />
