@@ -58,7 +58,7 @@ const TYPES_DATA = [
     label: "populace",
     color: "bg-violet-50 border-violet-200",
     pctColor: "text-violet-500",
-    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/sANQFuVQUjwYhHFL.png",
+    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/NUWIRYzSOureZciJ.png",
   },
   {
     name: "Manifestor",
@@ -67,7 +67,7 @@ const TYPES_DATA = [
     label: "populace",
     color: "bg-emerald-50 border-emerald-200",
     pctColor: "text-emerald-500",
-    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/NUWIRYzSOureZciJ.png",
+    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/sANQFuVQUjwYhHFL.png",
   },
   {
     name: "Reflector",
