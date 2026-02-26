@@ -188,3 +188,20 @@
 - [ ] Dream Rave chart
 - [ ] Incarnation Cross deep analysis
 - [ ] ahumandesign.cz-inspired presentation style
+
+## Inkarnační Kříž — Detailní Analýza
+- [ ] Vytvořit kompletní data pro všechny hlavní Inkarnační kříže (Right Angle, Left Angle, Juxtaposition)
+- [ ] Stránka s detailní analýzou kříže — 4 brány, životní poslání, témata, výzvy
+- [ ] AI generované čtení kříže pro konkrétní uživatelský chart
+- [ ] Propojení ze stránky výsledků chartu
+- [ ] Přidat do navigace
+
+## Oprava angličtiny v ChartResult
+- [x] Přeložit popisy typů v hdContent.ts do češtiny (TYPE_DESCRIPTIONS)
+- [x] Přeložit popisy profilů v hdContent.ts do češtiny (PROFILE_DESCRIPTIONS)
+- [x] Přeložit popisy autorit v hdContent.ts do češtiny (AUTHORITY_DESCRIPTIONS)
+- [x] Přeložit názvy bran (gate names) do češtiny (GATE_DESCRIPTIONS)
+- [x] Přidat CENTER_DESCRIPTIONS export (oprava chyby chybějícího exportu)
+- [x] CENTER_DESCRIPTIONS přidan do hdContent.ts s českými popisy všech 9 center
+- [ ] Přeložit inkarnační kříž sekci do češtiny
+- [x] Přidat tlačítko pro stažení AI rozboru (.txt)

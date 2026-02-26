@@ -652,8 +652,28 @@ export default function ChartResult() {
                   )}
 
                   {aiReading && (
-                    <div className="prose prose-invert prose-sm max-w-none mt-4 p-4 rounded-lg bg-muted/20 border border-border/30">
-                      <Streamdown>{aiReading}</Streamdown>
+                    <div className="mt-4">
+                      <div className="flex justify-end mb-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs gap-1.5 h-8"
+                          onClick={() => {
+                            const blob = new Blob([aiReading], { type: 'text/plain;charset=utf-8' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `HD-rozbor-${chartMeta?.name || 'chart'}.txt`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                          }}
+                        >
+                          <Download className="w-3 h-3" /> Stáhnout rozbor (.txt)
+                        </Button>
+                      </div>
+                      <div className="prose prose-sm max-w-none p-4 rounded-lg bg-muted/20 border border-border/30">
+                        <Streamdown>{aiReading}</Streamdown>
+                      </div>
                     </div>
                   )}
                 </CardContent>
