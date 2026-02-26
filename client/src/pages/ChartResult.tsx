@@ -35,11 +35,11 @@ const PLANET_SYMBOLS: Record<string, string> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  Manifestor: "bg-red-500/20 text-red-300 border-red-500/30",
-  Generator: "bg-orange-500/20 text-orange-300 border-orange-500/30",
-  "Manifesting Generator": "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
-  Projector: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-  Reflector: "bg-green-500/20 text-green-300 border-green-500/30",
+  Manifestor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  Generator: "bg-amber-50 text-amber-700 border-amber-200",
+  "Manifesting Generator": "bg-orange-50 text-orange-700 border-orange-200",
+  Projector: "bg-violet-50 text-violet-700 border-violet-200",
+  Reflector: "bg-slate-100 text-slate-700 border-slate-200",
 };
 
 interface DetailModalState {
@@ -201,7 +201,7 @@ export default function ChartResult() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Bodygraph Column */}
             <div className="lg:col-span-1">
-              <Card className="bg-cosmic-card sticky top-24">
+              <Card className="bg-card border-border/50 shadow-sm sticky top-24">
                 <CardHeader className="pb-2">
                   <CardTitle className="font-serif text-lg">{t.chart.bodygraph}</CardTitle>
                   <CardDescription>{t.chart.bodygraphDesc}</CardDescription>
@@ -257,7 +257,7 @@ export default function ChartResult() {
                         const czPlanet = (t.hd.planets as any)[tg.planet] || tg.planet;
                         return (
                           <div key={i} className="flex items-center justify-between text-[10px] py-0.5 px-1">
-                            <span className="text-cyan-400">{czPlanet}</span>
+                            <span className="text-cyan-600">{czPlanet}</span>
                             <span className="text-muted-foreground font-mono">Brána {tg.gate}.{tg.line}</span>
                           </div>
                         );
@@ -272,7 +272,7 @@ export default function ChartResult() {
             <div className="lg:col-span-2 space-y-6">
 
               {/* ─── Type & Strategy Card ─── */}
-              <Card className="bg-cosmic-card overflow-hidden">
+              <Card className="bg-card border-border/50 shadow-sm overflow-hidden">
                 <CardHeader className="pb-3">
                   <CardTitle className="font-serif text-xl flex items-center gap-2">
                     <Shield className="w-5 h-5 text-primary" /> {t.chart.typeStrategy}
@@ -291,11 +291,11 @@ export default function ChartResult() {
                     </div>
                     <div className="p-3 rounded-lg bg-muted/20 border border-border/30">
                       <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{t.chart.signature}</p>
-                      <p className="font-serif font-semibold text-sm text-green-400">{czSignature}</p>
+                      <p className="font-serif font-semibold text-sm text-green-600">{czSignature}</p>
                     </div>
                     <div className="p-3 rounded-lg bg-muted/20 border border-border/30">
                       <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{t.chart.notSelf}</p>
-                      <p className="font-serif font-semibold text-sm text-red-400">{czNotSelf}</p>
+                      <p className="font-serif font-semibold text-sm text-red-600">{czNotSelf}</p>
                     </div>
                   </div>
                   {typeDesc && (
@@ -311,7 +311,7 @@ export default function ChartResult() {
               </Card>
 
               {/* ─── Profile Card ─── */}
-              <Card className="bg-cosmic-card">
+              <Card className="bg-card border-border/50 shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="font-serif text-xl flex items-center gap-2">
                     <Target className="w-5 h-5 text-primary" /> {t.chart.profile}: {chart.profile} {chart.profileName}
@@ -326,8 +326,8 @@ export default function ChartResult() {
                           <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{t.chart.conscious}</p>
                           <p className="text-xs leading-relaxed">{profileDesc.conscious}</p>
                         </div>
-                        <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/20">
-                          <p className="text-[10px] text-red-400 uppercase tracking-widest mb-1">{t.chart.unconscious}</p>
+                        <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                          <p className="text-[10px] text-red-600 uppercase tracking-widest mb-1">{t.chart.unconscious}</p>
                           <p className="text-xs leading-relaxed">{profileDesc.unconscious}</p>
                         </div>
                       </div>
@@ -337,7 +337,7 @@ export default function ChartResult() {
               </Card>
 
               {/* ─── Authority Card ─── */}
-              <Card className="bg-cosmic-card">
+              <Card className="bg-card border-border/50 shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="font-serif text-xl flex items-center gap-2">
                     <Compass className="w-5 h-5 text-primary" /> {t.chart.authority}: {chart.authority}
@@ -357,7 +357,7 @@ export default function ChartResult() {
               </Card>
 
               {/* ─── Incarnation Cross ─── */}
-              <Card className="bg-cosmic-card">
+              <Card className="bg-card border-border/50 shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="font-serif text-xl flex items-center gap-2">
                     <Star className="w-5 h-5 text-primary" /> {t.chart.incarnationCross}
@@ -397,7 +397,7 @@ export default function ChartResult() {
                 {/* Planetary Activations */}
                 <TabsContent value="activations" className="mt-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card className="bg-cosmic-card">
+                    <Card className="bg-card border-border/50 shadow-sm">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
                           <Sun className="w-4 h-4" /> {t.chart.personalityConscious}
@@ -425,10 +425,10 @@ export default function ChartResult() {
                       </CardContent>
                     </Card>
 
-                    <Card className="bg-cosmic-card">
+                    <Card className="bg-card border-border/50 shadow-sm">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium flex items-center gap-2">
-                          <Moon className="w-4 h-4 text-red-400" /> {t.chart.designUnconscious}
+                          <Moon className="w-4 h-4 text-red-500" /> {t.chart.designUnconscious}
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -443,7 +443,7 @@ export default function ChartResult() {
                                   <span className="text-muted-foreground text-xs">{czPlanet}</span>
                                 </span>
                                 <span className="flex items-center gap-2">
-                                  <span className="font-mono font-medium text-xs text-red-300">Brána {a.gate}.{a.line}</span>
+                                  <span className="font-mono font-medium text-xs text-red-600">Brána {a.gate}.{a.line}</span>
                                   <span className="text-[10px] text-muted-foreground">B{a.color} T{a.tone}</span>
                                 </span>
                               </button>
@@ -457,7 +457,7 @@ export default function ChartResult() {
 
                 {/* Channels */}
                 <TabsContent value="channels" className="mt-4">
-                  <Card className="bg-cosmic-card">
+                  <Card className="bg-card border-border/50 shadow-sm">
                     <CardContent className="pt-6">
                       {(chart.channels || []).length === 0 ? (
                         <p className="text-muted-foreground text-center py-8">Žádné definované kanály (typ Reflektor)</p>
@@ -548,7 +548,7 @@ export default function ChartResult() {
                       const meta = labels[key];
                       const Icon = meta?.icon || Info;
                       return (
-                        <Card key={key} className="bg-cosmic-card">
+                        <Card key={key} className="bg-card border-border/50 shadow-sm">
                           <CardContent className="pt-4 pb-4">
                             <div className="flex items-start gap-3">
                               <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
@@ -576,7 +576,7 @@ export default function ChartResult() {
 
                 {/* All Activated Gates */}
                 <TabsContent value="gates" className="mt-4">
-                  <Card className="bg-cosmic-card">
+                  <Card className="bg-card border-border/50 shadow-sm">
                     <CardContent className="pt-6">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {(chart.activatedGates || []).sort((a, b) => a - b).map(gate => {
@@ -600,7 +600,7 @@ export default function ChartResult() {
                               </div>
                               <div className="flex gap-1 shrink-0">
                                 {isPers && <span className="text-[9px] px-1 py-0.5 rounded bg-foreground/10">O</span>}
-                                {isDes && <span className="text-[9px] px-1 py-0.5 rounded bg-red-500/20 text-red-300">D</span>}
+                                {isDes && <span className="text-[9px] px-1 py-0.5 rounded bg-red-100 text-red-600">D</span>}
                               </div>
                             </button>
                           );
@@ -612,7 +612,7 @@ export default function ChartResult() {
               </Tabs>
 
               {/* ─── AI Reading Section ─── */}
-              <Card className="bg-cosmic-card">
+              <Card className="bg-card border-border/50 shadow-sm">
                 <CardHeader>
                   <CardTitle className="font-serif text-xl flex items-center gap-2">
                     <Brain className="w-5 h-5 text-primary" /> {t.chart.aiReading}
@@ -689,12 +689,12 @@ export default function ChartResult() {
                       <Separator />
                       <p className="text-sm leading-relaxed">{g.description}</p>
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="p-3 rounded-lg bg-green-500/5 border border-green-500/20">
-                          <p className="text-[10px] text-green-400 uppercase tracking-widest mb-1">{t.chart.gift}</p>
+                        <div className="p-3 rounded-lg bg-green-50 border border-green-200">
+                          <p className="text-[10px] text-green-600 uppercase tracking-widest mb-1">{t.chart.gift}</p>
                           <p className="text-sm font-medium">{g.giftKeyword}</p>
                         </div>
-                        <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/20">
-                          <p className="text-[10px] text-red-400 uppercase tracking-widest mb-1">{t.chart.shadow}</p>
+                        <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                          <p className="text-[10px] text-red-600 uppercase tracking-widest mb-1">{t.chart.shadow}</p>
                           <p className="text-sm font-medium">{g.shadowKeyword}</p>
                         </div>
                       </div>
@@ -779,12 +779,12 @@ export default function ChartResult() {
                           <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{t.chart.aura}</p>
                           <p className="text-sm font-medium">{tp.aura}</p>
                         </div>
-                        <div className="p-3 rounded-lg bg-green-500/5 border border-green-500/20">
-                          <p className="text-[10px] text-green-400 uppercase tracking-widest mb-1">{t.chart.signature}</p>
+                        <div className="p-3 rounded-lg bg-green-50 border border-green-200">
+                          <p className="text-[10px] text-green-600 uppercase tracking-widest mb-1">{t.chart.signature}</p>
                           <p className="text-sm font-medium">{(t.hd.signatures as any)[tp.signature] || tp.signature}</p>
                         </div>
-                        <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/20">
-                          <p className="text-[10px] text-red-400 uppercase tracking-widest mb-1">{t.chart.notSelf}</p>
+                        <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                          <p className="text-[10px] text-red-600 uppercase tracking-widest mb-1">{t.chart.notSelf}</p>
                           <p className="text-sm font-medium">{(t.hd.notSelfs as any)[tp.notSelf] || tp.notSelf}</p>
                         </div>
                       </div>
@@ -794,7 +794,7 @@ export default function ChartResult() {
                         <div className="p-3 rounded-lg bg-muted/20 border border-border/30">
                           <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">{t.chart.strengths}</p>
                           <ul className="text-xs space-y-1">
-                            {tp.strengths.map((s, i) => <li key={i} className="flex items-center gap-1"><span className="text-green-400">+</span> {s}</li>)}
+                            {tp.strengths.map((s, i) => <li key={i} className="flex items-center gap-1"><span className="text-green-600">+</span> {s}</li>)}
                           </ul>
                         </div>
                         <div className="p-3 rounded-lg bg-muted/20 border border-border/30">

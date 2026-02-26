@@ -1,0 +1,469 @@
+import { useState, useMemo } from "react";
+import { motion } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Search, BookOpen, Zap, Circle, ArrowRight, Sparkles } from "lucide-react";
+import { GATE_DESCRIPTIONS, CHANNEL_DESCRIPTIONS, CENTER_DESCRIPTIONS, TYPE_DESCRIPTIONS, AUTHORITY_DESCRIPTIONS, PROFILE_DESCRIPTIONS } from "../../../shared/hdContent";
+
+// Czech gate names mapping
+const GATE_NAMES_CS: Record<number, string> = {
+  1: "Sebevyjádření", 2: "Směr Já", 3: "Uspořádání", 4: "Formulace", 5: "Pevné vzorce",
+  6: "Tření", 7: "Role Já", 8: "Přínos", 9: "Soustředění", 10: "Chování Já",
+  11: "Ideje", 12: "Opatrnost", 13: "Naslouchající", 14: "Mocné dovednosti", 15: "Extrémy",
+  16: "Dovednosti", 17: "Názory", 18: "Korekce", 19: "Chtění", 20: "Přítomnost",
+  21: "Lovec", 22: "Otevřenost", 23: "Asimilace", 24: "Racionalizace", 25: "Nevinnost",
+  26: "Trikster", 27: "Výživa", 28: "Hráč", 29: "Vytrvalost", 30: "Pocity",
+  31: "Vedení", 32: "Kontinuita", 33: "Soukromí", 34: "Síla", 35: "Změna",
+  36: "Krize", 37: "Přátelství", 38: "Bojovník", 39: "Provokace", 40: "Samota",
+  41: "Stažení", 42: "Růst", 43: "Vhled", 44: "Bdělost", 45: "Shromažďovatel",
+  46: "Odhodlání", 47: "Realizace", 48: "Hloubka", 49: "Revoluce", 50: "Hodnoty",
+  51: "Šok", 52: "Klid", 53: "Začátky", 54: "Ambice", 55: "Duch",
+  56: "Stimulace", 57: "Intuice", 58: "Vitalita", 59: "Sexualita", 60: "Omezení",
+  61: "Tajemství", 62: "Detail", 63: "Pochybnost", 64: "Zmatek",
+};
+
+const CENTER_NAMES_CS: Record<string, string> = {
+  Head: "Hlava", Ajna: "Ajna", Throat: "Hrdlo", G: "G Centrum",
+  Heart: "Srdce", Sacral: "Sakrální", SolarPlexus: "Solární plexus",
+  Spleen: "Slezina", Root: "Kořen",
+};
+
+const CIRCUIT_NAMES_CS: Record<string, string> = {
+  Individual: "Individuální", Collective: "Kolektivní", Tribal: "Kmenový",
+};
+
+const CIRCUIT_COLORS: Record<string, string> = {
+  Individual: "bg-red-100 text-red-700 border-red-200",
+  Collective: "bg-blue-100 text-blue-700 border-blue-200",
+  Tribal: "bg-amber-100 text-amber-700 border-amber-200",
+};
+
+type GateDetail = { gateNum: number; data: typeof GATE_DESCRIPTIONS[number] } | null;
+type ChannelDetail = { key: string; data: typeof CHANNEL_DESCRIPTIONS[string] } | null;
+
+export default function Encyclopedia() {
+  const { t } = useTranslation();
+  const [search, setSearch] = useState("");
+  const [activeTab, setActiveTab] = useState("gates");
+  const [circuitFilter, setCircuitFilter] = useState<string>("all");
+  const [centerFilter, setCenterFilter] = useState<string>("all");
+  const [selectedGate, setSelectedGate] = useState<GateDetail>(null);
+  const [selectedChannel, setSelectedChannel] = useState<ChannelDetail>(null);
+
+  // Gate data as array
+  const gatesArray = useMemo(() => {
+    return Object.entries(GATE_DESCRIPTIONS).map(([num, data]) => ({
+      num: parseInt(num),
+      data,
+    }));
+  }, []);
+
+  // Channel data as array
+  const channelsArray = useMemo(() => {
+    return Object.entries(CHANNEL_DESCRIPTIONS).map(([key, data]) => ({
+      key,
+      data,
+    }));
+  }, []);
+
+  // Filtered gates
+  const filteredGates = useMemo(() => {
+    return gatesArray.filter(g => {
+      const matchSearch = search === "" ||
+        g.num.toString().includes(search) ||
+        (GATE_NAMES_CS[g.num] || "").toLowerCase().includes(search.toLowerCase()) ||
+        g.data.name.toLowerCase().includes(search.toLowerCase()) ||
+        g.data.iChing.toLowerCase().includes(search.toLowerCase());
+      const matchCircuit = circuitFilter === "all" || g.data.circuit === circuitFilter;
+      const matchCenter = centerFilter === "all" || g.data.center === centerFilter;
+      return matchSearch && matchCircuit && matchCenter;
+    });
+  }, [gatesArray, search, circuitFilter, centerFilter]);
+
+  // Filtered channels
+  const filteredChannels = useMemo(() => {
+    return channelsArray.filter(c => {
+      const matchSearch = search === "" ||
+        c.key.includes(search) ||
+        c.data.name.toLowerCase().includes(search.toLowerCase()) ||
+        c.data.theme.toLowerCase().includes(search.toLowerCase());
+      const matchCircuit = circuitFilter === "all" || c.data.circuit === circuitFilter;
+      return matchSearch && matchCircuit;
+    });
+  }, [channelsArray, search, circuitFilter]);
+
+  // Unique centers for filter
+  const centers = useMemo(() => {
+    const set = new Set(gatesArray.map(g => g.data.center));
+    return Array.from(set).sort();
+  }, [gatesArray]);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main className="pt-24 pb-16">
+        <div className="container max-w-7xl">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-10"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+              <BookOpen className="w-4 h-4" />
+              Encyklopedie Human Designu
+            </div>
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
+              Brány, dráhy a centra
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Kompletní průvodce všemi 64 branami, 36 dráhami a 9 centry systému Human Design s podrobnými popisy a I-Ťing hexagramy.
+            </p>
+          </motion.div>
+
+          {/* Search & Filters */}
+          <div className="flex flex-col md:flex-row gap-4 mb-8">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Hledat brány, dráhy, hexagramy..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                variant={circuitFilter === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setCircuitFilter("all")}
+              >
+                Vše
+              </Button>
+              {["Individual", "Collective", "Tribal"].map(c => (
+                <Button
+                  key={c}
+                  variant={circuitFilter === c ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCircuitFilter(c)}
+                >
+                  {CIRCUIT_NAMES_CS[c]}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="mb-6">
+              <TabsTrigger value="gates" className="gap-1.5">
+                <Sparkles className="w-4 h-4" />
+                64 bran
+              </TabsTrigger>
+              <TabsTrigger value="channels" className="gap-1.5">
+                <Zap className="w-4 h-4" />
+                36 dráh
+              </TabsTrigger>
+              <TabsTrigger value="centers" className="gap-1.5">
+                <Circle className="w-4 h-4" />
+                9 center
+              </TabsTrigger>
+            </TabsList>
+
+            {/* ─── Gates Tab ─── */}
+            <TabsContent value="gates">
+              {activeTab === "gates" && (
+                <div className="mb-4 flex gap-2 flex-wrap">
+                  <Button
+                    variant={centerFilter === "all" ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => setCenterFilter("all")}
+                  >
+                    Všechna centra
+                  </Button>
+                  {centers.map(c => (
+                    <Button
+                      key={c}
+                      variant={centerFilter === c ? "secondary" : "ghost"}
+                      size="sm"
+                      onClick={() => setCenterFilter(c)}
+                    >
+                      {CENTER_NAMES_CS[c] || c}
+                    </Button>
+                  ))}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredGates.map(({ num, data }, i) => (
+                  <motion.div
+                    key={num}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: Math.min(i * 0.02, 0.5) }}
+                  >
+                    <Card
+                      className="cursor-pointer hover:shadow-lg transition-all hover:-translate-y-0.5 h-full"
+                      onClick={() => setSelectedGate({ gateNum: num, data })}
+                    >
+                      <CardHeader className="pb-2">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center font-bold text-primary text-lg">
+                              {num}
+                            </div>
+                            <div>
+                              <CardTitle className="text-sm font-semibold">
+                                {GATE_NAMES_CS[num] || data.name}
+                              </CardTitle>
+                              <p className="text-xs text-muted-foreground">{data.iChing}</p>
+                            </div>
+                          </div>
+                          <span className="text-2xl" title={data.iChing}>{data.hexagram}</span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{data.theme}</p>
+                        <div className="flex gap-1.5 flex-wrap">
+                          <Badge variant="outline" className={`text-[10px] ${CIRCUIT_COLORS[data.circuit] || ""}`}>
+                            {CIRCUIT_NAMES_CS[data.circuit]}
+                          </Badge>
+                          <Badge variant="outline" className="text-[10px]">
+                            {CENTER_NAMES_CS[data.center] || data.center}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+              {filteredGates.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  Žádné brány neodpovídají vašemu hledání.
+                </div>
+              )}
+            </TabsContent>
+
+            {/* ─── Channels Tab ─── */}
+            <TabsContent value="channels">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredChannels.map(({ key, data }, i) => (
+                  <motion.div
+                    key={key}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: Math.min(i * 0.03, 0.5) }}
+                  >
+                    <Card
+                      className="cursor-pointer hover:shadow-lg transition-all hover:-translate-y-0.5 h-full"
+                      onClick={() => setSelectedChannel({ key, data })}
+                    >
+                      <CardHeader className="pb-2">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <CardTitle className="text-sm font-semibold">{data.name}</CardTitle>
+                            <p className="text-xs text-muted-foreground mt-0.5">{data.theme}</p>
+                          </div>
+                          <div className="flex items-center gap-1 text-primary font-bold text-sm shrink-0">
+                            {data.gates[0]}
+                            <ArrowRight className="w-3 h-3" />
+                            {data.gates[1]}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <p className="text-xs text-muted-foreground mb-2 line-clamp-3">{data.description}</p>
+                        <div className="flex gap-1.5 flex-wrap">
+                          <Badge variant="outline" className={`text-[10px] ${CIRCUIT_COLORS[data.circuit] || ""}`}>
+                            {CIRCUIT_NAMES_CS[data.circuit]}
+                          </Badge>
+                          <Badge variant="outline" className="text-[10px]">
+                            {CENTER_NAMES_CS[data.centers[0]]} → {CENTER_NAMES_CS[data.centers[1]]}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+              {filteredChannels.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  Žádné dráhy neodpovídají vašemu hledání.
+                </div>
+              )}
+            </TabsContent>
+
+            {/* ─── Centers Tab ─── */}
+            <TabsContent value="centers">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Object.entries(CENTER_DESCRIPTIONS).map(([key, data], i) => (
+                  <motion.div
+                    key={key}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <Card className="h-full">
+                      <CardHeader>
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <Circle className="w-6 h-6 text-primary" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base">{CENTER_NAMES_CS[key] || data.name}</CardTitle>
+                            <p className="text-xs text-muted-foreground">{data.biologicalCorrelation}</p>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm font-medium text-primary mb-3">{data.theme}</p>
+                        
+                        <div className="space-y-3">
+                          <div className="p-3 rounded-lg bg-green-50 border border-green-200">
+                            <p className="text-xs font-semibold text-green-700 mb-1">✦ Definované centrum</p>
+                            <p className="text-xs text-green-800">{data.definedMeaning}</p>
+                          </div>
+                          <div className="p-3 rounded-lg bg-gray-50 border border-gray-200">
+                            <p className="text-xs font-semibold text-gray-700 mb-1">○ Otevřené centrum</p>
+                            <p className="text-xs text-gray-800">{data.openMeaning}</p>
+                          </div>
+                          <div className="p-3 rounded-lg bg-amber-50 border border-amber-200">
+                            <p className="text-xs font-semibold text-amber-700 mb-1">? Otázka Ne-Já</p>
+                            <p className="text-xs text-amber-800 italic">{data.notSelfQuestion}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
+
+      {/* Gate Detail Dialog */}
+      <Dialog open={!!selectedGate} onOpenChange={() => setSelectedGate(null)}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          {selectedGate && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center font-bold text-primary text-2xl">
+                    {selectedGate.gateNum}
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl">
+                      {GATE_NAMES_CS[selectedGate.gateNum] || selectedGate.data.name}
+                    </DialogTitle>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedGate.data.iChing} {selectedGate.data.hexagram}
+                    </p>
+                  </div>
+                </div>
+              </DialogHeader>
+              <div className="space-y-4 mt-4">
+                <div className="flex gap-2 flex-wrap">
+                  <Badge className={CIRCUIT_COLORS[selectedGate.data.circuit]}>
+                    {CIRCUIT_NAMES_CS[selectedGate.data.circuit]} okruh
+                  </Badge>
+                  <Badge variant="outline">
+                    {CENTER_NAMES_CS[selectedGate.data.center]}
+                  </Badge>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Téma</h4>
+                  <p className="text-sm text-muted-foreground">{selectedGate.data.theme}</p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Popis</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{selectedGate.data.description}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-lg bg-green-50 border border-green-200">
+                    <p className="text-xs font-semibold text-green-700 mb-0.5">Dar (Gift)</p>
+                    <p className="text-sm font-medium text-green-800">{selectedGate.data.giftKeyword}</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                    <p className="text-xs font-semibold text-red-700 mb-0.5">Stín (Shadow)</p>
+                    <p className="text-sm font-medium text-red-800">{selectedGate.data.shadowKeyword}</p>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-lg bg-muted/50 border">
+                  <p className="text-xs font-semibold text-muted-foreground mb-1">I-Ťing hexagram</p>
+                  <p className="text-4xl text-center py-2">{selectedGate.data.hexagram}</p>
+                  <p className="text-sm text-center text-muted-foreground">{selectedGate.data.iChing}</p>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Channel Detail Dialog */}
+      <Dialog open={!!selectedChannel} onOpenChange={() => setSelectedChannel(null)}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          {selectedChannel && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1 text-primary font-bold text-xl">
+                    {selectedChannel.data.gates[0]}
+                    <ArrowRight className="w-5 h-5" />
+                    {selectedChannel.data.gates[1]}
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl">{selectedChannel.data.name}</DialogTitle>
+                    <p className="text-sm text-muted-foreground">{selectedChannel.data.theme}</p>
+                  </div>
+                </div>
+              </DialogHeader>
+              <div className="space-y-4 mt-4">
+                <div className="flex gap-2 flex-wrap">
+                  <Badge className={CIRCUIT_COLORS[selectedChannel.data.circuit]}>
+                    {CIRCUIT_NAMES_CS[selectedChannel.data.circuit]} okruh
+                  </Badge>
+                  <Badge variant="outline">
+                    {CENTER_NAMES_CS[selectedChannel.data.centers[0]]} → {CENTER_NAMES_CS[selectedChannel.data.centers[1]]}
+                  </Badge>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Popis</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{selectedChannel.data.description}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {selectedChannel.data.gates.map(gateNum => {
+                    const gateData = GATE_DESCRIPTIONS[gateNum];
+                    return gateData ? (
+                      <div key={gateNum} className="p-3 rounded-lg bg-muted/50 border">
+                        <p className="text-xs font-semibold text-muted-foreground mb-0.5">Brána {gateNum}</p>
+                        <p className="text-sm font-medium">{GATE_NAMES_CS[gateNum] || gateData.name}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{gateData.iChing} {gateData.hexagram}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{CENTER_NAMES_CS[gateData.center]}</p>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Footer />
+    </div>
+  );
+}

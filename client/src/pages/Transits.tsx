@@ -76,10 +76,10 @@ export default function Transits() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left: Bodygraph with transit overlay */}
               <motion.div initial="hidden" animate="visible" custom={1} variants={fadeUp} className="lg:col-span-1">
-                <Card className="bg-cosmic-card sticky top-24">
+                <Card className="bg-card border-border/50 shadow-sm sticky top-24">
                   <CardHeader className="pb-2">
                     <CardTitle className="font-serif text-lg flex items-center gap-2">
-                      <Globe className="w-5 h-5 text-cyan-400" />
+                      <Globe className="w-5 h-5 text-cyan-600" />
                       {t.transits.transitOverlay}
                     </CardTitle>
                     <CardDescription>{t.transits.selectChart}</CardDescription>
@@ -110,8 +110,8 @@ export default function Transits() {
                     ) : (
                       <div className="flex items-center justify-center py-12">
                         <div className="text-center text-muted-foreground">
-                          <Globe className="w-16 h-16 mx-auto mb-4 text-cyan-400/30" />
-                          <p className="text-sm">Vyberte chart pro zobrazení překrytí tranzitů na vašem Bodygraphu</p>
+                          <Globe className="w-16 h-16 mx-auto mb-4 text-cyan-500/30" />
+                          <p className="text-sm">Vyberte mapu pro zobrazení překrytí tranzitů na vašem Bodygraphu</p>
                         </div>
                       </div>
                     )}
@@ -170,7 +170,7 @@ export default function Transits() {
                                 </div>
                               </div>
                               <div className="text-right">
-                                <Badge variant="outline" className="text-base font-mono border-cyan-500/30 text-cyan-300">
+                                <Badge variant="outline" className="text-base font-mono border-cyan-500/30 text-cyan-600">
                                   Brána {tr.gate}.{tr.line}
                                 </Badge>
                                 {gateDesc && (
@@ -181,7 +181,7 @@ export default function Transits() {
                             {gateDesc && (
                               <div className="mt-3 pt-3 border-t border-border/30">
                                 <p className="text-xs text-muted-foreground leading-relaxed">
-                                  <span className="text-cyan-400 font-medium">{gateDesc.theme}</span> — {gateDesc.iChing}
+                                  <span className="text-cyan-600 font-medium">{gateDesc.theme}</span> — {gateDesc.iChing}
                                 </p>
                               </div>
                             )}
@@ -193,7 +193,7 @@ export default function Transits() {
                 </div>
 
                 <motion.div initial="hidden" animate="visible" custom={16} variants={fadeUp}>
-                  <Card className="bg-cosmic-card mt-4">
+                  <Card className="bg-card border-border/50 shadow-sm mt-4">
                     <CardHeader>
                       <CardTitle className="font-serif text-lg flex items-center gap-2">
                         <Info className="w-5 h-5 text-primary" />

@@ -100,7 +100,7 @@ describe("Czech i18n translations", () => {
     expect(cs.hd.centerNames.G).toBe("G Centrum");
     expect(cs.hd.centerNames.Heart).toBe("Srdce");
     expect(cs.hd.centerNames.Sacral).toBe("Sakrální");
-    expect(cs.hd.centerNames.SolarPlexus).toBe("Solární Plexus");
+    expect(cs.hd.centerNames.SolarPlexus).toBe("Solární plexus");
     expect(cs.hd.centerNames.Spleen).toBe("Slezina");
     expect(cs.hd.centerNames.Root).toBe("Kořen");
   });
@@ -116,14 +116,14 @@ describe("Czech i18n translations", () => {
   it("has all strategy translations", () => {
     expect(cs.hd.strategies["To Inform"]).toBe("Informovat");
     expect(cs.hd.strategies["To Respond"]).toBe("Reagovat");
-    expect(cs.hd.strategies["Wait for the Invitation"]).toBe("Čekat na Pozvání");
-    expect(cs.hd.strategies["Wait a Lunar Cycle"]).toBe("Čekat Lunární Cyklus");
+    expect(cs.hd.strategies["Wait for the Invitation"]).toBe("Čekat na pozvání");
+    expect(cs.hd.strategies["Wait a Lunar Cycle"]).toBe("Čekat lunární cyklus");
   });
 
   it("has all definition type translations", () => {
-    expect(cs.hd.definitionTypes["Single Definition"]).toBe("Jednoduchá Definice");
-    expect(cs.hd.definitionTypes["Split Definition"]).toBe("Rozdělená Definice");
-    expect(cs.hd.definitionTypes["No Definition"]).toBe("Bez Definice");
+    expect(cs.hd.definitionTypes["Single Definition"]).toBe("Jednoduchá definice");
+    expect(cs.hd.definitionTypes["Split Definition"]).toBe("Rozdělená definice");
+    expect(cs.hd.definitionTypes["No Definition"]).toBe("Bez definice");
   });
 
   it("has all signature and not-self translations", () => {
@@ -164,12 +164,12 @@ describe("Czech i18n translations", () => {
   });
 
   it("has navigation translations", () => {
-    expect(cs.nav.calculateChart).toBe("Vypočítat Chart");
+    expect(cs.nav.calculateChart).toBe("Mapa zdarma");
     expect(cs.nav.transits).toBe("Tranzity");
     expect(cs.nav.celebrities).toBe("Celebrity");
     expect(cs.nav.iChing).toBe("I-Ťing Orákulum");
     expect(cs.nav.compare).toBe("Porovnání");
-    expect(cs.nav.dashboard).toBe("Nástěnka");
+    expect(cs.nav.dashboard).toBe("Moje mapy");
   });
 });
 

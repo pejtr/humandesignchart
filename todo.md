@@ -103,7 +103,7 @@
 ## Advanced Features
 - [x] Celebrity chart database (20 celebrities)
 - [x] I Ching Oracle with all 64 hexagrams
-- [ ] Return charts (Saturn, Chiron, Uranus, Solar)
+- [x] Return charts (Saturn, Chiron, Uranus, Solar) - ReturnChart page
 - [ ] Gene Keys reference
 - [ ] Multi-language support
 
@@ -145,3 +145,46 @@
 - [x] Czech i18n translation tests (9 tests)
 - [x] Chart calculation via router tests (2 tests)
 - [x] Transit line calculation bug fix (clamped to 1-6)
+
+## Light Theme Redesign
+- [x] Switch entire theme from dark to light/white background
+- [x] Update CSS variables in index.css for light theme
+- [x] Update Navbar for light theme
+- [x] Update Footer for light theme
+- [x] Update Bodygraph SVG colors for light background
+- [x] Update all page components for light theme compatibility
+- [x] Update cosmic-card, cosmic bg classes for light theme
+
+## Types Graphic Integration
+- [x] Upload types graphic to S3 (5 types version generated)
+- [x] Integrate graphic into Home page types section
+
+## Czech Language Polish
+- [x] Review and improve all Czech translations for natural language
+- [x] Ensure humandesign.cz-style Czech terminology throughout
+
+## Loading Animation Enhancement
+- [x] Make loading animation bigger and thematic with moving HD Bodygraph/mandala pattern (HDLoader)
+- [x] Create SVG type aura icons (TypeAuraIcon component)
+- [x] Use type icons on Celebrities page
+- [ ] Final Czech language audit — no English text remaining
+- [x] Add celebrity photo thumbnails from Wikipedia
+
+## Premium HD Features Implementation
+- [x] Research top HD apps for feature list
+- [x] Return charts (Solar Return, Saturn Return, Chiron Return, Uranus Opposition)
+- [ ] Composite/Partnership charts (electromagnetic connections, compatibility)
+- [ ] Advanced interactive Bodygraph (click centers/channels/gates for deep info)
+- [x] Transit calendar with daily/weekly/monthly view (TransitCalendar page)
+- [ ] Daily HD digest/notification
+- [x] Nutrition/Digestion guidance based on Variables (PHS) (VariablesAnalysis page)
+- [x] Environment guidance based on Variables (VariablesAnalysis page)
+- [x] AI chat guide (conversational HD assistant) (AiGuide page)
+- [x] Advanced PDF reports (light theme, multi-page, Czech)
+- [ ] Chart sharing (public link, social media)
+- [x] Complete Gate encyclopedia (64 gates with I Ching) (Encyclopedia page)
+- [x] Complete Channel encyclopedia (36 channels with circuit info) (Encyclopedia page)
+- [x] Variable/Cognition deep analysis (VariablesAnalysis page with 4 tabs)
+- [ ] Dream Rave chart
+- [ ] Incarnation Cross deep analysis
+- [ ] ahumandesign.cz-inspired presentation style

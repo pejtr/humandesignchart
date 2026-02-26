@@ -21,11 +21,11 @@ import {
 import { useEffect } from "react";
 
 const typeColors: Record<string, string> = {
-  Manifestor: "bg-red-500/20 text-red-300 border-red-500/30",
-  Generator: "bg-orange-500/20 text-orange-300 border-orange-500/30",
-  "Manifesting Generator": "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
-  Projector: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-  Reflector: "bg-green-500/20 text-green-300 border-green-500/30",
+  Manifestor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  Generator: "bg-amber-50 text-amber-700 border-amber-200",
+  "Manifesting Generator": "bg-orange-50 text-orange-700 border-orange-200",
+  Projector: "bg-violet-50 text-violet-700 border-violet-200",
+  Reflector: "bg-slate-100 text-slate-700 border-slate-200",
 };
 
 const categoryIcons: Record<string, typeof Users> = {
@@ -81,13 +81,13 @@ export default function Dashboard() {
             <div>
               <h1 className="font-serif text-3xl font-bold mb-1">{t.dashboard.title}</h1>
               <p className="text-muted-foreground">
-                Vítejte zpět, {user?.name || "Průzkumníku"}. Máte {charts.length} uložen{charts.length === 1 ? "ý" : charts.length < 5 ? "é" : "ých"} chart{charts.length === 1 ? "" : charts.length < 5 ? "y" : "ů"}.
+                Vítejte zpět, {user?.name || "Průzkumníku"}. Máte {charts.length} uložen{charts.length === 1 ? "ou" : charts.length < 5 ? "é" : "ých"} map{charts.length === 1 ? "u" : charts.length < 5 ? "y" : ""}.
               </p>
             </div>
             <Link href="/calculate">
               <Button className="bg-primary text-primary-foreground">
                 <Plus className="w-4 h-4 mr-1.5" />
-                Nový Chart
+                Nová mapa
               </Button>
             </Link>
           </div>
@@ -152,7 +152,7 @@ export default function Dashboard() {
                             </AlertDialogTrigger>
                             <AlertDialogContent className="bg-popover text-popover-foreground">
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Smazat Chart</AlertDialogTitle>
+                                <AlertDialogTitle>Smazat mapu</AlertDialogTitle>
                                 <AlertDialogDescription>
                                   {t.dashboard.deleteConfirm} "{chart.name}"?
                                 </AlertDialogDescription>

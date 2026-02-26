@@ -95,7 +95,7 @@ function ChartInputForm({ label, form, setForm, onCalculate, loading }: {
             <Button type="button" variant="secondary" size="sm" onClick={handlePlaceSearch}>Najít</Button>
           </div>
           {form.locationResolved && (
-            <p className="text-xs text-green-400">{form.latitude}, {form.longitude} ({form.timezone})</p>
+            <p className="text-xs text-green-600">{form.latitude}, {form.longitude} ({form.timezone})</p>
           )}
         </div>
         <Button

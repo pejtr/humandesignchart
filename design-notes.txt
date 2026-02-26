@@ -1,0 +1,10 @@
+humandesign.cz design analysis:
+- White/light background, clean and airy
+- Gold/warm accent colors with purple/violet secondary
+- Serif headings, clean sans-serif body
+- Large hero with "HUMAN DESIGN" and "Mapa vašeho já" subtitle
+- Numbered steps (1, 2, 3) for getting started
+- Testimonials section
+- Form for free chart
+- Czech terminology: "mapa" (chart/map), "rozbor" (reading/analysis), "brány" (gates), "dráhy" (channels), "centra" (centers)
+- Graphic CDN URL: https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/JNvvQbJZysQErGSW.png

@@ -179,6 +179,58 @@ export const appRouter = router({
       .query(async ({ ctx, input }) => {
         return getAiReadings(input.chartId, ctx.user.id);
       }),
+
+    // AI Chat Guide - conversational HD assistant
+    askGuide: protectedProcedure
+      .input(z.object({
+        question: z.string().min(1),
+        history: z.array(z.object({
+          role: z.enum(["user", "assistant"]),
+          content: z.string(),
+        })).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const systemPrompt = `Jsi odborný průvodce systémem Human Design. Máš hluboké znalosti o:
+- 5 typech (Manifestor, Generátor, Manifestující Generátor, Projektor, Reflektor)
+- 9 centrech a jejich funkcích
+- 64 branách a jejich I-Ťing hexagramech
+- 36 dráhách (kanálech)
+- 12 profilech a 6 linkách
+- 7 typech autority
+- Proměnných (Variables) - trávení, prostředí, perspektiva, vědomí
+- Inkarnačních křížích
+- Tranzitních vlivech
+- Kompozitních a partnerských mapách
+- Historii HD (Ra Uru Hu, Jovian Archive)
+
+Pravidla:
+1. VŽDY odpovídej v češtině
+2. Používej správnou českou HD terminologii (brány, dráhy, centra, mapy)
+3. Buď přátelský ale profesionální
+4. Strukturuj odpovědi přehledně s markdown formátováním
+5. Dávej praktické rady a příklady
+6. Pokud se uživatel ptá na svůj konkrétní design, zeptej se na jeho typ/profil/autoritu
+7. Odpovídej stručně ale výstižně (max 300 slov pokud to není komplexní téma)`;
+
+        const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+          { role: "system" as const, content: systemPrompt },
+        ];
+
+        // Add conversation history
+        if (input.history) {
+          for (const msg of input.history) {
+            messages.push({ role: msg.role as "user" | "assistant", content: msg.content });
+          }
+        }
+
+        messages.push({ role: "user" as const, content: input.question });
+
+        const response = await invokeLLM({ messages });
+        const rawContent = response.choices?.[0]?.message?.content;
+        const content = typeof rawContent === "string" ? rawContent : "Omlouvám se, nepodařilo se vygenerovat odpověď.";
+
+        return { content };
+      }),
   }),
 
   // ─── Transit Calculation ─────────────────────────────────────────────

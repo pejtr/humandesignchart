@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import { lazy, Suspense } from "react";
+import HDLoader from "./components/HDLoader";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
 const ChartResult = lazy(() => import("./pages/ChartResult"));
@@ -14,16 +15,14 @@ const ChartComparison = lazy(() => import("./pages/ChartComparison"));
 const Transits = lazy(() => import("./pages/Transits"));
 const IChing = lazy(() => import("./pages/IChing"));
 const Celebrities = lazy(() => import("./pages/Celebrities"));
+const Encyclopedia = lazy(() => import("./pages/Encyclopedia"));
+const AiGuide = lazy(() => import("./pages/AiGuide"));
+const ReturnChart = lazy(() => import("./pages/ReturnChart"));
+const TransitCalendar = lazy(() => import("./pages/TransitCalendar"));
+const VariablesAnalysis = lazy(() => import("./pages/VariablesAnalysis"));
 
 function PageLoader() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        <p className="text-muted-foreground font-serif text-lg">Načítání...</p>
-      </div>
-    </div>
-  );
+  return <HDLoader />;
 }
 
 function Router() {
@@ -38,6 +37,11 @@ function Router() {
         <Route path="/transits" component={Transits} />
         <Route path="/iching" component={IChing} />
         <Route path="/celebrities" component={Celebrities} />
+        <Route path="/encyclopedia" component={Encyclopedia} />
+        <Route path="/ai-guide" component={AiGuide} />
+        <Route path="/return-chart" component={ReturnChart} />
+        <Route path="/transit-calendar" component={TransitCalendar} />
+        <Route path="/variables" component={VariablesAnalysis} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>
@@ -48,7 +52,7 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="dark">
+      <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
           <Router />

@@ -103,9 +103,9 @@ export default function ChartCalculator() {
             </p>
           </div>
 
-          <Card className="bg-card border-border/50">
+          <Card className="bg-card border-border/50 shadow-sm">
             <CardHeader>
-              <CardTitle className="font-serif text-xl">Údaje o Narození</CardTitle>
+              <CardTitle className="font-serif text-xl text-foreground">Údaje o narození</CardTitle>
               <CardDescription>
                 {t.calculator.birthTimeNote}
               </CardDescription>
@@ -188,7 +188,7 @@ export default function ChartCalculator() {
                     </Button>
                   </div>
                   {locationResolved && (
-                    <div className="flex items-center gap-2 text-sm text-green-400">
+                    <div className="flex items-center gap-2 text-sm text-green-600">
                       <Info className="w-3.5 h-3.5" />
                       {t.calculator.coordinates}: {latitude}, {longitude} ({timezone})
                     </div>

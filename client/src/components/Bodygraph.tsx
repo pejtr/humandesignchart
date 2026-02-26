@@ -186,7 +186,7 @@ export default function Bodygraph({
   }
 
   function getChannelColor(key: string): string {
-    if (!definedChannelKeys.has(key)) return "rgba(100,100,140,0.12)";
+    if (!definedChannelKeys.has(key)) return "rgba(140,140,170,0.25)";
     
     const parts = key.split("-").map(Number);
     const g1Pers = personalityGates.has(parts[0]);
@@ -240,8 +240,8 @@ export default function Bodygraph({
 
         {/* Radial gradient for undefined centers */}
         <radialGradient id="undefinedCenter">
-          <stop offset="0%" stopColor="oklch(0.20 0.02 280)" />
-          <stop offset="100%" stopColor="oklch(0.14 0.02 280)" />
+          <stop offset="0%" stopColor="oklch(0.95 0.01 280)" />
+          <stop offset="100%" stopColor="oklch(0.90 0.02 280)" />
         </radialGradient>
       </defs>
 
@@ -258,7 +258,7 @@ export default function Bodygraph({
             {/* Background line always visible */}
             <path
               d={path}
-              stroke={isDefined ? "none" : "rgba(100,100,140,0.12)"}
+              stroke={isDefined ? "none" : "rgba(140,140,170,0.25)"}
               strokeWidth={isDefined ? 0 : 1.5}
               fill="none"
               strokeDasharray={isDefined ? "none" : "4 4"}
@@ -304,7 +304,7 @@ export default function Bodygraph({
         const colors = CENTER_DEFINED_COLORS[name];
 
         const fillColor = isDefined ? colors.fill : "url(#undefinedCenter)";
-        const strokeColor = isDefined ? colors.stroke : "oklch(0.32 0.03 280)";
+        const strokeColor = isDefined ? colors.stroke : "oklch(0.75 0.03 280)";
         const sw = isHovered ? 3 : 1.5;
         const filterVal = isDefined ? "url(#glow)" : "url(#shadow)";
 
@@ -365,7 +365,7 @@ export default function Bodygraph({
                 x={pos.x}
                 y={pos.y + 4}
                 textAnchor="middle"
-                fill={isDefined ? "white" : "oklch(0.55 0.02 280)"}
+                fill={isDefined ? "white" : "oklch(0.45 0.03 280)"}
                 fontSize="9"
                 fontFamily="Inter, sans-serif"
                 fontWeight={isDefined ? "600" : "400"}
@@ -451,8 +451,8 @@ export default function Bodygraph({
               width={56}
               height={16}
               rx={4}
-              fill="oklch(0.15 0.02 280)"
-              stroke="oklch(0.35 0.03 280)"
+              fill="oklch(0.98 0.01 280)"
+              stroke="oklch(0.80 0.03 280)"
               strokeWidth={0.5}
               opacity={0.95}
             />
@@ -460,7 +460,7 @@ export default function Bodygraph({
               x={pos.x}
               y={pos.y - 13}
               textAnchor="middle"
-              fill="oklch(0.8 0.05 280)"
+              fill="oklch(0.30 0.05 280)"
               fontSize="8"
               fontFamily="Inter, sans-serif"
             >

@@ -1,6 +1,6 @@
 /**
  * Czech (Čeština) translations for Human Design App
- * Complete UI localization for the Czech market
+ * Terminology aligned with humandesign.cz conventions
  */
 
 export const cs = {
@@ -27,7 +27,7 @@ export const cs = {
     signIn: "Přihlásit se",
     signOut: "Odhlásit se",
     account: "Účet",
-    dashboard: "Nástěnka",
+    dashboard: "Moje mapy",
     download: "Stáhnout",
     export: "Exportovat",
     share: "Sdílet",
@@ -40,37 +40,37 @@ export const cs = {
 
   // ─── Navigation ───────────────────────────────────────────────────────
   nav: {
-    calculateChart: "Vypočítat Chart",
+    calculateChart: "Mapa zdarma",
     transits: "Tranzity",
     celebrities: "Celebrity",
     iChing: "I-Ťing Orákulum",
     compare: "Porovnání",
-    dashboard: "Nástěnka",
+    dashboard: "Moje mapy",
   },
 
   // ─── Home / Landing Page ──────────────────────────────────────────────
   home: {
-    badge: "Nejkomplexnější Human Design Aplikace",
-    heroTitle: "Objevte Svůj",
-    heroTitleHighlight: "Energetický Blueprint",
-    heroDescription: "Odhalte moudrost svého jedinečného designu s nejpokročilejším Human Design kalkulátorem. Kompletní analýza chartu, AI čtení, denní tranzity a hluboké vhledy do vašeho životního účelu.",
-    ctaCalculate: "Vypočítat Váš Chart",
-    ctaDashboard: "Zobrazit Nástěnku",
-    typesTitle: "Pět Energetických Typů",
-    typesDescription: "Každý člověk patří k jednomu z pěti energetických typů, z nichž každý má jedinečnou strategii pro navigaci životem.",
-    featuresTitle: "Vše, Co Potřebujete",
-    featuresDescription: "Od základního výpočtu chartu po pokročilá AI čtení – poskytujeme nejkomplexnější nástroje Human Design.",
-    ctaTitle: "Připraveni Objevit Svůj Design?",
-    ctaDescription: "Vypočítejte si svůj Human Design chart během několika sekund. Potřebujete pouze datum, čas a místo narození.",
-    ctaButton: "Začít Zdarma",
+    badge: "Poznejte svůj Human Design",
+    heroTitle: "Mapa Vašeho",
+    heroTitleHighlight: "Já",
+    heroDescription: "Poznejte sebe sama. Respektujte svoji jedinečnost. Dělejte správná rozhodnutí. Žijte život, který je opravdu váš.",
+    ctaCalculate: "Získat mapu zdarma",
+    ctaDashboard: "Moje mapy",
+    typesTitle: "Pět typů lidí a jejich aura",
+    typesDescription: "Každý člověk patří k jednomu z energetických typů. Každý typ má svoji jedinečnou auru a strategii pro správná rozhodnutí.",
+    featuresTitle: "Co vám nabízíme",
+    featuresDescription: "Od výpočtu vaší mapy po pokročilé AI rozbory – poskytujeme nejkomplexnější nástroje Human Designu v češtině.",
+    ctaTitle: "Připraveni poznat svůj design?",
+    ctaDescription: "Vygenerujte si svoji mapu Human Designu během několika sekund. Potřebujete pouze datum, čas a místo narození.",
+    ctaButton: "Získat mapu zdarma",
     ofPopulation: "populace",
     features: {
-      chartCalc: { title: "Kompletní Výpočet Chartu", description: "Plný Bodygraph se všemi 9 centry, 36 kanály, 64 branami, typem, profilem, autoritou, definicí a inkarnačním křížem." },
-      aiReadings: { title: "AI Čtení", description: "Hluboké personalizované interpretace poháněné umělou inteligencí analyzující váš kompletní chart pro strategii typu, témata profilu a životní účel." },
-      transits: { title: "Denní Tranzity", description: "Překrytí planetárních tranzitů v reálném čase na vašem chartu ukazující dočasné aktivace bran a jejich denní vliv." },
-      comparison: { title: "Porovnání Chartů", description: "Porovnejte dva charty vedle sebe a objevte elektromagnetická spojení, kompozitní kanály a dynamiku vztahů." },
-      variables: { title: "Proměnné & Dieta", description: "Kompletní analýza proměnných včetně typu trávení, optimálního prostředí, perspektivy a vědomí s praktickými doporučeními." },
-      pdfReports: { title: "PDF Reporty", description: "Exportujte profesionálně formátované PDF reporty s vizualizací Bodygraphu a podrobnými popisy." },
+      chartCalc: { title: "Kompletní mapa designu", description: "Plný Bodygraph se všemi 9 centry, 36 dráhami, 64 branami, typem, profilem, autoritou, definicí a inkarnačním křížem." },
+      aiReadings: { title: "AI rozbor", description: "Hluboké personalizované interpretace poháněné umělou inteligencí. Analýza vašeho typu, profilu, autority a životního účelu." },
+      transits: { title: "Denní tranzity", description: "Aktuální planetární pozice a jejich vliv na váš design. Sledujte, které brány jsou právě aktivované a jak to ovlivňuje váš den." },
+      comparison: { title: "Porovnání map", description: "Porovnejte dvě mapy vedle sebe. Objevte elektromagnetická spojení a dynamiku vašich vztahů." },
+      variables: { title: "Proměnné a dieta", description: "Kompletní analýza proměnných – typ trávení, optimální prostředí, perspektiva a vědomí s praktickými doporučeními." },
+      pdfReports: { title: "PDF reporty", description: "Exportujte profesionálně formátované PDF reporty s vizualizací Bodygraphu a podrobnými popisy." },
     },
   },
 
@@ -85,8 +85,8 @@ export const cs = {
 
   // ─── Chart Calculator ─────────────────────────────────────────────────
   calculator: {
-    title: "Vypočítejte Svůj Human Design Chart",
-    description: "Zadejte svá data narození pro výpočet vašeho jedinečného energetického blueprintu.",
+    title: "Vypočítejte svoji mapu Human Designu",
+    description: "Zadejte svá data narození pro vygenerování vaší jedinečné mapy designu.",
     name: "Jméno",
     namePlaceholder: "Vaše jméno",
     birthDate: "Datum narození",
@@ -97,7 +97,7 @@ export const cs = {
     locationFound: "Lokace nalezena!",
     locationNotFound: "Lokace nenalezena. Zkuste zadat přesnější adresu.",
     locationSearchFailed: "Vyhledávání lokace selhalo.",
-    calculate: "Vypočítat Chart",
+    calculate: "Vypočítat mapu",
     calculating: "Počítám...",
     birthTimeNote: "Přesný čas narození je klíčový pro správný výpočet. Zkontrolujte rodný list.",
     timezoneNote: "Časové pásmo",
@@ -106,23 +106,23 @@ export const cs = {
 
   // ─── Chart Result ─────────────────────────────────────────────────────
   chart: {
-    newCalculation: "Nový Výpočet",
-    yourChart: "Váš Chart",
-    saveChart: "Uložit Chart",
+    newCalculation: "Nový výpočet",
+    yourChart: "Vaše mapa",
+    saveChart: "Uložit mapu",
     saving: "Ukládám...",
-    savedToCollection: "Chart uložen do vaší sbírky!",
+    savedToCollection: "Mapa uložena do vaší sbírky!",
     bodygraph: "Bodygraph",
-    bodygraphDesc: "Klikněte na centra, brány nebo kanály pro detaily",
+    bodygraphDesc: "Klikněte na centra, brány nebo dráhy pro detaily",
     personality: "Osobnost",
     design: "Design",
     both: "Obojí",
     transit: "Tranzit",
 
     // Sections
-    typeStrategy: "Typ & Strategie",
+    typeStrategy: "Typ a strategie",
     profile: "Profil",
     authority: "Autorita",
-    incarnationCross: "Inkarnační Kříž",
+    incarnationCross: "Inkarnační kříž",
     definition: "Definice",
     signature: "Signatura",
     notSelf: "Ne-Já",
@@ -132,14 +132,14 @@ export const cs = {
 
     // Tabs
     activations: "Aktivace",
-    channels: "Kanály",
+    channels: "Dráhy",
     centers: "Centra",
     variables: "Proměnné",
     gates: "Brány",
 
     // Activations
-    personalityConscious: "Osobnost (Vědomé)",
-    designUnconscious: "Design (Nevědomé)",
+    personalityConscious: "Osobnost (vědomé)",
+    designUnconscious: "Design (nevědomé)",
 
     // Variables
     digestion: "Trávení",
@@ -176,16 +176,16 @@ export const cs = {
     designSun: "☉ Design",
 
     // AI Reading
-    aiReading: "AI Čtení",
-    aiReadingDesc: "Získejte personalizované vhledy generované AI na základě vašeho jedinečného chartu",
-    generatingReading: "Generuji vaše personalizované čtení...",
+    aiReading: "AI rozbor",
+    aiReadingDesc: "Získejte personalizovaný rozbor generovaný AI na základě vaší jedinečné mapy",
+    generatingReading: "Generuji váš personalizovaný rozbor...",
     aiTypes: {
-      overview: "Celkový Přehled",
-      type_strategy: "Typ & Strategie",
+      overview: "Celkový přehled",
+      type_strategy: "Typ a strategie",
       profile: "Profil",
       authority: "Autorita",
-      incarnation_cross: "Životní Účel",
-      channels: "Kanály",
+      incarnation_cross: "Životní účel",
+      channels: "Dráhy",
       gates: "Brány",
       variables: "Proměnné",
       relationships: "Vztahy",
@@ -199,13 +199,13 @@ export const cs = {
 
   // ─── Dashboard ────────────────────────────────────────────────────────
   dashboard: {
-    title: "Moje Charty",
-    description: "Spravujte své uložené Human Design charty",
-    noCharts: "Zatím nemáte žádné uložené charty",
-    noChartsDesc: "Vypočítejte svůj první chart a uložte ho do své sbírky.",
-    calculateFirst: "Vypočítat První Chart",
-    deleteConfirm: "Opravdu chcete smazat tento chart?",
-    deleteSuccess: "Chart smazán",
+    title: "Moje mapy",
+    description: "Spravujte své uložené mapy Human Designu",
+    noCharts: "Zatím nemáte žádné uložené mapy",
+    noChartsDesc: "Vypočítejte svoji první mapu a uložte ji do sbírky.",
+    calculateFirst: "Vypočítat první mapu",
+    deleteConfirm: "Opravdu chcete smazat tuto mapu?",
+    deleteSuccess: "Mapa smazána",
     categories: {
       all: "Vše",
       self: "Já",
@@ -216,31 +216,31 @@ export const cs = {
       other: "Ostatní",
     },
     favorites: "Oblíbené",
-    viewChart: "Zobrazit Chart",
+    viewChart: "Zobrazit mapu",
     born: "Narozen/a",
   },
 
   // ─── Chart Comparison ─────────────────────────────────────────────────
   comparison: {
-    title: "Porovnání Chartů",
-    subtitle: "Porovnejte Dva Charty",
-    description: "Objevte elektromagnetická spojení a dynamiku vztahů.",
+    title: "Porovnání map",
+    subtitle: "Porovnejte dvě mapy",
+    description: "Objevte elektromagnetická spojení a dynamiku vztahů mezi dvěma lidmi.",
     personA: "Osoba A",
     personB: "Osoba B",
-    electromagneticConnections: "Elektromagnetická Spojení",
-    noConnections: "Mezi těmito dvěma charty nebyla nalezena žádná elektromagnetická spojení.",
-    channel: "Kanál",
-    sideBySide: "Porovnání Vedle Sebe",
+    electromagneticConnections: "Elektromagnetická spojení",
+    noConnections: "Mezi těmito dvěma mapami nebyla nalezena žádná elektromagnetická spojení.",
+    channel: "Dráha",
+    sideBySide: "Porovnání vedle sebe",
     property: "Vlastnost",
-    incCross: "Ink. Kříž",
+    incCross: "Ink. kříž",
   },
 
   // ─── Transits ─────────────────────────────────────────────────────────
   transits: {
-    title: "Planetární Tranzity",
-    subtitle: "Aktuální Tranzity",
-    description: "Sledujte aktuální planetární pozice a jejich vliv na váš Human Design chart.",
-    currentPositions: "Aktuální Planetární Pozice",
+    title: "Planetární tranzity",
+    subtitle: "Aktuální tranzity",
+    description: "Sledujte aktuální planetární pozice a jejich vliv na váš Human Design.",
+    currentPositions: "Aktuální planetární pozice",
     planet: "Planeta",
     gate: "Brána",
     line: "Linka",
@@ -248,31 +248,31 @@ export const cs = {
     lastUpdated: "Poslední aktualizace",
     refreshing: "Aktualizuji...",
     refresh: "Aktualizovat",
-    transitOverlay: "Překrytí Tranzitů",
-    selectChart: "Vyberte chart pro překrytí tranzitů",
+    transitOverlay: "Překrytí tranzitů",
+    selectChart: "Vyberte mapu pro překrytí tranzitů",
   },
 
   // ─── Celebrities ──────────────────────────────────────────────────────
   celebrities: {
-    title: "Databáze Celebrit",
-    subtitle: "Celebrity Charty",
-    description: "Prozkoumejte Human Design charty slavných osobností.",
+    title: "Databáze celebrit",
+    subtitle: "Mapy slavných osobností",
+    description: "Prozkoumejte Human Design mapy slavných osobností a porovnejte je se svou vlastní.",
     searchPlaceholder: "Hledat celebrity...",
     noResults: "Žádné výsledky",
-    viewChart: "Zobrazit Chart",
+    viewChart: "Zobrazit mapu",
     category: "Kategorie",
   },
 
   // ─── I Ching ──────────────────────────────────────────────────────────
   iChing: {
     title: "I-Ťing Orákulum",
-    subtitle: "Moudrost 64 Hexagramů",
+    subtitle: "Moudrost 64 hexagramů",
     description: "Prozkoumejte starobylou moudrost I-Ťingu, která tvoří základ systému Human Design.",
-    drawHexagram: "Hodit Hexagram",
-    yourHexagram: "Váš Hexagram",
+    drawHexagram: "Hodit hexagram",
+    yourHexagram: "Váš hexagram",
     hexagram: "Hexagram",
     searchPlaceholder: "Hledat hexagram...",
-    allHexagrams: "Všechny Hexagramy",
+    allHexagrams: "Všechny hexagramy",
     gate: "Brána",
     iChingName: "Název I-Ťing",
     center: "Centrum",
@@ -281,39 +281,39 @@ export const cs = {
 
   // ─── Footer ───────────────────────────────────────────────────────────
   footer: {
-    description: "Objevte svůj jedinečný energetický blueprint. Nejkomplexnější Human Design aplikace.",
+    description: "Poznejte svůj jedinečný design. Nejkomplexnější Human Design aplikace v češtině.",
     features: "Funkce",
-    chartCalculator: "Kalkulátor Chartu",
-    dailyTransits: "Denní Tranzity",
-    chartComparison: "Porovnání Chartů",
-    celebrityCharts: "Celebrity Charty",
+    chartCalculator: "Mapa zdarma",
+    dailyTransits: "Denní tranzity",
+    chartComparison: "Porovnání map",
+    celebrityCharts: "Celebrity",
     learn: "Vzdělávání",
     iChingOracle: "I-Ťing Orákulum",
-    typesStrategy: "Typy & Strategie",
+    typesStrategy: "Typy a strategie",
     authorityLabel: "Autorita",
-    gatesChannels: "Brány & Kanály",
+    gatesChannels: "Brány a dráhy",
     accountLabel: "Účet",
-    myCharts: "Moje Charty",
-    aiReadings: "AI Čtení",
+    myCharts: "Moje mapy",
+    aiReadings: "AI rozbory",
     copyright: "Human Design App. Všechna práva vyhrazena.",
-    foundedBy: "Human Design Systém založil Ra Uru Hu",
+    foundedBy: "Human Design systém založil Ra Uru Hu",
   },
 
   // ─── HD Content Labels ────────────────────────────────────────────────
   hd: {
     definitionTypes: {
-      "Single Definition": "Jednoduchá Definice",
-      "Split Definition": "Rozdělená Definice",
-      "Triple Split Definition": "Trojitě Rozdělená Definice",
-      "Quadruple Split Definition": "Čtyřnásobně Rozdělená Definice",
-      "No Definition": "Bez Definice",
+      "Single Definition": "Jednoduchá definice",
+      "Split Definition": "Rozdělená definice",
+      "Triple Split Definition": "Trojitě rozdělená definice",
+      "Quadruple Split Definition": "Čtyřnásobně rozdělená definice",
+      "No Definition": "Bez definice",
     },
     strategies: {
       "To Inform": "Informovat",
       "To Respond": "Reagovat",
-      "To Respond, Then Inform": "Reagovat, Poté Informovat",
-      "Wait for the Invitation": "Čekat na Pozvání",
-      "Wait a Lunar Cycle": "Čekat Lunární Cyklus",
+      "To Respond, Then Inform": "Reagovat, poté informovat",
+      "Wait for the Invitation": "Čekat na pozvání",
+      "Wait a Lunar Cycle": "Čekat lunární cyklus",
     },
     signatures: {
       Peace: "Mír",
@@ -324,7 +324,7 @@ export const cs = {
     notSelfs: {
       Anger: "Hněv",
       Frustration: "Frustrace",
-      "Frustration & Anger": "Frustrace & Hněv",
+      "Frustration & Anger": "Frustrace a hněv",
       Bitterness: "Hořkost",
       Disappointment: "Zklamání",
     },
@@ -340,7 +340,7 @@ export const cs = {
       G: "G Centrum",
       Heart: "Srdce",
       Sacral: "Sakrální",
-      SolarPlexus: "Solární Plexus",
+      SolarPlexus: "Solární plexus",
       Spleen: "Slezina",
       Root: "Kořen",
     },
@@ -348,8 +348,8 @@ export const cs = {
       Sun: "Slunce",
       Earth: "Země",
       Moon: "Měsíc",
-      "North Node": "Severní Uzel",
-      "South Node": "Jižní Uzel",
+      "North Node": "Severní uzel",
+      "South Node": "Jižní uzel",
       Mercury: "Merkur",
       Venus: "Venuše",
       Mars: "Mars",

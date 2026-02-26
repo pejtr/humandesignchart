@@ -1,0 +1,7 @@
+Status check 2026-02-26:
+- Light theme is working - white background, purple accents
+- Czech text is showing correctly in navbar and hero
+- TypeScript: No errors
+- LSP: No errors
+- Dev server running
+- Need to continue with: celebrity photos integration, type icons, then premium features
