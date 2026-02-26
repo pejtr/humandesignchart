@@ -28,6 +28,21 @@ import {
   TYPE_DESCRIPTIONS, AUTHORITY_DESCRIPTIONS, PROFILE_DESCRIPTIONS,
 } from "@shared/hdContent";
 
+// Czech cross type translations
+const CROSS_TYPE_CS: Record<string, string> = {
+  "Right Angle Cross": "Pravý Úhlový Kříž",
+  "Left Angle Cross": "Levý Úhlový Kříž",
+  "Juxtaposition Cross": "Juxtapoziční Kříž",
+};
+
+function translateCrossName(name: string): string {
+  let result = name;
+  for (const [en, cz] of Object.entries(CROSS_TYPE_CS)) {
+    result = result.replace(en, cz);
+  }
+  return result;
+}
+
 const PLANET_SYMBOLS: Record<string, string> = {
   Sun: "☉", Earth: "⊕", Moon: "☽", "North Node": "☊", "South Node": "☋",
   Mercury: "☿", Venus: "♀", Mars: "♂", Jupiter: "♃", Saturn: "♄",
@@ -364,8 +379,8 @@ export default function ChartResult() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-lg font-serif font-semibold mb-1">{chart.incarnationCross.name}</p>
-                  <p className="text-sm text-muted-foreground mb-4">{chart.incarnationCross.type}</p>
+                  <p className="text-lg font-serif font-semibold mb-1">{translateCrossName(chart.incarnationCross.name)}</p>
+                  <p className="text-sm text-muted-foreground mb-4">{CROSS_TYPE_CS[chart.incarnationCross.type] || chart.incarnationCross.type}</p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {chart.incarnationCross.gates.map((g, i) => {
                       const gateDesc = GATE_DESCRIPTIONS[g];

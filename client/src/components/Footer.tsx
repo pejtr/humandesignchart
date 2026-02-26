@@ -90,12 +90,7 @@ export default function Footer() {
                   Amulets.cz
                 </a>
               </li>
-              <li>
-                <a href="https://ohorai.com" target="_blank" rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors">
-                  Ohorai
-                </a>
-              </li>
+
             </ul>
           </div>
         </div>

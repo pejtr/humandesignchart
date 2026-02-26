@@ -209,3 +209,8 @@
 ## Footer Partner Links
 - [x] Přidat sekci "Další projekty" do footeru s odkazy: cajovny-praha.cz, katastr-online.cz, akcni-letenky.com
 - [x] Přidat do footeru další projekty: do-italie.cz, amulets.cz, ohorai.com
+- [x] Přeložit názvy inkarnačního kříže do češtiny (Levý/Pravý Úhlový Kříž, Juxtapoziční Kříž) v ChartResult i PDF
+- [ ] Opravit PDF generování — česká diakritika (háčky/čárky) se zobrazuje špatně
+- [ ] Přeložit inkarnační kříž do češtiny (Left Angle Cross → Levý Úhlový Kříž atd.)
+- [x] Odstranit Ohorai z footeru
+- [x] Opravit PDF — přepsáno na HTML print přístup (správná čeština, zalamování textu)

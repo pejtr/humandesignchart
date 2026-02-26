@@ -1,258 +1,269 @@
-import jsPDF from "jspdf";
 import type { HumanDesignChartData } from "@shared/types";
-import { GATE_DESCRIPTIONS, CHANNEL_DESCRIPTIONS, CENTER_DESCRIPTIONS, TYPE_DESCRIPTIONS, AUTHORITY_DESCRIPTIONS, PROFILE_DESCRIPTIONS } from "@shared/hdContent";
+import {
+  GATE_DESCRIPTIONS, CHANNEL_DESCRIPTIONS, CENTER_DESCRIPTIONS,
+  TYPE_DESCRIPTIONS, AUTHORITY_DESCRIPTIONS, PROFILE_DESCRIPTIONS,
+} from "@shared/hdContent";
 import { cs } from "@shared/i18n/cs";
 
 const t = cs;
 
-// Light theme colors
-const COLORS = {
-  bg: [255, 255, 255] as [number, number, number],
-  card: [248, 247, 255] as [number, number, number],
-  primary: [109, 40, 217] as [number, number, number],
-  primaryLight: [237, 233, 254] as [number, number, number],
-  text: [30, 30, 50] as [number, number, number],
-  muted: [100, 100, 130] as [number, number, number],
-  accent: [139, 92, 246] as [number, number, number],
-  red: [185, 28, 28] as [number, number, number],
-  green: [22, 163, 74] as [number, number, number],
-  gold: [180, 140, 20] as [number, number, number],
-  border: [229, 225, 245] as [number, number, number],
+// Czech cross type translations
+const CROSS_TYPE_CS: Record<string, string> = {
+  "Right Angle Cross": "Pravý Úhlový Kříž",
+  "Left Angle Cross": "Levý Úhlový Kříž",
+  "Juxtaposition Cross": "Juxtapoziční Kříž",
 };
 
-function addHeader(doc: jsPDF, name: string, y: number): number {
-  // Purple gradient header
-  doc.setFillColor(...COLORS.primary);
-  doc.rect(0, 0, 210, 32, "F");
-  
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(20);
-  doc.text("HUMAN DESIGN", 15, 14);
-  doc.setFontSize(9);
-  doc.setTextColor(220, 210, 255);
-  doc.text("Osobní energetický blueprint", 15, 22);
-  
-  // Chart name and date
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(9);
-  doc.text(name, 195, 14, { align: "right" });
-  doc.setFontSize(8);
-  doc.setTextColor(220, 210, 255);
-  doc.text(new Date().toLocaleDateString("cs-CZ"), 195, 22, { align: "right" });
-  
-  // Thin accent line
-  doc.setFillColor(...COLORS.accent);
-  doc.rect(0, 32, 210, 1, "F");
-  
-  return 40;
-}
-
-function addSectionTitle(doc: jsPDF, title: string, y: number): number {
-  if (y > 265) {
-    doc.addPage();
-    doc.setFillColor(...COLORS.bg);
-    doc.rect(0, 0, 210, 297, "F");
-    y = 15;
+function translateCrossName(name: string): string {
+  let result = name;
+  for (const [en, cs] of Object.entries(CROSS_TYPE_CS)) {
+    result = result.replace(en, cs);
   }
-  // Light purple background with left accent
-  doc.setFillColor(...COLORS.primaryLight);
-  doc.rect(15, y, 180, 8, "F");
-  doc.setFillColor(...COLORS.primary);
-  doc.rect(15, y, 2, 8, "F");
-  doc.setTextColor(...COLORS.primary);
-  doc.setFontSize(10);
-  doc.text(title, 22, y + 5.5);
-  return y + 14;
-}
-
-function addKeyValue(doc: jsPDF, label: string, value: string, y: number, labelWidth = 55): number {
-  if (y > 280) {
-    doc.addPage();
-    doc.setFillColor(...COLORS.bg);
-    doc.rect(0, 0, 210, 297, "F");
-    y = 15;
-  }
-  doc.setTextColor(...COLORS.muted);
-  doc.setFontSize(8);
-  doc.text(label, 20, y);
-  doc.setTextColor(...COLORS.text);
-  doc.setFontSize(9);
-  doc.text(value, 20 + labelWidth, y);
-  return y + 6;
-}
-
-function addParagraph(doc: jsPDF, text: string, y: number, maxWidth = 170): number {
-  if (y > 275) {
-    doc.addPage();
-    doc.setFillColor(...COLORS.bg);
-    doc.rect(0, 0, 210, 297, "F");
-    y = 15;
-  }
-  doc.setTextColor(...COLORS.muted);
-  doc.setFontSize(8);
-  const lines = doc.splitTextToSize(text, maxWidth);
-  doc.text(lines, 20, y);
-  return y + lines.length * 4 + 3;
-}
-
-function addSmallLabel(doc: jsPDF, text: string, y: number, color: [number, number, number] = COLORS.muted): number {
-  if (y > 280) {
-    doc.addPage();
-    doc.setFillColor(...COLORS.bg);
-    doc.rect(0, 0, 210, 297, "F");
-    y = 15;
-  }
-  doc.setTextColor(...color);
-  doc.setFontSize(7);
-  doc.text(text, 20, y);
-  return y + 4;
+  return result;
 }
 
 export function generateChartPDF(chart: HumanDesignChartData, name: string): void {
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-  
-  // White background
-  doc.setFillColor(...COLORS.bg);
-  doc.rect(0, 0, 210, 297, "F");
+  const czType = (t.types as Record<string, string>)[chart.type] || chart.type;
+  const czStrategy = (t.hd.strategies as Record<string, string>)[chart.strategy] || chart.strategy;
+  const czSignature = (t.hd.signatures as Record<string, string>)[chart.signature] || chart.signature;
+  const czNotSelf = (t.hd.notSelfs as Record<string, string>)[chart.notSelf] || chart.notSelf;
+  const czDefinition = (t.hd.definitionTypes as Record<string, string>)[chart.definition] || chart.definition;
+  const czCrossName = translateCrossName(chart.incarnationCross?.name || "—");
+  const czCrossType = CROSS_TYPE_CS[chart.incarnationCross?.type || ""] || chart.incarnationCross?.type || "";
 
-  let y = addHeader(doc, name, 0);
-
-  // ─── Overview Section ───
-  y = addSectionTitle(doc, "Prehled mapy", y);
-  
-  const czType = (t.types as any)[chart.type] || chart.type;
-  const czStrategy = (t.hd.strategies as any)[chart.strategy] || chart.strategy;
-  const czSignature = (t.hd.signatures as any)[chart.signature] || chart.signature;
-  const czNotSelf = (t.hd.notSelfs as any)[chart.notSelf] || chart.notSelf;
-  const czDefinition = (t.hd.definitionTypes as any)[chart.definition] || chart.definition;
-
-  y = addKeyValue(doc, "Typ:", czType, y);
-  y = addKeyValue(doc, "Profil:", `${chart.profile} ${chart.profileName}`, y);
-  y = addKeyValue(doc, "Strategie:", czStrategy, y);
-  y = addKeyValue(doc, "Autorita:", chart.authority, y);
-  y = addKeyValue(doc, "Definice:", czDefinition, y);
-  y = addKeyValue(doc, "Signatura:", czSignature, y);
-  y = addKeyValue(doc, "Ne-Ja:", czNotSelf, y);
-  y = addKeyValue(doc, "Aura:", chart.aura, y);
-  y = addKeyValue(doc, "Inkarnacni Kriz:", chart.incarnationCross?.name || "—", y);
-  y += 4;
-
-  // ─── Type Description ───
   const typeDesc = TYPE_DESCRIPTIONS[chart.type];
-  if (typeDesc) {
-    y = addSectionTitle(doc, `Typ: ${czType}`, y);
-    y = addParagraph(doc, typeDesc.description, y);
-    y = addSmallLabel(doc, `Strategie: ${czStrategy} | Signatura: ${czSignature} | Ne-Ja: ${czNotSelf}`, y, COLORS.accent);
-    y += 2;
-  }
-
-  // ─── Profile ───
   const profileDesc = PROFILE_DESCRIPTIONS[chart.profile];
-  if (profileDesc) {
-    y = addSectionTitle(doc, `Profil: ${chart.profile} ${chart.profileName}`, y);
-    y = addParagraph(doc, profileDesc.description, y);
-    y = addSmallLabel(doc, `Vedome: ${profileDesc.conscious}`, y, COLORS.text);
-    y = addSmallLabel(doc, `Nevedome: ${profileDesc.unconscious}`, y, COLORS.red);
-    y += 2;
-  }
-
-  // ─── Authority ───
   const authDesc = AUTHORITY_DESCRIPTIONS[chart.authority];
-  if (authDesc) {
-    y = addSectionTitle(doc, `Autorita: ${chart.authority}`, y);
-    y = addParagraph(doc, authDesc.description, y);
-    y = addSmallLabel(doc, `Jak pouzivat: ${authDesc.howToUse}`, y, COLORS.accent);
-    y += 2;
-  }
 
-  // ─── Centers ───
-  y = addSectionTitle(doc, "Centra", y);
-  for (const center of chart.centers || []) {
-    const czName = (t.hd.centerNames as any)[center.name] || center.name;
-    const status = center.defined ? "Definovane" : "Otevrene";
+  const centersHtml = (chart.centers || []).map(center => {
+    const czName = (t.hd.centerNames as Record<string, string>)[center.name] || center.name;
+    const status = center.defined ? "Definováno" : "Otevřeno";
     const desc = CENTER_DESCRIPTIONS[center.name];
-    y = addKeyValue(doc, `${czName}:`, `${status} — ${desc?.theme || ""}`, y, 40);
-    if (y > 280) { doc.addPage(); doc.setFillColor(...COLORS.bg); doc.rect(0, 0, 210, 297, "F"); y = 15; }
-  }
-  y += 2;
+    const statusColor = center.defined ? "#7c3aed" : "#6b7280";
+    return `<tr>
+      <td style="padding:5px 8px;font-weight:600;color:#374151;width:120px">${czName}</td>
+      <td style="padding:5px 8px;color:${statusColor};font-weight:600">${status}</td>
+      <td style="padding:5px 8px;color:#6b7280">${desc?.theme || ""}</td>
+    </tr>`;
+  }).join("");
 
-  // ─── Channels ───
-  if ((chart.channels || []).length > 0) {
-    y = addSectionTitle(doc, `Kanaly (${chart.channels.length})`, y);
-    for (const ch of chart.channels) {
-      const key = CHANNEL_DESCRIPTIONS[`${ch.gate1}-${ch.gate2}`] ? `${ch.gate1}-${ch.gate2}` : `${ch.gate2}-${ch.gate1}`;
-      const desc = CHANNEL_DESCRIPTIONS[key];
-      const czCenA = (t.hd.centerNames as any)[ch.centerA] || ch.centerA;
-      const czCenB = (t.hd.centerNames as any)[ch.centerB] || ch.centerB;
-      y = addKeyValue(doc, `${ch.gate1}-${ch.gate2}:`, `${desc?.name || ""} (${czCenA} -> ${czCenB})`, y, 25);
-      if (desc) {
-        y = addSmallLabel(doc, `  ${desc.theme}`, y);
-      }
-      if (y > 280) { doc.addPage(); doc.setFillColor(...COLORS.bg); doc.rect(0, 0, 210, 297, "F"); y = 15; }
-    }
-    y += 2;
-  }
+  const channelsHtml = (chart.channels || []).map(ch => {
+    const key = CHANNEL_DESCRIPTIONS[`${ch.gate1}-${ch.gate2}`] ? `${ch.gate1}-${ch.gate2}` : `${ch.gate2}-${ch.gate1}`;
+    const desc = CHANNEL_DESCRIPTIONS[key];
+    const czCenA = (t.hd.centerNames as Record<string, string>)[ch.centerA] || ch.centerA;
+    const czCenB = (t.hd.centerNames as Record<string, string>)[ch.centerB] || ch.centerB;
+    return `<tr>
+      <td style="padding:5px 8px;font-weight:600;color:#374151;width:60px">${ch.gate1}–${ch.gate2}</td>
+      <td style="padding:5px 8px;font-weight:600;color:#374151">${desc?.name || ""}</td>
+      <td style="padding:5px 8px;color:#6b7280">${czCenA} → ${czCenB}</td>
+      <td style="padding:5px 8px;color:#9ca3af;font-style:italic">${desc?.theme || ""}</td>
+    </tr>`;
+  }).join("");
 
-  // ─── Planetary Activations ───
-  y = addSectionTitle(doc, "Planetarni aktivace — Osobnost (Vedome)", y);
-  for (const a of chart.personalityActivations || []) {
-    const czPlanet = (t.hd.planets as any)[a.planet] || a.planet;
-    const gateDesc = GATE_DESCRIPTIONS[a.gate];
-    y = addKeyValue(doc, `${czPlanet}:`, `Brana ${a.gate}.${a.line} — ${gateDesc?.name || ""}`, y, 35);
-    if (y > 280) { doc.addPage(); doc.setFillColor(...COLORS.bg); doc.rect(0, 0, 210, 297, "F"); y = 15; }
-  }
-  y += 2;
+  const activationsHtml = (activations: typeof chart.personalityActivations, label: string, color: string) =>
+    `<div style="margin-bottom:16px">
+      <h4 style="font-size:11px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0">${label}</h4>
+      <table style="width:100%;border-collapse:collapse">
+        ${(activations || []).map(a => {
+          const czPlanet = (t.hd.planets as Record<string, string>)[a.planet] || a.planet;
+          const gateDesc = GATE_DESCRIPTIONS[a.gate];
+          return `<tr>
+            <td style="padding:3px 8px;color:#6b7280;width:90px;font-size:10px">${czPlanet}</td>
+            <td style="padding:3px 8px;font-weight:600;color:#374151;font-size:10px">Brána ${a.gate}.${a.line}</td>
+            <td style="padding:3px 8px;color:#6b7280;font-size:10px">${gateDesc?.name || ""}</td>
+          </tr>`;
+        }).join("")}
+      </table>
+    </div>`;
 
-  y = addSectionTitle(doc, "Planetarni aktivace — Design (Nevedome)", y);
-  for (const a of chart.designActivations || []) {
-    const czPlanet = (t.hd.planets as any)[a.planet] || a.planet;
-    const gateDesc = GATE_DESCRIPTIONS[a.gate];
-    y = addKeyValue(doc, `${czPlanet}:`, `Brana ${a.gate}.${a.line} — ${gateDesc?.name || ""}`, y, 35);
-    if (y > 280) { doc.addPage(); doc.setFillColor(...COLORS.bg); doc.rect(0, 0, 210, 297, "F"); y = 15; }
-  }
-  y += 2;
-
-  // ─── Variables ───
-  if (chart.variables) {
-    y = addSectionTitle(doc, "Promenne (PHS)", y);
-    const varLabels: Record<string, string> = {
-      digestion: "Traveni",
-      environment: "Prostredi",
-      perspective: "Perspektiva",
-      awareness: "Vedomi",
-    };
-    for (const [key, v] of Object.entries(chart.variables)) {
-      y = addKeyValue(doc, `${varLabels[key] || key}:`, `${v.type} (${v.arrow}) — Barva ${v.color}, Ton ${v.tone}`, y, 35);
-      if (y > 280) { doc.addPage(); doc.setFillColor(...COLORS.bg); doc.rect(0, 0, 210, 297, "F"); y = 15; }
-    }
-    y += 2;
-  }
-
-  // ─── All Activated Gates ───
-  y = addSectionTitle(doc, `Aktivovane brany (${(chart.activatedGates || []).length})`, y);
-  const gateChunks: string[] = [];
-  for (const gate of (chart.activatedGates || []).sort((a, b) => a - b)) {
+  const gatesHtml = (chart.activatedGates || []).sort((a, b) => a - b).map(gate => {
     const desc = GATE_DESCRIPTIONS[gate];
-    gateChunks.push(`${gate}${desc ? ` (${desc.name})` : ""}`);
-  }
-  y = addParagraph(doc, gateChunks.join(" • "), y);
+    return `<span style="display:inline-block;background:#f3f0ff;color:#7c3aed;border-radius:4px;padding:2px 7px;margin:2px;font-size:10px;font-weight:600">${gate}${desc ? ` · ${desc.name}` : ""}</span>`;
+  }).join("");
 
-  // ─── Footer on all pages ───
-  const pageCount = doc.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    // Re-draw white background for added pages (header page already has it)
-    if (i > 1) {
-      // Background is already set when page was added
+  const variablesHtml = chart.variables ? Object.entries(chart.variables).map(([key, v]) => {
+    const labels: Record<string, string> = {
+      digestion: "Trávení", environment: "Prostředí",
+      perspective: "Perspektiva", awareness: "Vědomí",
+    };
+    return `<tr>
+      <td style="padding:5px 8px;font-weight:600;color:#374151;width:120px">${labels[key] || key}</td>
+      <td style="padding:5px 8px;color:#7c3aed;font-weight:600">${v.type}</td>
+      <td style="padding:5px 8px;color:#6b7280">${v.arrow} · Barva ${v.color} · Tón ${v.tone}</td>
+    </tr>`;
+  }).join("") : "";
+
+  const html = `<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Human Design — ${name}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', Arial, sans-serif; color: #1e1e32; background: #fff; font-size: 11px; line-height: 1.5; }
+    
+    .header { background: linear-gradient(135deg, #7c3aed, #5b21b6); color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .header-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; letter-spacing: 0.05em; }
+    .header-sub { font-size: 10px; color: #ddd6fe; margin-top: 3px; }
+    .header-right { text-align: right; }
+    .header-name { font-size: 14px; font-weight: 600; }
+    .header-date { font-size: 10px; color: #ddd6fe; margin-top: 3px; }
+    .accent-bar { height: 3px; background: linear-gradient(90deg, #a78bfa, #7c3aed); }
+    
+    .content { padding: 20px 30px; }
+    
+    .section { margin-bottom: 20px; break-inside: avoid; }
+    .section-title { background: #f3f0ff; border-left: 3px solid #7c3aed; padding: 6px 10px; font-size: 11px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+    
+    table { width: 100%; border-collapse: collapse; }
+    td { vertical-align: top; }
+    tr:nth-child(even) td { background: #fafafa; }
+    
+    .kv-label { font-size: 10px; color: #9ca3af; width: 130px; padding: 4px 8px; }
+    .kv-value { font-size: 11px; font-weight: 600; color: #1e1e32; padding: 4px 8px; }
+    
+    .desc-box { background: #fafafa; border: 1px solid #e9e5ff; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; font-size: 10px; color: #4b5563; line-height: 1.6; }
+    .desc-label { font-size: 9px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .conscious-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; padding: 6px 10px; margin-top: 6px; font-size: 10px; color: #166534; }
+    .unconscious-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 6px 10px; margin-top: 4px; font-size: 10px; color: #991b1b; }
+    
+    .cross-gates { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+    .cross-gate { background: #f3f0ff; border: 1px solid #ddd6fe; border-radius: 6px; padding: 8px; text-align: center; }
+    .cross-gate-label { font-size: 9px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; }
+    .cross-gate-num { font-size: 16px; font-weight: 700; color: #7c3aed; }
+    .cross-gate-name { font-size: 9px; color: #6b7280; margin-top: 2px; }
+    
+    .footer { border-top: 1px solid #e5e7eb; padding: 10px 30px; text-align: center; font-size: 9px; color: #9ca3af; margin-top: 20px; }
+    
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .section { break-inside: avoid; }
+      .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
-    // Footer line
-    doc.setDrawColor(...COLORS.border);
-    doc.line(15, 286, 195, 286);
-    doc.setTextColor(...COLORS.muted);
-    doc.setFontSize(7);
-    doc.text(`Human Design App — ${name} — Strana ${i}/${pageCount}`, 105, 290, { align: "center" });
-    doc.text("Vygenerovano: " + new Date().toLocaleDateString("cs-CZ"), 105, 294, { align: "center" });
-  }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <div class="header-title">HUMAN DESIGN</div>
+      <div class="header-sub">Osobní energetický blueprint</div>
+    </div>
+    <div class="header-right">
+      <div class="header-name">${name}</div>
+      <div class="header-date">${new Date().toLocaleDateString("cs-CZ")}</div>
+    </div>
+  </div>
+  <div class="accent-bar"></div>
 
-  doc.save(`${name.replace(/\s+/g, "_")}_Human_Design_Mapa.pdf`);
+  <div class="content">
+
+    <!-- Overview -->
+    <div class="section">
+      <div class="section-title">Přehled mapy</div>
+      <table>
+        <tr><td class="kv-label">Typ:</td><td class="kv-value">${czType}</td><td class="kv-label">Strategie:</td><td class="kv-value">${czStrategy}</td></tr>
+        <tr><td class="kv-label">Profil:</td><td class="kv-value">${chart.profile} ${chart.profileName}</td><td class="kv-label">Autorita:</td><td class="kv-value">${chart.authority}</td></tr>
+        <tr><td class="kv-label">Definice:</td><td class="kv-value">${czDefinition}</td><td class="kv-label">Signatura:</td><td class="kv-value">${czSignature}</td></tr>
+        <tr><td class="kv-label">Ne-Já:</td><td class="kv-value">${czNotSelf}</td><td class="kv-label">Aura:</td><td class="kv-value">${chart.aura}</td></tr>
+        <tr><td class="kv-label">Inkarnační kříž:</td><td class="kv-value" colspan="3">${czCrossName}</td></tr>
+        <tr><td class="kv-label">Typ kříže:</td><td class="kv-value" colspan="3">${czCrossType}</td></tr>
+      </table>
+    </div>
+
+    ${typeDesc ? `
+    <!-- Type -->
+    <div class="section">
+      <div class="section-title">Typ: ${czType}</div>
+      <div class="desc-box">${typeDesc.description}</div>
+      <div style="font-size:10px;color:#7c3aed;padding:0 4px">Strategie: ${czStrategy} · Signatura: ${czSignature} · Ne-Já: ${czNotSelf}</div>
+    </div>` : ""}
+
+    ${profileDesc ? `
+    <!-- Profile -->
+    <div class="section">
+      <div class="section-title">Profil: ${chart.profile} ${chart.profileName}</div>
+      <div class="desc-box">${profileDesc.description}</div>
+      <div class="conscious-box"><strong>Vědomé:</strong> ${profileDesc.conscious}</div>
+      <div class="unconscious-box"><strong>Nevědomé:</strong> ${profileDesc.unconscious}</div>
+    </div>` : ""}
+
+    ${authDesc ? `
+    <!-- Authority -->
+    <div class="section">
+      <div class="section-title">Autorita: ${chart.authority}</div>
+      <div class="desc-box">${authDesc.description}</div>
+      <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:4px;padding:6px 10px;margin-top:6px;font-size:10px;color:#6b21a8">
+        <strong>Jak používat:</strong> ${authDesc.howToUse}
+      </div>
+    </div>` : ""}
+
+    <!-- Incarnation Cross -->
+    <div class="section">
+      <div class="section-title">Inkarnační kříž</div>
+      <div style="font-size:14px;font-weight:700;color:#1e1e32;margin-bottom:4px">${czCrossName}</div>
+      <div style="font-size:11px;color:#7c3aed;margin-bottom:10px">${czCrossType}</div>
+      <div class="cross-gates">
+        ${(chart.incarnationCross?.gates || []).map((g, i) => {
+          const gd = GATE_DESCRIPTIONS[g];
+          const labels = ["Osobnost ☉", "Osobnost ⊕", "Design ☉", "Design ⊕"];
+          return `<div class="cross-gate">
+            <div class="cross-gate-label">${labels[i] || ""}</div>
+            <div class="cross-gate-num">${g}</div>
+            <div class="cross-gate-name">${gd?.name || ""}</div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+
+    <!-- Centers -->
+    <div class="section">
+      <div class="section-title">Centra</div>
+      <table>${centersHtml}</table>
+    </div>
+
+    ${(chart.channels || []).length > 0 ? `
+    <!-- Channels -->
+    <div class="section">
+      <div class="section-title">Kanály (${chart.channels.length})</div>
+      <table>${channelsHtml}</table>
+    </div>` : ""}
+
+    <!-- Activations -->
+    <div class="section">
+      <div class="section-title">Planetární aktivace</div>
+      ${activationsHtml(chart.personalityActivations, "Osobnost (Vědomé)", "#166534")}
+      ${activationsHtml(chart.designActivations, "Design (Nevědomé)", "#991b1b")}
+    </div>
+
+    ${chart.variables ? `
+    <!-- Variables -->
+    <div class="section">
+      <div class="section-title">Proměnné (PHS)</div>
+      <table>${variablesHtml}</table>
+    </div>` : ""}
+
+    <!-- All Gates -->
+    <div class="section">
+      <div class="section-title">Aktivované brány (${(chart.activatedGates || []).length})</div>
+      <div style="padding:4px">${gatesHtml}</div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Human Design App &mdash; ${name} &mdash; Vygenerováno: ${new Date().toLocaleDateString("cs-CZ")}
+  </div>
+
+  <script>
+    window.onload = function() { window.print(); }
+  </script>
+</body>
+</html>`;
+
+  const printWindow = window.open("", "_blank", "width=900,height=700");
+  if (printWindow) {
+    printWindow.document.write(html);
+    printWindow.document.close();
+  }
 }
