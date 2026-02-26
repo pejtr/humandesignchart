@@ -208,3 +208,4 @@
 
 ## Footer Partner Links
 - [x] Přidat sekci "Další projekty" do footeru s odkazy: cajovny-praha.cz, katastr-online.cz, akcni-letenky.com
+- [x] Přidat do footeru další projekty: do-italie.cz, amulets.cz, ohorai.com

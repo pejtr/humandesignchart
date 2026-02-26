@@ -78,6 +78,24 @@ export default function Footer() {
                   Akční Letenky
                 </a>
               </li>
+              <li>
+                <a href="https://do-italie.cz" target="_blank" rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors">
+                  Do Itálie
+                </a>
+              </li>
+              <li>
+                <a href="https://amulets.cz" target="_blank" rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors">
+                  Amulets.cz
+                </a>
+              </li>
+              <li>
+                <a href="https://ohorai.com" target="_blank" rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors">
+                  Ohorai
+                </a>
+              </li>
             </ul>
           </div>
         </div>
