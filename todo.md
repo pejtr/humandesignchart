@@ -214,3 +214,13 @@
 - [ ] Přeložit inkarnační kříž do češtiny (Left Angle Cross → Levý Úhlový Kříž atd.)
 - [x] Odstranit Ohorai z footeru
 - [x] Opravit PDF — přepsáno na HTML print přístup (správná čeština, zalamování textu)
+
+## Inkarnační Kříž — Detailní stránka s AI
+- [ ] Server procedure pro AI výklad inkarnačního kříže (životní poslání, témata, výzvy, praktické rady)
+- [ ] Stránka IncarnationCrossDetail s krásným UI a AI čtením
+- [ ] Propojit z ChartResult — kliknutí na kříž otevře detailní stránku
+- [ ] Přidat do navigace
+
+## UI Redesign & AI Fix
+- [x] Odstranit "Ahoj!" oslovení z AI výkladů (server/routers.ts)
+- [x] Přepracovat Home stránku dle referenčního designu (hero, 5 ikon výhod, 5 typů s aurami, statistiky populace)

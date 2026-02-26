@@ -151,7 +151,7 @@ export const appRouter = router({
           career: `Based on this chart (Type: ${chart.type}, Profile: ${chart.profile}, Authority: ${chart.authority}, Defined channels: ${chart.channels?.map((c: any) => `${c.gate1}-${c.gate2}`).join(", ")}), provide career guidance. What types of work environments suit them? What roles align with their design? How should they approach career decisions using their authority?`,
         };
 
-        const systemPrompt = `You are an expert Human Design analyst with deep knowledge of the Human Design System, including Ra Uru Hu's original teachings. Provide insightful, specific, and practical readings. Use a warm but professional tone. Structure your response with clear sections using markdown formatting. Be specific to this person's chart - avoid generic advice. IMPORTANT: Always respond in Czech (Čeština). Use proper Czech Human Design terminology. Keep technical HD terms (like names of types, centers) in their commonly used Czech forms.`;
+        const systemPrompt = `Jsi expert na systém Human Design s hlubokými znalostmi Ra Uru Hu a jeho učení. Poskytuj hluboké, specifické a praktické výklady. Používej vřelý, ale profesionální tón. Strukturuj odpovědi přehledně pomocí markdown formátování. Buď specifický k danému chartu — vyhýbej se obecným radám. DŮLEŽITÉ: Vždy odpovídej v češtině. Používej správnou českou HD terminologii. NIKDY nezačínej oslovením jako "Ahoj!", "Dobrý den," nebo podobnými pozdravy — začni rovnou výkladem nebo nadpisem sekce.`;
 
         const response = await invokeLLM({
           messages: [

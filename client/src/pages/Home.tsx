@@ -5,7 +5,11 @@ import { useTranslation } from "@/hooks/useTranslation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
-import { Compass, Brain, Sparkles, Users, Star, BarChart3, FileText, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
+import {
+  Compass, Brain, Sparkles, Users, Star, BarChart3,
+  FileText, Zap, ArrowRight, CheckCircle2, Eye, Lightbulb,
+  Heart, Shield, Leaf,
+} from "lucide-react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -25,7 +29,201 @@ const scaleIn = {
   }),
 };
 
-const TYPES_GRAPHIC_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/IJCEzjXdfWLhtTFD.png";
+// ─── Inline SVG aura figures for each type ──────────────────────────────────
+// Each type has a silhouette + geometric aura shape + glow color
+
+function GeneratorFigure() {
+  return (
+    <svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* Glow */}
+      <circle cx="60" cy="90" r="55" fill="#F97316" fillOpacity="0.18" />
+      {/* Flower of Life circles */}
+      {[0, 60, 120, 180, 240, 300].map((angle, i) => {
+        const rad = (angle * Math.PI) / 180;
+        const cx = 60 + 22 * Math.cos(rad);
+        const cy = 90 + 22 * Math.sin(rad);
+        return <circle key={i} cx={cx} cy={cy} r="22" stroke="#F97316" strokeWidth="1" strokeOpacity="0.5" />;
+      })}
+      <circle cx="60" cy="90" r="22" stroke="#F97316" strokeWidth="1" strokeOpacity="0.5" />
+      {/* Body silhouette */}
+      <ellipse cx="60" cy="38" rx="10" ry="10" fill="#F97316" />
+      <rect x="50" y="50" width="20" height="35" rx="4" fill="#F97316" />
+      <rect x="38" y="52" width="10" height="28" rx="4" fill="#F97316" />
+      <rect x="72" y="52" width="10" height="28" rx="4" fill="#F97316" />
+      <rect x="50" y="85" width="8" height="32" rx="4" fill="#F97316" />
+      <rect x="62" y="85" width="8" height="32" rx="4" fill="#F97316" />
+      {/* Diamond icon below */}
+      <polygon points="60,140 67,150 60,160 53,150" stroke="#F97316" strokeWidth="1.5" fill="none" strokeOpacity="0.7" />
+    </svg>
+  );
+}
+
+function ManifestingGeneratorFigure() {
+  return (
+    <svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* Glow */}
+      <circle cx="60" cy="90" r="55" fill="#EF4444" fillOpacity="0.18" />
+      {/* Starburst lines */}
+      {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => {
+        const rad = (angle * Math.PI) / 180;
+        return (
+          <line
+            key={i}
+            x1={60 + 28 * Math.cos(rad)}
+            y1={90 + 28 * Math.sin(rad)}
+            x2={60 + 52 * Math.cos(rad)}
+            y2={90 + 52 * Math.sin(rad)}
+            stroke="#EF4444"
+            strokeWidth="1"
+            strokeOpacity="0.5"
+          />
+        );
+      })}
+      <circle cx="60" cy="90" r="28" stroke="#EF4444" strokeWidth="1" strokeOpacity="0.4" />
+      {/* Body silhouette */}
+      <ellipse cx="60" cy="38" rx="10" ry="10" fill="#EF4444" />
+      <rect x="50" y="50" width="20" height="35" rx="4" fill="#EF4444" />
+      <rect x="38" y="52" width="10" height="28" rx="4" fill="#EF4444" />
+      <rect x="72" y="52" width="10" height="28" rx="4" fill="#EF4444" />
+      <rect x="50" y="85" width="8" height="32" rx="4" fill="#EF4444" />
+      <rect x="62" y="85" width="8" height="32" rx="4" fill="#EF4444" />
+      {/* Diamond icon below */}
+      <polygon points="60,140 68,150 60,160 52,150" stroke="#EF4444" strokeWidth="1.5" fill="none" strokeOpacity="0.7" />
+      <polygon points="60,143 65,150 60,157 55,150" stroke="#EF4444" strokeWidth="1" fill="none" strokeOpacity="0.4" />
+    </svg>
+  );
+}
+
+function ProjectorFigure() {
+  return (
+    <svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* Glow */}
+      <circle cx="60" cy="90" r="55" fill="#8B5CF6" fillOpacity="0.2" />
+      {/* Concentric circles */}
+      {[52, 42, 32].map((r, i) => (
+        <circle key={i} cx="60" cy="90" r={r} stroke="#8B5CF6" strokeWidth="1" strokeOpacity={0.3 + i * 0.15} />
+      ))}
+      {/* Body silhouette */}
+      <ellipse cx="60" cy="38" rx="10" ry="10" fill="#8B5CF6" />
+      <rect x="50" y="50" width="20" height="35" rx="4" fill="#8B5CF6" />
+      <rect x="38" y="52" width="10" height="28" rx="4" fill="#8B5CF6" />
+      <rect x="72" y="52" width="10" height="28" rx="4" fill="#8B5CF6" />
+      <rect x="50" y="85" width="8" height="32" rx="4" fill="#8B5CF6" />
+      <rect x="62" y="85" width="8" height="32" rx="4" fill="#8B5CF6" />
+      {/* Diamond icon below */}
+      <polygon points="60,140 68,150 60,160 52,150" stroke="#8B5CF6" strokeWidth="1.5" fill="none" strokeOpacity="0.7" />
+      <polygon points="60,143 65,150 60,157 55,150" stroke="#8B5CF6" strokeWidth="1" fill="none" strokeOpacity="0.4" />
+      <polygon points="60,146 62,150 60,154 58,150" stroke="#8B5CF6" strokeWidth="1" fill="none" strokeOpacity="0.3" />
+    </svg>
+  );
+}
+
+function ManifestorFigure() {
+  return (
+    <svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* Glow */}
+      <circle cx="60" cy="90" r="55" fill="#10B981" fillOpacity="0.18" />
+      {/* Star of David / hexagram */}
+      <polygon points="60,40 80,75 40,75" stroke="#10B981" strokeWidth="1.2" fill="none" strokeOpacity="0.5" transform="translate(0,15)" />
+      <polygon points="60,140 80,105 40,105" stroke="#10B981" strokeWidth="1.2" fill="none" strokeOpacity="0.5" transform="translate(0,-15)" />
+      <circle cx="60" cy="90" r="35" stroke="#10B981" strokeWidth="1" strokeOpacity="0.3" />
+      {/* Body silhouette */}
+      <ellipse cx="60" cy="38" rx="10" ry="10" fill="#10B981" />
+      <rect x="50" y="50" width="20" height="35" rx="4" fill="#10B981" />
+      <rect x="38" y="52" width="10" height="28" rx="4" fill="#10B981" />
+      <rect x="72" y="52" width="10" height="28" rx="4" fill="#10B981" />
+      <rect x="50" y="85" width="8" height="32" rx="4" fill="#10B981" />
+      <rect x="62" y="85" width="8" height="32" rx="4" fill="#10B981" />
+      {/* Diamond icon below */}
+      <polygon points="60,140 68,150 60,160 52,150" stroke="#10B981" strokeWidth="1.5" fill="none" strokeOpacity="0.7" />
+    </svg>
+  );
+}
+
+function ReflectorFigure() {
+  return (
+    <svg viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* Glow */}
+      <circle cx="60" cy="90" r="55" fill="#94A3B8" fillOpacity="0.18" />
+      {/* Concentric rings */}
+      {[52, 44, 36, 28].map((r, i) => (
+        <circle key={i} cx="60" cy="90" r={r} stroke="#94A3B8" strokeWidth="1" strokeOpacity={0.2 + i * 0.1} strokeDasharray="4 3" />
+      ))}
+      {/* Body silhouette */}
+      <ellipse cx="60" cy="38" rx="10" ry="10" fill="#94A3B8" />
+      <rect x="50" y="50" width="20" height="35" rx="4" fill="#94A3B8" />
+      <rect x="38" y="52" width="10" height="28" rx="4" fill="#94A3B8" />
+      <rect x="72" y="52" width="10" height="28" rx="4" fill="#94A3B8" />
+      <rect x="50" y="85" width="8" height="32" rx="4" fill="#94A3B8" />
+      <rect x="62" y="85" width="8" height="32" rx="4" fill="#94A3B8" />
+      {/* Diamond icon below */}
+      <polygon points="60,140 68,150 60,160 52,150" stroke="#94A3B8" strokeWidth="1.5" fill="none" strokeOpacity="0.7" />
+    </svg>
+  );
+}
+
+const TYPES_DATA = [
+  {
+    name: "Generator",
+    czechName: "GENERATOR",
+    pct: "37%",
+    label: "populace",
+    color: "bg-amber-50 border-amber-200",
+    pctColor: "text-amber-500",
+    Figure: GeneratorFigure,
+    bgGlow: "bg-amber-100/60",
+  },
+  {
+    name: "Manifesting Generator",
+    czechName: "MANIFESTUJÍCÍ\nGENERATOR",
+    pct: "33%",
+    label: "populace",
+    color: "bg-red-50 border-red-200",
+    pctColor: "text-red-500",
+    Figure: ManifestingGeneratorFigure,
+    bgGlow: "bg-red-100/60",
+  },
+  {
+    name: "Projector",
+    czechName: "PROJEKTOR",
+    pct: "20%",
+    label: "populace",
+    color: "bg-violet-50 border-violet-200",
+    pctColor: "text-violet-500",
+    Figure: ProjectorFigure,
+    bgGlow: "bg-violet-100/60",
+  },
+  {
+    name: "Manifestor",
+    czechName: "MANIFESTOR",
+    pct: "9%",
+    label: "populace",
+    color: "bg-emerald-50 border-emerald-200",
+    pctColor: "text-emerald-500",
+    Figure: ManifestorFigure,
+    bgGlow: "bg-emerald-100/60",
+  },
+  {
+    name: "Reflector",
+    czechName: "REFLEKTOR",
+    pct: "1%",
+    label: "populace",
+    color: "bg-slate-50 border-slate-200",
+    pctColor: "text-slate-500",
+    Figure: ReflectorFigure,
+    bgGlow: "bg-slate-100/60",
+  },
+];
+
+const BENEFIT_ICONS = [Eye, Shield, Lightbulb, Heart, Leaf];
+
+const BENEFITS = [
+  { icon: Eye, label: "Poznejte sebe sama" },
+  { icon: Shield, label: "Respektujte svoji jedinečnost" },
+  { icon: Lightbulb, label: "Dělejte správná rozhodnutí" },
+  { icon: Heart, label: "Přestaňte si stát v cestě vrozené kvality" },
+  { icon: Leaf, label: "Žijte život, který je opravdu váš." },
+];
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
@@ -40,174 +238,167 @@ export default function Home() {
     { icon: FileText, ...t.home.features.pdfReports },
   ];
 
-  const benefits = [
-    "Poznejte sebe sama",
-    "Respektujte svoji jedinečnost",
-    "Dělejte správná rozhodnutí",
-    "Přestaňte si stát v cestě",
-    "Projevte své vrozené kvality",
-    "Žijte život, který je opravdu váš",
-  ];
-
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
-      {/* Hero Section — clean white with soft purple accents */}
-      <section className="relative pt-28 pb-20 overflow-hidden">
-        {/* Soft decorative blobs */}
-        <div className="absolute top-0 left-0 w-full h-full bg-dots opacity-40 pointer-events-none" />
-        <div className="absolute -top-20 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-primary/4 rounded-full blur-3xl" />
+      {/* ── Hero Section ─────────────────────────────────────────────────── */}
+      <section className="relative pt-28 pb-16 overflow-hidden">
+        {/* Soft gradient blobs like in reference */}
+        <div className="absolute -top-10 -left-20 w-80 h-80 rounded-full bg-purple-200/40 blur-3xl pointer-events-none" />
+        <div className="absolute top-20 right-0 w-72 h-72 rounded-full bg-pink-100/30 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-96 h-40 rounded-full bg-blue-100/20 blur-3xl pointer-events-none" />
 
         <div className="container relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <motion.div
+          <div className="max-w-3xl mx-auto text-center">
+            {/* Big serif headline */}
+            <motion.h1
               initial="hidden"
               animate="visible"
               custom={0}
               variants={fadeUp}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-sm mb-8 font-medium"
+              className="font-serif text-6xl md:text-8xl font-bold leading-tight mb-4 text-foreground tracking-tight"
             >
-              <Sparkles className="w-4 h-4" />
-              {t.home.badge}
-            </motion.div>
-
-            <motion.h1
-              initial="hidden"
-              animate="visible"
-              custom={1}
-              variants={fadeUp}
-              className="font-serif text-5xl md:text-7xl font-bold leading-tight mb-6 text-foreground"
-            >
-              {t.home.heroTitle}{" "}
-              <span className="text-gradient-purple">{t.home.heroTitleHighlight}</span>
+              Mapa Vašeho Já
             </motion.h1>
 
             <motion.p
               initial="hidden"
               animate="visible"
-              custom={2}
+              custom={1}
               variants={fadeUp}
-              className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto"
+              className="text-base md:text-lg text-muted-foreground leading-relaxed mb-8 max-w-lg mx-auto"
             >
-              {t.home.heroDescription}
+              Objevte své pravé já, dělejte sebevědomá rozhodnutí,<br />
+              žijte svůj autentický život
             </motion.p>
 
+            {/* CTA row: purple button + trust badge */}
             <motion.div
               initial="hidden"
               animate="visible"
-              custom={3}
+              custom={2}
               variants={fadeUp}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
               <Link href="/calculate">
-                <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg shadow-primary/20 transition-all hover:scale-105 hover:shadow-xl hover:shadow-primary/25">
-                  <Compass className="w-5 h-5 mr-2" />
-                  {t.home.ctaCalculate}
+                <Button
+                  size="lg"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-base px-7 py-5 shadow-lg shadow-primary/20 transition-all hover:scale-105 rounded-full"
+                >
+                  <Compass className="w-4 h-4 mr-2" />
+                  Získat mapu zdarma
                 </Button>
               </Link>
-              {!isAuthenticated && (
-                <Link href="/dashboard">
-                  <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-border hover:bg-muted transition-all hover:scale-105">
-                    {t.home.ctaDashboard}
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </Link>
-              )}
+
+              {/* Trust badge */}
+              <div className="flex items-center gap-3 px-4 py-2.5 rounded-full border border-border bg-card shadow-sm">
+                <div className="w-9 h-9 rounded-full bg-amber-100 border-2 border-amber-300 flex items-center justify-center text-xs font-bold text-amber-700">
+                  TRS
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-foreground leading-none">Over 1,200</p>
+                  <p className="text-xs text-muted-foreground">satisfied users</p>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Benefits list — inspired by humandesign.cz */}
-      <section className="py-12 border-t border-border/50">
+      {/* ── 5 Benefit Icons Row ───────────────────────────────────────────── */}
+      <section className="py-10 border-t border-border/40">
         <div className="container">
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="flex flex-wrap justify-center gap-x-8 gap-y-3"
+            viewport={{ once: true, margin: "-40px" }}
+            className="flex flex-wrap justify-center gap-6 md:gap-10"
           >
-            {benefits.map((b, i) => (
+            {BENEFITS.map((b, i) => (
               <motion.div
-                key={b}
+                key={b.label}
                 custom={i}
                 variants={fadeUp}
-                className="flex items-center gap-2 text-muted-foreground"
+                className="flex flex-col items-center gap-2 max-w-[110px] text-center"
               >
-                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                <span className="text-sm md:text-base">{b}</span>
+                <div className="w-14 h-14 rounded-xl bg-primary/8 flex items-center justify-center">
+                  <b.icon className="w-7 h-7 text-primary/70" strokeWidth={1.5} />
+                </div>
+                <span className="text-xs text-muted-foreground leading-tight">{b.label}</span>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
-      {/* Types Graphic Section — showcase the provided image */}
-      <section className="py-20 bg-muted/30">
+      {/* ── 5 Types Section ───────────────────────────────────────────────── */}
+      <section className="py-20 bg-gradient-to-b from-white to-purple-50/40">
         <div className="container">
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: "-80px" }}
             custom={0}
             variants={fadeUp}
-            className="text-center mb-12"
+            className="text-center mb-14"
           >
-            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">{t.home.typesTitle}</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              {t.home.typesDescription}
-            </p>
+            <h2 className="font-serif text-3xl md:text-5xl font-bold text-foreground">
+              Pět typů lidí a jejich aura
+            </h2>
           </motion.div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            custom={1}
-            variants={scaleIn}
-            className="max-w-4xl mx-auto"
-          >
-            <div className="bg-card rounded-2xl shadow-lg shadow-black/5 border border-border/50 overflow-hidden p-4 md:p-8">
-              <img
-                src={TYPES_GRAPHIC_URL}
-                alt="Pět typů lidí a jejich aura — Generátor, Manifestující Generátor, Projektor, Manifestor, Reflektor"
-                className="w-full h-auto rounded-lg"
-                loading="lazy"
-              />
-            </div>
-          </motion.div>
+          {/* Aura figures row */}
+          <div className="grid grid-cols-5 gap-3 md:gap-6 mb-12 max-w-4xl mx-auto">
+            {TYPES_DATA.map((tp, i) => (
+              <motion.div
+                key={tp.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.4 }}
+                className="flex flex-col items-center gap-3"
+              >
+                {/* Aura figure */}
+                <div className={`w-full aspect-[3/4] rounded-2xl ${tp.bgGlow} flex items-center justify-center p-2`}>
+                  <tp.Figure />
+                </div>
+                {/* Type name */}
+                <p className="text-[10px] md:text-xs font-bold text-foreground tracking-wide text-center whitespace-pre-line leading-tight">
+                  {tp.czechName}
+                </p>
+              </motion.div>
+            ))}
+          </div>
 
-          {/* Type cards below the graphic */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-10 max-w-4xl mx-auto">
-            {[
-              { name: t.types.Generator, pct: "37%", color: "bg-amber-50 border-amber-200 hover:shadow-amber-100" },
-              { name: t.types["Manifesting Generator"], pct: "33%", color: "bg-orange-50 border-orange-200 hover:shadow-orange-100" },
-              { name: t.types.Projector, pct: "20%", color: "bg-violet-50 border-violet-200 hover:shadow-violet-100" },
-              { name: t.types.Manifestor, pct: "9%", color: "bg-emerald-50 border-emerald-200 hover:shadow-emerald-100" },
-              { name: t.types.Reflector, pct: "1%", color: "bg-slate-50 border-slate-200 hover:shadow-slate-100" },
-            ].map((tp, i) => (
+          {/* Population stats cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+            {TYPES_DATA.filter(tp => tp.name !== "Manifestor").map((tp, i) => (
               <motion.div
                 key={tp.name}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-30px" }}
-                custom={i + 2}
+                custom={i + 5}
                 variants={scaleIn}
-                whileHover={{ scale: 1.05, y: -3 }}
-                className={`rounded-xl p-4 border text-center transition-shadow hover:shadow-lg cursor-default ${tp.color}`}
+                whileHover={{ scale: 1.04, y: -2 }}
+                className={`rounded-2xl p-5 border text-center transition-shadow hover:shadow-md cursor-default ${tp.color}`}
               >
-                <p className="font-serif text-base md:text-lg font-semibold mb-1 text-foreground">{tp.name}</p>
-                <p className="text-2xl font-bold text-primary">{tp.pct}</p>
-                <p className="text-xs text-muted-foreground mt-1">{t.home.ofPopulation}</p>
+                <p className="text-sm text-muted-foreground mb-1">
+                  {tp.name === "Manifesting Generator" ? "Manifestující" : tp.name === "Projector" ? "Projektor" : tp.name === "Reflector" ? "Reflektor" : tp.name}
+                </p>
+                <p className={`text-3xl font-bold ${tp.pctColor} leading-none`}>{tp.pct}</p>
+                {tp.name === "Manifesting Generator" && (
+                  <p className="text-xs text-muted-foreground mt-0.5">Generator</p>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">{tp.label}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How to start — 3 steps inspired by humandesign.cz */}
+      {/* ── How to start — 3 steps ───────────────────────────────────────── */}
       <section className="py-20 border-t border-border/50">
         <div className="container">
           <motion.div
@@ -273,7 +464,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Grid */}
+      {/* ── Features Grid ────────────────────────────────────────────────── */}
       <section className="py-20 bg-muted/30">
         <div className="container">
           <motion.div
@@ -312,7 +503,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* ── CTA Section ──────────────────────────────────────────────────── */}
       <section className="py-20 border-t border-border/50 relative overflow-hidden">
         <div className="absolute inset-0 bg-dots opacity-30 pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
@@ -335,7 +526,7 @@ export default function Home() {
               {t.home.ctaDescription}
             </p>
             <Link href="/calculate">
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg shadow-primary/20 transition-all hover:scale-105">
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg shadow-primary/20 transition-all hover:scale-105 rounded-full">
                 {t.home.ctaButton}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
