@@ -44,7 +44,7 @@ const TYPES_DATA = [
     label: "populace",
     color: "bg-amber-50 border-amber-200",
     pctColor: "text-orange-500",
-    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/muZUBTOiGqlHxeWJ.webp",
+    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/IxAVlaOWqHGkhytp.webp",
   },
   {
     name: "Manifesting Generator",
@@ -56,7 +56,7 @@ const TYPES_DATA = [
     label: "populace",
     color: "bg-red-50 border-red-200",
     pctColor: "text-red-500",
-    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/flYuNwJecllrpktS.webp",
+    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/qWsAFzAtJmYBPSzE.webp",
   },
   {
     name: "Projector",
@@ -68,7 +68,7 @@ const TYPES_DATA = [
     label: "populace",
     color: "bg-violet-50 border-violet-200",
     pctColor: "text-violet-500",
-    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/wSJjlYzTWUUvYwnp.webp",
+    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/uyvogIBNHAiNkHXh.webp",
   },
   {
     name: "Manifestor",
@@ -80,7 +80,7 @@ const TYPES_DATA = [
     label: "populace",
     color: "bg-emerald-50 border-emerald-200",
     pctColor: "text-emerald-500",
-    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/hzdETKHRqUCWhlsa.webp",
+    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/rMbULSgMTGcVzRZZ.webp",
   },
   {
     name: "Reflector",
@@ -92,7 +92,7 @@ const TYPES_DATA = [
     label: "populace",
     color: "bg-slate-50 border-slate-200",
     pctColor: "text-slate-500",
-    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/TTYeYumBkHxZdvTr.webp",
+    imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/UWRWlEUvFOKUinyN.webp",
   },
 ];
 
@@ -222,40 +222,18 @@ export default function Home() {
       <Navbar />
 
       {/* ── Hero Section ─────────────────────────────────────────────────── */}
-      <section className="relative min-h-[90vh] flex flex-col justify-center overflow-hidden" style={{background: '#f5f0e8'}}>
-        {/* Flower of Life SVG tiled background */}
-        <svg
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{opacity: 0.18}}
-        >
-          <defs>
-            <pattern id="fol" x="0" y="0" width="120" height="104" patternUnits="userSpaceOnUse">
-              {/* Flower of Life — 7 circles in hexagonal arrangement */}
-              <circle cx="60" cy="52" r="30" fill="none" stroke="#b8960c" strokeWidth="0.8"/>
-              <circle cx="90" cy="52" r="30" fill="none" stroke="#b8960c" strokeWidth="0.8"/>
-              <circle cx="30" cy="52" r="30" fill="none" stroke="#b8960c" strokeWidth="0.8"/>
-              <circle cx="75" cy="26" r="30" fill="none" stroke="#b8960c" strokeWidth="0.8"/>
-              <circle cx="45" cy="26" r="30" fill="none" stroke="#b8960c" strokeWidth="0.8"/>
-              <circle cx="75" cy="78" r="30" fill="none" stroke="#b8960c" strokeWidth="0.8"/>
-              <circle cx="45" cy="78" r="30" fill="none" stroke="#b8960c" strokeWidth="0.8"/>
-              {/* Outer ring */}
-              <circle cx="60" cy="52" r="60" fill="none" stroke="#b8960c" strokeWidth="0.5"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#fol)"/>
-        </svg>
-
-        {/* Golden radial glow in center */}
-        <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-          style={{
-            width: '520px',
-            height: '520px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(212,175,55,0.28) 0%, rgba(212,175,55,0.10) 40%, transparent 70%)',
-          }}
-        />
+      <section
+        className="relative flex flex-col justify-center overflow-hidden"
+        style={{
+          minHeight: '55vh',
+          backgroundImage: 'url(https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/WUcqCUXbXPPoyTKt.webp)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundColor: '#f5f0f8',
+        }}
+      >
+        {/* Subtle white overlay so text stays readable */}
+        <div className="absolute inset-0 pointer-events-none" style={{background: 'rgba(255,255,255,0.45)'}} />
 
         <div className="container relative z-10 py-32">
           <div className="max-w-3xl mx-auto text-center">
