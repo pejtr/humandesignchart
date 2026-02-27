@@ -360,7 +360,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.4 }}
-                className="flex flex-col items-center gap-3"
+                className="flex flex-col items-center gap-3 flex-shrink-0 w-40 md:w-auto snap-center"
               >
                 {/* Aura figure */}
                 <div className="w-full aspect-[3/4] flex items-center justify-center">
@@ -377,7 +377,7 @@ export default function Home() {
           </div>
 
           {/* Description cards — all 5 types */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 max-w-5xl mx-auto">
             {TYPES_DATA.map((tp, i) => (
               <motion.div
                 key={tp.name}
