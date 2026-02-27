@@ -351,8 +351,8 @@ export default function Home() {
             </h2>
           </motion.div>
 
-          {/* Aura figures row */}
-          <div className="grid grid-cols-5 gap-3 md:gap-6 mb-12 max-w-4xl mx-auto">
+          {/* Aura figures row — horizontal scroll on mobile, grid on desktop */}
+          <div className="flex md:grid md:grid-cols-5 gap-4 md:gap-8 mb-12 max-w-5xl mx-auto overflow-x-auto pb-2 md:overflow-visible md:pb-0 snap-x snap-mandatory md:snap-none">
             {TYPES_DATA.map((tp, i) => (
               <motion.div
                 key={tp.name}
@@ -371,10 +371,7 @@ export default function Home() {
                     loading="lazy"
                   />
                 </div>
-                {/* Type name */}
-                <p className="text-[10px] md:text-xs font-bold text-foreground tracking-wide text-center whitespace-pre-line leading-tight">
-                  {tp.czechName}
-                </p>
+
               </motion.div>
             ))}
           </div>
@@ -390,7 +387,9 @@ export default function Home() {
                 transition={{ delay: i * 0.08, duration: 0.4 }}
                 className={`rounded-xl p-4 border text-center ${tp.color}`}
               >
-                <p className={`text-sm font-bold mb-1 ${tp.pctColor}`}>{tp.displayName}</p>
+                <p className="text-[10px] md:text-xs font-bold tracking-widest text-center whitespace-pre-line leading-tight mb-2" style={{color: '#555'}}>{tp.czechName}</p>
+                <p className={`text-2xl md:text-3xl font-bold leading-none mb-1 ${tp.pctColor}`}>{tp.pct}</p>
+                <p className="text-[10px] text-muted-foreground mb-2">{tp.label}</p>
                 <p className="text-xs text-muted-foreground leading-snug mb-1">{tp.role}</p>
                 <p className="text-[11px] text-muted-foreground leading-snug italic">{tp.strategy}</p>
               </motion.div>
