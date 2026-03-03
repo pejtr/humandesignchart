@@ -24,6 +24,7 @@ const SharedChart = lazy(() => import("./pages/SharedChart"));
 const TypeDetail = lazy(() => import("./pages/TypeDetail"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogArticle = lazy(() => import("./pages/BlogArticle"));
+const IncarnationCross = lazy(() => import("./pages/IncarnationCross"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -50,6 +51,7 @@ function Router() {
         <Route path="/types/:type" component={TypeDetail} />
         <Route path="/blog" component={Blog} />
         <Route path="/blog/:slug" component={BlogArticle} />
+        <Route path="/incarnation-cross" component={IncarnationCross} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

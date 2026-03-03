@@ -258,3 +258,27 @@
 - [x] Blog integration into Navbar, Footer, sitemap.xml
 - [x] Blog CTA on Home page
 - [x] Blog tests (list, detail, SEO)
+
+## Mobilní hamburger menu
+- [ ] Hamburger tlačítko v Navbar (viditelné pouze na mobile)
+- [ ] Slide-in drawer menu s kompletní navigací
+- [ ] Zavření menu kliknutím mimo nebo na křížek
+- [ ] Animace otevření/zavření
+
+## Onboarding flow po výpočtu mapy
+- [ ] Onboarding modal/overlay po přesměrování na ChartResult
+- [ ] 3 kroky: "Váš typ", "Vaše autorita", "AI výklad"
+- [ ] Přeskočit / Další tlačítka
+- [ ] Uložit do localStorage (nezobrazovat znovu)
+
+## Inkarnační kříž — detailní stránka s AI
+- [ ] Stránka /cross/:crossName s detailní analýzou
+- [ ] 4 brány kříže s popisem
+- [ ] AI-generovaný výklad životního poslání
+- [ ] Propojení z ChartResult (kliknutí na kříž)
+- [ ] Přidat do navigace/sitemapy
+
+## Hero pozadí animace
+- [x] CSS keyframe animace pro barevné orby (pohyb, pulzování, rotace)
+- [x] Plynná smyčka bez trhání
+- [x] Respektovat prefers-reduced-motion

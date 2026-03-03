@@ -232,8 +232,42 @@ export default function Home() {
           backgroundColor: '#f5f0f8',
         }}
       >
-        {/* Subtle white overlay so text stays readable */}
-        <div className="absolute inset-0 pointer-events-none" style={{background: 'rgba(255,255,255,0.45)'}} />
+        {/* Animated orbs — behind the overlay, above the bg image */}
+        <div className="hero-orb-1 absolute pointer-events-none" style={{
+          width: '520px', height: '520px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle at 40% 40%, rgba(139,92,246,0.45) 0%, rgba(167,139,250,0.20) 50%, transparent 70%)',
+          top: '-120px', left: '-80px',
+          filter: 'blur(40px)',
+          zIndex: 1,
+        }} />
+        <div className="hero-orb-2 absolute pointer-events-none" style={{
+          width: '600px', height: '600px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle at 60% 60%, rgba(251,191,36,0.38) 0%, rgba(252,211,77,0.18) 50%, transparent 70%)',
+          bottom: '-160px', right: '-100px',
+          filter: 'blur(50px)',
+          zIndex: 1,
+        }} />
+        <div className="hero-orb-3 absolute pointer-events-none" style={{
+          width: '380px', height: '380px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle at 50% 50%, rgba(42,157,143,0.35) 0%, rgba(94,234,212,0.15) 50%, transparent 70%)',
+          top: '30%', left: '55%',
+          filter: 'blur(35px)',
+          zIndex: 1,
+        }} />
+        <div className="hero-orb-4 absolute pointer-events-none" style={{
+          width: '300px', height: '300px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle at 50% 50%, rgba(244,114,182,0.32) 0%, rgba(251,207,232,0.14) 50%, transparent 70%)',
+          top: '10%', right: '20%',
+          filter: 'blur(30px)',
+          zIndex: 1,
+        }} />
+
+        {/* Subtle white overlay so text stays readable — above orbs */}
+        <div className="absolute inset-0 pointer-events-none" style={{background: 'rgba(255,255,255,0.42)', zIndex: 2}} />
 
         <div className="container relative z-10 py-32">
           <div className="max-w-3xl mx-auto text-center">

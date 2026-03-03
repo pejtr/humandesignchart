@@ -27,6 +27,7 @@ import {
   GATE_DESCRIPTIONS, CHANNEL_DESCRIPTIONS, CENTER_DESCRIPTIONS,
   TYPE_DESCRIPTIONS, AUTHORITY_DESCRIPTIONS, PROFILE_DESCRIPTIONS,
 } from "@shared/hdContent";
+import OnboardingModal, { useOnboarding } from "@/components/OnboardingModal";
 
 // Czech cross type translations
 const CROSS_TYPE_CS: Record<string, string> = {
@@ -80,6 +81,7 @@ export default function ChartResult() {
   const [aiReadingType, setAiReadingType] = useState<string | null>(null);
   const [showAiTypes, setShowAiTypes] = useState(false);
   const aiSectionRef = useRef<HTMLDivElement>(null);
+  const { shouldShow: showOnboarding, triggerOnboarding, markSeen: markOnboardingSeen } = useOnboarding();
 
   const shareMutation = trpc.share.createLink.useMutation({
     onSuccess: (data) => {
@@ -130,7 +132,11 @@ export default function ChartResult() {
     if (isNewChart) {
       const stored = sessionStorage.getItem("chartResult");
       const meta = sessionStorage.getItem("chartMeta");
-      if (stored) setChart(JSON.parse(stored));
+      if (stored) {
+        setChart(JSON.parse(stored));
+        // Trigger onboarding for first-time chart viewers
+        setTimeout(() => triggerOnboarding(), 1200);
+      }
       if (meta) setChartMeta(JSON.parse(meta));
     }
   }, [isNewChart]);
@@ -205,6 +211,23 @@ export default function ChartResult() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
+
+      {/* Onboarding modal for first-time users */}
+      {showOnboarding && chart && (
+        <OnboardingModal
+          chartType={czType}
+          chartProfile={`${chart.profile} ${chart.profileName}`}
+          chartAuthority={chart.authority}
+          onClose={markOnboardingSeen}
+          onRequestAiReading={() => {
+            markOnboardingSeen();
+            setTimeout(() => {
+              aiSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+          }}
+        />
+      )}
+
       <main className="flex-1 pt-24 pb-16">
         <div className="container">
           {/* Back button */}
@@ -533,8 +556,19 @@ export default function ChartResult() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-lg font-serif font-semibold mb-1">{translateCrossName(chart.incarnationCross.name)}</p>
-                  <p className="text-sm text-muted-foreground mb-4">{CROSS_TYPE_CS[chart.incarnationCross.type] || chart.incarnationCross.type}</p>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="text-lg font-serif font-semibold">{translateCrossName(chart.incarnationCross.name)}</p>
+                      <p className="text-sm text-muted-foreground">{CROSS_TYPE_CS[chart.incarnationCross.type] || chart.incarnationCross.type}</p>
+                    </div>
+                    <a href="/incarnation-cross">
+                      <Button size="sm" variant="outline" className="text-xs gap-1.5 border-primary/30 text-primary hover:bg-primary/10">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        AI analýza
+                        <ChevronRight className="w-3 h-3" />
+                      </Button>
+                    </a>
+                  </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {chart.incarnationCross.gates.map((g, i) => {
                       const gateDesc = GATE_DESCRIPTIONS[g];
