@@ -43,6 +43,7 @@ export default function Footer() {
               <li><Link href="/calculate" className="hover:text-primary transition-colors">{t.footer.typesStrategy}</Link></li>
               <li><Link href="/calculate" className="hover:text-primary transition-colors">{t.footer.authorityLabel}</Link></li>
               <li><Link href="/calculate" className="hover:text-primary transition-colors">{t.footer.gatesChannels}</Link></li>
+              <li><Link href="/blog" className="hover:text-primary transition-colors">Blog</Link></li>
             </ul>
           </div>
 

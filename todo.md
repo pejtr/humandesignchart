@@ -239,7 +239,7 @@
 - [ ] Mobilní hamburger navigace
 - [ ] Page transition animace
 - [ ] Dark mode přepínač
-- [ ] Blog sekce se starter články
+- [x] Blog sekce se starter články
 - [ ] Onboarding flow pro nové uživatele
 
 ## SEO & Share Tests
@@ -248,3 +248,13 @@
 - [x] Non-existent share token returns null
 - [x] Sitemap.xml endpoint test (all pages included)
 - [x] Robots.txt endpoint test (correct directives)
+
+## Blog sekce — SEO články
+- [x] Blog data model (static articles in shared/blogArticles.ts)
+- [x] Server tRPC procedures for blog (list, getBySlug)
+- [x] Blog list page (/blog) with article cards, categories, reading time
+- [x] Blog article detail page (/blog/:slug) with full content, SEO meta, JSON-LD
+- [x] 10 Czech SEO articles (types, strategies, authorities, profiles, centers, channels)
+- [x] Blog integration into Navbar, Footer, sitemap.xml
+- [x] Blog CTA on Home page
+- [x] Blog tests (list, detail, SEO)

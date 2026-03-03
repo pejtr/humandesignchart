@@ -49,6 +49,7 @@ export default function Navbar() {
   const exploreLinks = [
     { href: "/celebrities", label: t.nav.celebrities, icon: Users, desc: "Mapy známých osobností" },
     { href: "/iching", label: t.nav.iChing, icon: Hexagon, desc: "I-Ťing orákulum" },
+    { href: "/blog", label: "Blog", icon: BookOpen, desc: "Články o Human Design" },
   ];
 
   const allMobileLinks = [...primaryLinks, ...toolsLinks, ...exploreLinks];

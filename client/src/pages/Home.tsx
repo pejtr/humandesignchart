@@ -533,7 +533,58 @@ export default function Home() {
       {/* ── Reference ──────────────────────────────────────────────────────── */}
       <TestimonialsSection />
 
-            {/* ── CTA Section ──────────────────────────────────────────────────── */}
+      {/* ── Blog Preview ────────────────────────────────────────────────────── */}
+      <section className="py-20 border-t border-border/50">
+        <div className="container">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            custom={0}
+            variants={fadeUp}
+            className="text-center mb-12"
+          >
+            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-3">
+              Z našeho blogu
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Prozkoumejte svět Human Design skrze naše články v češtině
+            </p>
+          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {[
+              { slug: "co-je-human-design", title: "Co je Human Design?", excerpt: "Kompletní průvodce pro začátečníky — zjistěte, jak systém funguje a jak vám může pomoci.", cat: "Základy HD", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8 },
+              { slug: "5-typu-human-design", title: "5 typů v Human Design", excerpt: "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.", cat: "Typy", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10 },
+              { slug: "strategie-v-human-design", title: "Strategie: Klíč ke správným rozhodnutím", excerpt: "Reagovat, informovat, čekat na pozvání — naučte se svou strategii.", cat: "Strategie", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7 },
+            ].map((post, i) => (
+              <motion.div key={post.slug} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={scaleIn}>
+                <Link href={`/blog/${post.slug}`} className="no-underline">
+                  <div className="group border border-border/50 rounded-xl overflow-hidden hover:shadow-lg transition-all h-full bg-card">
+                    <div className="p-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className={`text-xs px-2 py-0.5 rounded-full border ${post.catStyle}`}>{post.cat}</span>
+                        <span className="text-xs text-muted-foreground">{post.time} min</span>
+                      </div>
+                      <h3 className="font-serif text-lg font-bold mb-2 group-hover:text-primary transition-colors">{post.title}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{post.excerpt}</p>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+          <div className="text-center">
+            <Link href="/blog">
+              <Button variant="outline" className="rounded-full">
+                Všechny články
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA Section ──────────────────────────────────────────────────── */}
       <section className="py-20 border-t border-border/50 relative overflow-hidden">
         <div className="absolute inset-0 bg-dots opacity-30 pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />

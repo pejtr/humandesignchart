@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation, useParams } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -77,6 +77,9 @@ export default function ChartResult() {
   const [generatingPdf, setGeneratingPdf] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [aiReadingType, setAiReadingType] = useState<string | null>(null);
+  const [showAiTypes, setShowAiTypes] = useState(false);
+  const aiSectionRef = useRef<HTMLDivElement>(null);
 
   const shareMutation = trpc.share.createLink.useMutation({
     onSuccess: (data) => {
@@ -320,6 +323,122 @@ export default function ChartResult() {
 
             {/* Details Column */}
             <div className="lg:col-span-2 space-y-6">
+
+              {/* ─── AI Výklad — PRIMÁRNÍ SEKCE ─── */}
+              <div ref={aiSectionRef}>
+                {!aiReading && !aiMutation.isPending ? (
+                  <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-violet-50 p-6 shadow-md">
+                    {/* Decorative glow */}
+                    <div className="absolute -top-8 -right-8 w-40 h-40 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+                    <div className="relative z-10">
+                      <div className="flex items-start gap-4">
+                        <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/30">
+                          <Sparkles className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h2 className="font-serif text-xl font-bold text-foreground">AI výklad vaší mapy</h2>
+                            <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-medium">Nové</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                            Získáte <strong>srozumitelný výklad v češtině</strong> — co váš typ znamená, jak využít svou autoritu a jaké je vaše životní poslání.
+                          </p>
+                          <div className="flex flex-wrap gap-2 mb-5">
+                            {[
+                              { key: "overview", label: "✨ Kompletní přehled", primary: true },
+                              { key: "type_strategy", label: "💫 Typ & strategie", primary: false },
+                              { key: "profile", label: "🎭 Profil", primary: false },
+                              { key: "authority", label: "🧠 Autorita", primary: false },
+                              { key: "incarnation_cross", label: "★ Životní poslání", primary: false },
+                              { key: "career", label: "💼 Kariéra", primary: false },
+                              { key: "relationships", label: "❤️ Vztahy", primary: false },
+                              { key: "channels", label: "⚡ Kanály", primary: false },
+                            ].map(item => (
+                              <Button
+                                key={item.key}
+                                size={item.primary ? "default" : "sm"}
+                                variant={item.primary ? "default" : "outline"}
+                                className={item.primary
+                                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90 font-semibold"
+                                  : "text-xs h-8 bg-white/70 hover:bg-white border-border/60"}
+                                onClick={() => {
+                                  setAiReadingType(item.key);
+                                  handleAiReading(item.key);
+                                }}
+                                disabled={aiMutation.isPending}
+                              >
+                                {item.label}
+                              </Button>
+                            ))}
+                          </div>
+                          {!isAuthenticated && (
+                            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                              <Info className="w-3.5 h-3.5" />
+                              Pro AI výklad se prosím{" "}
+                              <a href={getLoginUrl()} className="text-primary underline underline-offset-2">přihlašte</a>.
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : aiMutation.isPending ? (
+                  <Card className="border-primary/20 bg-primary/5">
+                    <CardContent className="py-8">
+                      <div className="flex flex-col items-center gap-3 text-center">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm">{t.chart.generatingReading}</p>
+                          <p className="text-xs text-muted-foreground mt-1">AI analýza vaší mapy probíhá...</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : aiReading ? (
+                  <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background shadow-sm">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="font-serif text-xl flex items-center gap-2">
+                          <Sparkles className="w-5 h-5 text-primary" /> AI výklad vaší mapy
+                        </CardTitle>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs gap-1.5 h-8"
+                            onClick={() => {
+                              const blob = new Blob([aiReading], { type: 'text/plain;charset=utf-8' });
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `HD-rozbor-${chartMeta?.name || 'chart'}.txt`;
+                              a.click();
+                              URL.revokeObjectURL(url);
+                            }}
+                          >
+                            <Download className="w-3 h-3" /> Stáhnout
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs h-8"
+                            onClick={() => { setAiReading(null); setAiReadingType(null); }}
+                          >
+                            Jiný výklad
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="prose prose-sm max-w-none p-4 rounded-lg bg-white/60 border border-border/30">
+                        <Streamdown>{aiReading}</Streamdown>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : null}
+              </div>
 
               {/* ─── Type & Strategy Card ─── */}
               <Card className="bg-card border-border/50 shadow-sm overflow-hidden">
@@ -661,73 +780,7 @@ export default function ChartResult() {
                 </TabsContent>
               </Tabs>
 
-              {/* ─── AI Reading Section ─── */}
-              <Card className="bg-card border-border/50 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="font-serif text-xl flex items-center gap-2">
-                    <Brain className="w-5 h-5 text-primary" /> {t.chart.aiReading}
-                  </CardTitle>
-                  <CardDescription>{t.chart.aiReadingDesc}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-4">
-                    {[
-                      { key: "overview", label: t.chart.aiTypes.overview, icon: Sparkles },
-                      { key: "type_strategy", label: t.chart.aiTypes.type_strategy, icon: Shield },
-                      { key: "profile", label: t.chart.aiTypes.profile, icon: Target },
-                      { key: "authority", label: t.chart.aiTypes.authority, icon: Compass },
-                      { key: "incarnation_cross", label: t.chart.aiTypes.incarnation_cross, icon: Star },
-                      { key: "channels", label: t.chart.aiTypes.channels, icon: Zap },
-                      { key: "gates", label: t.chart.aiTypes.gates, icon: CircleDot },
-                      { key: "variables", label: t.chart.aiTypes.variables, icon: Eye },
-                      { key: "relationships", label: t.chart.aiTypes.relationships, icon: Zap },
-                      { key: "career", label: t.chart.aiTypes.career, icon: Target },
-                    ].map(item => {
-                      const Icon = item.icon;
-                      return (
-                        <Button key={item.key} variant="outline" size="sm"
-                          onClick={() => handleAiReading(item.key)} disabled={aiMutation.isPending}
-                          className="text-xs h-9 justify-start">
-                          <Icon className="w-3 h-3 mr-1 shrink-0" /> {item.label}
-                        </Button>
-                      );
-                    })}
-                  </div>
 
-                  {aiMutation.isPending && (
-                    <div className="flex items-center gap-3 py-8 justify-center">
-                      <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                      <span className="text-muted-foreground">{t.chart.generatingReading}</span>
-                    </div>
-                  )}
-
-                  {aiReading && (
-                    <div className="mt-4">
-                      <div className="flex justify-end mb-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-xs gap-1.5 h-8"
-                          onClick={() => {
-                            const blob = new Blob([aiReading], { type: 'text/plain;charset=utf-8' });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `HD-rozbor-${chartMeta?.name || 'chart'}.txt`;
-                            a.click();
-                            URL.revokeObjectURL(url);
-                          }}
-                        >
-                          <Download className="w-3 h-3" /> Stáhnout rozbor (.txt)
-                        </Button>
-                      </div>
-                      <div className="prose prose-sm max-w-none p-4 rounded-lg bg-muted/20 border border-border/30">
-                        <Streamdown>{aiReading}</Streamdown>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>

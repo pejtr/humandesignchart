@@ -11,6 +11,7 @@ import {
 } from "./db";
 import crypto from "crypto";
 import { invokeLLM } from "./_core/llm";
+import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../shared/blogArticles";
 
 export const appRouter = router({
   system: systemRouter,
@@ -303,6 +304,31 @@ Pravidla:
         transitGates,
       };
     }),
+  }),
+
+  // ─── Blog ─────────────────────────────────────────────────────────────
+  blog: router({
+    list: publicProcedure
+      .input(z.object({
+        category: z.string().optional(),
+      }).optional())
+      .query(({ input }) => {
+        let articles = BLOG_ARTICLES;
+        if (input?.category) {
+          articles = articles.filter(a => a.category === input.category);
+        }
+        return {
+          articles: articles.map(({ content, ...rest }) => rest),
+          categories: BLOG_CATEGORIES,
+        };
+      }),
+
+    getBySlug: publicProcedure
+      .input(z.object({ slug: z.string() }))
+      .query(({ input }) => {
+        const article = BLOG_ARTICLES.find(a => a.slug === input.slug);
+        return article || null;
+      }),
   }),
 });
 
