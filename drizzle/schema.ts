@@ -59,5 +59,16 @@ export type Chart = typeof charts.$inferSelect;
 export type InsertChart = typeof charts.$inferInsert;
 export type Celebrity = typeof celebrities.$inferSelect;
 export type InsertCelebrity = typeof celebrities.$inferInsert;
+export const sharedCharts = mysqlTable("sharedCharts", {
+  id: int("id").autoincrement().primaryKey(),
+  token: varchar("token", { length: 64 }).notNull().unique(),
+  chartData: json("chartData").notNull(),
+  ownerName: varchar("ownerName", { length: 255 }),
+  expiresAt: timestamp("expiresAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export type AiReading = typeof aiReadings.$inferSelect;
 export type InsertAiReading = typeof aiReadings.$inferInsert;
+export type SharedChart = typeof sharedCharts.$inferSelect;
+export type InsertSharedChart = typeof sharedCharts.$inferInsert;

@@ -7,7 +7,9 @@ import { calculateChart } from "./humandesign";
 import {
   createChart, getUserCharts, getChartById, updateChart,
   deleteChart, toggleFavorite, createAiReading, getAiReadings,
+  createSharedChart, getSharedChart,
 } from "./db";
+import crypto from "crypto";
 import { invokeLLM } from "./_core/llm";
 
 export const appRouter = router({
@@ -230,6 +232,38 @@ Pravidla:
         const content = typeof rawContent === "string" ? rawContent : "Omlouvám se, nepodařilo se vygenerovat odpověď.";
 
         return { content };
+      }),
+  }),
+
+  // ─── Share ──────────────────────────────────────────────────────────
+  share: router({
+    createLink: publicProcedure
+      .input(z.object({
+        chartData: z.any(),
+        ownerName: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const token = crypto.randomBytes(16).toString("hex");
+        const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+        await createSharedChart({
+          token,
+          chartData: input.chartData,
+          ownerName: input.ownerName || null,
+          expiresAt,
+        });
+        return { token };
+      }),
+
+    getShared: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .query(async ({ input }) => {
+        const shared = await getSharedChart(input.token);
+        if (!shared) return null;
+        return {
+          chartData: shared.chartData,
+          ownerName: shared.ownerName,
+          createdAt: shared.createdAt,
+        };
       }),
   }),
 

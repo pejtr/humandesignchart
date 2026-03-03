@@ -19,7 +19,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import {
   Save, Sparkles, ArrowLeft, Brain, Compass, Star, Sun, Moon,
   Loader2, Eye, Zap, Shield, Target, FileText, Download,
-  ChevronRight, Info, Hexagon, CircleDot, Globe,
+  ChevronRight, Info, Hexagon, CircleDot, Globe, Share2, Copy, Check,
 } from "lucide-react";
 import { generateChartPDF } from "@/lib/pdfExport";
 import type { HumanDesignChartData } from "@shared/types";
@@ -75,6 +75,37 @@ export default function ChartResult() {
   const [aiReading, setAiReading] = useState<string | null>(null);
   const [showTransits, setShowTransits] = useState(false);
   const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const shareMutation = trpc.share.createLink.useMutation({
+    onSuccess: (data) => {
+      const url = `${window.location.origin}/shared/${data.token}`;
+      setShareUrl(url);
+      navigator.clipboard.writeText(url).then(() => {
+        setCopied(true);
+        toast.success("Odkaz zkopírován do schránky!");
+        setTimeout(() => setCopied(false), 3000);
+      });
+    },
+    onError: () => toast.error("Sdílení se nezdařilo"),
+  });
+
+  const handleShare = () => {
+    if (shareUrl) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        setCopied(true);
+        toast.success("Odkaz zkopírován do schránky!");
+        setTimeout(() => setCopied(false), 3000);
+      });
+      return;
+    }
+    if (!chart) return;
+    shareMutation.mutate({
+      chartData: chart,
+      ownerName: chartMeta?.name,
+    });
+  };
 
   const transitQuery = trpc.transit.current.useQuery(undefined, {
     enabled: showTransits,
@@ -196,6 +227,10 @@ export default function ChartResult() {
                 </Button>
               )}
               {savedChartId && <Badge variant="secondary" className="py-1.5 px-3">{t.common.saved}</Badge>}
+              <Button variant="outline" size="sm" onClick={handleShare} disabled={shareMutation.isPending}>
+                {shareMutation.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : copied ? <Check className="w-4 h-4 mr-1 text-green-500" /> : <Share2 className="w-4 h-4 mr-1" />}
+                {shareMutation.isPending ? "Sdílení..." : copied ? "Zkopírováno!" : "Sdílet mapu"}
+              </Button>
               <Button variant="outline" size="sm" onClick={() => {
                 setGeneratingPdf(true);
                 setTimeout(() => {

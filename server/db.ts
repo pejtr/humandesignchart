@@ -1,6 +1,6 @@
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, charts, InsertChart, aiReadings, InsertAiReading } from "../drizzle/schema";
+import { InsertUser, users, charts, InsertChart, aiReadings, InsertAiReading, sharedCharts, InsertSharedChart } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -145,4 +145,26 @@ export async function getAiReadings(chartId: number, userId: number) {
   return db.select().from(aiReadings)
     .where(and(eq(aiReadings.chartId, chartId), eq(aiReadings.userId, userId)))
     .orderBy(desc(aiReadings.createdAt));
+}
+
+// ─── Shared Chart Operations ────────────────────────────────────────────────
+
+export async function createSharedChart(data: InsertSharedChart) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(sharedCharts).values(data);
+  return data.token;
+}
+
+export async function getSharedChart(token: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(sharedCharts)
+    .where(eq(sharedCharts.token, token))
+    .limit(1);
+  if (result.length === 0) return null;
+  const chart = result[0];
+  // Check expiration
+  if (chart.expiresAt && new Date(chart.expiresAt) < new Date()) return null;
+  return chart;
 }

@@ -35,6 +35,34 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+
+  // ─── SEO: Sitemap.xml ───────────────────────────────────────────────
+  app.get("/sitemap.xml", (_req, res) => {
+    const baseUrl = "https://human-design.manus.space";
+    const now = new Date().toISOString().split("T")[0];
+    const pages = [
+      { loc: "/", priority: "1.0", changefreq: "weekly" },
+      { loc: "/calculate", priority: "0.9", changefreq: "monthly" },
+      { loc: "/encyclopedia", priority: "0.8", changefreq: "monthly" },
+      { loc: "/ai-guide", priority: "0.7", changefreq: "monthly" },
+      { loc: "/transits", priority: "0.7", changefreq: "daily" },
+      { loc: "/transit-calendar", priority: "0.6", changefreq: "daily" },
+      { loc: "/celebrities", priority: "0.7", changefreq: "monthly" },
+      { loc: "/comparison", priority: "0.6", changefreq: "monthly" },
+      { loc: "/return-chart", priority: "0.6", changefreq: "monthly" },
+      { loc: "/variables", priority: "0.6", changefreq: "monthly" },
+      { loc: "/iching", priority: "0.6", changefreq: "monthly" },
+      { loc: "/types/generator", priority: "0.8", changefreq: "monthly" },
+      { loc: "/types/manifesting-generator", priority: "0.8", changefreq: "monthly" },
+      { loc: "/types/projector", priority: "0.8", changefreq: "monthly" },
+      { loc: "/types/manifestor", priority: "0.8", changefreq: "monthly" },
+      { loc: "/types/reflector", priority: "0.8", changefreq: "monthly" },
+    ];
+    const urls = pages.map(p => `  <url>\n    <loc>${baseUrl}${p.loc}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`).join("\n");
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`;
+    res.set("Content-Type", "application/xml");
+    res.send(xml);
+  });
   // tRPC API
   app.use(
     "/api/trpc",

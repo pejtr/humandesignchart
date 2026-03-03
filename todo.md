@@ -181,7 +181,7 @@
 - [x] Environment guidance based on Variables (VariablesAnalysis page)
 - [x] AI chat guide (conversational HD assistant) (AiGuide page)
 - [x] Advanced PDF reports (light theme, multi-page, Czech)
-- [ ] Chart sharing (public link, social media)
+- [x] Chart sharing (public link, social media)
 - [x] Complete Gate encyclopedia (64 gates with I Ching) (Encyclopedia page)
 - [x] Complete Channel encyclopedia (36 channels with circuit info) (Encyclopedia page)
 - [x] Variable/Cognition deep analysis (VariablesAnalysis page with 4 tabs)
@@ -224,3 +224,27 @@
 ## UI Redesign & AI Fix
 - [x] Odstranit "Ahoj!" oslovení z AI výkladů (server/routers.ts)
 - [x] Přepracovat Home stránku dle referenčního designu (hero, 5 ikon výhod, 5 typů s aurami, statistiky populace)
+
+## Sdílení mapy & OG meta
+- [x] DB tabulka shared_charts (token, chartData, expiresAt)
+- [x] Server procedure: createShareToken, getSharedChart
+- [x] Tlačítko "Sdílet mapu" na ChartResult stránce
+- [x] Veřejná stránka /shared/:token zobrazující sdílený chart
+- [x] OG meta description v češtině v index.html
+
+## Velká implementace — všechna vylepšení
+- [x] SEO: Dedikované stránky pro 5 typů (/types/generator, /types/manifesting-generator, /types/projector, /types/manifestor, /types/reflector) s CTA nahoru
+- [x] SEO: JSON-LD structured data
+- [x] SEO: sitemap.xml + robots.txt
+- [ ] Mobilní hamburger navigace
+- [ ] Page transition animace
+- [ ] Dark mode přepínač
+- [ ] Blog sekce se starter články
+- [ ] Onboarding flow pro nové uživatele
+
+## SEO & Share Tests
+- [x] Share link creation test (token generation)
+- [x] Share link retrieval test (create + get)
+- [x] Non-existent share token returns null
+- [x] Sitemap.xml endpoint test (all pages included)
+- [x] Robots.txt endpoint test (correct directives)
