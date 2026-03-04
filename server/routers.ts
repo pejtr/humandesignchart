@@ -7,6 +7,7 @@ import { calculateChart } from "./humandesign";
 import {
   createChart, getUserCharts, getChartById, updateChart,
   deleteChart, toggleFavorite, createAiReading, getAiReadings,
+  getAllReadingsByUser, updateReadingRating, getReadingById,
   createSharedChart, getSharedChart,
 } from "./db";
 import crypto from "crypto";
@@ -181,6 +182,37 @@ export const appRouter = router({
       .input(z.object({ chartId: z.number() }))
       .query(async ({ ctx, input }) => {
         return getAiReadings(input.chartId, ctx.user.id);
+      }),
+
+    getAllReadings: protectedProcedure
+      .query(async ({ ctx }) => {
+        return getAllReadingsByUser(ctx.user.id);
+      }),
+
+    rateReading: protectedProcedure
+      .input(z.object({
+        readingId: z.number(),
+        rating: z.enum(["up", "down"]).nullable(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await updateReadingRating(input.readingId, ctx.user.id, input.rating);
+        return { success: true };
+      }),
+
+    shareReading: protectedProcedure
+      .input(z.object({ readingId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const reading = await getReadingById(input.readingId, ctx.user.id);
+        if (!reading) throw new Error("Reading not found");
+        const token = crypto.randomBytes(24).toString("hex");
+        // Store as a shared chart with reading content embedded
+        await createSharedChart({
+          token,
+          chartData: { readingContent: reading.content, readingType: reading.readingType, readingId: reading.id } as any,
+          ownerName: ctx.user.name || undefined,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        });
+        return { token };
       }),
 
     // AI Chat Guide - conversational HD assistant

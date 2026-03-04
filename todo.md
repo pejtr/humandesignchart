@@ -292,3 +292,11 @@
 - [x] Hodnocení výkladu palcem nahoru/dolů
 - [x] DB tabulka ai_readings (chartId, type, content, rating)
 - [x] Abort controller pro přerušení streamu při změně typu výkladu
+
+## Dashboard — Moje výklady + sdílení
+- [x] Server procedure: getAllReadingsByUser (všechny výklady uživatele s info o mapě)
+- [x] Server procedure: getReadingsByChart (výklady pro konkrétní mapu)
+- [x] Záložka "Moje výklady" v dashboardu (seznam výkladů s typem, datem, hodnocením)
+- [x] Kliknutí na výklad otevře detail s plným textem (rozbalit/sbalit)
+- [x] Sdílení AI výkladu — tlačítko "Sdílet" vedle thumbs up/down (ChartResult + Dashboard)
+- [x] Vylepšený dashboard — záložky "Moje mapy" a "Moje výklady"

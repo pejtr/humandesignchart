@@ -29,6 +29,42 @@ import {
 } from "@shared/hdContent";
 import OnboardingModal, { useOnboarding } from "@/components/OnboardingModal";
 
+// ─── ShareReadingButton ─────────────────────────────────────────────────────
+function ShareReadingButton({ readingId }: { readingId: number }) {
+  const [copied, setCopied] = useState(false);
+  const shareMut = trpc.ai.shareReading.useMutation({
+    onSuccess: (data) => {
+      const url = `${window.location.origin}/shared/${data.token}`;
+      navigator.clipboard.writeText(url).then(() => {
+        setCopied(true);
+        toast.success("Odkaz na výklad zkopírován!");
+        setTimeout(() => setCopied(false), 3000);
+      }).catch(() => toast.success(`Odkaz: ${url}`));
+    },
+    onError: () => toast.error("Sdílení se nezdařilo"),
+  });
+  return (
+    <button
+      onClick={() => !copied && shareMut.mutate({ readingId })}
+      disabled={shareMut.isPending}
+      className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+        copied
+          ? "bg-primary/10 text-primary border-primary/30"
+          : "bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary border-border/40"
+      }`}
+    >
+      {shareMut.isPending ? (
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+      ) : copied ? (
+        <Check className="w-3.5 h-3.5" />
+      ) : (
+        <Share2 className="w-3.5 h-3.5" />
+      )}
+      {copied ? "Zkopírováno!" : "Sdílet výklad"}
+    </button>
+  );
+}
+
 // Czech cross type translations
 const CROSS_TYPE_CS: Record<string, string> = {
   "Right Angle Cross": "Pravý Úhlový Kříž",
@@ -559,10 +595,10 @@ export default function ChartResult() {
                           <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-middle rounded-sm" />
                         )}
                       </div>
-                      {/* Thumbs up/down feedback */}
+                      {/* Thumbs up/down feedback + share reading */}
                       {!aiStreaming && (
-                        <div className="flex items-center gap-3 mt-4 pt-4 border-t border-border/20">
-                          <span className="text-xs text-muted-foreground">Byl tento výklad užitečný?</span>
+                        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border/20 flex-wrap">
+                          <span className="text-xs text-muted-foreground mr-1">Byl tento výklad užitečný?</span>
                           <button
                             onClick={() => handleRating("up")}
                             className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
@@ -583,6 +619,10 @@ export default function ChartResult() {
                           >
                             👎 {aiRating === "down" ? "Děkujeme" : "Ne"}
                           </button>
+                          {/* Share reading button */}
+                          {aiReadingId && isAuthenticated && (
+                            <ShareReadingButton readingId={aiReadingId} />
+                          )}
                         </div>
                       )}
                     </CardContent>
