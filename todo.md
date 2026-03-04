@@ -282,3 +282,6 @@
 - [x] CSS keyframe animace pro barevné orby (pohyb, pulzování, rotace)
 - [x] Plynná smyčka bez trhání
 - [x] Respektovat prefers-reduced-motion
+
+## Bug fix — AI výklad selector
+- [x] Po spuštění AI výkladu zůstanou tlačítka výběru typu výkladu vždy viditelná

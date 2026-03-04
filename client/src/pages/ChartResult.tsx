@@ -419,39 +419,58 @@ export default function ChartResult() {
                       </div>
                     </CardContent>
                   </Card>
-                ) : aiReading ? (
+) : aiReading ? (
                   <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background shadow-sm">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <CardTitle className="font-serif text-xl flex items-center gap-2">
                           <Sparkles className="w-5 h-5 text-primary" /> AI výklad vaší mapy
                         </CardTitle>
-                        <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs gap-1.5 h-8"
+                          onClick={() => {
+                            const blob = new Blob([aiReading], { type: 'text/plain;charset=utf-8' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `HD-rozbor-${chartMeta?.name || 'chart'}.txt`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                          }}
+                        >
+                          <Download className="w-3 h-3" /> Stáhnout
+                        </Button>
+                      </div>
+                      {/* Reading type selector — always visible */}
+                      <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border/30">
+                        {[
+                          { key: "overview", label: "✨ Kompletní přehled" },
+                          { key: "type_strategy", label: "💫 Typ & strategie" },
+                          { key: "profile", label: "🎭 Profil" },
+                          { key: "authority", label: "🧠 Autorita" },
+                          { key: "incarnation_cross", label: "★ Životní poslání" },
+                          { key: "career", label: "💼 Kariéra" },
+                          { key: "relationships", label: "❤️ Vztahy" },
+                          { key: "channels", label: "⚡ Kanály" },
+                        ].map(item => (
                           <Button
-                            variant="outline"
+                            key={item.key}
                             size="sm"
-                            className="text-xs gap-1.5 h-8"
+                            variant={aiReadingType === item.key ? "default" : "outline"}
+                            className={aiReadingType === item.key
+                              ? "text-xs h-7 bg-primary text-primary-foreground font-semibold"
+                              : "text-xs h-7 bg-white/70 hover:bg-white border-border/60"}
                             onClick={() => {
-                              const blob = new Blob([aiReading], { type: 'text/plain;charset=utf-8' });
-                              const url = URL.createObjectURL(blob);
-                              const a = document.createElement('a');
-                              a.href = url;
-                              a.download = `HD-rozbor-${chartMeta?.name || 'chart'}.txt`;
-                              a.click();
-                              URL.revokeObjectURL(url);
+                              setAiReadingType(item.key);
+                              handleAiReading(item.key);
                             }}
+                            disabled={aiMutation.isPending}
                           >
-                            <Download className="w-3 h-3" /> Stáhnout
+                            {item.label}
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-xs h-8"
-                            onClick={() => { setAiReading(null); setAiReadingType(null); }}
-                          >
-                            Jiný výklad
-                          </Button>
-                        </div>
+                        ))}
                       </div>
                     </CardHeader>
                     <CardContent>
