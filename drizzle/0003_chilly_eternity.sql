@@ -1,0 +1,1 @@
+ALTER TABLE `aiReadings` ADD `rating` enum('up','down');

@@ -285,3 +285,10 @@
 
 ## Bug fix — AI výklad selector
 - [x] Po spuštění AI výkladu zůstanou tlačítka výběru typu výkladu vždy viditelná
+
+## Streaming AI výkladu + uložení + hodnocení
+- [x] Streaming AI výkladu (token po tokenu) přes SSE endpoint
+- [x] Uložení AI výkladu k uložené mapě v dashboardu (auto-save po dokončení streamu)
+- [x] Hodnocení výkladu palcem nahoru/dolů
+- [x] DB tabulka ai_readings (chartId, type, content, rating)
+- [x] Abort controller pro přerušení streamu při změně typu výkladu

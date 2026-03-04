@@ -50,6 +50,7 @@ export const aiReadings = mysqlTable("aiReadings", {
   chartId: int("chartId").notNull(),
   readingType: varchar("readingType", { length: 50 }).notNull(),
   content: text("content"),
+  rating: mysqlEnum("rating", ["up", "down"]),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

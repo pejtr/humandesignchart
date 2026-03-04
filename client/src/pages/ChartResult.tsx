@@ -74,6 +74,9 @@ export default function ChartResult() {
   const [savedChartId, setSavedChartId] = useState<number | null>(null);
   const [detailModal, setDetailModal] = useState<DetailModalState>({ type: null, id: null });
   const [aiReading, setAiReading] = useState<string | null>(null);
+  const [aiStreaming, setAiStreaming] = useState(false);
+  const [aiRating, setAiRating] = useState<"up" | "down" | null>(null);
+  const [aiReadingId, setAiReadingId] = useState<number | null>(null);
   const [showTransits, setShowTransits] = useState(false);
   const [generatingPdf, setGeneratingPdf] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -81,6 +84,7 @@ export default function ChartResult() {
   const [aiReadingType, setAiReadingType] = useState<string | null>(null);
   const [showAiTypes, setShowAiTypes] = useState(false);
   const aiSectionRef = useRef<HTMLDivElement>(null);
+  const streamAbortRef = useRef<AbortController | null>(null);
   const { shouldShow: showOnboarding, triggerOnboarding, markSeen: markOnboardingSeen } = useOnboarding();
 
   const shareMutation = trpc.share.createLink.useMutation({
@@ -162,8 +166,9 @@ export default function ChartResult() {
     onError: (err) => toast.error(err.message),
   });
 
+  // Keep old mutation as fallback but prefer streaming
   const aiMutation = trpc.ai.generateReading.useMutation({
-    onSuccess: (data) => setAiReading(data.content),
+    onSuccess: (data) => { setAiReading(data.content); setAiReadingId(data.id); },
     onError: (err) => toast.error("AI čtení selhalo: " + err.message),
   });
 
@@ -185,8 +190,82 @@ export default function ChartResult() {
 
   const handleAiReading = (type: string) => {
     if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+    // Abort any existing stream
+    if (streamAbortRef.current) streamAbortRef.current.abort();
     setAiReading(null);
-    aiMutation.mutate({ chartId: savedChartId || 0, chartData: chart, readingType: type as any });
+    setAiRating(null);
+    setAiReadingId(null);
+    setAiReadingType(type);
+
+    const abort = new AbortController();
+    streamAbortRef.current = abort;
+    setAiStreaming(true);
+
+    const params = new URLSearchParams({
+      chartData: encodeURIComponent(JSON.stringify(chart)),
+      readingType: type,
+      chartId: String(savedChartId || 0),
+    });
+
+    let accumulated = "";
+
+    fetch(`/api/ai/stream?${params}`, { signal: abort.signal })
+      .then(async (res) => {
+        if (!res.ok || !res.body) {
+          // Fallback to tRPC mutation
+          setAiStreaming(false);
+          aiMutation.mutate({ chartId: savedChartId || 0, chartData: chart, readingType: type as any });
+          return;
+        }
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split("\n");
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.token) {
+                accumulated += data.token;
+                setAiReading(accumulated);
+              }
+              if (data.done) {
+                setAiStreaming(false);
+              }
+              if (data.error) {
+                setAiStreaming(false);
+                toast.error("AI výklad selhal");
+              }
+            } catch { /* skip */ }
+          }
+        }
+        setAiStreaming(false);
+      })
+      .catch((err) => {
+        if (err.name !== "AbortError") {
+          setAiStreaming(false);
+          // Fallback to tRPC mutation
+          aiMutation.mutate({ chartId: savedChartId || 0, chartData: chart, readingType: type as any });
+        }
+      });
+  };
+
+  const handleRating = async (rating: "up" | "down") => {
+    setAiRating(rating);
+    if (!aiReadingId) return;
+    try {
+      await fetch("/api/ai/rating", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ readingId: aiReadingId, rating }),
+      });
+      toast.success(rating === "up" ? "Děkujeme za hodnocení! 😊" : "Děkujeme za zpětnou vazbu");
+    } catch {
+      toast.error("Hodnocení se nepodařilo uložit");
+    }
   };
 
   const typeDesc = useMemo(() => chart ? TYPE_DESCRIPTIONS[chart.type] : null, [chart]);
@@ -349,7 +428,7 @@ export default function ChartResult() {
 
               {/* ─── AI Výklad — PRIMÁRNÍ SEKCE ─── */}
               <div ref={aiSectionRef}>
-                {!aiReading && !aiMutation.isPending ? (
+                {!aiReading && !aiStreaming && !aiMutation.isPending ? (
                   <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-violet-50 p-6 shadow-md">
                     {/* Decorative glow */}
                     <div className="absolute -top-8 -right-8 w-40 h-40 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
@@ -388,7 +467,7 @@ export default function ChartResult() {
                                   setAiReadingType(item.key);
                                   handleAiReading(item.key);
                                 }}
-                                disabled={aiMutation.isPending}
+                                disabled={aiStreaming || aiMutation.isPending}
                               >
                                 {item.label}
                               </Button>
@@ -405,7 +484,7 @@ export default function ChartResult() {
                       </div>
                     </div>
                   </div>
-                ) : aiMutation.isPending ? (
+                ) : (aiStreaming || aiMutation.isPending) && !aiReading ? (
                   <Card className="border-primary/20 bg-primary/5">
                     <CardContent className="py-8">
                       <div className="flex flex-col items-center gap-3 text-center">
@@ -419,7 +498,7 @@ export default function ChartResult() {
                       </div>
                     </CardContent>
                   </Card>
-) : aiReading ? (
+                ) : aiReading ? (
                   <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background shadow-sm">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
@@ -466,7 +545,7 @@ export default function ChartResult() {
                               setAiReadingType(item.key);
                               handleAiReading(item.key);
                             }}
-                            disabled={aiMutation.isPending}
+                            disabled={aiStreaming || aiMutation.isPending}
                           >
                             {item.label}
                           </Button>
@@ -474,9 +553,38 @@ export default function ChartResult() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="prose prose-sm max-w-none p-4 rounded-lg bg-white/60 border border-border/30">
+                      <div className="prose prose-sm max-w-none p-4 rounded-lg bg-white/60 border border-border/30 relative">
                         <Streamdown>{aiReading}</Streamdown>
+                        {aiStreaming && (
+                          <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-middle rounded-sm" />
+                        )}
                       </div>
+                      {/* Thumbs up/down feedback */}
+                      {!aiStreaming && (
+                        <div className="flex items-center gap-3 mt-4 pt-4 border-t border-border/20">
+                          <span className="text-xs text-muted-foreground">Byl tento výklad užitečný?</span>
+                          <button
+                            onClick={() => handleRating("up")}
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                              aiRating === "up"
+                                ? "bg-green-100 text-green-700 border border-green-300"
+                                : "bg-muted/30 text-muted-foreground hover:bg-green-50 hover:text-green-600 border border-border/40"
+                            }`}
+                          >
+                            👍 {aiRating === "up" ? "Děkujeme!" : "Ano"}
+                          </button>
+                          <button
+                            onClick={() => handleRating("down")}
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                              aiRating === "down"
+                                ? "bg-red-100 text-red-700 border border-red-300"
+                                : "bg-muted/30 text-muted-foreground hover:bg-red-50 hover:text-red-600 border border-border/40"
+                            }`}
+                          >
+                            👎 {aiRating === "down" ? "Děkujeme" : "Ne"}
+                          </button>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ) : null}
