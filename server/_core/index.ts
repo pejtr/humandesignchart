@@ -69,6 +69,8 @@ async function startServer() {
       { loc: "/blog/human-design-a-vztahy", priority: "0.7", changefreq: "monthly" },
       { loc: "/blog/inkarnacni-kriz-zivotni-ucel", priority: "0.7", changefreq: "monthly" },
       { loc: "/blog/jak-cist-bodygraph", priority: "0.7", changefreq: "monthly" },
+      { loc: "/daily-transit", priority: "0.6", changefreq: "daily" },
+      { loc: "/incarnation-cross", priority: "0.6", changefreq: "monthly" },
     ];
     const urls = pages.map(p => `  <url>\n    <loc>${baseUrl}${p.loc}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`).join("\n");
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`;

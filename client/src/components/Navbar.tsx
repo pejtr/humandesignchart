@@ -5,7 +5,7 @@ import { Link, useLocation } from "wouter";
 import {
   Menu, X, User, LogOut, LayoutDashboard, Compass, Star, Users,
   Sparkles, GitCompare, BookOpen, Bot, RotateCcw, ChevronDown,
-  Calendar, Hexagon, UtensilsCrossed, ChevronRight,
+  Calendar, Hexagon, UtensilsCrossed, ChevronRight, Sun,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -47,10 +47,11 @@ export default function Navbar() {
   ];
 
   const toolsLinks = [
+    { href: "/daily-transit", label: "Denní tranzit", icon: Sun, desc: "Jak dnešní planety ovlivňují tvůj design" },
     { href: "/return-chart", label: "Return charty", icon: RotateCcw, desc: "Solární, Saturnův a další Return charty" },
     { href: "/compare", label: t.nav.compare, icon: GitCompare, desc: "Porovnání dvou Human Design map" },
     { href: "/transits", label: t.nav.transits, icon: Star, desc: "Aktuální planetární tranzity" },
-    { href: "/transit-calendar", label: "Tranzitní kalendář", icon: Calendar, desc: "Denní a týdenní přehled tranzitů" },
+    { href: "/transit-calendar", label: "Tranzitní kalendář", icon: Calendar, desc: "Denní a týdní přehled tranzitů" },
     { href: "/variables", label: "Proměnné (PHS)", icon: UtensilsCrossed, desc: "Strávení, prostředí, perspektiva, vědomí" },
   ];
 

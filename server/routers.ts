@@ -300,7 +300,7 @@ Pravidla:
       }),
   }),
 
-  // ─── Transit Calculation ─────────────────────────────────────────────
+  // --- Transit Calculation ---
   transit: router({
     current: publicProcedure.query(async () => {
       const { calculatePlanetaryPositions, dateToJD } = await import("./humandesign/ephemeris");
@@ -336,9 +336,127 @@ Pravidla:
         transitGates,
       };
     }),
+
+    // Personalized daily transit: compares current transits with user's natal chart
+    personalized: protectedProcedure
+      .input(z.object({ chartId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const { calculatePlanetaryPositions, dateToJD } = await import("./humandesign/ephemeris");
+        const { GATE_WHEEL, PLANET_NAMES } = await import("./humandesign/constants");
+
+        // 1. Load user's natal chart
+        const chart = await getChartById(input.chartId, ctx.user.id);
+        if (!chart) throw new Error("Chart not found");
+        const chartData = chart.chartData as import("../shared/types").HumanDesignChartData;
+
+        // 2. Calculate current transit gates
+        const now = new Date();
+        const jd = dateToJD(now);
+        const positions = calculatePlanetaryPositions(jd);
+        const transitGates: Array<{ planet: string; gate: number; line: number }> = [];
+
+        for (const planet of PLANET_NAMES) {
+          const lon = positions[planet];
+          const normLon = ((lon % 360) + 360) % 360;
+          let gateIndex = 0;
+          for (let i = GATE_WHEEL.length - 1; i >= 0; i--) {
+            if (normLon >= GATE_WHEEL[i][0]) { gateIndex = i; break; }
+          }
+          const gate = GATE_WHEEL[gateIndex][1];
+          const offset = normLon - GATE_WHEEL[gateIndex][0];
+          const line = Math.max(1, Math.min(Math.floor(offset / 0.9375) + 1, 6));
+          transitGates.push({ planet, gate, line });
+        }
+
+        // 3. Find activated channels (transit gate + natal gate = defined channel)
+        const natalGates = new Set(chartData.activatedGates || []);
+        const transitGateNums = new Set(transitGates.map(t => t.gate));
+        const CHANNELS = [
+          [1,8],[2,14],[3,60],[4,63],[5,15],[6,59],[7,31],[8,1],[9,52],[10,20],
+          [11,56],[12,22],[13,33],[14,2],[15,5],[16,48],[17,62],[18,58],[19,49],
+          [20,10],[21,45],[22,12],[23,43],[24,61],[25,51],[26,44],[27,50],[28,38],
+          [29,46],[30,41],[31,7],[32,54],[33,13],[34,20],[35,36],[36,35],[37,40],
+          [38,28],[39,55],[40,37],[41,30],[42,53],[43,23],[44,26],[45,21],[46,29],
+          [47,64],[48,16],[49,19],[50,27],[51,25],[52,9],[53,42],[54,32],[55,39],
+          [56,11],[57,34],[58,18],[59,6],[60,3],[61,24],[62,17],[63,4],[64,47],
+        ];
+        const activatedChannels: Array<{ gate1: number; gate2: number; via: string }> = [];
+        for (const [g1, g2] of CHANNELS) {
+          const transitHasG1 = transitGateNums.has(g1);
+          const transitHasG2 = transitGateNums.has(g2);
+          const natalHasG1 = natalGates.has(g1);
+          const natalHasG2 = natalGates.has(g2);
+          if ((transitHasG1 && natalHasG2) || (transitHasG2 && natalHasG1)) {
+            activatedChannels.push({
+              gate1: g1, gate2: g2,
+              via: transitHasG1 ? `Tranzit brana ${g1} + natalální brána ${g2}` : `Tranzit brana ${g2} + natalální brána ${g1}`,
+            });
+          }
+        }
+
+        // 4. Find transit gates that hit natal gates (reinforcement)
+        const reinforcedGates = transitGates.filter(t => natalGates.has(t.gate));
+
+        // 5. Build AI prompt for personalized interpretation
+        const PLANET_SYMBOLS: Record<string, string> = {
+          Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
+          Jupiter: "♃", Saturn: "♄", Uranus: "⛢", Neptune: "♆", Pluto: "♇",
+          "North Node": "☊", "South Node": "☋",
+        };
+        const transitSummary = transitGates
+          .map(t => `${PLANET_SYMBOLS[t.planet] || t.planet} ${t.planet}: Brána ${t.gate}.${t.line}`)
+          .join(", ");
+        const channelSummary = activatedChannels.length > 0
+          ? activatedChannels.map(c => `Dráha ${c.gate1}-${c.gate2}`).join(", ")
+          : "Žádné aktivované dráhy dnes";
+        const reinforcedSummary = reinforcedGates.length > 0
+          ? reinforcedGates.map(g => `Brána ${g.gate} (${g.planet})`).join(", ")
+          : "Žádné zesilování";
+
+        const systemPrompt = `Jsi expert na Human Design a tranzity. Popiš jak dnešní planetární tranzity ovlivňují konkrétní osobu.
+
+Pravidla:
+1. VžDY odpovídej v češtině
+2. Buď konkrétní, praktický a povzbudivý
+3. Strukturuj: Úvod (2 věty) | Klíčové tranzity (3-4 body) | Doporučení pro dnešek (2-3 body)
+4. Používej HD terminologii v češtině
+5. Max 350 slov
+6. Nezmíňuj "Ahoj" ani úvodní pozdrav`;
+
+        const userMsg = `Typ: ${chartData.type}, Profil: ${chartData.profile}, Autorita: ${chartData.authority}
+Natalální brány: ${Array.from(natalGates).sort((a,b)=>a-b).join(", ")}
+
+Dnešní tranzity (${now.toLocaleDateString("cs-CZ")}):
+${transitSummary}
+
+Aktivované dráhy tranzitem: ${channelSummary}
+Zesílené natalální brány: ${reinforcedSummary}
+
+Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
+
+        const response = await invokeLLM({
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userMsg },
+          ],
+        });
+        const rawContent = response.choices?.[0]?.message?.content;
+        const interpretation = typeof rawContent === "string" ? rawContent : "Nepodařilo se vygenerovat výklad.";
+
+        return {
+          timestamp: now.toISOString(),
+          transitGates,
+          activatedChannels,
+          reinforcedGates,
+          interpretation,
+          chartName: chart.name,
+          chartType: chartData.type,
+          chartProfile: chartData.profile,
+        };
+      }),
   }),
 
-  // ─── Blog ─────────────────────────────────────────────────────────────
+  // --- Blog ---
   blog: router({
     list: publicProcedure
       .input(z.object({

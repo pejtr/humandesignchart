@@ -1,0 +1,330 @@
+import { useState, useMemo } from "react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, RefreshCw, Sun, Moon, Sparkles, Zap, Star, Download } from "lucide-react";
+import { Streamdown } from "streamdown";
+import { Link } from "wouter";
+import { getLoginUrl } from "@/const";
+import { toast } from "sonner";
+
+const PLANET_SYMBOLS: Record<string, string> = {
+  Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
+  Jupiter: "♃", Saturn: "♄", Uranus: "⛢", Neptune: "♆", Pluto: "♇",
+  "North Node": "☊", "South Node": "☋",
+};
+
+const PLANET_COLORS: Record<string, string> = {
+  Sun: "text-amber-500",
+  Moon: "text-slate-400",
+  Mercury: "text-cyan-500",
+  Venus: "text-pink-400",
+  Mars: "text-red-500",
+  Jupiter: "text-orange-400",
+  Saturn: "text-stone-500",
+  Uranus: "text-teal-400",
+  Neptune: "text-indigo-400",
+  Pluto: "text-purple-500",
+  "North Node": "text-emerald-500",
+  "South Node": "text-rose-400",
+};
+
+const PLANET_MEANINGS: Record<string, string> = {
+  Sun: "Identita & účel",
+  Moon: "Emoce & rytmus",
+  Mercury: "Komunikace & mysl",
+  Venus: "Hodnoty & vztahy",
+  Mars: "Energie & akce",
+  Jupiter: "Expanze & moudrost",
+  Saturn: "Struktura & lekce",
+  Uranus: "Změna & průlom",
+  Neptune: "Intuice & iluze",
+  Pluto: "Transformace & moc",
+  "North Node": "Karmický směr",
+  "South Node": "Karmická minulost",
+};
+
+export default function DailyTransit() {
+  const { user, isAuthenticated, loading } = useAuth();
+  const [selectedChartId, setSelectedChartId] = useState<number | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const chartsQuery = trpc.chart.list.useQuery(undefined, { enabled: isAuthenticated });
+  const charts = chartsQuery.data || [];
+
+  // Auto-select first chart
+  const effectiveChartId = selectedChartId ?? (charts[0]?.id ?? null);
+
+  const stableInput = useMemo(
+    () => (effectiveChartId ? { chartId: effectiveChartId } : undefined),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [effectiveChartId, refreshKey]
+  );
+
+  const transitQuery = trpc.transit.personalized.useQuery(
+    stableInput!,
+    { enabled: isAuthenticated && !!effectiveChartId }
+  );
+
+  const transit = transitQuery.data;
+
+  const handleDownload = () => {
+    if (!transit) return;
+    const date = new Date(transit.timestamp).toLocaleDateString("cs-CZ");
+    const content = `DENNÍ TRANZIT — ${date}\n${"=".repeat(50)}\n\nMapa: ${transit.chartName}\nTyp: ${transit.chartType} | Profil: ${transit.chartProfile}\n\n${transit.interpretation}\n\n${"=".repeat(50)}\nVygenerováno: humandesign.manus.space`;
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `tranzit-${date.replace(/\./g, "-")}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Výklad stažen");
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background text-foreground">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center pt-24 pb-16">
+          <div className="text-center max-w-md px-4">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Star className="w-8 h-8 text-primary" />
+            </div>
+            <h1 className="font-serif text-2xl font-bold mb-3">Denní tranzit</h1>
+            <p className="text-muted-foreground mb-6">
+              Pro zobrazení personalizovaného denního tranzitu se musíte přihlásit a mít uloženou mapu.
+            </p>
+            <a href={getLoginUrl()}>
+              <Button className="bg-primary text-primary-foreground">Přihlásit se</Button>
+            </a>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const today = new Date().toLocaleDateString("cs-CZ", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric",
+  });
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
+      <Navbar />
+
+      <main className="flex-1 pt-24 pb-16">
+        <div className="container max-w-5xl">
+
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Sun className="w-5 h-5 text-amber-500" />
+                <span className="text-sm font-medium text-muted-foreground capitalize">{today}</span>
+              </div>
+              <h1 className="font-serif text-3xl font-bold">Denní tranzit</h1>
+              <p className="text-muted-foreground mt-1">
+                Jak dnešní planety ovlivňují tvůj Human Design
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              {transit && (
+                <Button variant="outline" size="sm" onClick={handleDownload}>
+                  <Download className="w-4 h-4 mr-1.5" />
+                  Stáhnout
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setRefreshKey(k => k + 1)}
+                disabled={transitQuery.isFetching}
+              >
+                <RefreshCw className={`w-4 h-4 mr-1.5 ${transitQuery.isFetching ? "animate-spin" : ""}`} />
+                Obnovit
+              </Button>
+            </div>
+          </div>
+
+          {/* Chart selector */}
+          {charts.length === 0 ? (
+            <Card className="mb-6 border-dashed">
+              <CardContent className="py-10 text-center">
+                <Moon className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground mb-4">Nemáte žádnou uloženou mapu. Nejprve si vypočítejte a uložte svůj Human Design.</p>
+                <Link href="/calculate">
+                  <Button className="bg-primary text-primary-foreground">Vytvořit mapu</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ) : charts.length > 1 ? (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {charts.map(chart => (
+                <button
+                  key={chart.id}
+                  onClick={() => setSelectedChartId(chart.id)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${
+                    effectiveChartId === chart.id
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background border-border text-muted-foreground hover:border-primary/50"
+                  }`}
+                >
+                  {chart.name}
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          {/* Loading state */}
+          {transitQuery.isLoading && (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <div className="relative">
+                <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                <Sun className="w-6 h-6 text-amber-500 absolute inset-0 m-auto" />
+              </div>
+              <p className="text-muted-foreground text-sm">Počítám dnešní planetární pozice…</p>
+            </div>
+          )}
+
+          {/* Error state */}
+          {transitQuery.isError && (
+            <Card className="border-destructive/30 bg-destructive/5">
+              <CardContent className="py-8 text-center">
+                <p className="text-destructive mb-3">Nepodařilo se načíst tranzit.</p>
+                <Button variant="outline" onClick={() => transitQuery.refetch()}>Zkusit znovu</Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Transit data */}
+          {transit && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+              {/* Left: Planetary positions */}
+              <div className="lg:col-span-1 space-y-4">
+
+                {/* Activated channels */}
+                {transit.activatedChannels.length > 0 && (
+                  <Card className="border-primary/30 bg-primary/5">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Zap className="w-4 h-4 text-primary" />
+                        Aktivované dráhy dnes
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="space-y-2">
+                        {transit.activatedChannels.map((ch, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <Badge variant="outline" className="font-mono text-xs border-primary/40 text-primary">
+                              {ch.gate1}–{ch.gate2}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">{ch.via}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Reinforced natal gates */}
+                {transit.reinforcedGates.length > 0 && (
+                  <Card className="border-amber-200 bg-amber-50/50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Star className="w-4 h-4 text-amber-500" />
+                        Zesílené natální brány
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="flex flex-wrap gap-1.5">
+                        {transit.reinforcedGates.map((g, i) => (
+                          <Badge key={i} variant="outline" className="font-mono text-xs border-amber-300 text-amber-700 bg-amber-50">
+                            {PLANET_SYMBOLS[g.planet] || g.planet} Brána {g.gate}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* All transit gates */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Sun className="w-4 h-4 text-amber-500" />
+                      Planetární pozice
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-2">
+                      {transit.transitGates.map((t, i) => (
+                        <div key={i} className="flex items-center justify-between py-1 border-b border-border/30 last:border-0">
+                          <div className="flex items-center gap-2">
+                            <span className={`text-lg leading-none ${PLANET_COLORS[t.planet] || "text-foreground"}`}>
+                              {PLANET_SYMBOLS[t.planet] || t.planet[0]}
+                            </span>
+                            <div>
+                              <div className="text-xs font-medium">{t.planet}</div>
+                              <div className="text-xs text-muted-foreground">{PLANET_MEANINGS[t.planet] || ""}</div>
+                            </div>
+                          </div>
+                          <Badge variant="outline" className="font-mono text-xs">
+                            Brána {t.gate}.{t.line}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Right: AI interpretation */}
+              <div className="lg:col-span-2">
+                <Card className="h-full">
+                  <CardHeader className="pb-3 border-b border-border/40">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-primary" />
+                        Personalizovaný výklad
+                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">{transit.chartType}</Badge>
+                        <Badge variant="outline" className="text-xs">Profil {transit.chartProfile}</Badge>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Pro mapu: <span className="font-medium">{transit.chartName}</span>
+                      {" · "}Aktualizováno: {new Date(transit.timestamp).toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <div className="prose prose-sm max-w-none text-foreground/90 leading-relaxed">
+                      <Streamdown>{transit.interpretation}</Streamdown>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+            </div>
+          )}
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

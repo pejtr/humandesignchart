@@ -25,6 +25,7 @@ const TypeDetail = lazy(() => import("./pages/TypeDetail"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogArticle = lazy(() => import("./pages/BlogArticle"));
 const IncarnationCross = lazy(() => import("./pages/IncarnationCross"));
+const DailyTransit = lazy(() => import("./pages/DailyTransit"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -52,6 +53,7 @@ function Router() {
         <Route path="/blog" component={Blog} />
         <Route path="/blog/:slug" component={BlogArticle} />
         <Route path="/incarnation-cross" component={IncarnationCross} />
+        <Route path="/daily-transit" component={DailyTransit} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>

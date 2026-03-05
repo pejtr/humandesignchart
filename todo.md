@@ -260,16 +260,16 @@
 - [x] Blog tests (list, detail, SEO)
 
 ## Mobilní hamburger menu
-- [ ] Hamburger tlačítko v Navbar (viditelné pouze na mobile)
-- [ ] Slide-in drawer menu s kompletní navigací
-- [ ] Zavření menu kliknutím mimo nebo na křížek
-- [ ] Animace otevření/zavření
+- [x] Hamburger tlačítko v Navbar (viditelné pouze na mobile)
+- [x] Slide-in drawer menu s kompletní navigací
+- [x] Zavření menu kliknutím mimo nebo na křížek
+- [x] Animace otevření/zavření
 
 ## Onboarding flow po výpočtu mapy
-- [ ] Onboarding modal/overlay po přesměrování na ChartResult
-- [ ] 3 kroky: "Váš typ", "Vaše autorita", "AI výklad"
-- [ ] Přeskočit / Další tlačítka
-- [ ] Uložit do localStorage (nezobrazovat znovu)
+- [x] Onboarding modal/overlay po přesměrování na ChartResult
+- [x] 3 kroky: "Váš typ", "Vaše autorita", "AI výklad"
+- [x] Přeskočit / Další tlačítka
+- [x] Uložit do localStorage (nezobrazovat znovu)
 
 ## Inkarnační kříž — detailní stránka s AI
 - [ ] Stránka /cross/:crossName s detailní analýzou
@@ -300,3 +300,15 @@
 - [x] Kliknutí na výklad otevře detail s plným textem (rozbalit/sbalit)
 - [x] Sdílení AI výkladu — tlačítko "Sdílet" vedle thumbs up/down (ChartResult + Dashboard)
 - [x] Vylepšený dashboard — záložky "Moje mapy" a "Moje výklady"
+
+## Denní tranzit na dashboardu
+- [ ] Server procedure: getDailyTransit (aktuální planetární pozice + aktivované brány)
+- [ ] Server procedure: getPersonalizedTransit (porovnání tranzitů s uživatelovou mapou)
+- [ ] AI interpretace denního tranzitu pro konkrétní typ/profil uživatele
+- [ ] DailyTransit widget na dashboardu (planetární pozice, aktivované brány, AI výklad)
+- [ ] Bodygraph s tranzitním overlayem na dashboardu
+- [ ] Zvýraznění "aktivovaných" kanálů (tranzit + natal = definovaný kanál)
+- [ ] Datum a čas poslední aktualizace tranzitů
+- [ ] Tlačítko pro refresh tranzitů
+- [ ] Integrace do navigace dashboardu
+- [ ] Testy pro personalizovaný tranzit
