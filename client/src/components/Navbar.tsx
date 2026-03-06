@@ -44,6 +44,7 @@ export default function Navbar() {
     { href: "/calculate", label: t.nav.calculateChart, icon: Compass },
     { href: "/encyclopedia", label: "Encyklopedie", icon: BookOpen },
     { href: "/ai-guide", label: "AI průvodce", icon: Bot },
+    { href: "/blog", label: "Blog", icon: BookOpen },
   ];
 
   const toolsLinks = [
@@ -58,7 +59,6 @@ export default function Navbar() {
   const exploreLinks = [
     { href: "/celebrities", label: t.nav.celebrities, icon: Users, desc: "Mapy známých osobností" },
     { href: "/iching", label: t.nav.iChing, icon: Hexagon, desc: "I-Ťing orákulum" },
-    { href: "/blog", label: "Blog", icon: BookOpen, desc: "Články o Human Design" },
   ];
 
   return (

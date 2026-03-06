@@ -151,8 +151,19 @@ export default function BlogArticle() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
+      {/* Cover image */}
+      {article.coverImage && (
+        <div className="w-full h-64 md:h-80 overflow-hidden mt-16">
+          <img
+            src={article.coverImage}
+            alt={article.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
       {/* Article header */}
-      <section className="pt-24 pb-8 bg-gradient-to-b from-primary/5 to-background">
+      <section className={`${article.coverImage ? 'pt-8' : 'pt-24'} pb-8 bg-gradient-to-b from-primary/5 to-background`}>
         <div className="container max-w-4xl">
           <Button variant="ghost" size="sm" onClick={() => navigate("/blog")} className="mb-6">
             <ArrowLeft className="w-4 h-4 mr-2" />

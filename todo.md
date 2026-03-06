@@ -312,3 +312,15 @@
 - [ ] Tlačítko pro refresh tranzitů
 - [ ] Integrace do navigace dashboardu
 - [ ] Testy pro personalizovaný tranzit
+
+## Blog — navigace a náhledové obrázky
+- [ ] Blog jako samostatné tlačítko v hlavní navigaci (vedle Encyklopedie)
+- [ ] Odstranit Blog z "Prozkoumat" dropdown menu
+- [ ] Přidat náhledové obrázky (coverImage) ke každému článku v blogArticles.ts
+- [ ] Zobrazit náhledové obrázky v kartičkách na Blog stránce
+
+## Blog — navigace a náhledové obrázky
+- [x] Blog přesunut jako samostatné tlačítko v hlavní navigaci
+- [x] Unsplash cover obrázky přidány ke všem 10 článkům
+- [x] Blog list stránka zobrazuje obrázky (featured + grid)
+- [x] BlogArticle stránka zobrazuje cover obrázek v záhlaví

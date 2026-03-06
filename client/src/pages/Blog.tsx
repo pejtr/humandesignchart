@@ -134,11 +134,19 @@ export default function Blog() {
                 <Link href={`/blog/${featured.slug}`} className="no-underline block mb-10">
                   <Card className="border-border/50 overflow-hidden hover:shadow-lg transition-shadow group">
                     <div className="grid grid-cols-1 md:grid-cols-2">
-                      <div className={`${featured.coverColor} p-8 md:p-12 flex items-center justify-center min-h-[200px]`}>
-                        {(() => {
-                          const Icon = ICON_MAP[featured.coverIcon] || Compass;
-                          return <Icon className="w-20 h-20 text-foreground/20" />;
-                        })()}
+                      <div className="relative overflow-hidden min-h-[200px]">
+                        {featured.coverImage ? (
+                          <img
+                            src={featured.coverImage}
+                            alt={featured.title}
+                            className="w-full h-full object-cover absolute inset-0"
+                            style={{ minHeight: 200 }}
+                          />
+                        ) : (
+                          <div className={`${featured.coverColor} p-8 md:p-12 flex items-center justify-center h-full`}>
+                            {(() => { const Icon = ICON_MAP[featured.coverIcon] || Compass; return <Icon className="w-20 h-20 text-foreground/20" />; })()}
+                          </div>
+                        )}
                       </div>
                       <CardContent className="p-6 md:p-8 flex flex-col justify-center">
                         <div className="flex items-center gap-2 mb-3">
@@ -173,8 +181,18 @@ export default function Blog() {
                   return (
                     <Link key={article.slug} href={`/blog/${article.slug}`} className="no-underline">
                       <Card className="border-border/50 overflow-hidden hover:shadow-lg transition-all group h-full">
-                        <div className={`${article.coverColor} p-6 flex items-center justify-center h-36`}>
-                          <Icon className="w-14 h-14 text-foreground/15" />
+                        <div className="relative overflow-hidden h-44">
+                          {article.coverImage ? (
+                            <img
+                              src={article.coverImage}
+                              alt={article.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          ) : (
+                            <div className={`${article.coverColor} p-6 flex items-center justify-center h-full`}>
+                              <Icon className="w-14 h-14 text-foreground/15" />
+                            </div>
+                          )}
                         </div>
                         <CardContent className="p-5">
                           <div className="flex items-center gap-2 mb-2.5">

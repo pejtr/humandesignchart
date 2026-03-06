@@ -11,6 +11,7 @@ export interface BlogArticle {
   updatedAt: string;
   coverColor: string; // tailwind bg class
   coverIcon: string; // lucide icon name
+  coverImage?: string; // URL to cover image
   tags: string[];
   content: string; // markdown
 }
@@ -39,6 +40,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-amber-50 to-orange-50",
     coverIcon: "Compass",
+    coverImage: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&q=80",
     tags: ["human design", "základy", "sebepoznání", "začátečníci"],
     content: `## Co je Human Design?
 
@@ -98,6 +100,7 @@ Human Design není víra ani dogma — je to experiment. Ra Uru Hu vždy říkal
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-violet-50 to-purple-50",
     coverIcon: "Users",
+    coverImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80",
     tags: ["typy", "generátor", "projektor", "manifestor", "reflektor"],
     content: `## Pět typů v Human Design
 
@@ -180,6 +183,7 @@ K zjištění svého typu potřebujete přesné datum, čas a místo narození. 
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-emerald-50 to-teal-50",
     coverIcon: "Target",
+    coverImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
     tags: ["strategie", "rozhodování", "reagovat", "informovat", "pozvání"],
     content: `## Co je strategie v Human Design?
 
@@ -244,6 +248,7 @@ Nejdůležitější je všímat si, kdy zažíváte svou signaturu (uspokojení,
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-blue-50 to-indigo-50",
     coverIcon: "Brain",
+    coverImage: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=800&q=80",
     tags: ["autorita", "rozhodování", "emocionální", "sakrální", "slezina"],
     content: `## Co je autorita v Human Design?
 
@@ -316,7 +321,8 @@ Nejřidší forma — pro Projektory, kteří nemají žádné definované centr
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-rose-50 to-pink-50",
     coverIcon: "Fingerprint",
-    tags: ["profil", "linie", "životní role", "osobnost", "design"],
+    coverImage: "https://images.unsplash.com/photo-1545987796-200677ee1011?w=800&q=80",
+    tags: ["profil", "životní role", "linie", "profily", "design"],
     content: `## Co je profil v Human Design?
 
 Profil je kombinace dvou čísel (např. 4/6), která popisuje vaši **životní roli** — jak se učíte, jak interagujete se světem a jaký je váš životní příběh. První číslo je vaše **vědomá** stránka (osobnost), druhé je **nevědomá** (design).
@@ -392,6 +398,7 @@ Profil není něco, co „děláte" — je to něco, čím **jste**. Nejdůleži
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-orange-50 to-amber-50",
     coverIcon: "CircleDot",
+    coverImage: "https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=800&q=80",
     tags: ["centra", "bodygraph", "definovaná", "otevřená", "energie"],
     content: `## 9 center v Human Design
 
@@ -490,9 +497,10 @@ Podívejte se na svá otevřená centra — tam jste nejvíce ovlivňováni okol
     readingTime: 7,
     publishedAt: "2026-02-15",
     updatedAt: "2026-03-01",
-    coverColor: "bg-gradient-to-br from-amber-50 to-yellow-50",
+     coverColor: "bg-gradient-to-br from-amber-50 to-yellow-50",
     coverIcon: "Zap",
-    tags: ["generátor", "reagovat", "sakrální", "frustrace", "práce"],
+    coverImage: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=800&q=80",
+    tags: ["generátor", "reagovat", "sakrální centrum", "strategie"],
     content: `## Generátor a umění reagování
 
 Jako Generátor máte přístup k nejmocnější energii v Human Design — **sakrální energii**. Je to motor, který vám dává vytrvalost, pracovní kapacitu a životní sílu. Ale tato energie má svá pravidla.
@@ -561,7 +569,8 @@ Správná práce pro Generátora je taková, na kterou reagoval sakrálním „a
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-violet-50 to-indigo-50",
     coverIcon: "Eye",
-    tags: ["projektor", "pozvání", "uznání", "hořkost", "průvodce"],
+    coverImage: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=800&q=80",
+    tags: ["projektor", "pozvání", "uznání", "strategie", "průvodce"],
     content: `## Projektor — průvodce nové éry
 
 Projektoři tvoří 20% populace a jsou navrženi jako **průvodci, vůdci a správci energie**. Nemají konzistentní sakrální energii, ale mají něco, co ostatní typy nemají — schopnost hluboce vidět do systémů a lidí.
@@ -634,11 +643,10 @@ Ve vztazích potřebujete partnera, který vás **vidí a uznává**. Nejlepší
     categoryLabel: "Vztahy",
     readingTime: 9,
     publishedAt: "2026-02-25",
-    updatedAt: "2026-03-01",
-    coverColor: "bg-gradient-to-br from-pink-50 to-rose-50",
+    updatedAt: "2026-03-01",    coverColor: "bg-gradient-to-br from-pink-50 to-rose-50",
     coverIcon: "Heart",
-    tags: ["vztahy", "kompatibilita", "elektromagnetické", "partnerství", "typy"],
-    content: `## Human Design a vztahy
+    coverImage: "https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=800&q=80",
+    tags: ["vztahy", "kompatibilita", "elektromagnetické spojení", "partnerské charty"],content: `## Human Design a vztahy
 
 Jednou z nejfascinujících aplikací Human Design je porozumění vztahové dynamice. Když položíte dva bodygraphy vedle sebe, uvidíte, jak se dvě energie vzájemně ovlivňují — kde se doplňují, kde si konkurují a kde vznikají nové kvality.
 
@@ -704,7 +712,8 @@ Otevřená centra jsou místa, kde jsme nejvíce ovlivňováni partnerem. Pokud 
     updatedAt: "2026-03-03",
     coverColor: "bg-gradient-to-br from-teal-50 to-cyan-50",
     coverIcon: "Star",
-    tags: ["inkarnační kříž", "životní účel", "poslání", "brány", "slunce"],
+    coverImage: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80",
+    tags: ["inkarnační kříž", "životní účel", "brány", "poslání", "slunce"],
     content: `## Co je inkarnační kříž?
 
 Inkarnační kříž je **životní téma** — účel, se kterým jste přišli na svět. Je tvořen čtyřmi bránami vašeho vědomého a nevědomého Slunce a Země:
@@ -760,7 +769,8 @@ Podívejte se na brány svého inkarnačního kříže a přečtěte si jejich p
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-slate-50 to-gray-100",
     coverIcon: "FileText",
-    tags: ["bodygraph", "čtení", "centra", "kanály", "brány", "začátečníci"],
+    coverImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80",
+    tags: ["bodygraph", "jak číst", "začátečníci", "brány", "kanály"],
     content: `## Co je bodygraph?
 
 Bodygraph je **vizuální mapa vaší energetiky** — diagram, který zobrazuje 9 center, 36 kanálů a 64 bran. Je to „schéma" vašeho energetického těla, vypočítané na základě přesného data, času a místa narození.
