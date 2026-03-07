@@ -13,6 +13,7 @@ import {
 import crypto from "crypto";
 import { invokeLLM } from "./_core/llm";
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../shared/blogArticles";
+import { BLOG_ARTICLES_EN } from "../shared/blogArticlesEn";
 
 export const appRouter = router({
   system: systemRouter,
@@ -216,28 +217,50 @@ export const appRouter = router({
       }),
 
     // AI Chat Guide - conversational HD assistant
-    askGuide: protectedProcedure
+     askGuide: protectedProcedure
       .input(z.object({
         question: z.string().min(1),
         history: z.array(z.object({
           role: z.enum(["user", "assistant"]),
           content: z.string(),
         })).optional(),
+        locale: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        const systemPrompt = `Jsi odborný průvodce systémem Human Design. Máš hluboké znalosti o:
+        const isEn = input.locale === 'en';
+        const systemPrompt = isEn
+          ? `You are an expert guide in the Human Design system. You have deep knowledge of:
+- 5 Types (Manifestor, Generator, Manifesting Generator, Projector, Reflector)
+- 9 Centers and their functions
+- 64 Gates and their I-Ching hexagrams
+- 36 Channels
+- 12 Profiles and 6 Lines
+- 7 Authority types
+- Variables - digestion, environment, perspective, awareness
+- Incarnation Crosses
+- Transit influences
+- Composite and partnership charts
+- HD history (Ra Uru Hu, Jovian Archive)
+Rules:
+1. ALWAYS respond in English
+2. Use correct Human Design terminology
+3. Be friendly but professional
+4. Structure responses clearly with markdown formatting
+5. Give practical advice and examples
+6. If the user asks about their specific design, ask for their type/profile/authority
+7. Keep answers concise but thorough (max 300 words unless the topic is complex)`
+          : `Jsi odborný průvodce systémem Human Design. Máš hluboké znalosti o:
 - 5 typech (Manifestor, Generátor, Manifestující Generátor, Projektor, Reflektor)
-- 9 centrech a jejich funkcích
-- 64 branách a jejich I-Ťing hexagramech
+- 9 centrách a jejich funkcích
+- 64 bránách a jejich I-Ťing hexagramech
 - 36 dráhách (kanálech)
 - 12 profilech a 6 linkách
 - 7 typech autority
 - Proměnných (Variables) - trávení, prostředí, perspektiva, vědomí
 - Inkarnačních křížích
 - Tranzitních vlivech
-- Kompozitních a partnerských mapách
+- Kompozitních a partnerskch mapách
 - Historii HD (Ra Uru Hu, Jovian Archive)
-
 Pravidla:
 1. VŽDY odpovídej v češtině
 2. Používej správnou českou HD terminologii (brány, dráhy, centra, mapy)
@@ -461,9 +484,11 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
     list: publicProcedure
       .input(z.object({
         category: z.string().optional(),
+        locale: z.string().optional(),
       }).optional())
       .query(({ input }) => {
-        let articles = BLOG_ARTICLES;
+        const isEn = input?.locale === 'en';
+        let articles = isEn ? BLOG_ARTICLES_EN : BLOG_ARTICLES;
         if (input?.category) {
           articles = articles.filter(a => a.category === input.category);
         }
@@ -472,11 +497,12 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
           categories: BLOG_CATEGORIES,
         };
       }),
-
     getBySlug: publicProcedure
-      .input(z.object({ slug: z.string() }))
+      .input(z.object({ slug: z.string(), locale: z.string().optional() }))
       .query(({ input }) => {
-        const article = BLOG_ARTICLES.find(a => a.slug === input.slug);
+        const isEn = input?.locale === 'en';
+        const articleList = isEn ? BLOG_ARTICLES_EN : BLOG_ARTICLES;
+        const article = articleList.find(a => a.slug === input.slug);
         return article || null;
       }),
   }),

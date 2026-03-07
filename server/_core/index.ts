@@ -84,7 +84,8 @@ async function startServer() {
   });
   // ─── AI Streaming SSE Endpoint ────────────────────────────────────────
   app.get("/api/ai/stream", async (req, res) => {
-    const { chartData, readingType, chartId } = req.query as Record<string, string>;
+    const { chartData, readingType, chartId, locale } = req.query as Record<string, string>;
+    const isEn = locale === 'en';
     const sessionCookie = req.cookies?.session || req.headers.cookie?.split("session=")[1]?.split(";")[0];
 
     // Validate session using sdk
@@ -124,7 +125,9 @@ async function startServer() {
       career: `Based on this chart (Type: ${chart.type}, Profile: ${chart.profile}, Authority: ${chart.authority}, Defined channels: ${(chart.channels as any[])?.map((c: any) => `${c.gate1}-${c.gate2}`).join(", ")}), provide career guidance. What types of work environments suit them? What roles align with their design? How should they approach career decisions using their authority?`,
     };
 
-    const systemPrompt = `Jsi expert na systém Human Design s hlubokými znalostmi Ra Uru Hu a jeho učení. Poskytuj hluboké, specifické a praktické výklady. Používej vřelý, ale profesionální tón. Strukturuj odpovědi přehledně pomocí markdown formátování. Buď specifický k danému chartu — vyhýbej se obecným radám. DŮLEŽITÉ: Vždy odpovídej v češtině. Používej správnou českou HD terminologii. NIKDY nezačínej oslovením jako "Ahoj!", "Dobrý den," nebo podobnými pozdravy — začni rovnou výkladem nebo nadpisem sekce.`;
+    const systemPrompt = isEn
+      ? `You are an expert in the Human Design system with deep knowledge of Ra Uru Hu's teachings. Provide deep, specific, and practical interpretations. Use a warm yet professional tone. Structure responses clearly using markdown formatting. Be specific to the given chart — avoid generic advice. IMPORTANT: Always respond in English. Use correct Human Design terminology. NEVER start with a greeting like "Hello!" or "Hi there" — begin directly with the interpretation or section heading.`
+      : `Jsi expert na systém Human Design s hlubokými znalostmi Ra Uru Hu a jeho učení. Poskytuj hluboké, specifické a praktické výklady. Používej vřelý, ale profesionální tón. Strukturuj odpovědi přehledně pomocí markdown formátování. Buď specifický k danému chartu — vyhýbej se obecným radám. DŮLEŽITÉ: Vždy odpovídej v češtině. Používej správnou českou HD terminologii. NIKDY nezačínej oslovením jako "Ahoj!", "Dobrý den," nebo podobnými pozdravy — začni rovnou výkladem nebo nadpisem sekce.`;
 
     const { ENV } = await import("./env");
     const apiUrl = ENV.forgeApiUrl

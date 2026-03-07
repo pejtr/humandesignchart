@@ -24,44 +24,36 @@ const CATEGORY_STYLES: Record<string, string> = {
 
 function renderMarkdown(md: string): string {
   return md
-    // Headers
     .replace(/^### (.+)$/gm, '<h3 class="font-serif text-xl font-bold mt-8 mb-3">$1</h3>')
     .replace(/^## (.+)$/gm, '<h2 class="font-serif text-2xl font-bold mt-10 mb-4">$1</h2>')
-    // Bold
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // Italic
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Unordered lists
     .replace(/^- (.+)$/gm, '<li class="ml-4 mb-1">$1</li>')
-    // Ordered lists
     .replace(/^(\d+)\. (.+)$/gm, '<li class="ml-4 mb-1"><span class="font-semibold text-primary">$1.</span> $2</li>')
-    // Wrap consecutive <li> in <ul>
     .replace(/((?:<li[^>]*>.*<\/li>\n?)+)/g, '<ul class="list-disc list-outside pl-4 mb-4 space-y-1 text-foreground/90">$1</ul>')
-    // Paragraphs (lines that aren't headers, lists, or empty)
     .replace(/^(?!<[hul]|<li|$)(.+)$/gm, '<p class="mb-4 leading-relaxed text-foreground/85">$1</p>')
-    // Remove double <ul> wrapping
     .replace(/<ul[^>]*>\s*<ul/g, '<ul')
     .replace(/<\/ul>\s*<\/ul>/g, '</ul>');
 }
 
 export default function BlogArticle() {
-  const { localePath } = useLanguage();
+  const { localePath, locale } = useLanguage();
+  const isEn = locale === 'en';
   const params = useParams<{ slug: string }>();
   const [, navigate] = useLocation();
   const slug = params.slug || "";
 
   const { data: article, isLoading } = trpc.blog.getBySlug.useQuery(
-    { slug },
+    { slug, locale },
     { enabled: !!slug }
   );
 
   // Also fetch article list for "related articles" sidebar
-  const { data: listData } = trpc.blog.list.useQuery(undefined);
+  const { data: listData } = trpc.blog.list.useQuery({ locale });
 
   useEffect(() => {
     if (article) {
       document.title = article.metaTitle;
-      // Meta description
       let metaDesc = document.querySelector('meta[name="description"]');
       if (metaDesc) metaDesc.setAttribute("content", article.metaDescription);
       else {
@@ -70,7 +62,6 @@ export default function BlogArticle() {
         (metaDesc as HTMLMetaElement).content = article.metaDescription;
         document.head.appendChild(metaDesc);
       }
-      // JSON-LD
       let jsonLd = document.querySelector('script[data-blog-jsonld]');
       if (!jsonLd) {
         jsonLd = document.createElement("script");
@@ -85,11 +76,11 @@ export default function BlogArticle() {
         description: article.metaDescription,
         datePublished: article.publishedAt,
         dateModified: article.updatedAt,
-        author: { "@type": "Organization", name: "Human Design App" },
-        publisher: { "@type": "Organization", name: "Human Design App" },
+        author: { "@type": "Organization", name: "Human Design Chart" },
+        publisher: { "@type": "Organization", name: "Human Design Chart" },
         mainEntityOfPage: {
           "@type": "WebPage",
-          "@id": `https://human-design.manus.space/blog/${article.slug}`,
+          "@id": `https://humandesignchart.app/${locale}/blog/${article.slug}`,
         },
       });
     }
@@ -97,9 +88,8 @@ export default function BlogArticle() {
       const el = document.querySelector('script[data-blog-jsonld]');
       if (el) el.remove();
     };
-  }, [article]);
+  }, [article, locale]);
 
-  // Scroll to top on slug change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
@@ -120,11 +110,15 @@ export default function BlogArticle() {
       <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="container pt-24 pb-16 text-center">
-          <h1 className="font-serif text-3xl font-bold mb-4">Článek nenalezen</h1>
-          <p className="text-muted-foreground mb-6">Tento článek neexistuje nebo byl odstraněn.</p>
-          <Button onClick={() => navigate("/blog")}>
+          <h1 className="font-serif text-3xl font-bold mb-4">
+            {isEn ? "Article not found" : "Článek nenalezen"}
+          </h1>
+          <p className="text-muted-foreground mb-6">
+            {isEn ? "This article does not exist or has been removed." : "Tento článek neexistuje nebo byl odstraněn."}
+          </p>
+          <Button onClick={() => navigate(localePath("/blog"))}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Zpět na blog
+            {isEn ? "Back to blog" : "Zpět na blog"}
           </Button>
         </div>
         <Footer />
@@ -132,18 +126,16 @@ export default function BlogArticle() {
     );
   }
 
-  // Related articles: same category, excluding current
   const relatedArticles = (listData?.articles ?? [])
     .filter(a => a.category === article.category && a.slug !== article.slug)
     .slice(0, 3);
 
-  // Next/prev articles
   const allArticles = listData?.articles ?? [];
   const currentIdx = allArticles.findIndex(a => a.slug === article.slug);
   const prevArticle = currentIdx > 0 ? allArticles[currentIdx - 1] : null;
   const nextArticle = currentIdx < allArticles.length - 1 ? allArticles[currentIdx + 1] : null;
 
-  const formattedDate = new Date(article.publishedAt).toLocaleDateString("cs-CZ", {
+  const formattedDate = new Date(article.publishedAt).toLocaleDateString(isEn ? "en-US" : "cs-CZ", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -153,7 +145,6 @@ export default function BlogArticle() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
-      {/* Cover image */}
       {article.coverImage && (
         <div className="w-full h-64 md:h-80 overflow-hidden mt-16">
           <img
@@ -164,12 +155,11 @@ export default function BlogArticle() {
         </div>
       )}
 
-      {/* Article header */}
       <section className={`${article.coverImage ? 'pt-8' : 'pt-24'} pb-8 bg-gradient-to-b from-primary/5 to-background`}>
         <div className="container max-w-4xl">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/blog")} className="mb-6">
+          <Button variant="ghost" size="sm" onClick={() => navigate(localePath("/blog"))} className="mb-6">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Zpět na blog
+            {isEn ? "Back to blog" : "Zpět na blog"}
           </Button>
 
           <div className="flex items-center gap-3 mb-4">
@@ -178,7 +168,7 @@ export default function BlogArticle() {
             </Badge>
             <span className="text-sm text-muted-foreground flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" />
-              {article.readingTime} min čtení
+              {article.readingTime} {isEn ? "min read" : "min čtení"}
             </span>
             <span className="text-sm text-muted-foreground flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5" />
@@ -196,25 +186,21 @@ export default function BlogArticle() {
         </div>
       </section>
 
-      {/* Article content */}
       <section className="py-8">
         <div className="container max-w-4xl">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-10">
-            {/* Main content */}
             <article
               className="prose-custom"
               dangerouslySetInnerHTML={{ __html: renderMarkdown(article.content) }}
             />
 
-            {/* Sidebar */}
             <aside className="hidden lg:block">
               <div className="sticky top-24 space-y-6">
-                {/* Tags */}
                 <Card className="border-border/50">
                   <CardContent className="p-4">
                     <h4 className="font-serif text-sm font-semibold mb-3 flex items-center gap-1.5">
                       <Tag className="w-3.5 h-3.5" />
-                      Štítky
+                      {isEn ? "Tags" : "Štítky"}
                     </h4>
                     <div className="flex flex-wrap gap-1.5">
                       {article.tags.map(tag => (
@@ -226,22 +212,21 @@ export default function BlogArticle() {
                   </CardContent>
                 </Card>
 
-                {/* Related articles */}
                 {relatedArticles.length > 0 && (
                   <Card className="border-border/50">
                     <CardContent className="p-4">
                       <h4 className="font-serif text-sm font-semibold mb-3 flex items-center gap-1.5">
                         <BookOpen className="w-3.5 h-3.5" />
-                        Související články
+                        {isEn ? "Related articles" : "Související články"}
                       </h4>
                       <div className="space-y-3">
                         {relatedArticles.map(ra => (
-                          <Link key={ra.slug} href={`/blog/${ra.slug}`} className="no-underline block group">
+                          <Link key={ra.slug} href={localePath(`/blog/${ra.slug}`)} className="no-underline block group">
                             <p className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-2">
                               {ra.title}
                             </p>
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              {ra.readingTime} min čtení
+                              {ra.readingTime} {isEn ? "min read" : "min čtení"}
                             </p>
                           </Link>
                         ))}
@@ -250,17 +235,18 @@ export default function BlogArticle() {
                   </Card>
                 )}
 
-                {/* CTA */}
                 <Card className="border-primary/20 bg-primary/5">
                   <CardContent className="p-4 text-center">
                     <Compass className="w-8 h-8 text-primary mx-auto mb-2" />
-                    <p className="text-sm font-semibold mb-1">Zjistěte svůj typ</p>
+                    <p className="text-sm font-semibold mb-1">
+                      {isEn ? "Discover your type" : "Zjistěte svůj typ"}
+                    </p>
                     <p className="text-xs text-muted-foreground mb-3">
-                      Vypočítejte si mapu zdarma
+                      {isEn ? "Calculate your free chart" : "Vypočítejte si mapu zdarma"}
                     </p>
                     <Link href={localePath("/calculate")}>
                       <Button size="sm" className="w-full bg-primary text-primary-foreground">
-                        Mapa zdarma
+                        {isEn ? "Free chart" : "Mapa zdarma"}
                       </Button>
                     </Link>
                   </CardContent>
@@ -271,17 +257,16 @@ export default function BlogArticle() {
         </div>
       </section>
 
-      {/* Prev / Next navigation */}
       <section className="py-8 border-t border-border/50">
         <div className="container max-w-4xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {prevArticle ? (
-              <Link href={`/blog/${prevArticle.slug}`} className="no-underline">
+              <Link href={localePath(`/blog/${prevArticle.slug}`)} className="no-underline">
                 <Card className="border-border/50 hover:shadow-md transition-shadow group h-full">
                   <CardContent className="p-5">
                     <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
                       <ArrowLeft className="w-3 h-3" />
-                      Předchozí článek
+                      {isEn ? "Previous article" : "Předchozí článek"}
                     </p>
                     <p className="font-serif font-semibold group-hover:text-primary transition-colors line-clamp-2">
                       {prevArticle.title}
@@ -291,11 +276,11 @@ export default function BlogArticle() {
               </Link>
             ) : <div />}
             {nextArticle ? (
-              <Link href={`/blog/${nextArticle.slug}`} className="no-underline">
+              <Link href={localePath(`/blog/${nextArticle.slug}`)} className="no-underline">
                 <Card className="border-border/50 hover:shadow-md transition-shadow group h-full">
                   <CardContent className="p-5 text-right">
                     <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1 justify-end">
-                      Další článek
+                      {isEn ? "Next article" : "Další článek"}
                       <ArrowRight className="w-3 h-3" />
                     </p>
                     <p className="font-serif font-semibold group-hover:text-primary transition-colors line-clamp-2">
@@ -309,19 +294,20 @@ export default function BlogArticle() {
         </div>
       </section>
 
-      {/* Bottom CTA */}
       <section className="py-16 bg-primary/5">
         <div className="container text-center">
           <h2 className="font-serif text-3xl font-bold mb-4">
-            Zjistěte svůj Human Design typ
+            {isEn ? "Discover Your Human Design Type" : "Zjistěte svůj Human Design typ"}
           </h2>
           <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
-            Vypočítejte si svou energetickou mapu zdarma a získejte personalizovaný AI rozbor.
+            {isEn
+              ? "Calculate your free energy map and get a personalized AI reading."
+              : "Vypočítejte si svou energetickou mapu zdarma a získejte personalizovaný AI rozbor."}
           </p>
           <Link href={localePath("/calculate")}>
             <Button size="lg" className="bg-primary text-primary-foreground">
               <Compass className="w-5 h-5 mr-2" />
-              Vytvořit moji mapu zdarma
+              {isEn ? "Create My Free Chart" : "Vytvořit moji mapu zdarma"}
             </Button>
           </Link>
         </div>

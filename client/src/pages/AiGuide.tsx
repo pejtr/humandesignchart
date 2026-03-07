@@ -1,16 +1,21 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Send, User, Bot, LogIn, Loader2, ChevronDown } from "lucide-react";
+import {
+  Sparkles, Send, User, Bot, LogIn, Loader2, ChevronDown,
+  Zap, Star, Compass, Moon, Sun, Activity, Circle,
+} from "lucide-react";
 import { Streamdown } from "streamdown";
+import { Link } from "wouter";
 
 type Message = {
   id: string;
@@ -19,26 +24,266 @@ type Message = {
   timestamp: Date;
 };
 
-const SUGGESTED_QUESTIONS = [
-  "Co je to Human Design a jak funguje?",
-  "Jaký je rozdíl mezi Generátorem a Manifestorem?",
-  "Co znamená mít otevřené Sakrální centrum?",
-  "Jak funguje emocionální autorita?",
-  "Co je to inkarnační kříž?",
-  "Vysvětli mi profil 4/6",
-  "Jak fungují tranzity v Human Designu?",
-  "Co jsou to proměnné (Variables)?",
-  "Jak najdu svou správnou stravu podle HD?",
-  "Co je to Ne-Já téma?",
-];
+// Ambient floating orb component
+function AmbientOrbs() {
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+      {/* Large slow orbs */}
+      <motion.div
+        className="absolute w-[600px] h-[600px] rounded-full opacity-[0.06]"
+        style={{
+          background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
+          top: "-10%",
+          left: "-10%",
+        }}
+        animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute w-[500px] h-[500px] rounded-full opacity-[0.05]"
+        style={{
+          background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
+          bottom: "-5%",
+          right: "-5%",
+        }}
+        animate={{ x: [0, -50, 0], y: [0, -40, 0] }}
+        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 5 }}
+      />
+      <motion.div
+        className="absolute w-[300px] h-[300px] rounded-full opacity-[0.04]"
+        style={{
+          background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
+          top: "40%",
+          right: "20%",
+        }}
+        animate={{ x: [0, 30, -20, 0], y: [0, -30, 20, 0] }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 10 }}
+      />
+      {/* Subtle star particles */}
+      {[...Array(12)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 rounded-full bg-primary/20"
+          style={{
+            left: `${10 + (i * 7.5)}%`,
+            top: `${15 + (i % 4) * 20}%`,
+          }}
+          animate={{ opacity: [0.1, 0.5, 0.1], scale: [0.8, 1.2, 0.8] }}
+          transition={{
+            duration: 3 + (i % 3),
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: i * 0.4,
+          }}
+        />
+      ))}
+      {/* Mandala-like ring */}
+      <motion.div
+        className="absolute w-[800px] h-[800px] rounded-full border border-primary/5"
+        style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.div
+        className="absolute w-[600px] h-[600px] rounded-full border border-primary/4"
+        style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
+        animate={{ rotate: -360 }}
+        transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
+      />
+    </div>
+  );
+}
+
+// Profile panel component
+function ProfilePanel({ locale }: { locale: string }) {
+  const isEn = locale === 'en';
+  const { data: charts, isLoading } = trpc.chart.list.useQuery();
+
+  const primaryChart = useMemo(() => {
+    if (!charts?.length) return null;
+    // Use the first chart (most recently created, or "self" chart)
+    return charts[0];
+  }, [charts]);
+
+  const chartData = primaryChart?.chartData as any;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-12 rounded-lg bg-muted/50 animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+
+  if (!primaryChart || !chartData) {
+    return (
+      <div className="text-center py-6">
+        <Compass className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
+        <p className="text-sm text-muted-foreground mb-4">
+          {isEn ? "No chart yet" : "Zatím žádná mapa"}
+        </p>
+        <Link href={`/${locale}/calculate`}>
+          <Button size="sm" variant="outline" className="w-full text-xs">
+            {isEn ? "Calculate my chart" : "Vypočítat mou mapu"}
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  const TYPE_COLORS: Record<string, string> = {
+    Generator: "text-emerald-500",
+    "Manifesting Generator": "text-teal-500",
+    Projector: "text-blue-500",
+    Manifestor: "text-violet-500",
+    Reflector: "text-amber-500",
+  };
+
+  const typeColor = TYPE_COLORS[chartData.type] || "text-primary";
+
+  const definedCenters = (chartData.centers as any[] || [])
+    .filter((c: any) => c.defined)
+    .map((c: any) => c.name);
+
+  return (
+    <div className="space-y-3">
+      {/* Name + Type */}
+      <div className="text-center pb-3 border-b border-border/40">
+        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+          <Star className="w-6 h-6 text-primary" />
+        </div>
+        <p className="font-serif font-semibold text-sm leading-tight">{primaryChart.name}</p>
+        <p className={`text-xs font-medium mt-0.5 ${typeColor}`}>{chartData.type}</p>
+      </div>
+
+      {/* Key data rows */}
+      <div className="space-y-2">
+        <ProfileRow
+          icon={<Zap className="w-3.5 h-3.5" />}
+          label={isEn ? "Strategy" : "Strategie"}
+          value={chartData.strategy}
+        />
+        <ProfileRow
+          icon={<Moon className="w-3.5 h-3.5" />}
+          label={isEn ? "Authority" : "Autorita"}
+          value={chartData.authority}
+        />
+        <ProfileRow
+          icon={<Sun className="w-3.5 h-3.5" />}
+          label={isEn ? "Profile" : "Profil"}
+          value={`${chartData.profile}${chartData.profileName ? ` — ${chartData.profileName}` : ''}`}
+        />
+        <ProfileRow
+          icon={<Activity className="w-3.5 h-3.5" />}
+          label={isEn ? "Definition" : "Definice"}
+          value={chartData.definition}
+        />
+        {chartData.incarnationCross?.name && (
+          <ProfileRow
+            icon={<Compass className="w-3.5 h-3.5" />}
+            label={isEn ? "Cross" : "Kříž"}
+            value={chartData.incarnationCross.name}
+            small
+          />
+        )}
+      </div>
+
+      {/* Defined centers */}
+      {definedCenters.length > 0 && (
+        <div className="pt-2 border-t border-border/40">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2">
+            {isEn ? "Defined Centers" : "Definovaná centra"}
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {definedCenters.map((c: string) => (
+              <span key={c} className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+                {c}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Channels count */}
+      {chartData.channels?.length > 0 && (
+        <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/40">
+          <span className="flex items-center gap-1">
+            <Circle className="w-3 h-3" />
+            {isEn ? "Channels" : "Dráhy"}
+          </span>
+          <span className="font-medium text-foreground">{chartData.channels.length}</span>
+        </div>
+      )}
+
+      {/* Link to full chart */}
+      <Link href={`/${locale}/chart/${primaryChart.id}`}>
+        <Button size="sm" variant="outline" className="w-full text-xs mt-1">
+          {isEn ? "View full chart" : "Zobrazit celou mapu"}
+        </Button>
+      </Link>
+    </div>
+  );
+}
+
+function ProfileRow({
+  icon, label, value, small = false
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  small?: boolean;
+}) {
+  return (
+    <div className="flex items-start gap-2">
+      <span className="text-primary/60 mt-0.5 shrink-0">{icon}</span>
+      <div className="min-w-0">
+        <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-none mb-0.5">{label}</p>
+        <p className={`font-medium leading-tight ${small ? 'text-[11px]' : 'text-xs'} text-foreground/90`}>{value}</p>
+      </div>
+    </div>
+  );
+}
 
 export default function AiGuide() {
   const { isAuthenticated } = useAuth();
+  const { locale, localePath } = useLanguage();
+  const isEn = locale === 'en';
+
+  const SUGGESTED_QUESTIONS = isEn ? [
+    "What is Human Design and how does it work?",
+    "What's the difference between a Generator and a Manifestor?",
+    "What does an open Sacral Center mean?",
+    "How does emotional authority work?",
+    "What is an incarnation cross?",
+    "Explain profile 4/6",
+    "How do transits work in Human Design?",
+    "What are Variables in Human Design?",
+    "How do I find my correct diet according to HD?",
+    "What is the Not-Self theme?",
+  ] : [
+    "Co je to Human Design a jak funguje?",
+    "Jaký je rozdíl mezi Generátorem a Manifestorem?",
+    "Co znamená mít otevřené Sakrální centrum?",
+    "Jak funguje emocionální autorita?",
+    "Co je to inkarnační kříž?",
+    "Vysvětli mi profil 4/6",
+    "Jak fungují tranzity v Human Designu?",
+    "Co jsou to proměnné (Variables)?",
+    "Jak najdu svou správnou stravu podle HD?",
+    "Co je to Ne-Já téma?",
+  ];
+
+  const welcomeMessage = isEn
+    ? "I'm your AI Human Design guide. Ask me anything about the Human Design system — types, centers, gates, channels, authorities, profiles, transits, and much more. How can I help you?"
+    : "Jsem váš AI průvodce Human Designem. Můžete se mě zeptat na cokoliv o systému Human Design — typy, centra, brány, dráhy, autority, profily, tranzity a mnoho dalšího. Jak vám mohu pomoci?";
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       role: "assistant",
-      content: "Ahoj! 👋 Jsem váš AI průvodce Human Designem. Můžete se mě zeptat na cokoliv o systému Human Design — typy, centra, brány, dráhy, autority, profily, tranzity a mnoho dalšího. Jak vám mohu pomoci?",
+      content: welcomeMessage,
       timestamp: new Date(),
     },
   ]);
@@ -81,6 +326,7 @@ export default function AiGuide() {
       const result = await askMutation.mutateAsync({
         question,
         history,
+        locale,
       });
 
       const assistantMsg: Message = {
@@ -95,7 +341,9 @@ export default function AiGuide() {
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "Omlouvám se, došlo k chybě při zpracování vaší otázky. Zkuste to prosím znovu.",
+        content: isEn
+          ? "I'm sorry, an error occurred while processing your question. Please try again."
+          : "Omlouvám se, došlo k chybě při zpracování vaší otázky. Zkuste to prosím znovu.",
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorMsg]);
@@ -107,23 +355,34 @@ export default function AiGuide() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background relative overflow-hidden">
+        <AmbientOrbs />
         <Navbar />
-        <main className="pt-24 pb-16">
+        <main className="pt-24 pb-16 relative z-10">
           <div className="container max-w-2xl text-center">
-            <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
-              <Bot className="w-10 h-10 text-primary" />
-            </div>
-            <h1 className="text-3xl font-serif font-bold mb-4">AI průvodce Human Designem</h1>
-            <p className="text-muted-foreground mb-8">
-              Přihlaste se pro přístup k AI průvodci, který vám zodpoví jakékoliv otázky o Human Designu.
-            </p>
-            <a href={getLoginUrl()}>
-              <Button size="lg" className="gap-2">
-                <LogIn className="w-5 h-5" />
-                Přihlásit se
-              </Button>
-            </a>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/10">
+                <Bot className="w-10 h-10 text-primary" />
+              </div>
+              <h1 className="text-3xl font-serif font-bold mb-4">
+                {isEn ? "AI Human Design Guide" : "AI průvodce Human Designem"}
+              </h1>
+              <p className="text-muted-foreground mb-8">
+                {isEn
+                  ? "Sign in to access the AI guide that will answer any questions about Human Design."
+                  : "Přihlaste se pro přístup k AI průvodci, který vám zodpoví jakékoliv otázky o Human Designu."}
+              </p>
+              <a href={getLoginUrl()}>
+                <Button size="lg" className="gap-2">
+                  <LogIn className="w-5 h-5" />
+                  {isEn ? "Sign in" : "Přihlásit se"}
+                </Button>
+              </a>
+            </motion.div>
           </div>
         </main>
         <Footer />
@@ -132,124 +391,170 @@ export default function AiGuide() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
+      <AmbientOrbs />
       <Navbar />
-      <main className="flex-1 pt-20 pb-4 flex flex-col">
-        <div className="container max-w-4xl flex-1 flex flex-col">
-          {/* Header */}
-          <div className="flex items-center gap-3 py-4 border-b mb-4">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Bot className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-lg font-serif font-semibold">AI průvodce Human Designem</h1>
-              <p className="text-xs text-muted-foreground">Zeptejte se na cokoliv o Human Designu</p>
-            </div>
-            <Badge variant="outline" className="ml-auto text-xs">
-              <Sparkles className="w-3 h-3 mr-1" />
-              AI
-            </Badge>
-          </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2" style={{ maxHeight: "calc(100vh - 260px)" }}>
-            <AnimatePresence>
-              {messages.map(msg => (
-                <motion.div
-                  key={msg.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
-                >
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                    msg.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-primary/10 text-primary"
-                  }`}>
-                    {msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-                  </div>
-                  <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                    msg.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted/70 text-foreground"
-                  }`}>
-                    {msg.role === "assistant" ? (
-                      <div className="text-sm prose prose-sm max-w-none [&_p]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mb-1 [&_ul]:mb-2 [&_li]:mb-0.5">
-                        <Streamdown>{msg.content}</Streamdown>
-                      </div>
-                    ) : (
-                      <p className="text-sm">{msg.content}</p>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+      <main className="flex-1 pt-20 pb-4 flex flex-col relative z-10">
+        <div className="container max-w-6xl flex-1 flex flex-col">
+          {/* Layout: profile panel left + chat right */}
+          <div className="flex-1 flex gap-6 py-4">
 
-            {isLoading && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex gap-3"
+            {/* Left: Profile Panel */}
+            <aside className="hidden lg:block w-64 shrink-0">
+              <div className="sticky top-24">
+                <Card className="border-border/40 bg-background/60 backdrop-blur-sm shadow-lg">
+                  <CardContent className="p-4">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+                      <Star className="w-3.5 h-3.5 text-primary" />
+                      {isEn ? "My Profile" : "Můj profil"}
+                    </h3>
+                    <ProfilePanel locale={locale} />
+                  </CardContent>
+                </Card>
+
+                {/* Quick tips */}
+                <Card className="border-border/40 bg-background/60 backdrop-blur-sm mt-3">
+                  <CardContent className="p-4">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" />
+                      {isEn ? "Tips" : "Tipy"}
+                    </h3>
+                    <ul className="space-y-2 text-xs text-muted-foreground">
+                      <li>• {isEn ? "Ask about your specific type" : "Ptejte se na svůj konkrétní typ"}</li>
+                      <li>• {isEn ? "Mention your profile for personal insights" : "Zmiňte svůj profil pro osobní výklad"}</li>
+                      <li>• {isEn ? "Ask about specific gates or channels" : "Ptejte se na konkrétní brány nebo dráhy"}</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+            </aside>
+
+            {/* Right: Chat */}
+            <div className="flex-1 flex flex-col min-w-0">
+              {/* Header */}
+              <div className="flex items-center gap-3 py-3 border-b border-border/50 mb-4 bg-background/60 backdrop-blur-sm rounded-t-xl px-4">
+                <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                  <Bot className="w-4.5 h-4.5 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-sm font-serif font-semibold">
+                    {isEn ? "AI Human Design Guide" : "AI průvodce Human Designem"}
+                  </h1>
+                  <p className="text-xs text-muted-foreground">
+                    {isEn ? "Ask anything about Human Design" : "Zeptejte se na cokoliv o Human Designu"}
+                  </p>
+                </div>
+                <Badge variant="outline" className="ml-auto text-xs border-primary/30 text-primary">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  AI
+                </Badge>
+              </div>
+
+              {/* Messages */}
+              <div
+                className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1"
+                style={{ maxHeight: "calc(100vh - 300px)" }}
               >
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-primary" />
-                </div>
-                <div className="bg-muted/70 rounded-2xl px-4 py-3">
-                  <div className="flex gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "0ms" }} />
-                    <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "150ms" }} />
-                    <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "300ms" }} />
+                <AnimatePresence>
+                  {messages.map(msg => (
+                    <motion.div
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
+                    >
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                        msg.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-primary/10 text-primary border border-primary/20"
+                      }`}>
+                        {msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                      </div>
+                      <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                        msg.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-background/80 backdrop-blur-sm border border-border/50 text-foreground shadow-sm"
+                      }`}>
+                        {msg.role === "assistant" ? (
+                          <div className="text-sm prose prose-sm max-w-none [&_p]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mb-1 [&_ul]:mb-2 [&_li]:mb-0.5">
+                            <Streamdown>{msg.content}</Streamdown>
+                          </div>
+                        ) : (
+                          <p className="text-sm">{msg.content}</p>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+
+                {isLoading && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex gap-3"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+                      <Bot className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl px-4 py-3 shadow-sm">
+                      <div className="flex gap-1.5">
+                        <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Suggested questions */}
+              {messages.length <= 1 && (
+                <div className="mb-4">
+                  <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                    <ChevronDown className="w-3 h-3" />
+                    {isEn ? "Suggested questions" : "Navrhované otázky"}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {SUGGESTED_QUESTIONS.slice(0, 6).map((q, i) => (
+                      <Button
+                        key={i}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-auto py-1.5 px-3 bg-background/60 backdrop-blur-sm border-border/50"
+                        onClick={() => handleSend(q)}
+                      >
+                        {q}
+                      </Button>
+                    ))}
                   </div>
                 </div>
-              </motion.div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+              )}
 
-          {/* Suggested questions (show only at start) */}
-          {messages.length <= 1 && (
-            <div className="mb-4">
-              <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                <ChevronDown className="w-3 h-3" />
-                Navrhované otázky
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {SUGGESTED_QUESTIONS.slice(0, 6).map((q, i) => (
-                  <Button
-                    key={i}
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-auto py-1.5 px-3"
-                    onClick={() => handleSend(q)}
-                  >
-                    {q}
+              {/* Input */}
+              <div className="border-t border-border/50 pt-4">
+                <form
+                  onSubmit={e => {
+                    e.preventDefault();
+                    handleSend();
+                  }}
+                  className="flex gap-2"
+                >
+                  <Input
+                    ref={inputRef}
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    placeholder={isEn ? "Ask anything about Human Design..." : "Zeptejte se na cokoliv o Human Designu..."}
+                    disabled={isLoading}
+                    className="flex-1 bg-background/60 backdrop-blur-sm border-border/50"
+                  />
+                  <Button type="submit" disabled={!input.trim() || isLoading} size="icon">
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   </Button>
-                ))}
+                </form>
               </div>
             </div>
-          )}
-
-          {/* Input */}
-          <div className="border-t pt-4">
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                handleSend();
-              }}
-              className="flex gap-2"
-            >
-              <Input
-                ref={inputRef}
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                placeholder="Zeptejte se na cokoliv o Human Designu..."
-                disabled={isLoading}
-                className="flex-1"
-              />
-              <Button type="submit" disabled={!input.trim() || isLoading} size="icon">
-                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              </Button>
-            </form>
           </div>
         </div>
       </main>

@@ -326,8 +326,8 @@
 - [x] BlogArticle stránka zobrazuje cover obrázek v záhlaví
 
 ## AI Guide stránka — redesign
-- [ ] Spirituální pozadí s ambientní animací (orby, částice, sacred geometry)
-- [ ] Levý panel s profilem uživatele (typ, strategie, autorita, profil, definice, centra, kanály)
+- [x] Spirituální pozadí s ambientní animací (orby, částice, sacred geometry)
+- [x] Levý panel s profilem uživatele (typ, strategie, autorita, profil, definice, centra, kanály)
 
 ## i18n Infrastructure & English Localization
 - [x] Create English translation file (shared/i18n/en.ts)
@@ -343,4 +343,20 @@
 - [x] Add hreflang tags to all pages (index.html + sitemap.xml)
 - [x] Update sitemap.xml with bilingual URLs and hreflang alternates
 - [x] Update OG meta tags for English pages
-- [ ] English AI Guide prompts (future)
+- [x] English AI Guide prompts (SSE + askGuide procedure)
+
+## Blog Articles — English Translation (30 articles)
+- [x] Translate all 10 existing Czech blog articles to English
+- [x] Add 20 new English blog articles with long-tail SEO keywords
+- [x] Add bilingual blog routing (/cs/blog vs /en/blog)
+- [x] English blog articles in blogArticles.ts with lang field
+
+## AI Guide — English Prompts
+- [x] Translate all 9 AI reading type prompts to English
+- [x] Language-aware prompt selection (EN/CS based on locale)
+- [x] English system prompt for AI guide chat
+
+## AI Guide Page — Visual Enhancement
+- [x] Spiritual background with ambient animation (orbs, particles, mandala rings, star particles)
+- [x] Left panel with user HD profile data (type, strategy, authority, profile, centers, channels)
+- [x] Responsive layout: profile panel + chat area

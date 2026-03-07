@@ -10,12 +10,15 @@ import { trpc } from "@/lib/trpc";
 import {
   Compass, Users, Target, Brain, Fingerprint, CircleDot,
   Zap, Eye, Heart, Star, FileText, Clock, ArrowRight,
-  BookOpen, Search,
+  BookOpen, Search, Moon, Waves, Shield, Hash, Globe,
+  GitBranch, Leaf, FlaskConical, Flame, AlertCircle, Map,
 } from "lucide-react";
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Compass, Users, Target, Brain, Fingerprint, CircleDot,
-  Zap, Eye, Heart, Star, FileText,
+  Zap, Eye, Heart, Star, FileText, Moon, Waves, Shield,
+  Hash, Globe, GitBranch, Leaf, FlaskConical, Flame,
+  AlertCircle, Map,
 };
 
 const CATEGORY_STYLES: Record<string, string> = {
@@ -29,16 +32,21 @@ const CATEGORY_STYLES: Record<string, string> = {
 };
 
 export default function Blog() {
-  const { localePath } = useLanguage();
+  const { localePath, locale } = useLanguage();
+  const isEn = locale === 'en';
   const [activeCategory, setActiveCategory] = useState<string | undefined>(undefined);
   const { data, isLoading } = trpc.blog.list.useQuery(
-    activeCategory ? { category: activeCategory } : undefined
+    activeCategory ? { category: activeCategory, locale } : { locale }
   );
 
   useEffect(() => {
-    document.title = "Blog o Human Design | Články, průvodci a tipy";
+    document.title = isEn
+      ? "Human Design Blog | Articles, Guides & Tips"
+      : "Blog o Human Design | Články, průvodci a tipy";
     const metaDesc = document.querySelector('meta[name="description"]');
-    const desc = "Čtěte články o Human Design v češtině. Typy, strategie, autorita, profily, centra — vše, co potřebujete vědět o svém designu.";
+    const desc = isEn
+      ? "Read Human Design articles in English. Types, strategies, authority, profiles, centers — everything you need to know about your design."
+      : "Čtěte články o Human Design v češtině. Typy, strategie, autorita, profily, centra — vše, co potřebujete vědět o svém designu.";
     if (metaDesc) metaDesc.setAttribute("content", desc);
     else {
       const meta = document.createElement("meta");
@@ -46,7 +54,7 @@ export default function Blog() {
       meta.content = desc;
       document.head.appendChild(meta);
     }
-  }, []);
+  }, [isEn]);
 
   const articles = data?.articles ?? [];
   const categories = data?.categories ?? [];
@@ -71,11 +79,12 @@ export default function Blog() {
             Blog
           </Badge>
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">
-            Články o Human Design
+            {isEn ? "Human Design Blog" : "Články o Human Design"}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Prozkoumejte svět Human Design skrze naše články v češtině.
-            Typy, strategie, autorita, profily a mnohem více.
+            {isEn
+              ? "Explore the world of Human Design through our in-depth articles. Types, strategies, authority, profiles, and much more."
+              : "Prozkoumejte svět Human Design skrze naše články v češtině. Typy, strategie, autorita, profily a mnohem více."}
           </p>
         </div>
       </section>
@@ -90,7 +99,7 @@ export default function Blog() {
               onClick={() => setActiveCategory(undefined)}
               className="rounded-full"
             >
-              Vše
+              {isEn ? "All" : "Vše"}
             </Button>
             {categories.map(cat => (
               <Button
@@ -100,7 +109,7 @@ export default function Blog() {
                 onClick={() => setActiveCategory(activeCategory === cat.key ? undefined : cat.key)}
                 className="rounded-full"
               >
-                {cat.label}
+                {isEn ? cat.key.charAt(0).toUpperCase() + cat.key.slice(1) : cat.label}
               </Button>
             ))}
           </div>
@@ -127,13 +136,15 @@ export default function Blog() {
           ) : articles.length === 0 ? (
             <div className="text-center py-16">
               <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-lg text-muted-foreground">Žádné články v této kategorii.</p>
+              <p className="text-lg text-muted-foreground">
+                {isEn ? "No articles in this category." : "Žádné články v této kategorii."}
+              </p>
             </div>
           ) : (
             <>
               {/* Featured article */}
               {featured && (
-                <Link href={`/blog/${featured.slug}`} className="no-underline block mb-10">
+                <Link href={localePath(`/blog/${featured.slug}`)} className="no-underline block mb-10">
                   <Card className="border-border/50 overflow-hidden hover:shadow-lg transition-shadow group">
                     <div className="grid grid-cols-1 md:grid-cols-2">
                       <div className="relative overflow-hidden min-h-[200px]">
@@ -157,7 +168,7 @@ export default function Blog() {
                           </Badge>
                           <span className="text-xs text-muted-foreground flex items-center gap-1">
                             <Clock className="w-3 h-3" />
-                            {featured.readingTime} min čtení
+                            {featured.readingTime} {isEn ? "min read" : "min čtení"}
                           </span>
                         </div>
                         <h2 className="font-serif text-2xl md:text-3xl font-bold mb-3 group-hover:text-primary transition-colors">
@@ -167,7 +178,7 @@ export default function Blog() {
                           {featured.excerpt}
                         </p>
                         <div className="flex items-center gap-2 text-primary font-medium text-sm">
-                          Číst článek
+                          {isEn ? "Read article" : "Číst článek"}
                           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </div>
                       </CardContent>
@@ -181,7 +192,7 @@ export default function Blog() {
                 {restArticles.map(article => {
                   const Icon = ICON_MAP[article.coverIcon] || Compass;
                   return (
-                    <Link key={article.slug} href={`/blog/${article.slug}`} className="no-underline">
+                    <Link key={article.slug} href={localePath(`/blog/${article.slug}`)} className="no-underline">
                       <Card className="border-border/50 overflow-hidden hover:shadow-lg transition-all group h-full">
                         <div className="relative overflow-hidden h-44">
                           {article.coverImage ? (
@@ -234,15 +245,17 @@ export default function Blog() {
       <section className="py-16 bg-primary/5">
         <div className="container text-center">
           <h2 className="font-serif text-3xl font-bold mb-4">
-            Zjistěte svůj Human Design typ
+            {isEn ? "Discover Your Human Design Type" : "Zjistěte svůj Human Design typ"}
           </h2>
           <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
-            Vypočítejte si svou energetickou mapu zdarma a získejte personalizovaný AI rozbor.
+            {isEn
+              ? "Calculate your free energy map and get a personalized AI reading."
+              : "Vypočítejte si svou energetickou mapu zdarma a získejte personalizovaný AI rozbor."}
           </p>
           <Link href={localePath("/calculate")}>
             <Button size="lg" className="bg-primary text-primary-foreground">
               <Compass className="w-5 h-5 mr-2" />
-              Vytvořit moji mapu zdarma
+              {isEn ? "Create My Free Chart" : "Vytvořit moji mapu zdarma"}
             </Button>
           </Link>
         </div>
