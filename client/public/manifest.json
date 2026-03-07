@@ -1,0 +1,53 @@
+{
+  "name": "Human Design Chart",
+  "short_name": "HD Chart",
+  "description": "Free Human Design chart calculator with AI readings. Discover your type, strategy, authority and life purpose.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "categories": ["lifestyle", "health", "education"],
+  "icons": [
+    {
+      "src": "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/icon-192_270b0157.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/icon-512_e795e720.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Calculate Chart",
+      "short_name": "Calculate",
+      "description": "Calculate your Human Design chart",
+      "url": "/calculate",
+      "icons": [
+        {
+          "src": "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/icon-192_270b0157.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "AI Guide",
+      "short_name": "AI Guide",
+      "description": "Chat with AI Human Design guide",
+      "url": "/ai-guide",
+      "icons": [
+        {
+          "src": "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/icon-192_270b0157.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

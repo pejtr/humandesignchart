@@ -360,3 +360,15 @@
 - [x] Spiritual background with ambient animation (orbs, particles, mandala rings, star particles)
 - [x] Left panel with user HD profile data (type, strategy, authority, profile, centers, channels)
 - [x] Responsive layout: profile panel + chat area
+
+## Cover Images for EN Blog Articles
+- [x] Add Unsplash cover images to all 30 English blog articles (included in generation)
+
+## PWA Support
+- [x] PWA manifest.json with app metadata and icons
+- [x] Service Worker for offline caching
+- [x] Web app installable on mobile devices
+
+## Encyclopedia & Dashboard — English Translation
+- [x] Translate Encyclopedia page to English (locale-aware)
+- [x] Translate Dashboard page to English (locale-aware)

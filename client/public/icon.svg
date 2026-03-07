@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="#f8f5ff"/>
+  <!-- Outer ring -->
+  <circle cx="256" cy="256" r="220" stroke="#7c3aed" stroke-width="8" fill="none" opacity="0.3"/>
+  <!-- Middle ring -->
+  <circle cx="256" cy="256" r="160" stroke="#7c3aed" stroke-width="6" fill="none" opacity="0.5"/>
+  <!-- Inner circle (center) -->
+  <circle cx="256" cy="256" r="60" fill="#7c3aed" opacity="0.9"/>
+  <!-- Triangle up (head center) -->
+  <polygon points="256,80 296,150 216,150" fill="#7c3aed" opacity="0.8"/>
+  <!-- Triangle down (root center) -->
+  <polygon points="256,432 216,362 296,362" fill="#7c3aed" opacity="0.8"/>
+  <!-- Left diamond (spleen) -->
+  <polygon points="100,256 150,206 200,256 150,306" fill="#7c3aed" opacity="0.7"/>
+  <!-- Right diamond (will) -->
+  <polygon points="412,256 362,206 312,256 362,306" fill="#7c3aed" opacity="0.7"/>
+  <!-- Channels connecting centers -->
+  <line x1="256" y1="150" x2="256" y2="196" stroke="#7c3aed" stroke-width="12" opacity="0.6"/>
+  <line x1="256" y1="316" x2="256" y2="362" stroke="#7c3aed" stroke-width="12" opacity="0.6"/>
+  <line x1="200" y1="256" x2="196" y2="256" stroke="#7c3aed" stroke-width="12" opacity="0.6"/>
+  <line x1="316" y1="256" x2="312" y2="256" stroke="#7c3aed" stroke-width="12" opacity="0.6"/>
+</svg>

@@ -10,9 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Search, BookOpen, Zap, Circle, ArrowRight, Sparkles } from "lucide-react";
-import { GATE_DESCRIPTIONS, CHANNEL_DESCRIPTIONS, CENTER_DESCRIPTIONS, TYPE_DESCRIPTIONS, AUTHORITY_DESCRIPTIONS, PROFILE_DESCRIPTIONS } from "../../../shared/hdContent";
+import { GATE_DESCRIPTIONS, CHANNEL_DESCRIPTIONS, CENTER_DESCRIPTIONS } from "../../../shared/hdContent";
 
-// Czech gate names mapping
+// Czech gate names
 const GATE_NAMES_CS: Record<number, string> = {
   1: "Sebevyjádření", 2: "Směr Já", 3: "Uspořádání", 4: "Formulace", 5: "Pevné vzorce",
   6: "Tření", 7: "Role Já", 8: "Přínos", 9: "Soustředění", 10: "Chování Já",
@@ -34,9 +34,17 @@ const CENTER_NAMES_CS: Record<string, string> = {
   Heart: "Srdce", Sacral: "Sakrální", SolarPlexus: "Solární plexus",
   Spleen: "Slezina", Root: "Kořen",
 };
+const CENTER_NAMES_EN: Record<string, string> = {
+  Head: "Head", Ajna: "Ajna", Throat: "Throat", G: "G Center",
+  Heart: "Heart", Sacral: "Sacral", SolarPlexus: "Solar Plexus",
+  Spleen: "Spleen", Root: "Root",
+};
 
 const CIRCUIT_NAMES_CS: Record<string, string> = {
   Individual: "Individuální", Collective: "Kolektivní", Tribal: "Kmenový",
+};
+const CIRCUIT_NAMES_EN: Record<string, string> = {
+  Individual: "Individual", Collective: "Collective", Tribal: "Tribal",
 };
 
 const CIRCUIT_COLORS: Record<string, string> = {
@@ -49,7 +57,11 @@ type GateDetail = { gateNum: number; data: typeof GATE_DESCRIPTIONS[number] } | 
 type ChannelDetail = { key: string; data: typeof CHANNEL_DESCRIPTIONS[string] } | null;
 
 export default function Encyclopedia() {
-  const { t, locale, localePath } = useLanguage();
+  const { locale, localePath } = useLanguage();
+  const isEN = locale === "en";
+  const centerNames = isEN ? CENTER_NAMES_EN : CENTER_NAMES_CS;
+  const circuitNames = isEN ? CIRCUIT_NAMES_EN : CIRCUIT_NAMES_CS;
+
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("gates");
   const [circuitFilter, setCircuitFilter] = useState<string>("all");
@@ -57,7 +69,6 @@ export default function Encyclopedia() {
   const [selectedGate, setSelectedGate] = useState<GateDetail>(null);
   const [selectedChannel, setSelectedChannel] = useState<ChannelDetail>(null);
 
-  // Gate data as array
   const gatesArray = useMemo(() => {
     return Object.entries(GATE_DESCRIPTIONS).map(([num, data]) => ({
       num: parseInt(num),
@@ -65,7 +76,6 @@ export default function Encyclopedia() {
     }));
   }, []);
 
-  // Channel data as array
   const channelsArray = useMemo(() => {
     return Object.entries(CHANNEL_DESCRIPTIONS).map(([key, data]) => ({
       key,
@@ -73,21 +83,20 @@ export default function Encyclopedia() {
     }));
   }, []);
 
-  // Filtered gates
   const filteredGates = useMemo(() => {
     return gatesArray.filter(g => {
+      const gateName = isEN ? g.data.name : (GATE_NAMES_CS[g.num] || g.data.name);
       const matchSearch = search === "" ||
         g.num.toString().includes(search) ||
-        (GATE_NAMES_CS[g.num] || "").toLowerCase().includes(search.toLowerCase()) ||
+        gateName.toLowerCase().includes(search.toLowerCase()) ||
         g.data.name.toLowerCase().includes(search.toLowerCase()) ||
         g.data.iChing.toLowerCase().includes(search.toLowerCase());
       const matchCircuit = circuitFilter === "all" || g.data.circuit === circuitFilter;
       const matchCenter = centerFilter === "all" || g.data.center === centerFilter;
       return matchSearch && matchCircuit && matchCenter;
     });
-  }, [gatesArray, search, circuitFilter, centerFilter]);
+  }, [gatesArray, search, circuitFilter, centerFilter, isEN]);
 
-  // Filtered channels
   const filteredChannels = useMemo(() => {
     return channelsArray.filter(c => {
       const matchSearch = search === "" ||
@@ -99,7 +108,6 @@ export default function Encyclopedia() {
     });
   }, [channelsArray, search, circuitFilter]);
 
-  // Unique centers for filter
   const centers = useMemo(() => {
     const set = new Set(gatesArray.map(g => g.data.center));
     return Array.from(set).sort();
@@ -118,13 +126,15 @@ export default function Encyclopedia() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
               <BookOpen className="w-4 h-4" />
-              Encyklopedie Human Designu
+              {isEN ? "Human Design Encyclopedia" : "Encyklopedie Human Designu"}
             </div>
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
-              Brány, dráhy a centra
+              {isEN ? "Gates, Channels & Centers" : "Brány, dráhy a centra"}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Kompletní průvodce všemi 64 branami, 36 dráhami a 9 centry systému Human Design s podrobnými popisy a I-Ťing hexagramy.
+              {isEN
+                ? "Complete guide to all 64 gates, 36 channels and 9 centers of the Human Design system with detailed descriptions and I Ching hexagrams."
+                : "Kompletní průvodce všemi 64 branami, 36 dráhami a 9 centry systému Human Design s podrobnými popisy a I-Ťing hexagramy."}
             </p>
           </motion.div>
 
@@ -133,7 +143,7 @@ export default function Encyclopedia() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Hledat brány, dráhy, hexagramy..."
+                placeholder={isEN ? "Search gates, channels, hexagrams..." : "Hledat brány, dráhy, hexagramy..."}
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className="pl-10"
@@ -145,7 +155,7 @@ export default function Encyclopedia() {
                 size="sm"
                 onClick={() => setCircuitFilter("all")}
               >
-                Vše
+                {isEN ? "All" : "Vše"}
               </Button>
               {["Individual", "Collective", "Tribal"].map(c => (
                 <Button
@@ -154,7 +164,7 @@ export default function Encyclopedia() {
                   size="sm"
                   onClick={() => setCircuitFilter(c)}
                 >
-                  {CIRCUIT_NAMES_CS[c]}
+                  {circuitNames[c]}
                 </Button>
               ))}
             </div>
@@ -165,15 +175,15 @@ export default function Encyclopedia() {
             <TabsList className="mb-6">
               <TabsTrigger value="gates" className="gap-1.5">
                 <Sparkles className="w-4 h-4" />
-                64 bran
+                {isEN ? "64 Gates" : "64 bran"}
               </TabsTrigger>
               <TabsTrigger value="channels" className="gap-1.5">
                 <Zap className="w-4 h-4" />
-                36 dráh
+                {isEN ? "36 Channels" : "36 dráh"}
               </TabsTrigger>
               <TabsTrigger value="centers" className="gap-1.5">
                 <Circle className="w-4 h-4" />
-                9 center
+                {isEN ? "9 Centers" : "9 center"}
               </TabsTrigger>
             </TabsList>
 
@@ -186,7 +196,7 @@ export default function Encyclopedia() {
                     size="sm"
                     onClick={() => setCenterFilter("all")}
                   >
-                    Všechna centra
+                    {isEN ? "All centers" : "Všechna centra"}
                   </Button>
                   {centers.map(c => (
                     <Button
@@ -195,7 +205,7 @@ export default function Encyclopedia() {
                       size="sm"
                       onClick={() => setCenterFilter(c)}
                     >
-                      {CENTER_NAMES_CS[c] || c}
+                      {centerNames[c] || c}
                     </Button>
                   ))}
                 </div>
@@ -221,7 +231,7 @@ export default function Encyclopedia() {
                             </div>
                             <div>
                               <CardTitle className="text-sm font-semibold">
-                                {GATE_NAMES_CS[num] || data.name}
+                                {isEN ? data.name : (GATE_NAMES_CS[num] || data.name)}
                               </CardTitle>
                               <p className="text-xs text-muted-foreground">{data.iChing}</p>
                             </div>
@@ -233,10 +243,10 @@ export default function Encyclopedia() {
                         <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{data.theme}</p>
                         <div className="flex gap-1.5 flex-wrap">
                           <Badge variant="outline" className={`text-[10px] ${CIRCUIT_COLORS[data.circuit] || ""}`}>
-                            {CIRCUIT_NAMES_CS[data.circuit]}
+                            {circuitNames[data.circuit]}
                           </Badge>
                           <Badge variant="outline" className="text-[10px]">
-                            {CENTER_NAMES_CS[data.center] || data.center}
+                            {centerNames[data.center]}
                           </Badge>
                         </div>
                       </CardContent>
@@ -246,7 +256,7 @@ export default function Encyclopedia() {
               </div>
               {filteredGates.length === 0 && (
                 <div className="text-center py-12 text-muted-foreground">
-                  Žádné brány neodpovídají vašemu hledání.
+                  {isEN ? "No gates match your search." : "Žádné brány neodpovídají vašemu hledání."}
                 </div>
               )}
             </TabsContent>
@@ -282,10 +292,10 @@ export default function Encyclopedia() {
                         <p className="text-xs text-muted-foreground mb-2 line-clamp-3">{data.description}</p>
                         <div className="flex gap-1.5 flex-wrap">
                           <Badge variant="outline" className={`text-[10px] ${CIRCUIT_COLORS[data.circuit] || ""}`}>
-                            {CIRCUIT_NAMES_CS[data.circuit]}
+                            {circuitNames[data.circuit]}
                           </Badge>
                           <Badge variant="outline" className="text-[10px]">
-                            {CENTER_NAMES_CS[data.centers[0]]} → {CENTER_NAMES_CS[data.centers[1]]}
+                            {centerNames[data.centers[0]]} → {centerNames[data.centers[1]]}
                           </Badge>
                         </div>
                       </CardContent>
@@ -295,7 +305,7 @@ export default function Encyclopedia() {
               </div>
               {filteredChannels.length === 0 && (
                 <div className="text-center py-12 text-muted-foreground">
-                  Žádné dráhy neodpovídají vašemu hledání.
+                  {isEN ? "No channels match your search." : "Žádné dráhy neodpovídají vašemu hledání."}
                 </div>
               )}
             </TabsContent>
@@ -317,25 +327,30 @@ export default function Encyclopedia() {
                             <Circle className="w-6 h-6 text-primary" />
                           </div>
                           <div>
-                            <CardTitle className="text-base">{CENTER_NAMES_CS[key] || data.name}</CardTitle>
+                            <CardTitle className="text-base">{centerNames[key] || data.name}</CardTitle>
                             <p className="text-xs text-muted-foreground">{data.biologicalCorrelation}</p>
                           </div>
                         </div>
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm font-medium text-primary mb-3">{data.theme}</p>
-                        
                         <div className="space-y-3">
                           <div className="p-3 rounded-lg bg-green-50 border border-green-200">
-                            <p className="text-xs font-semibold text-green-700 mb-1">✦ Definované centrum</p>
+                            <p className="text-xs font-semibold text-green-700 mb-1">
+                              ✦ {isEN ? "Defined center" : "Definované centrum"}
+                            </p>
                             <p className="text-xs text-green-800">{data.definedMeaning}</p>
                           </div>
                           <div className="p-3 rounded-lg bg-gray-50 border border-gray-200">
-                            <p className="text-xs font-semibold text-gray-700 mb-1">○ Otevřené centrum</p>
+                            <p className="text-xs font-semibold text-gray-700 mb-1">
+                              ○ {isEN ? "Open center" : "Otevřené centrum"}
+                            </p>
                             <p className="text-xs text-gray-800">{data.openMeaning}</p>
                           </div>
                           <div className="p-3 rounded-lg bg-amber-50 border border-amber-200">
-                            <p className="text-xs font-semibold text-amber-700 mb-1">? Otázka Ne-Já</p>
+                            <p className="text-xs font-semibold text-amber-700 mb-1">
+                              ? {isEN ? "Not-Self question" : "Otázka Ne-Já"}
+                            </p>
                             <p className="text-xs text-amber-800 italic">{data.notSelfQuestion}</p>
                           </div>
                         </div>
@@ -361,7 +376,7 @@ export default function Encyclopedia() {
                   </div>
                   <div>
                     <DialogTitle className="text-xl">
-                      {GATE_NAMES_CS[selectedGate.gateNum] || selectedGate.data.name}
+                      {isEN ? selectedGate.data.name : (GATE_NAMES_CS[selectedGate.gateNum] || selectedGate.data.name)}
                     </DialogTitle>
                     <p className="text-sm text-muted-foreground">
                       {selectedGate.data.iChing} {selectedGate.data.hexagram}
@@ -372,36 +387,32 @@ export default function Encyclopedia() {
               <div className="space-y-4 mt-4">
                 <div className="flex gap-2 flex-wrap">
                   <Badge className={CIRCUIT_COLORS[selectedGate.data.circuit]}>
-                    {CIRCUIT_NAMES_CS[selectedGate.data.circuit]} okruh
+                    {circuitNames[selectedGate.data.circuit]}{isEN ? " circuit" : " okruh"}
                   </Badge>
                   <Badge variant="outline">
-                    {CENTER_NAMES_CS[selectedGate.data.center]}
+                    {centerNames[selectedGate.data.center]}
                   </Badge>
                 </div>
-                
                 <div>
-                  <h4 className="text-sm font-semibold mb-1">Téma</h4>
+                  <h4 className="text-sm font-semibold mb-1">{isEN ? "Theme" : "Téma"}</h4>
                   <p className="text-sm text-muted-foreground">{selectedGate.data.theme}</p>
                 </div>
-
                 <div>
-                  <h4 className="text-sm font-semibold mb-1">Popis</h4>
+                  <h4 className="text-sm font-semibold mb-1">{isEN ? "Description" : "Popis"}</h4>
                   <p className="text-sm text-muted-foreground leading-relaxed">{selectedGate.data.description}</p>
                 </div>
-
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 rounded-lg bg-green-50 border border-green-200">
-                    <p className="text-xs font-semibold text-green-700 mb-0.5">Dar (Gift)</p>
+                    <p className="text-xs font-semibold text-green-700 mb-0.5">{isEN ? "Gift" : "Dar (Gift)"}</p>
                     <p className="text-sm font-medium text-green-800">{selectedGate.data.giftKeyword}</p>
                   </div>
                   <div className="p-3 rounded-lg bg-red-50 border border-red-200">
-                    <p className="text-xs font-semibold text-red-700 mb-0.5">Stín (Shadow)</p>
+                    <p className="text-xs font-semibold text-red-700 mb-0.5">{isEN ? "Shadow" : "Stín (Shadow)"}</p>
                     <p className="text-sm font-medium text-red-800">{selectedGate.data.shadowKeyword}</p>
                   </div>
                 </div>
-
                 <div className="p-3 rounded-lg bg-muted/50 border">
-                  <p className="text-xs font-semibold text-muted-foreground mb-1">I-Ťing hexagram</p>
+                  <p className="text-xs font-semibold text-muted-foreground mb-1">{isEN ? "I Ching hexagram" : "I-Ťing hexagram"}</p>
                   <p className="text-4xl text-center py-2">{selectedGate.data.hexagram}</p>
                   <p className="text-sm text-center text-muted-foreground">{selectedGate.data.iChing}</p>
                 </div>
@@ -432,27 +443,29 @@ export default function Encyclopedia() {
               <div className="space-y-4 mt-4">
                 <div className="flex gap-2 flex-wrap">
                   <Badge className={CIRCUIT_COLORS[selectedChannel.data.circuit]}>
-                    {CIRCUIT_NAMES_CS[selectedChannel.data.circuit]} okruh
+                    {circuitNames[selectedChannel.data.circuit]}{isEN ? " circuit" : " okruh"}
                   </Badge>
                   <Badge variant="outline">
-                    {CENTER_NAMES_CS[selectedChannel.data.centers[0]]} → {CENTER_NAMES_CS[selectedChannel.data.centers[1]]}
+                    {centerNames[selectedChannel.data.centers[0]]} → {centerNames[selectedChannel.data.centers[1]]}
                   </Badge>
                 </div>
-
                 <div>
-                  <h4 className="text-sm font-semibold mb-1">Popis</h4>
+                  <h4 className="text-sm font-semibold mb-1">{isEN ? "Description" : "Popis"}</h4>
                   <p className="text-sm text-muted-foreground leading-relaxed">{selectedChannel.data.description}</p>
                 </div>
-
                 <div className="grid grid-cols-2 gap-3">
                   {selectedChannel.data.gates.map(gateNum => {
                     const gateData = GATE_DESCRIPTIONS[gateNum];
                     return gateData ? (
                       <div key={gateNum} className="p-3 rounded-lg bg-muted/50 border">
-                        <p className="text-xs font-semibold text-muted-foreground mb-0.5">Brána {gateNum}</p>
-                        <p className="text-sm font-medium">{GATE_NAMES_CS[gateNum] || gateData.name}</p>
+                        <p className="text-xs font-semibold text-muted-foreground mb-0.5">
+                          {isEN ? `Gate ${gateNum}` : `Brána ${gateNum}`}
+                        </p>
+                        <p className="text-sm font-medium">
+                          {isEN ? gateData.name : (GATE_NAMES_CS[gateNum] || gateData.name)}
+                        </p>
                         <p className="text-xs text-muted-foreground mt-1">{gateData.iChing} {gateData.hexagram}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{CENTER_NAMES_CS[gateData.center]}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{centerNames[gateData.center]}</p>
                       </div>
                     ) : null;
                   })}

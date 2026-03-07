@@ -39,7 +39,7 @@ const categoryIcons: Record<string, typeof Users> = {
   other: LayoutDashboard,
 };
 
-const readingTypeLabels: Record<string, string> = {
+const readingTypeLabelsCS: Record<string, string> = {
   overview: "Kompletní přehled",
   type_strategy: "Typ & Strategie",
   profile: "Profil",
@@ -51,12 +51,25 @@ const readingTypeLabels: Record<string, string> = {
   gates: "Brány",
   variables: "Proměnné",
 };
+const readingTypeLabelsEN: Record<string, string> = {
+  overview: "Complete Overview",
+  type_strategy: "Type & Strategy",
+  profile: "Profile",
+  authority: "Authority",
+  incarnation_cross: "Life Purpose",
+  channels: "Channels",
+  relationships: "Relationships",
+  career: "Career",
+  gates: "Gates",
+  variables: "Variables",
+};
 
 export default function Dashboard() {
   const { user, isAuthenticated, loading } = useAuth();
   const [, navigate] = useLocation();
   const utils = trpc.useUtils();
-  const { t, localePath } = useLanguage();
+  const { t, localePath, locale } = useLanguage();
+  const readingTypeLabels = locale === 'en' ? readingTypeLabelsEN : readingTypeLabelsCS;
   const [activeTab, setActiveTab] = useState<"charts" | "readings" | "transit">("charts");
   const [expandedReading, setExpandedReading] = useState<number | null>(null);
 
@@ -79,12 +92,12 @@ export default function Dashboard() {
     onSuccess: (data) => {
       const url = `${window.location.origin}/shared/${data.token}`;
       navigator.clipboard.writeText(url).then(() => {
-        toast.success("Odkaz na výklad zkopírován do schránky!");
+        toast.success(locale === 'en' ? 'Reading link copied to clipboard!' : 'Odkaz na výklad zkopírován do schránky!');
       }).catch(() => {
-        toast.success(`Odkaz: ${url}`);
+        toast.success(`Link: ${url}`);
       });
     },
-    onError: () => toast.error("Nepodařilo se vytvořit odkaz"),
+    onError: () => toast.error(locale === 'en' ? 'Failed to create link' : 'Nepodařilo se vytvořit odkaz'),
   });
 
   useEffect(() => {
@@ -115,13 +128,16 @@ export default function Dashboard() {
             <div>
               <h1 className="font-serif text-3xl font-bold mb-1">{t.dashboard.title}</h1>
               <p className="text-muted-foreground">
-                Vítejte zpět, {user?.name || "Průzkumníku"}. Máte {charts.length} uložen{charts.length === 1 ? "ou" : charts.length < 5 ? "é" : "ých"} map{charts.length === 1 ? "u" : charts.length < 5 ? "y" : ""}.
+                {locale === 'en'
+                  ? `Welcome back, ${user?.name || 'Explorer'}. You have ${charts.length} saved chart${charts.length !== 1 ? 's' : ''}.`
+                  : `Vítejte zpět, ${user?.name || 'Průzkumníku'}. Máte ${charts.length} uložen${charts.length === 1 ? 'ou' : charts.length < 5 ? 'é' : 'ých'} map${charts.length === 1 ? 'u' : charts.length < 5 ? 'y' : ''}.`
+                }
               </p>
             </div>
             <Link href={localePath("/calculate")}>
               <Button className="bg-primary text-primary-foreground">
                 <Plus className="w-4 h-4 mr-1.5" />
-                Nová mapa
+                {locale === 'en' ? 'New Chart' : 'Nová mapa'}
               </Button>
             </Link>
           </div>
@@ -137,7 +153,7 @@ export default function Dashboard() {
               }`}
             >
               <Compass className="w-4 h-4" />
-              Moje mapy
+              {locale === 'en' ? 'My Charts' : 'Moje mapy'}
               {charts.length > 0 && (
                 <span className="ml-1 px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
                   {charts.length}
@@ -153,7 +169,7 @@ export default function Dashboard() {
               }`}
             >
               <Sparkles className="w-4 h-4" />
-              Moje výklady
+              {locale === 'en' ? 'My Readings' : 'Moje výklady'}
               {readings.length > 0 && (
                 <span className="ml-1 px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
                   {readings.length}
@@ -169,7 +185,7 @@ export default function Dashboard() {
               }`}
             >
               <Sun className="w-4 h-4" />
-              Denní tranzit
+              {locale === 'en' ? 'Daily Transit' : 'Denní tranzit'}
             </button>
           </div>
 
@@ -235,7 +251,7 @@ export default function Dashboard() {
                                 </AlertDialogTrigger>
                                 <AlertDialogContent className="bg-popover text-popover-foreground">
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle>Smazat mapu</AlertDialogTitle>
+                                    <AlertDialogTitle>{locale === 'en' ? 'Delete Chart' : 'Smazat mapu'}</AlertDialogTitle>
                                     <AlertDialogDescription>
                                       {t.dashboard.deleteConfirm} "{chart.name}"?
                                     </AlertDialogDescription>
@@ -288,14 +304,14 @@ export default function Dashboard() {
                 <Card className="bg-card border-border/50">
                   <CardContent className="flex flex-col items-center justify-center py-16">
                     <BookOpen className="w-16 h-16 text-muted-foreground/30 mb-4" />
-                    <h3 className="font-serif text-xl font-semibold mb-2">Zatím žádné výklady</h3>
+                    <h3 className="font-serif text-xl font-semibold mb-2">{locale === 'en' ? 'No readings yet' : 'Zatím žádné výklady'}</h3>
                     <p className="text-muted-foreground mb-6 text-center max-w-sm">
-                      Vygenerujte svůj první AI výklad na stránce výsledků vaší mapy.
+                      {locale === 'en' ? 'Generate your first AI reading on your chart result page.' : 'Vygenerujte svůj první AI výklad na stránce výsledků vaší mapy.'}
                     </p>
                     <Link href={localePath("/calculate")}>
                       <Button className="bg-primary text-primary-foreground">
                         <Plus className="w-4 h-4 mr-1.5" />
-                        Vytvořit mapu
+                        {locale === 'en' ? 'Create Chart' : 'Vytvořit mapu'}
                       </Button>
                     </Link>
                   </CardContent>
@@ -306,7 +322,7 @@ export default function Dashboard() {
                     const isExpanded = expandedReading === reading.id;
                     const label = readingTypeLabels[reading.readingType] || reading.readingType;
                     const preview = reading.content?.slice(0, 200) + (reading.content && reading.content.length > 200 ? "..." : "");
-                    const dateStr = new Date(reading.createdAt).toLocaleDateString("cs-CZ", {
+                    const dateStr = new Date(reading.createdAt).toLocaleDateString(locale === 'en' ? 'en-US' : 'cs-CZ', {
                       day: "numeric", month: "long", year: "numeric",
                     });
 
@@ -346,14 +362,14 @@ export default function Dashboard() {
                               <button
                                 onClick={() => rateMutation.mutate({ readingId: reading.id, rating: reading.rating === "up" ? null : "up" })}
                                 className={`p-1.5 rounded-full transition-colors ${reading.rating === "up" ? "bg-green-100 text-green-600" : "text-muted-foreground hover:text-green-600 hover:bg-green-50"}`}
-                                title="Užitečný výklad"
+                                title={locale === 'en' ? 'Helpful reading' : 'Užitečný výklad'}
                               >
                                 <ThumbsUp className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => rateMutation.mutate({ readingId: reading.id, rating: reading.rating === "down" ? null : "down" })}
                                 className={`p-1.5 rounded-full transition-colors ${reading.rating === "down" ? "bg-red-100 text-red-500" : "text-muted-foreground hover:text-red-500 hover:bg-red-50"}`}
-                                title="Neužitečný výklad"
+                                title={locale === 'en' ? 'Not helpful' : 'Neužitečný výklad'}
                               >
                                 <ThumbsDown className="w-3.5 h-3.5" />
                               </button>
@@ -362,7 +378,7 @@ export default function Dashboard() {
                                 onClick={() => shareMutation.mutate({ readingId: reading.id })}
                                 disabled={shareMutation.isPending}
                                 className="p-1.5 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                                title="Sdílet výklad"
+                                title={locale === 'en' ? 'Share reading' : 'Sdílet výklad'}
                               >
                                 {shareMutation.isPending ? (
                                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -374,7 +390,7 @@ export default function Dashboard() {
                               <button
                                 onClick={() => setExpandedReading(isExpanded ? null : reading.id)}
                                 className="p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                                title={isExpanded ? "Sbalit" : "Rozbalit"}
+                                title={isExpanded ? (locale === 'en' ? 'Collapse' : 'Sbalit') : (locale === 'en' ? 'Expand' : 'Rozbalit')}
                               >
                                 {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                               </button>
@@ -410,7 +426,7 @@ export default function Dashboard() {
 
 // ─── DailyTransitWidget (inline in Dashboard) ────────────────────────────────
 function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: string }> }) {
-  const { localePath } = useLanguage();
+  const { localePath, locale } = useLanguage();
   const [selectedChartId, setSelectedChartId] = useState<number | null>(null);
   const effectiveChartId = selectedChartId ?? (charts[0]?.id ?? null);
 
@@ -443,9 +459,9 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
     return (
       <div className="text-center py-16">
         <Sun className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground mb-4">Nemáte žádnou uloženou mapu pro výpočet tranzitu.</p>
+        <p className="text-muted-foreground mb-4">{locale === 'en' ? 'You have no saved chart to calculate transit.' : 'Nemáte žádnou uloženou mapu pro výpočet tranzitu.'}</p>
         <Link href={localePath("/calculate")}>
-          <Button className="bg-primary text-primary-foreground">Vytvořit mapu</Button>
+          <Button className="bg-primary text-primary-foreground">{locale === 'en' ? 'Create Chart' : 'Vytvořit mapu'}</Button>
         </Link>
       </div>
     );
@@ -502,7 +518,7 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
                     <Zap className="w-4 h-4 text-primary" />
-                    Aktivované dráhy dnes
+                    {locale === 'en' ? 'Activated Channels Today' : 'Aktivované dráhy dnes'}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 space-y-1.5">
@@ -523,14 +539,14 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
                     <Star className="w-4 h-4 text-amber-500" />
-                    Zesílené natální brány
+                    {locale === 'en' ? 'Reinforced Natal Gates' : 'Zesílené natální brány'}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
                   <div className="flex flex-wrap gap-1.5">
                     {transit.reinforcedGates.map((g, i) => (
-                      <Badge key={i} variant="outline" className="font-mono text-xs border-amber-300 text-amber-700">
-                        {PLANET_SYMBOLS[g.planet]} Brána {g.gate}
+                            <Badge variant="outline" className="font-mono text-xs border-amber-300 text-amber-700">
+                        {PLANET_SYMBOLS[g.planet]} {locale === 'en' ? 'Gate' : 'Brána'} {g.gate}
                       </Badge>
                     ))}
                   </div>
@@ -543,7 +559,7 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Sun className="w-4 h-4 text-amber-500" />
-                  Planetární pozice
+                  {locale === 'en' ? 'Planetary Positions' : 'Planetární pozice'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
@@ -553,13 +569,13 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
                       <span className={`text-sm ${PLANET_COLORS[t.planet] || ""}`}>
                         {PLANET_SYMBOLS[t.planet]} {t.planet}
                       </span>
-                      <Badge variant="outline" className="font-mono text-xs">Brána {t.gate}.{t.line}</Badge>
+                      <Badge variant="outline" className="font-mono text-xs">{locale === 'en' ? 'Gate' : 'Brána'} {t.gate}.{t.line}</Badge>
                     </div>
                   ))}
                 </div>
                 <Link href={localePath("/daily-transit")}>
                   <Button variant="outline" size="sm" className="w-full mt-3 text-xs">
-                    Zobrazit vše
+                    {locale === 'en' ? 'View all' : 'Zobrazit vše'}
                   </Button>
                 </Link>
               </CardContent>
@@ -573,12 +589,12 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <Sparkles className="w-4 h-4 text-primary" />
-                    Personalizovaný výklad pro dnes
+                    {locale === 'en' ? 'Personalized Reading for Today' : 'Personalizovaný výklad pro dnes'}
                   </CardTitle>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className="text-xs">{transit.chartType}</Badge>
                     <span className="text-xs text-muted-foreground">
-                      {new Date(transit.timestamp).toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" })}
+                      {new Date(transit.timestamp).toLocaleTimeString(locale === 'en' ? 'en-US' : 'cs-CZ', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                 </div>
@@ -591,7 +607,7 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
                   <Link href={localePath("/daily-transit")}>
                     <Button variant="outline" size="sm" className="text-xs">
                       <Sun className="w-3.5 h-3.5 mr-1.5" />
-                      Otevřít plný přehled tranzitu
+                      {locale === 'en' ? 'Open full transit overview' : 'Otevřít plný přehled tranzitu'}
                     </Button>
                   </Link>
                 </div>
