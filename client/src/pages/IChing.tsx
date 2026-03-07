@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, BookOpen } from "lucide-react";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // I Ching hexagram data (64 hexagrams)
 const HEXAGRAMS: Array<{
@@ -106,7 +106,7 @@ function HexagramDisplay({ hex }: { hex: typeof HEXAGRAMS[0] }) {
 export default function IChing() {
   const [selectedHex, setSelectedHex] = useState<typeof HEXAGRAMS[0] | null>(null);
   const [oracleResult, setOracleResult] = useState<typeof HEXAGRAMS[0] | null>(null);
-  const { t } = useTranslation();
+  const { t, locale, localePath } = useLanguage();
 
   const castOracle = () => {
     const idx = Math.floor(Math.random() * 64);

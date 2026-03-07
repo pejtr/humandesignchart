@@ -115,13 +115,17 @@ describe("Sitemap and SEO", () => {
     expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>');
     expect(xml).toContain("<urlset");
     expect(xml).toContain("https://human-design.manus.space/");
-    expect(xml).toContain("https://human-design.manus.space/calculate");
-    expect(xml).toContain("https://human-design.manus.space/types/generator");
-    expect(xml).toContain("https://human-design.manus.space/types/manifesting-generator");
-    expect(xml).toContain("https://human-design.manus.space/types/projector");
-    expect(xml).toContain("https://human-design.manus.space/types/manifestor");
-    expect(xml).toContain("https://human-design.manus.space/types/reflector");
-    expect(xml).toContain("https://human-design.manus.space/encyclopedia");
+    // Bilingual URLs with /cs/ and /en/ prefixes
+    expect(xml).toContain("https://human-design.manus.space/cs/calculate");
+    expect(xml).toContain("https://human-design.manus.space/en/calculate");
+    expect(xml).toContain("https://human-design.manus.space/cs/types/generator");
+    expect(xml).toContain("https://human-design.manus.space/en/types/generator");
+    expect(xml).toContain("https://human-design.manus.space/cs/types/manifesting-generator");
+    expect(xml).toContain("https://human-design.manus.space/en/types/reflector");
+    expect(xml).toContain("https://human-design.manus.space/cs/encyclopedia");
+    // hreflang alternates
+    expect(xml).toContain('xhtml:link rel="alternate" hreflang="cs"');
+    expect(xml).toContain('xhtml:link rel="alternate" hreflang="en"');
   });
 
   it("robots.txt is accessible and contains sitemap reference", async () => {

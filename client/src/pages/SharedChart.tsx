@@ -1,3 +1,4 @@
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -43,6 +44,7 @@ const DEFINITION_CS: Record<string, string> = {
 };
 
 export default function SharedChart() {
+  const { localePath } = useLanguage();
   const params = useParams<{ token: string }>();
   const [, navigate] = useLocation();
 
@@ -62,7 +64,7 @@ export default function SharedChart() {
           <p className="text-muted-foreground mb-6">
             Tento odkaz je neplatný nebo vypršel. Sdílené mapy jsou platné 30 dní.
           </p>
-          <Button onClick={() => navigate("/")}>
+          <Button onClick={() => navigate(localePath("/"))}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Zpět na hlavní stránku
           </Button>
@@ -199,7 +201,7 @@ export default function SharedChart() {
                 <p className="text-muted-foreground mb-4">
                   Vytvořte si svou Human Design mapu zdarma a získejte personalizovaný AI rozbor.
                 </p>
-                <Button onClick={() => navigate("/calculate")} className="bg-primary text-primary-foreground">
+                <Button onClick={() => navigate(localePath("/calculate"))} className="bg-primary text-primary-foreground">
                   <Compass className="w-4 h-4 mr-2" />
                   Vytvořit moji mapu zdarma
                 </Button>

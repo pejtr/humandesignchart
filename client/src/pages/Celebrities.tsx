@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Users, Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import TypeAuraIcon from "@/components/TypeAuraIcon";
 import type { HumanDesignChartData } from "@shared/types";
 
@@ -38,7 +38,7 @@ export default function Celebrities() {
   const [search, setSearch] = useState("");
   const [selectedCeleb, setSelectedCeleb] = useState<typeof CELEBRITIES[0] | null>(null);
   const [chartData, setChartData] = useState<HumanDesignChartData | null>(null);
-  const { t } = useTranslation();
+  const { t, locale, localePath } = useLanguage();
 
   const calcMutation = trpc.chart.calculate.useMutation({
     onSuccess: (data) => setChartData(data as unknown as HumanDesignChartData),

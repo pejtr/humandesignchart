@@ -1,11 +1,12 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, Redirect, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import Home from "./pages/Home";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import HDLoader from "./components/HDLoader";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
@@ -31,29 +32,96 @@ function PageLoader() {
   return <HDLoader />;
 }
 
-function Router() {
+/**
+ * Detect preferred language from browser settings.
+ * Returns "cs" if Czech/Slovak is preferred, "en" otherwise.
+ */
+function detectPreferredLocale(): "cs" | "en" {
+  const langs = navigator.languages || [navigator.language];
+  for (const lang of langs) {
+    const code = lang.toLowerCase().split("-")[0];
+    if (code === "cs" || code === "sk") return "cs";
+    if (code === "en") return "en";
+  }
+  return "en";
+}
+
+/**
+ * Root redirect: / → /cs or /en based on browser language.
+ * Also handles legacy routes without locale prefix.
+ */
+function RootRedirect() {
+  const [, setLocation] = useLocation();
+  useEffect(() => {
+    const locale = detectPreferredLocale();
+    setLocation(`/${locale}`, { replace: true });
+  }, [setLocation]);
+  return <HDLoader />;
+}
+
+/**
+ * Legacy route redirect: /calculate → /cs/calculate (or /en/calculate)
+ */
+function LegacyRedirect({ path }: { path: string }) {
+  const locale = detectPreferredLocale();
+  return <Redirect to={`/${locale}${path}`} />;
+}
+
+/** All app routes, rendered inside a locale prefix */
+function LocaleRoutes() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/calculate" component={ChartCalculator} />
-        <Route path="/chart/:id" component={ChartResult} />
-        <Route path="/dashboard" component={Dashboard} />
-        <Route path="/compare" component={ChartComparison} />
-        <Route path="/transits" component={Transits} />
-        <Route path="/iching" component={IChing} />
-        <Route path="/celebrities" component={Celebrities} />
-        <Route path="/encyclopedia" component={Encyclopedia} />
-        <Route path="/ai-guide" component={AiGuide} />
-        <Route path="/return-chart" component={ReturnChart} />
-        <Route path="/transit-calendar" component={TransitCalendar} />
-        <Route path="/variables" component={VariablesAnalysis} />
+        {/* Locale root = home */}
+        <Route path="/:locale" component={Home} />
+
+        {/* Core pages */}
+        <Route path="/:locale/calculate" component={ChartCalculator} />
+        <Route path="/:locale/chart/:id" component={ChartResult} />
+        <Route path="/:locale/dashboard" component={Dashboard} />
+        <Route path="/:locale/compare" component={ChartComparison} />
+        <Route path="/:locale/transits" component={Transits} />
+        <Route path="/:locale/iching" component={IChing} />
+        <Route path="/:locale/celebrities" component={Celebrities} />
+        <Route path="/:locale/encyclopedia" component={Encyclopedia} />
+        <Route path="/:locale/ai-guide" component={AiGuide} />
+        <Route path="/:locale/return-chart" component={ReturnChart} />
+        <Route path="/:locale/transit-calendar" component={TransitCalendar} />
+        <Route path="/:locale/variables" component={VariablesAnalysis} />
+        <Route path="/:locale/types/:type" component={TypeDetail} />
+        <Route path="/:locale/blog" component={Blog} />
+        <Route path="/:locale/blog/:slug" component={BlogArticle} />
+        <Route path="/:locale/incarnation-cross" component={IncarnationCross} />
+        <Route path="/:locale/daily-transit" component={DailyTransit} />
+
+        {/* Shared charts (no locale prefix — public links) */}
         <Route path="/shared/:token" component={SharedChart} />
-        <Route path="/types/:type" component={TypeDetail} />
-        <Route path="/blog" component={Blog} />
-        <Route path="/blog/:slug" component={BlogArticle} />
-        <Route path="/incarnation-cross" component={IncarnationCross} />
-        <Route path="/daily-transit" component={DailyTransit} />
+
+        {/* Root redirect */}
+        <Route path="/">
+          <RootRedirect />
+        </Route>
+
+        {/* Legacy routes without locale prefix → redirect */}
+        <Route path="/calculate"><LegacyRedirect path="/calculate" /></Route>
+        <Route path="/chart/:id">{(params: any) => <LegacyRedirect path={`/chart/${params.id}`} />}</Route>
+        <Route path="/dashboard"><LegacyRedirect path="/dashboard" /></Route>
+        <Route path="/compare"><LegacyRedirect path="/compare" /></Route>
+        <Route path="/transits"><LegacyRedirect path="/transits" /></Route>
+        <Route path="/iching"><LegacyRedirect path="/iching" /></Route>
+        <Route path="/celebrities"><LegacyRedirect path="/celebrities" /></Route>
+        <Route path="/encyclopedia"><LegacyRedirect path="/encyclopedia" /></Route>
+        <Route path="/ai-guide"><LegacyRedirect path="/ai-guide" /></Route>
+        <Route path="/return-chart"><LegacyRedirect path="/return-chart" /></Route>
+        <Route path="/transit-calendar"><LegacyRedirect path="/transit-calendar" /></Route>
+        <Route path="/variables"><LegacyRedirect path="/variables" /></Route>
+        <Route path="/types/:type">{(params: any) => <LegacyRedirect path={`/types/${params.type}`} />}</Route>
+        <Route path="/blog"><LegacyRedirect path="/blog" /></Route>
+        <Route path="/blog/:slug">{(params: any) => <LegacyRedirect path={`/blog/${params.slug}`} />}</Route>
+        <Route path="/incarnation-cross"><LegacyRedirect path="/incarnation-cross" /></Route>
+        <Route path="/daily-transit"><LegacyRedirect path="/daily-transit" /></Route>
+
+        {/* 404 */}
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>
@@ -66,8 +134,10 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
-          <Toaster />
-          <Router />
+          <LanguageProvider>
+            <Toaster />
+            <LocaleRoutes />
+          </LanguageProvider>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

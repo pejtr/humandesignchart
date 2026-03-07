@@ -1,9 +1,11 @@
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Home } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function NotFound() {
+  const { localePath } = useLanguage();
   const [, setLocation] = useLocation();
 
   return (
@@ -30,7 +32,7 @@ export default function NotFound() {
           </p>
 
           <Button
-            onClick={() => setLocation("/")}
+            onClick={() => setLocation(localePath("/"))}
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Home className="w-4 h-4 mr-2" />

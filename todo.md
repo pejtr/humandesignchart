@@ -105,7 +105,7 @@
 - [x] I Ching Oracle with all 64 hexagrams
 - [x] Return charts (Saturn, Chiron, Uranus, Solar) - ReturnChart page
 - [ ] Gene Keys reference
-- [ ] Multi-language support
+- [x] Multi-language support (i18n with /cs/ and /en/ subpath routing)
 
 ## Premium UI & Polish
 - [x] Dark cosmic premium theme
@@ -324,3 +324,23 @@
 - [x] Unsplash cover obrázky přidány ke všem 10 článkům
 - [x] Blog list stránka zobrazuje obrázky (featured + grid)
 - [x] BlogArticle stránka zobrazuje cover obrázek v záhlaví
+
+## AI Guide stránka — redesign
+- [ ] Spirituální pozadí s ambientní animací (orby, částice, sacred geometry)
+- [ ] Levý panel s profilem uživatele (typ, strategie, autorita, profil, definice, centra, kanály)
+
+## i18n Infrastructure & English Localization
+- [x] Create English translation file (shared/i18n/en.ts)
+- [x] Update useTranslation hook with language detection from URL
+- [x] Create LanguageContext provider
+- [x] Implement subpath routing (/cs/ and /en/ prefixes)
+- [x] Root / redirect based on browser language preference
+- [x] Translate Landing page (Home.tsx) to English
+- [x] Translate Calculator page to English
+- [x] Translate Chart Result page to English
+- [x] Translate 5 Type pages to English
+- [x] Add language switcher component in Navbar
+- [x] Add hreflang tags to all pages (index.html + sitemap.xml)
+- [x] Update sitemap.xml with bilingual URLs and hreflang alternates
+- [x] Update OG meta tags for English pages
+- [ ] English AI Guide prompts (future)

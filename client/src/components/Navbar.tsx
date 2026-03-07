@@ -8,7 +8,8 @@ import {
   Calendar, Hexagon, UtensilsCrossed, ChevronRight, Sun,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +22,7 @@ export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [location] = useLocation();
-  const { t } = useTranslation();
+  const { t, locale, localePath } = useLanguage();
 
   // Close drawer on route change
   useEffect(() => {
@@ -38,27 +39,27 @@ export default function Navbar() {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  const isActive = (href: string) => location === href;
+  const isActive = (href: string) => location === localePath(href);
 
   const primaryLinks = [
     { href: "/calculate", label: t.nav.calculateChart, icon: Compass },
-    { href: "/encyclopedia", label: "Encyklopedie", icon: BookOpen },
-    { href: "/ai-guide", label: "AI průvodce", icon: Bot },
+    { href: "/encyclopedia", label: locale === "cs" ? "Encyklopedie" : "Encyclopedia", icon: BookOpen },
+    { href: "/ai-guide", label: locale === "cs" ? "AI průvodce" : "AI Guide", icon: Bot },
     { href: "/blog", label: "Blog", icon: BookOpen },
   ];
 
   const toolsLinks = [
-    { href: "/daily-transit", label: "Denní tranzit", icon: Sun, desc: "Jak dnešní planety ovlivňují tvůj design" },
-    { href: "/return-chart", label: "Return charty", icon: RotateCcw, desc: "Solární, Saturnův a další Return charty" },
-    { href: "/compare", label: t.nav.compare, icon: GitCompare, desc: "Porovnání dvou Human Design map" },
-    { href: "/transits", label: t.nav.transits, icon: Star, desc: "Aktuální planetární tranzity" },
-    { href: "/transit-calendar", label: "Tranzitní kalendář", icon: Calendar, desc: "Denní a týdní přehled tranzitů" },
-    { href: "/variables", label: "Proměnné (PHS)", icon: UtensilsCrossed, desc: "Strávení, prostředí, perspektiva, vědomí" },
+    { href: "/daily-transit", label: locale === "cs" ? "Denní tranzit" : "Daily Transit", icon: Sun, desc: locale === "cs" ? "Jak dnešní planety ovlivňují tvůj design" : "How today's planets affect your design" },
+    { href: "/return-chart", label: "Return Charts", icon: RotateCcw, desc: locale === "cs" ? "Solární, Saturnův a další Return charty" : "Solar, Saturn, and other Return charts" },
+    { href: "/compare", label: t.nav.compare, icon: GitCompare, desc: locale === "cs" ? "Porovnání dvou Human Design map" : "Compare two Human Design charts" },
+    { href: "/transits", label: t.nav.transits, icon: Star, desc: locale === "cs" ? "Aktuální planetární tranzity" : "Current planetary transits" },
+    { href: "/transit-calendar", label: locale === "cs" ? "Tranzitní kalendář" : "Transit Calendar", icon: Calendar, desc: locale === "cs" ? "Denní a týdní přehled tranzitů" : "Daily and weekly transit overview" },
+    { href: "/variables", label: locale === "cs" ? "Proměnné (PHS)" : "Variables (PHS)", icon: UtensilsCrossed, desc: locale === "cs" ? "Strávení, prostředí, perspektiva, vědomí" : "Digestion, environment, perspective, awareness" },
   ];
 
   const exploreLinks = [
-    { href: "/celebrities", label: t.nav.celebrities, icon: Users, desc: "Mapy známých osobností" },
-    { href: "/iching", label: t.nav.iChing, icon: Hexagon, desc: "I-Ťing orákulum" },
+    { href: "/celebrities", label: t.nav.celebrities, icon: Users, desc: locale === "cs" ? "Mapy známých osobností" : "Charts of famous people" },
+    { href: "/iching", label: t.nav.iChing, icon: Hexagon, desc: locale === "cs" ? "I-Ťing orákulum" : "I Ching Oracle" },
   ];
 
   return (
@@ -66,7 +67,7 @@ export default function Navbar() {
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <nav className="container flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 no-underline">
+          <Link href={localePath("/")} className="flex items-center gap-2 no-underline">
             <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-primary" />
             </div>
@@ -78,7 +79,7 @@ export default function Navbar() {
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-1">
             {primaryLinks.map(link => (
-              <Link key={link.href} href={link.href}>
+              <Link key={link.href} href={localePath(link.href)}>
                 <Button
                   variant={isActive(link.href) ? "secondary" : "ghost"}
                   size="sm"
@@ -95,13 +96,13 @@ export default function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-sm gap-1">
                   <Calendar className="w-4 h-4" />
-                  Nástroje
+                  {locale === "cs" ? "Nástroje" : "Tools"}
                   <ChevronDown className="w-3 h-3 opacity-60" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-64 bg-popover text-popover-foreground">
                 {toolsLinks.map(link => (
-                  <Link key={link.href} href={link.href}>
+                  <Link key={link.href} href={localePath(link.href)}>
                     <DropdownMenuItem className="cursor-pointer py-2.5">
                       <link.icon className="w-4 h-4 mr-2.5 text-primary" />
                       <div>
@@ -119,13 +120,13 @@ export default function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-sm gap-1">
                   <Sparkles className="w-4 h-4" />
-                  Prozkoumat
+                  {locale === "cs" ? "Prozkoumat" : "Explore"}
                   <ChevronDown className="w-3 h-3 opacity-60" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-64 bg-popover text-popover-foreground">
                 {exploreLinks.map(link => (
-                  <Link key={link.href} href={link.href}>
+                  <Link key={link.href} href={localePath(link.href)}>
                     <DropdownMenuItem className="cursor-pointer py-2.5">
                       <link.icon className="w-4 h-4 mr-2.5 text-primary" />
                       <div>
@@ -139,8 +140,9 @@ export default function Navbar() {
             </DropdownMenu>
           </div>
 
-          {/* Desktop auth section */}
+          {/* Desktop auth section + language switcher */}
           <div className="hidden lg:flex items-center gap-2">
+            <LanguageSwitcher />
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -152,7 +154,7 @@ export default function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 bg-popover text-popover-foreground">
-                  <Link href="/dashboard">
+                  <Link href={localePath("/dashboard")}>
                     <DropdownMenuItem>
                       <LayoutDashboard className="w-4 h-4 mr-2" />
                       {t.common.dashboard}
@@ -174,10 +176,11 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile: auth + hamburger */}
-          <div className="flex lg:hidden items-center gap-2">
+          {/* Mobile: auth + language + hamburger */}
+          <div className="flex lg:hidden items-center gap-1">
+            <LanguageSwitcher />
             {isAuthenticated && (
-              <Link href="/dashboard">
+              <Link href={localePath("/dashboard")}>
                 <Button variant="ghost" size="sm" className="p-2">
                   <User className="w-5 h-5" />
                 </Button>
@@ -188,7 +191,7 @@ export default function Navbar() {
               size="sm"
               className="p-2"
               onClick={() => setMobileOpen(true)}
-              aria-label="Otevřít menu"
+              aria-label={locale === "cs" ? "Otevřít menu" : "Open menu"}
             >
               <Menu className="w-5 h-5" />
             </Button>
@@ -231,7 +234,7 @@ export default function Navbar() {
             size="sm"
             className="p-2 -mr-1"
             onClick={() => setMobileOpen(false)}
-            aria-label="Zavřít menu"
+            aria-label={locale === "cs" ? "Zavřít menu" : "Close menu"}
           >
             <X className="w-5 h-5" />
           </Button>
@@ -240,9 +243,11 @@ export default function Navbar() {
         {/* Drawer content — scrollable */}
         <div className="flex-1 overflow-y-auto py-3 px-3">
           {/* Primary links */}
-          <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-widest px-3 pt-2 pb-1.5">Hlavní</p>
+          <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-widest px-3 pt-2 pb-1.5">
+            {locale === "cs" ? "Hlavní" : "Main"}
+          </p>
           {primaryLinks.map(link => (
-            <Link key={link.href} href={link.href}>
+            <Link key={link.href} href={localePath(link.href)}>
               <button
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-0.5 ${
                   isActive(link.href)
@@ -258,9 +263,11 @@ export default function Navbar() {
           ))}
 
           <div className="border-t border-border/40 my-3" />
-          <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-widest px-3 pb-1.5">Nástroje</p>
+          <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-widest px-3 pb-1.5">
+            {locale === "cs" ? "Nástroje" : "Tools"}
+          </p>
           {toolsLinks.map(link => (
-            <Link key={link.href} href={link.href}>
+            <Link key={link.href} href={localePath(link.href)}>
               <button
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-0.5 ${
                   isActive(link.href)
@@ -278,9 +285,11 @@ export default function Navbar() {
           ))}
 
           <div className="border-t border-border/40 my-3" />
-          <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-widest px-3 pb-1.5">Prozkoumat</p>
+          <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-widest px-3 pb-1.5">
+            {locale === "cs" ? "Prozkoumat" : "Explore"}
+          </p>
           {exploreLinks.map(link => (
-            <Link key={link.href} href={link.href}>
+            <Link key={link.href} href={localePath(link.href)}>
               <button
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-0.5 ${
                   isActive(link.href)
@@ -308,7 +317,7 @@ export default function Navbar() {
                 </div>
                 <span className="text-sm font-medium truncate">{user?.name || t.common.account}</span>
               </div>
-              <Link href="/dashboard">
+              <Link href={localePath("/dashboard")}>
                 <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors">
                   <LayoutDashboard className="w-4 h-4 text-primary/70" />
                   {t.common.dashboard}

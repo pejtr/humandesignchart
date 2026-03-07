@@ -1,3 +1,4 @@
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useState, useMemo } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
@@ -49,6 +50,7 @@ const PLANET_MEANINGS: Record<string, string> = {
 };
 
 export default function DailyTransit() {
+  const { localePath } = useLanguage();
   const { user, isAuthenticated, loading } = useAuth();
   const [selectedChartId, setSelectedChartId] = useState<number | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -165,7 +167,7 @@ export default function DailyTransit() {
               <CardContent className="py-10 text-center">
                 <Moon className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                 <p className="text-muted-foreground mb-4">Nemáte žádnou uloženou mapu. Nejprve si vypočítejte a uložte svůj Human Design.</p>
-                <Link href="/calculate">
+                <Link href={localePath("/calculate")}>
                   <Button className="bg-primary text-primary-foreground">Vytvořit mapu</Button>
                 </Link>
               </CardContent>

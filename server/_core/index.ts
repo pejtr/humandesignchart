@@ -36,7 +36,7 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
 
-  // ─── SEO: Sitemap.xml ───────────────────────────────────────────────
+  // ─── SEO: Sitemap.xml (bilingual with hreflang) ─────────────────────
   app.get("/sitemap.xml", (_req, res) => {
     const baseUrl = "https://human-design.manus.space";
     const now = new Date().toISOString().split("T")[0];
@@ -72,8 +72,13 @@ async function startServer() {
       { loc: "/daily-transit", priority: "0.6", changefreq: "daily" },
       { loc: "/incarnation-cross", priority: "0.6", changefreq: "monthly" },
     ];
-    const urls = pages.map(p => `  <url>\n    <loc>${baseUrl}${p.loc}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`).join("\n");
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`;
+    const locales = ["cs", "en"];
+    const urls = pages.flatMap(p => locales.map(lang => {
+      const loc = `${baseUrl}/${lang}${p.loc}`;
+      const alternates = locales.map(l => `    <xhtml:link rel="alternate" hreflang="${l}" href="${baseUrl}/${l}${p.loc}" />`).join("\n");
+      return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n${alternates}\n  </url>`;
+    })).join("\n");
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>`;
     res.set("Content-Type", "application/xml");
     res.send(xml);
   });

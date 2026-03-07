@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Plus, Heart, Trash2, Loader2, LayoutDashboard,
   Star, Users, Compass, BookOpen, ThumbsUp, ThumbsDown,
@@ -56,7 +56,7 @@ export default function Dashboard() {
   const { user, isAuthenticated, loading } = useAuth();
   const [, navigate] = useLocation();
   const utils = trpc.useUtils();
-  const { t } = useTranslation();
+  const { t, localePath } = useLanguage();
   const [activeTab, setActiveTab] = useState<"charts" | "readings" | "transit">("charts");
   const [expandedReading, setExpandedReading] = useState<number | null>(null);
 
@@ -118,7 +118,7 @@ export default function Dashboard() {
                 Vítejte zpět, {user?.name || "Průzkumníku"}. Máte {charts.length} uložen{charts.length === 1 ? "ou" : charts.length < 5 ? "é" : "ých"} map{charts.length === 1 ? "u" : charts.length < 5 ? "y" : ""}.
               </p>
             </div>
-            <Link href="/calculate">
+            <Link href={localePath("/calculate")}>
               <Button className="bg-primary text-primary-foreground">
                 <Plus className="w-4 h-4 mr-1.5" />
                 Nová mapa
@@ -188,7 +188,7 @@ export default function Dashboard() {
                     <p className="text-muted-foreground mb-6 text-center max-w-sm">
                       {t.dashboard.noChartsDesc}
                     </p>
-                    <Link href="/calculate">
+                    <Link href={localePath("/calculate")}>
                       <Button className="bg-primary text-primary-foreground">
                         <Plus className="w-4 h-4 mr-1.5" />
                         {t.dashboard.calculateFirst}
@@ -208,7 +208,7 @@ export default function Dashboard() {
                       <Card
                         key={chart.id}
                         className="bg-card border-border/50 hover:border-primary/30 transition-all group cursor-pointer"
-                        onClick={() => { navigate(`/chart/${chart.id}`); window.scrollTo(0, 0); }}
+                        onClick={() => { navigate(localePath(`/chart/${chart.id}`)); window.scrollTo(0, 0); }}
                       >
                         <CardHeader className="pb-3">
                           <div className="flex items-start justify-between">
@@ -292,7 +292,7 @@ export default function Dashboard() {
                     <p className="text-muted-foreground mb-6 text-center max-w-sm">
                       Vygenerujte svůj první AI výklad na stránce výsledků vaší mapy.
                     </p>
-                    <Link href="/calculate">
+                    <Link href={localePath("/calculate")}>
                       <Button className="bg-primary text-primary-foreground">
                         <Plus className="w-4 h-4 mr-1.5" />
                         Vytvořit mapu
@@ -322,7 +322,7 @@ export default function Dashboard() {
                                 {reading.chartName && (
                                   <span
                                     className="text-xs text-primary/70 hover:text-primary cursor-pointer underline underline-offset-2"
-                                    onClick={() => { navigate(`/chart/${reading.chartId}`); window.scrollTo(0, 0); }}
+                                    onClick={() => { navigate(localePath(`/chart/${reading.chartId}`)); window.scrollTo(0, 0); }}
                                   >
                                     {reading.chartName}
                                   </span>
@@ -410,6 +410,7 @@ export default function Dashboard() {
 
 // ─── DailyTransitWidget (inline in Dashboard) ────────────────────────────────
 function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: string }> }) {
+  const { localePath } = useLanguage();
   const [selectedChartId, setSelectedChartId] = useState<number | null>(null);
   const effectiveChartId = selectedChartId ?? (charts[0]?.id ?? null);
 
@@ -443,7 +444,7 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
       <div className="text-center py-16">
         <Sun className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
         <p className="text-muted-foreground mb-4">Nemáte žádnou uloženou mapu pro výpočet tranzitu.</p>
-        <Link href="/calculate">
+        <Link href={localePath("/calculate")}>
           <Button className="bg-primary text-primary-foreground">Vytvořit mapu</Button>
         </Link>
       </div>
@@ -556,7 +557,7 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
                     </div>
                   ))}
                 </div>
-                <Link href="/daily-transit">
+                <Link href={localePath("/daily-transit")}>
                   <Button variant="outline" size="sm" className="w-full mt-3 text-xs">
                     Zobrazit vše
                   </Button>
@@ -587,7 +588,7 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
                   <Streamdown>{transit.interpretation}</Streamdown>
                 </div>
                 <div className="mt-4 pt-3 border-t border-border/30">
-                  <Link href="/daily-transit">
+                  <Link href={localePath("/daily-transit")}>
                     <Button variant="outline" size="sm" className="text-xs">
                       <Sun className="w-3.5 h-3.5 mr-1.5" />
                       Otevřít plný přehled tranzitu

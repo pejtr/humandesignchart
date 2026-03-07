@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Users, Zap, MapPin, Calendar, Clock } from "lucide-react";
 import { toast } from "sonner";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { HumanDesignChartData } from "@shared/types";
 
 interface ChartFormData {
@@ -116,7 +116,7 @@ export default function ChartComparison() {
   const [formB, setFormB] = useState<ChartFormData>(emptyForm());
   const [chartA, setChartA] = useState<HumanDesignChartData | null>(null);
   const [chartB, setChartB] = useState<HumanDesignChartData | null>(null);
-  const { t } = useTranslation();
+  const { t, locale, localePath } = useLanguage();
 
   const calcA = trpc.chart.calculate.useMutation({
     onSuccess: (data) => setChartA(data as unknown as HumanDesignChartData),

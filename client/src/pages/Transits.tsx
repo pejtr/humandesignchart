@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Star, RefreshCw, Globe, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { GATE_DESCRIPTIONS } from "@shared/hdContent";
 import { motion } from "framer-motion";
 import type { HumanDesignChartData } from "@shared/types";
@@ -29,7 +29,7 @@ const fadeUp = {
 };
 
 export default function Transits() {
-  const { t } = useTranslation();
+  const { t, locale, localePath } = useLanguage();
   const { isAuthenticated } = useAuth();
   const [selectedChartId, setSelectedChartId] = useState<string>("none");
 

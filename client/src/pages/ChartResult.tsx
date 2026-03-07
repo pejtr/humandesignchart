@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Save, Sparkles, ArrowLeft, Brain, Compass, Star, Sun, Moon,
   Loader2, Eye, Zap, Shield, Target, FileText, Download,
@@ -103,7 +103,7 @@ export default function ChartResult() {
   const params = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { isAuthenticated } = useAuth();
-  const { t } = useTranslation();
+  const { t, localePath } = useLanguage();
 
   const [chart, setChart] = useState<HumanDesignChartData | null>(null);
   const [chartMeta, setChartMeta] = useState<any>(null);
@@ -346,7 +346,7 @@ export default function ChartResult() {
       <main className="flex-1 pt-24 pb-16">
         <div className="container">
           {/* Back button */}
-          <Button variant="ghost" size="sm" className="mb-4" onClick={() => navigate("/calculate")}>
+          <Button variant="ghost" size="sm" className="mb-4" onClick={() => navigate(localePath("/calculate"))}>
             <ArrowLeft className="w-4 h-4 mr-1" /> {t.chart.newCalculation}
           </Button>
 

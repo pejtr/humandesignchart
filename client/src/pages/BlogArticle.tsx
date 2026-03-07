@@ -1,3 +1,4 @@
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useParams, useLocation, Link } from "wouter";
 import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
@@ -44,6 +45,7 @@ function renderMarkdown(md: string): string {
 }
 
 export default function BlogArticle() {
+  const { localePath } = useLanguage();
   const params = useParams<{ slug: string }>();
   const [, navigate] = useLocation();
   const slug = params.slug || "";
@@ -256,7 +258,7 @@ export default function BlogArticle() {
                     <p className="text-xs text-muted-foreground mb-3">
                       Vypočítejte si mapu zdarma
                     </p>
-                    <Link href="/calculate">
+                    <Link href={localePath("/calculate")}>
                       <Button size="sm" className="w-full bg-primary text-primary-foreground">
                         Mapa zdarma
                       </Button>
@@ -316,7 +318,7 @@ export default function BlogArticle() {
           <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
             Vypočítejte si svou energetickou mapu zdarma a získejte personalizovaný AI rozbor.
           </p>
-          <Link href="/calculate">
+          <Link href={localePath("/calculate")}>
             <Button size="lg" className="bg-primary text-primary-foreground">
               <Compass className="w-5 h-5 mr-2" />
               Vytvořit moji mapu zdarma

@@ -10,12 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Compass, Loader2, MapPin, Calendar, Clock, Info } from "lucide-react";
 import { toast } from "sonner";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ChartCalculator() {
   const [, navigate] = useLocation();
   const { isAuthenticated } = useAuth();
-  const { t } = useTranslation();
+  const { t, localePath } = useLanguage();
 
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -33,10 +33,10 @@ export default function ChartCalculator() {
       sessionStorage.setItem("chartMeta", JSON.stringify({
         name, birthDate, birthTime, birthPlace, latitude, longitude, timezone,
       }));
-      navigate("/chart/new");
+      navigate(localePath("/chart/new"));
     },
     onError: (err) => {
-      toast.error("Výpočet selhal: " + err.message);
+      toast.error(t.common?.error ? `${t.common.error}: ${err.message}` : `Calculation failed: ${err.message}`);
     },
   });
 

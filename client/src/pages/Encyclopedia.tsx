@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Input } from "@/components/ui/input";
@@ -49,7 +49,7 @@ type GateDetail = { gateNum: number; data: typeof GATE_DESCRIPTIONS[number] } | 
 type ChannelDetail = { key: string; data: typeof CHANNEL_DESCRIPTIONS[string] } | null;
 
 export default function Encyclopedia() {
-  const { t } = useTranslation();
+  const { t, locale, localePath } = useLanguage();
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("gates");
   const [circuitFilter, setCircuitFilter] = useState<string>("all");

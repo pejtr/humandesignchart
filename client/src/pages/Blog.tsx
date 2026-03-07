@@ -1,3 +1,4 @@
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "wouter";
 import Navbar from "@/components/Navbar";
@@ -28,6 +29,7 @@ const CATEGORY_STYLES: Record<string, string> = {
 };
 
 export default function Blog() {
+  const { localePath } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<string | undefined>(undefined);
   const { data, isLoading } = trpc.blog.list.useQuery(
     activeCategory ? { category: activeCategory } : undefined
@@ -237,7 +239,7 @@ export default function Blog() {
           <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
             Vypočítejte si svou energetickou mapu zdarma a získejte personalizovaný AI rozbor.
           </p>
-          <Link href="/calculate">
+          <Link href={localePath("/calculate")}>
             <Button size="lg" className="bg-primary text-primary-foreground">
               <Compass className="w-5 h-5 mr-2" />
               Vytvořit moji mapu zdarma
