@@ -135,7 +135,11 @@ export default function IChing() {
           {/* Oracle casting */}
           <Card className="bg-card border-border/50 mb-8">
             <CardContent className="py-8 text-center">
-              <p className="text-muted-foreground mb-4">Soustřeďte se na svou otázku a poté hoďte orákulum.</p>
+              <p className="text-muted-foreground mb-4">
+                {locale === "en"
+                  ? "Focus on your question and then cast the oracle."
+                  : "Soustřeďte se na svou otázku a poté hoďte orákulum."}
+              </p>
               <Button size="lg" onClick={castOracle} className="bg-primary text-primary-foreground">
                 <Sparkles className="w-5 h-5 mr-2" />
                 {t.iChing.drawHexagram}
@@ -158,11 +162,15 @@ export default function IChing() {
                     <p className="text-muted-foreground mb-4">{displayHex.meaning}</p>
                     <div className="space-y-3">
                       <div>
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Výrok</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                          {locale === "en" ? "Judgment" : "Výrok"}
+                        </p>
                         <p className="text-sm italic">{displayHex.judgment}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Obraz</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                          {locale === "en" ? "Image" : "Obraz"}
+                        </p>
                         <p className="text-sm italic">{displayHex.image}</p>
                       </div>
                     </div>

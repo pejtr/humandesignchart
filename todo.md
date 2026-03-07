@@ -372,3 +372,13 @@
 ## Encyclopedia & Dashboard — English Translation
 - [x] Translate Encyclopedia page to English (locale-aware)
 - [x] Translate Dashboard page to English (locale-aware)
+
+## Session 3 — Remaining Page Translations & TWA
+- [x] Translate DailyTransit page to English
+- [x] Translate ChartComparison page to English
+- [x] Translate Celebrities page to English
+- [x] Translate IChing page to English
+- [x] Translate ReturnChart page to English
+- [ ] Add EN translations for all remaining Czech strings (Navbar dropdowns, type pages, shared pages)
+- [ ] Prepare TWA Android package (assetlinks.json, TWA manifest, Google Play assets)
+- [ ] Write Google Search Console setup guide with sitemap submission instructions

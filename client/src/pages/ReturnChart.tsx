@@ -11,42 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sun, Moon, LogIn, Loader2, RotateCcw, Info } from "lucide-react";
 import Bodygraph from "@/components/Bodygraph";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type ReturnType = "solar" | "saturn" | "chiron" | "uranus";
 
-const RETURN_INFO: Record<ReturnType, { title: string; icon: typeof Sun; description: string; period: string; color: string }> = {
-  solar: {
-    title: "Solární Return",
-    icon: Sun,
-    description: "Solární Return nastává každý rok, když se Slunce vrátí na přesnou pozici, kde bylo v okamžiku vašeho narození. Tato mapa ukazuje témata a energie pro nadcházející rok.",
-    period: "~1 rok",
-    color: "text-amber-600 bg-amber-50",
-  },
-  saturn: {
-    title: "Saturnův Return",
-    icon: RotateCcw,
-    description: "Saturnův Return nastává přibližně každých 29,5 let. Je to období zrání, zodpovědnosti a přehodnocení životních struktur. První Return (~29 let) přináší dospělost, druhý (~58 let) moudrost.",
-    period: "~29.5 let",
-    color: "text-slate-600 bg-slate-50",
-  },
-  chiron: {
-    title: "Chironův Return",
-    icon: Moon,
-    description: "Chironův Return nastává kolem 50. roku života. Chiron je 'zraněný léčitel' — toto období přináší hluboké uzdravení starých ran a transformaci bolesti v moudrost.",
-    period: "~50 let",
-    color: "text-purple-600 bg-purple-50",
-  },
-  uranus: {
-    title: "Uranová Opozice",
-    icon: RotateCcw,
-    description: "Uranová opozice nastává kolem 38-42 let (krize středního věku). Uran se dostává do opozice vůči své natální pozici, což přináší touhu po svobodě, změně a autenticitě.",
-    period: "~40 let",
-    color: "text-cyan-600 bg-cyan-50",
-  },
-};
-
 export default function ReturnChart() {
   const { isAuthenticated } = useAuth();
+  const { t, locale } = useLanguage();
   const [selectedChartId, setSelectedChartId] = useState<string>("");
   const [returnType, setReturnType] = useState<ReturnType>("solar");
   const [returnData, setReturnData] = useState<any>(null);
@@ -60,35 +31,61 @@ export default function ReturnChart() {
     return chartsQuery.data.find(c => c.id === parseInt(selectedChartId));
   }, [selectedChartId, chartsQuery.data]);
 
+  const RETURN_INFO: Record<ReturnType, { title: string; icon: typeof Sun; description: string; period: string; color: string }> = {
+    solar: {
+      title: t.returnChart.returns.solar.title,
+      icon: Sun,
+      description: t.returnChart.returns.solar.description,
+      period: t.returnChart.returns.solar.period,
+      color: "text-amber-600 bg-amber-50",
+    },
+    saturn: {
+      title: t.returnChart.returns.saturn.title,
+      icon: RotateCcw,
+      description: t.returnChart.returns.saturn.description,
+      period: t.returnChart.returns.saturn.period,
+      color: "text-slate-600 bg-slate-50",
+    },
+    chiron: {
+      title: t.returnChart.returns.chiron.title,
+      icon: Moon,
+      description: t.returnChart.returns.chiron.description,
+      period: t.returnChart.returns.chiron.period,
+      color: "text-purple-600 bg-purple-50",
+    },
+    uranus: {
+      title: t.returnChart.returns.uranus.title,
+      icon: RotateCcw,
+      description: t.returnChart.returns.uranus.description,
+      period: t.returnChart.returns.uranus.period,
+      color: "text-cyan-600 bg-cyan-50",
+    },
+  };
+
   const handleCalculateReturn = async () => {
     if (!selectedChart) return;
     setIsCalculating(true);
     setReturnData(null);
 
     try {
-      // For solar return, calculate chart for current year's birthday
       const birthDate = new Date(selectedChart.birthDate);
       const now = new Date();
       let returnDate: Date;
 
       switch (returnType) {
         case "solar":
-          // This year's birthday
           returnDate = new Date(now.getFullYear(), birthDate.getMonth(), birthDate.getDate());
           if (returnDate < now) {
             returnDate = new Date(now.getFullYear() + 1, birthDate.getMonth(), birthDate.getDate());
           }
           break;
         case "saturn":
-          // ~29.5 years from birth
           returnDate = new Date(birthDate.getTime() + 29.5 * 365.25 * 24 * 60 * 60 * 1000);
           break;
         case "chiron":
-          // ~50 years from birth
           returnDate = new Date(birthDate.getTime() + 50.7 * 365.25 * 24 * 60 * 60 * 1000);
           break;
         case "uranus":
-          // ~42 years from birth (opposition)
           returnDate = new Date(birthDate.getTime() + 42 * 365.25 * 24 * 60 * 60 * 1000);
           break;
       }
@@ -125,14 +122,14 @@ export default function ReturnChart() {
             <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
               <RotateCcw className="w-10 h-10 text-primary" />
             </div>
-            <h1 className="text-3xl font-serif font-bold mb-4">Return charty</h1>
+            <h1 className="text-3xl font-serif font-bold mb-4">{t.returnChart.title}</h1>
             <p className="text-muted-foreground mb-8">
-              Přihlaste se pro výpočet Return chartů — Solární Return, Saturnův Return a dalších.
+              {t.returnChart.loginRequired}
             </p>
             <a href={getLoginUrl()}>
               <Button size="lg" className="gap-2">
                 <LogIn className="w-5 h-5" />
-                Přihlásit se
+                {t.common.signIn}
               </Button>
             </a>
           </div>
@@ -155,13 +152,13 @@ export default function ReturnChart() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
               <RotateCcw className="w-4 h-4" />
-              Return charty
+              {t.returnChart.title}
             </div>
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
-              Cyklické návraty planet
+              {t.returnChart.subtitle}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Prozkoumejte klíčové planetární návraty ve vašem životě — od ročního Solárního Returnu po transformativní Saturnův Return.
+              {t.returnChart.description}
             </p>
           </motion.div>
 
@@ -201,7 +198,7 @@ export default function ReturnChart() {
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <Select value={selectedChartId} onValueChange={setSelectedChartId}>
               <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Vyberte uloženou mapu..." />
+                <SelectValue placeholder={t.returnChart.selectChart} />
               </SelectTrigger>
               <SelectContent>
                 {chartsQuery.data?.map(chart => (
@@ -217,7 +214,7 @@ export default function ReturnChart() {
               className="gap-2"
             >
               {isCalculating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
-              Vypočítat {info.title}
+              {t.returnChart.calculate} {info.title}
             </Button>
           </div>
 
@@ -231,7 +228,7 @@ export default function ReturnChart() {
                 {/* Original chart */}
                 <div>
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Badge variant="outline">Natální mapa</Badge>
+                    <Badge variant="outline">{t.returnChart.natalChart}</Badge>
                     {selectedChart?.name as string}
                   </h3>
                   {selectedChart?.chartData != null && (
@@ -255,31 +252,33 @@ export default function ReturnChart() {
               {/* Return chart details */}
               <Card className="mt-8">
                 <CardHeader>
-                  <CardTitle className="text-lg">Detaily {info.title}</CardTitle>
+                  <CardTitle className="text-lg">
+                    {locale === "en" ? `Details: ${info.title}` : `Detaily ${info.title}`}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="p-3 rounded-lg bg-muted/50">
-                      <p className="text-xs text-muted-foreground">Typ</p>
-                      <p className="font-semibold text-sm">{returnData.type}</p>
+                      <p className="text-xs text-muted-foreground">{t.returnChart.details.type}</p>
+                      <p className="font-semibold text-sm">{(t.types as any)[returnData.type] || returnData.type}</p>
                     </div>
                     <div className="p-3 rounded-lg bg-muted/50">
-                      <p className="text-xs text-muted-foreground">Profil</p>
+                      <p className="text-xs text-muted-foreground">{t.returnChart.details.profile}</p>
                       <p className="font-semibold text-sm">{returnData.profile}</p>
                     </div>
                     <div className="p-3 rounded-lg bg-muted/50">
-                      <p className="text-xs text-muted-foreground">Autorita</p>
+                      <p className="text-xs text-muted-foreground">{t.returnChart.details.authority}</p>
                       <p className="font-semibold text-sm">{returnData.authority}</p>
                     </div>
                     <div className="p-3 rounded-lg bg-muted/50">
-                      <p className="text-xs text-muted-foreground">Definice</p>
-                      <p className="font-semibold text-sm">{returnData.definition}</p>
+                      <p className="text-xs text-muted-foreground">{t.returnChart.details.definition}</p>
+                      <p className="font-semibold text-sm">{(t.hd.definitionTypes as any)[returnData.definition] || returnData.definition}</p>
                     </div>
                   </div>
 
                   {returnData.channels?.length > 0 && (
                     <div className="mt-4">
-                      <p className="text-sm font-semibold mb-2">Aktivní dráhy</p>
+                      <p className="text-sm font-semibold mb-2">{t.returnChart.activeChannels}</p>
                       <div className="flex flex-wrap gap-2">
                         {returnData.channels.map((ch: any, i: number) => (
                           <Badge key={i} variant="outline" className="text-xs">

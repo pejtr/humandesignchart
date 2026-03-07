@@ -37,6 +37,8 @@ function ChartInputForm({ label, form, setForm, onCalculate, loading }: {
   onCalculate: () => void;
   loading: boolean;
 }) {
+  const { t } = useLanguage();
+
   const handlePlaceSearch = async () => {
     if (!form.birthPlace.trim()) return;
     try {
@@ -56,11 +58,11 @@ function ChartInputForm({ label, form, setForm, onCalculate, loading }: {
           timezone: `UTC${tzOff >= 0 ? "+" : ""}${tzOff}`,
           locationResolved: true,
         });
-        toast.success("Lokace nalezena!");
+        toast.success(t.calculator.locationFound);
       } else {
-        toast.error("Lokace nenalezena.");
+        toast.error(t.calculator.locationNotFound);
       }
-    } catch { toast.error("Vyhledávání selhalo."); }
+    } catch { toast.error(t.calculator.locationSearchFailed); }
   };
 
   return (
@@ -70,29 +72,29 @@ function ChartInputForm({ label, form, setForm, onCalculate, loading }: {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>Jméno</Label>
-          <Input placeholder="Jméno" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+          <Label>{t.calculator.name}</Label>
+          <Input placeholder={t.calculator.namePlaceholder} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
-            <Label className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />Datum</Label>
+            <Label className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{t.calculator.birthDate}</Label>
             <Input type="date" value={form.birthDate} onChange={e => setForm({ ...form, birthDate: e.target.value })} />
           </div>
           <div className="space-y-2">
-            <Label className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />Čas</Label>
+            <Label className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{t.calculator.birthTime}</Label>
             <Input type="time" value={form.birthTime} onChange={e => setForm({ ...form, birthTime: e.target.value })} />
           </div>
         </div>
         <div className="space-y-2">
-          <Label className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />Místo</Label>
+          <Label className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{t.calculator.birthPlace}</Label>
           <div className="flex gap-2">
             <Input
-              placeholder="Město, Země"
+              placeholder={t.calculator.birthPlacePlaceholder}
               value={form.birthPlace}
               onChange={e => setForm({ ...form, birthPlace: e.target.value, locationResolved: false })}
               onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); handlePlaceSearch(); } }}
             />
-            <Button type="button" variant="secondary" size="sm" onClick={handlePlaceSearch}>Najít</Button>
+            <Button type="button" variant="secondary" size="sm" onClick={handlePlaceSearch}>{t.calculator.findLocation}</Button>
           </div>
           {form.locationResolved && (
             <p className="text-xs text-green-600">{form.latitude}, {form.longitude} ({form.timezone})</p>
@@ -104,7 +106,7 @@ function ChartInputForm({ label, form, setForm, onCalculate, loading }: {
           disabled={loading || !form.name || !form.birthDate || !form.birthTime || !form.locationResolved}
         >
           {loading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : null}
-          Vypočítat
+          {t.calculator.calculate}
         </Button>
       </CardContent>
     </Card>
@@ -153,12 +155,14 @@ export default function ChartComparison() {
       [32,54],[34,57],[35,36],[37,40],[39,55],[42,53],[47,64],
     ];
 
+    const gateLabel = locale === "en" ? "Gate" : "Brána";
+
     for (const [g1, g2] of channelDefs) {
       if (aGates.has(g1) && bGates.has(g2) && !aGates.has(g2)) {
-        connections.push({ gate1: g1, gate2: g2, source: `${formA.name} Brána ${g1} + ${formB.name} Brána ${g2}` });
+        connections.push({ gate1: g1, gate2: g2, source: `${formA.name} ${gateLabel} ${g1} + ${formB.name} ${gateLabel} ${g2}` });
       }
       if (bGates.has(g1) && aGates.has(g2) && !bGates.has(g2)) {
-        connections.push({ gate1: g1, gate2: g2, source: `${formB.name} Brána ${g1} + ${formA.name} Brána ${g2}` });
+        connections.push({ gate1: g1, gate2: g2, source: `${formB.name} ${gateLabel} ${g1} + ${formA.name} ${gateLabel} ${g2}` });
       }
     }
     return connections;
@@ -235,7 +239,7 @@ export default function ChartComparison() {
                       {electromagneticChannels.map((c, i) => (
                         <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-primary/5 border border-primary/20">
                           <div>
-                            <p className="font-medium">Kanál {c.gate1}-{c.gate2}</p>
+                            <p className="font-medium">{t.comparison.channel} {c.gate1}-{c.gate2}</p>
                             <p className="text-sm text-muted-foreground">{c.source}</p>
                           </div>
                           <Zap className="w-5 h-5 text-primary" />
