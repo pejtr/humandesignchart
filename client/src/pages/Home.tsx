@@ -1,5 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -185,6 +185,30 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
   const { t, locale, localePath } = useLanguage();
   const isCs = locale === "cs";
+
+  useEffect(() => {
+    if (isCs) {
+      document.title = "Human Design Mapa Zdarma | Kalkulačka & AI Výklad";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Vypočítejte svou Human Design mapu zdarma. Zjistěte svůj typ, strategii, autoritu a získejte AI výklad."
+      );
+      document.querySelector('meta[name="keywords"]')?.setAttribute(
+        "content",
+        "human design, human design mapa, bodygraph kalkulačka, human design zdarma"
+      );
+    } else {
+      document.title = "Free Human Design Chart Calculator & AI Reading";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Calculate your free Human Design chart. Discover your type, strategy, authority and get a personalized AI reading."
+      );
+      document.querySelector('meta[name="keywords"]')?.setAttribute(
+        "content",
+        "human design, human design chart, bodygraph calculator, free human design"
+      );
+    }
+  }, [locale, isCs]);
   const typesData = getTypesData(isCs);
 
   const features = [

@@ -401,3 +401,8 @@
 - [x] Accessible (aria-modal, aria-hidden, aria-expanded, aria-label)
 - [x] Body scroll lock when drawer is open
 - [x] Auth section in footer (user info + dashboard + sign out / sign in)
+
+## SEO Fix — Homepage Meta Tags
+- [x] Reduce keywords to 3-8 focused keywords (4 keywords now)
+- [x] Fix title length to 30-60 characters (47 chars EN, 49 chars CS)
+- [x] Shorten description to 50-160 characters (114 chars EN, 103 chars CS)
