@@ -42,13 +42,13 @@ export default function Celebrities() {
 
   useEffect(() => {
     if (locale === "en") {
-      document.title = "Human Design Celebrity Charts — Famous People";
+      document.title = "⭐ Human Design Celebrity Charts — Famous People's Blueprints 🌟";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Explore Human Design charts of famous people. See the type, profile, authority, and bodygraph of celebrities and historical figures."
       );
     } else {
-      document.title = "Human Design Mapy Celebrit — Známé Osobnosti";
+      document.title = "⭐ Human Design Mapy Celebrit — Slavné Osobnosti 🌟";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Prozkoumejte Human Design mapy známých osobností. Zjistěte typ, profil, autoritu a bodygraph celebrit a historických postav."

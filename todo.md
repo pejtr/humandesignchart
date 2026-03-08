@@ -415,3 +415,36 @@
 - [x] Update sitemap with incarnation-cross and daily-transit routes (already present)
 - [x] Generate branded OG image (1200x630) — cosmic dark theme with bodygraph
 - [x] Add og:image and twitter:image meta tags to index.html
+
+## SEO — AiGuide & IncarnationCross Pages
+- [ ] Add locale-aware document.title + meta description to AiGuide page (EN + CS)
+- [ ] Add locale-aware document.title + meta description to IncarnationCross page (EN + CS)
+
+## Blog — Czech Cover Images
+- [ ] Add Unsplash cover images to all 10 Czech blog articles in blogArticles.ts
+
+## Footer — Partner Projects
+- [ ] Add "Další projekty" section to footer with links: Akční letenky, Do Itálie, Katastr Online, Čajovny Praha, Bezmasá Jídla
+
+## Dynamic OG Image for Shared Charts
+- [ ] Server endpoint: generate per-chart OG image (SVG/HTML → PNG) with type, name, bodygraph
+- [ ] Update SharedChart page to use dynamic og:image meta tag
+
+## Footer — Remove Amulets.cz
+- [ ] Remove Amulets.cz from footer partner links
+
+## Dynamic Locale-Aware SEO Branding
+- [ ] CS title: "BODY DESIGN – Mapa vašeho Já | Odemkněte svůj potenciál"
+- [ ] EN title: "Free Human Design Chart Calculator & AI Reading"
+- [ ] Update index.html static fallback title (EN default)
+- [ ] Update Home.tsx dynamic title useEffect for both locales
+- [ ] Update all per-page titles to use locale-aware suffix branding
+- [ ] Update OG title, twitter:title, and description for CS locale
+
+## Dynamic Locale-Aware SEO Branding
+- [x] CS homepage title: "✨ HUMAN DESIGN – Mapa vašeho Já | Odemkněte svůj potenciál! 🔮"
+- [x] EN homepage title: "✨ Free Human Design Chart Calculator & AI Reading 🔮"
+- [x] Update index.html static fallback (EN default with emoji)
+- [x] Update Home.tsx dynamic title useEffect for both locales
+- [x] Update all 9 per-page titles with emoji (EN + CS)
+- [x] Update og:title, twitter:title in index.html with emoji

@@ -86,12 +86,11 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="https://amulets.cz" target="_blank" rel="noopener noreferrer"
+                <a href="https://bezmasajidla.cz" target="_blank" rel="noopener noreferrer"
                   className="hover:text-primary transition-colors">
-                  Amulets.cz
+                  Bezmasá Jídla
                 </a>
               </li>
-
             </ul>
           </div>
         </div>

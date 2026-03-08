@@ -51,13 +51,13 @@ export default function TransitCalendar() {
 
   useEffect(() => {
     if (locale === "en") {
-      document.title = "Human Design Transit Calendar — Daily & Weekly Overview";
+      document.title = "📅 Human Design Transit Calendar — Daily & Weekly Overview 🌙";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Plan with the Human Design transit calendar. See daily and weekly gate activations and their influence on your energy."
       );
     } else {
-      document.title = "Human Design Tranzitní Kalendář — Denní & Týdenní Přehled";
+      document.title = "📅 Human Design Tranzitní Kalendář — Denní & Týdenní Přehled 🌙";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Plánujte s Human Design tranzitním kalendářem. Sledujte denní a týdenní aktivace brán a jejich vliv na vaši energii."

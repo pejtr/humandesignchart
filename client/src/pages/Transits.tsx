@@ -33,13 +33,13 @@ export default function Transits() {
 
   useEffect(() => {
     if (locale === "en") {
-      document.title = "Human Design Planetary Transits — Current Gates";
+      document.title = "🪐 Human Design Planetary Transits — Today's Active Gates 🌟";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "View current Human Design planetary transits. See which gates are active today and how they interact with your natal chart."
       );
     } else {
-      document.title = "Human Design Planetární Tranzity — Aktuální Brány";
+      document.title = "🪐 Human Design Planetární Tranzity — Aktuální Brány 🌟";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Zobrazit aktuální Human Design planetární tranzity. Zjistěte, které brány jsou dnes aktivní a jak interagují s vaší natální mapou."

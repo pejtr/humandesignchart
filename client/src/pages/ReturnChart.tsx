@@ -21,13 +21,13 @@ export default function ReturnChart() {
 
   useEffect(() => {
     if (locale === "en") {
-      document.title = "Human Design Return Charts — Solar, Saturn & Chiron";
+      document.title = "🌀 Human Design Return Charts — Solar, Saturn & Chiron 🪐";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Calculate your Human Design Solar Return, Saturn Return, and Chiron Return charts. Discover how planetary cycles shape your life."
       );
     } else {
-      document.title = "Human Design Return Charty — Solární, Saturnův & Chironův";
+      document.title = "🌀 Human Design Return Charty — Solární, Saturnův & Chironův 🪐";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Vypočítejte svůj Human Design Solární Return, Saturnův Return a Chironův Return. Zjistěte, jak planetární cykly formují váš život."

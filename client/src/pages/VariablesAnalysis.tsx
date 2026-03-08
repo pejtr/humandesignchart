@@ -142,13 +142,13 @@ export default function VariablesAnalysis() {
 
   useEffect(() => {
     if (locale === "en") {
-      document.title = "Human Design Variables — Digestion, Environment & PHS";
+      document.title = "🧬 Human Design Variables — Digestion, Environment & PHS 🌿";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Explore your Human Design Variables: digestion type, environment, perspective, and awareness. Deep PHS analysis for optimal living."
       );
     } else {
-      document.title = "Human Design Proměnné — Trávení, Prostředí & PHS";
+      document.title = "🧬 Human Design Proměnné — Trávení, Prostředí & PHS 🌿";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Prozkoumejte své Human Design Proměnné: typ trávení, prostředí, perspektivu a vědomí. Hluboká PHS analýza pro optimální život."

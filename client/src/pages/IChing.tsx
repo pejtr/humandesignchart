@@ -110,13 +110,13 @@ export default function IChing() {
 
   useEffect(() => {
     if (locale === "en") {
-      document.title = "I Ching Oracle — Human Design Hexagrams";
+      document.title = "☯️ I Ching Oracle — Human Design Hexagrams & Wisdom 🎴";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Consult the I Ching oracle. Explore all 64 hexagrams and their connection to Human Design gates and life themes."
       );
     } else {
-      document.title = "I-Ťing Orákulum — Human Design Hexagramy";
+      document.title = "☯️ I-Ťing Orákulum — Human Design Hexagramy & Moudrost 🎴";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Konzultujte I-Ťing orákulum. Prozkoumejte všech 64 hexagramů a jejich spojení s bránami Human Design."

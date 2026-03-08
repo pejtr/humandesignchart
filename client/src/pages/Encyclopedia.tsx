@@ -63,13 +63,13 @@ export default function Encyclopedia() {
 
   useEffect(() => {
     if (isEN) {
-      document.title = "Human Design Encyclopedia — Gates, Channels & Centers";
+      document.title = "📖 Human Design Encyclopedia — Gates, Channels & Centers 🔮";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Browse all 64 gates, 36 channels, and 9 centers of Human Design. Detailed descriptions, I Ching hexagrams, and circuit information."
       );
     } else {
-      document.title = "Human Design Encyklopedie — Brány, Dráhy & Centra";
+      document.title = "📖 Human Design Encyklopedie — Brány, Dráhy & Centra 🔮";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Prozkoumejte všech 64 brán, 36 dráh a 9 center Human Design. Podrobné popisy, I-Ťing hexagramy a informace o okruzích."

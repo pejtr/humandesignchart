@@ -47,6 +47,20 @@ export default function IncarnationCross() {
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    const isEn = locale === 'en';
+    if (isEn) {
+      document.title = 'Incarnation Cross — Life Purpose & Human Design Reading';
+      document.querySelector('meta[name="description"]')?.setAttribute('content', 'Discover the meaning of your Incarnation Cross in Human Design. Explore your 4 gates, life purpose, themes, and get an AI-generated personal reading.');
+    } else {
+      document.title = 'Inkarnační Kříž — Životní Poslání a Human Design Výklad';
+      document.querySelector('meta[name="description"]')?.setAttribute('content', 'Objevťe význam svého Inkarnačního kříže v Human Designu. Prozkoumejte 4 brány, životní poslání a získejte AI výklad vašeho kříže.');
+    }
+    return () => {
+      document.title = isEn ? 'Free Human Design Chart Calculator & AI Reading' : 'Human Design Mapa Zdarma — Kalkulačka a AI Výklad';
+    };
+  }, [locale]);
+
+  useEffect(() => {
     const stored = sessionStorage.getItem("chartResult");
     const meta = sessionStorage.getItem("chartMeta");
     if (stored) setChart(JSON.parse(stored));

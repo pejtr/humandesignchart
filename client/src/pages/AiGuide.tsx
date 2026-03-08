@@ -251,6 +251,19 @@ export default function AiGuide() {
   const { locale, localePath } = useLanguage();
   const isEn = locale === 'en';
 
+  useEffect(() => {
+    if (isEn) {
+      document.title = 'AI Human Design Guide — Chat with Your HD Assistant';
+      document.querySelector('meta[name="description"]')?.setAttribute('content', 'Chat with your personal AI Human Design guide. Ask questions about your type, strategy, authority, profile, and get instant personalized answers.');
+    } else {
+      document.title = 'AI Průvodce Human Design — Chat s HD Asistentem';
+      document.querySelector('meta[name="description"]')?.setAttribute('content', 'Chatujte s vaším osobním AI průvodcem Human Design. Ptejte se na váš typ, strategii, autoritu, profil a získejte okamžité personalizované odpovědi.');
+    }
+    return () => {
+      document.title = isEn ? 'Free Human Design Chart Calculator & AI Reading' : 'Human Design Mapa Zdarma — Kalkulačka a AI Výklad';
+    };
+  }, [isEn]);
+
   const SUGGESTED_QUESTIONS = isEn ? [
     "What is Human Design and how does it work?",
     "What's the difference between a Generator and a Manifestor?",

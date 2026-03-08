@@ -40,13 +40,13 @@ export default function DailyTransit() {
 
   useEffect(() => {
     if (locale === "en") {
-      document.title = "Daily Human Design Transit — Today's Planetary Gates";
+      document.title = "🌅 Daily Human Design Transit — Today's Planetary Gates 🪐";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "See today's Human Design transit gates and how current planetary positions activate your bodygraph."
       );
     } else {
-      document.title = "Denní Human Design Tranzit — Dnešní Planeterní Brány";
+      document.title = "🌅 Denní Human Design Tranzit — Dnešní Planetární Brány 🪐";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Zjistěte dnešní tranzitové brány Human Design a jak aktuální planeterní pozice aktivují váš bodygraph."

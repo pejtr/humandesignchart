@@ -122,13 +122,13 @@ export default function ChartComparison() {
 
   useEffect(() => {
     if (locale === "en") {
-      document.title = "Human Design Chart Comparison — Relationship Compatibility";
+      document.title = "🔗 Human Design Chart Comparison — Relationship Compatibility 💑";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Compare two Human Design charts side by side. Discover electromagnetic connections, shared channels, and relationship compatibility."
       );
     } else {
-      document.title = "Porovnání Human Design Map — Kompatibilita Vztahů";
+      document.title = "🔗 Porovnání Human Design Map — Kompatibilita Vztahů 💑";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Porovnejte dvě Human Design mapy vedle sebe. Objevte elektromagnetická spojení, sdílené dráhy a kompatibilitu vztahů."

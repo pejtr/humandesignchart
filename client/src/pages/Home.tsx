@@ -188,17 +188,17 @@ export default function Home() {
 
   useEffect(() => {
     if (isCs) {
-      document.title = "Human Design Mapa Zdarma | Kalkulačka & AI Výklad";
+      document.title = "✨ HUMAN DESIGN – Mapa vašeho Já | Odemkněte svůj potenciál! 🔮";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
-        "Vypočítejte svou Human Design mapu zdarma. Zjistěte svůj typ, strategii, autoritu a získejte AI výklad."
+        "🌟 Vypočítejte svou Human Design mapu zdarma. Zjistěte svůj typ, strategii, autoritu a získejte AI výklad svého životního poslání."
       );
       document.querySelector('meta[name="keywords"]')?.setAttribute(
         "content",
         "human design, human design mapa, bodygraph kalkulačka, human design zdarma"
       );
     } else {
-      document.title = "Free Human Design Chart Calculator & AI Reading";
+      document.title = "✨ Free Human Design Chart Calculator & AI Reading 🔮";
       document.querySelector('meta[name="description"]')?.setAttribute(
         "content",
         "Calculate your free Human Design chart. Discover your type, strategy, authority and get a personalized AI reading."
