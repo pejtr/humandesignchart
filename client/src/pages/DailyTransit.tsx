@@ -1,5 +1,5 @@
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import Navbar from "@/components/Navbar";
@@ -37,6 +37,23 @@ const PLANET_COLORS: Record<string, string> = {
 export default function DailyTransit() {
   const { t, locale, localePath } = useLanguage();
   const { user, isAuthenticated, loading } = useAuth();
+
+  useEffect(() => {
+    if (locale === "en") {
+      document.title = "Daily Human Design Transit — Today's Planetary Gates";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "See today's Human Design transit gates and how current planetary positions activate your bodygraph."
+      );
+    } else {
+      document.title = "Denní Human Design Tranzit — Dnešní Planeterní Brány";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Zjistěte dnešní tranzitové brány Human Design a jak aktuální planeterní pozice aktivují váš bodygraph."
+      );
+    }
+  }, [locale]);
+
   const [selectedChartId, setSelectedChartId] = useState<number | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 

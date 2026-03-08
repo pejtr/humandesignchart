@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -39,6 +39,22 @@ export default function Celebrities() {
   const [selectedCeleb, setSelectedCeleb] = useState<typeof CELEBRITIES[0] | null>(null);
   const [chartData, setChartData] = useState<HumanDesignChartData | null>(null);
   const { t, locale, localePath } = useLanguage();
+
+  useEffect(() => {
+    if (locale === "en") {
+      document.title = "Human Design Celebrity Charts — Famous People";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Explore Human Design charts of famous people. See the type, profile, authority, and bodygraph of celebrities and historical figures."
+      );
+    } else {
+      document.title = "Human Design Mapy Celebrit — Známé Osobnosti";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Prozkoumejte Human Design mapy známých osobností. Zjistěte typ, profil, autoritu a bodygraph celebrit a historických postav."
+      );
+    }
+  }, [locale]);
 
   const calcMutation = trpc.chart.calculate.useMutation({
     onSuccess: (data) => setChartData(data as unknown as HumanDesignChartData),

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -107,6 +107,22 @@ export default function IChing() {
   const [selectedHex, setSelectedHex] = useState<typeof HEXAGRAMS[0] | null>(null);
   const [oracleResult, setOracleResult] = useState<typeof HEXAGRAMS[0] | null>(null);
   const { t, locale, localePath } = useLanguage();
+
+  useEffect(() => {
+    if (locale === "en") {
+      document.title = "I Ching Oracle — Human Design Hexagrams";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Consult the I Ching oracle. Explore all 64 hexagrams and their connection to Human Design gates and life themes."
+      );
+    } else {
+      document.title = "I-Ťing Orákulum — Human Design Hexagramy";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Konzultujte I-Ťing orákulum. Prozkoumejte všech 64 hexagramů a jejich spojení s bránami Human Design."
+      );
+    }
+  }, [locale]);
 
   const castOracle = () => {
     const idx = Math.floor(Math.random() * 64);

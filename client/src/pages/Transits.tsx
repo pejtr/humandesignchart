@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import Navbar from "@/components/Navbar";
@@ -30,7 +30,24 @@ const fadeUp = {
 
 export default function Transits() {
   const { t, locale, localePath } = useLanguage();
-  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (locale === "en") {
+      document.title = "Human Design Planetary Transits — Current Gates";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "View current Human Design planetary transits. See which gates are active today and how they interact with your natal chart."
+      );
+    } else {
+      document.title = "Human Design Planetární Tranzity — Aktuální Brány";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Zobrazit aktuální Human Design planetární tranzity. Zjistěte, které brány jsou dnes aktivní a jak interagují s vaší natální mapou."
+      );
+    }
+  }, [locale]);
+
+    const { isAuthenticated } = useAuth();
   const [selectedChartId, setSelectedChartId] = useState<string>("none");
 
   const transitQuery = trpc.transit.current.useQuery(undefined, {

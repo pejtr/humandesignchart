@@ -406,3 +406,12 @@
 - [x] Reduce keywords to 3-8 focused keywords (4 keywords now)
 - [x] Fix title length to 30-60 characters (47 chars EN, 49 chars CS)
 - [x] Shorten description to 50-160 characters (114 chars EN, 103 chars CS)
+
+## SEO — Per-page Meta & Sitemap & OG Image
+- [x] Add per-page SEO meta to Encyclopedia page (EN + CS)
+- [x] Add per-page SEO meta to Celebrities page (EN + CS)
+- [x] Add per-page SEO meta to IChing page (EN + CS)
+- [x] Add per-page SEO meta to other key pages (DailyTransit, ReturnChart, Compare, Transits, Variables, TransitCalendar)
+- [x] Update sitemap with incarnation-cross and daily-transit routes (already present)
+- [x] Generate branded OG image (1200x630) — cosmic dark theme with bodygraph
+- [x] Add og:image and twitter:image meta tags to index.html

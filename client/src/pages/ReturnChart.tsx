@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
@@ -18,6 +18,23 @@ type ReturnType = "solar" | "saturn" | "chiron" | "uranus";
 export default function ReturnChart() {
   const { isAuthenticated } = useAuth();
   const { t, locale } = useLanguage();
+
+  useEffect(() => {
+    if (locale === "en") {
+      document.title = "Human Design Return Charts — Solar, Saturn & Chiron";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Calculate your Human Design Solar Return, Saturn Return, and Chiron Return charts. Discover how planetary cycles shape your life."
+      );
+    } else {
+      document.title = "Human Design Return Charty — Solární, Saturnův & Chironův";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Vypočítejte svůj Human Design Solární Return, Saturnův Return a Chironův Return. Zjistěte, jak planetární cykly formují váš život."
+      );
+    }
+  }, [locale]);
+
   const [selectedChartId, setSelectedChartId] = useState<string>("");
   const [returnType, setReturnType] = useState<ReturnType>("solar");
   const [returnData, setReturnData] = useState<any>(null);

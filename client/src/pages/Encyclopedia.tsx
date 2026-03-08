@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/Navbar";
@@ -60,6 +60,22 @@ export default function Encyclopedia() {
   const { locale, localePath } = useLanguage();
   const isEN = locale === "en";
   const centerNames = isEN ? CENTER_NAMES_EN : CENTER_NAMES_CS;
+
+  useEffect(() => {
+    if (isEN) {
+      document.title = "Human Design Encyclopedia — Gates, Channels & Centers";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Browse all 64 gates, 36 channels, and 9 centers of Human Design. Detailed descriptions, I Ching hexagrams, and circuit information."
+      );
+    } else {
+      document.title = "Human Design Encyklopedie — Brány, Dráhy & Centra";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Prozkoumejte všech 64 brán, 36 dráh a 9 center Human Design. Podrobné popisy, I-Ťing hexagramy a informace o okruzích."
+      );
+    }
+  }, [locale, isEN]);
   const circuitNames = isEN ? CIRCUIT_NAMES_EN : CIRCUIT_NAMES_CS;
 
   const [search, setSearch] = useState("");

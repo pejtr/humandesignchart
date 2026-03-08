@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 import Navbar from "@/components/Navbar";
@@ -44,8 +45,25 @@ const MONTHS_CS = [
 ];
 
 export default function TransitCalendar() {
+  const { locale } = useLanguage();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMonth, setViewMonth] = useState(new Date());
+
+  useEffect(() => {
+    if (locale === "en") {
+      document.title = "Human Design Transit Calendar — Daily & Weekly Overview";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Plan with the Human Design transit calendar. See daily and weekly gate activations and their influence on your energy."
+      );
+    } else {
+      document.title = "Human Design Tranzitní Kalendář — Denní & Týdenní Přehled";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Plánujte s Human Design tranzitním kalendářem. Sledujte denní a týdenní aktivace brán a jejich vliv na vaši energii."
+      );
+    }
+  }, [locale]);
 
   const transitQuery = trpc.transit.current.useQuery(undefined, {
     refetchInterval: 60000,

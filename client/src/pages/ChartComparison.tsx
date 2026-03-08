@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, } from "react";
 import { trpc } from "@/lib/trpc";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -120,6 +120,23 @@ export default function ChartComparison() {
   const [chartB, setChartB] = useState<HumanDesignChartData | null>(null);
   const { t, locale, localePath } = useLanguage();
 
+  useEffect(() => {
+    if (locale === "en") {
+      document.title = "Human Design Chart Comparison — Relationship Compatibility";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Compare two Human Design charts side by side. Discover electromagnetic connections, shared channels, and relationship compatibility."
+      );
+    } else {
+      document.title = "Porovnání Human Design Map — Kompatibilita Vztahů";
+      document.querySelector('meta[name="description"]')?.setAttribute(
+        "content",
+        "Porovnejte dvě Human Design mapy vedle sebe. Objevte elektromagnetická spojení, sdílené dráhy a kompatibilitu vztahů."
+      );
+    }
+  }, [locale]);
+
+  
   const calcA = trpc.chart.calculate.useMutation({
     onSuccess: (data) => setChartA(data as unknown as HumanDesignChartData),
     onError: (err) => toast.error(err.message),
