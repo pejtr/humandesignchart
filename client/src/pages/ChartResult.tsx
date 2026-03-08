@@ -72,7 +72,8 @@ const CROSS_TYPE_CS: Record<string, string> = {
   "Juxtaposition Cross": "Juxtapoziční Kříž",
 };
 
-function translateCrossName(name: string): string {
+function translateCrossName(name: string, locale?: string): string {
+  if (locale === "en") return name;
   let result = name;
   for (const [en, cz] of Object.entries(CROSS_TYPE_CS)) {
     result = result.replace(en, cz);
@@ -103,7 +104,7 @@ export default function ChartResult() {
   const params = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { isAuthenticated } = useAuth();
-  const { t, localePath } = useLanguage();
+  const { t, localePath, locale } = useLanguage();
 
   const [chart, setChart] = useState<HumanDesignChartData | null>(null);
   const [chartMeta, setChartMeta] = useState<any>(null);
@@ -725,13 +726,13 @@ export default function ChartResult() {
                 <CardContent>
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <p className="text-lg font-serif font-semibold">{translateCrossName(chart.incarnationCross.name)}</p>
+                      <p className="text-lg font-serif font-semibold">{translateCrossName(chart.incarnationCross.name, locale)}</p>
                       <p className="text-sm text-muted-foreground">{CROSS_TYPE_CS[chart.incarnationCross.type] || chart.incarnationCross.type}</p>
                     </div>
-                    <a href="/incarnation-cross">
+                    <a href={localePath("/incarnation-cross")}>
                       <Button size="sm" variant="outline" className="text-xs gap-1.5 border-primary/30 text-primary hover:bg-primary/10">
                         <Sparkles className="w-3.5 h-3.5" />
-                        AI analýza
+                        {locale === "en" ? "AI Analysis" : "AI analýza"}
                         <ChevronRight className="w-3 h-3" />
                       </Button>
                     </a>

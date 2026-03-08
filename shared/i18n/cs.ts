@@ -441,6 +441,48 @@ export const cs = {
     },
   },
 
+  // ─── Incarnation Cross Page ─────────────────────────────────────────────
+  incarnationCrossPage: {
+    title: "Inkarnační kříž",
+    subtitle: "Vaše životní poslání",
+    description: "Inkarnační kříž definuje vaše životní téma a poslání, které přinášíte do světa. Je tvořen čtyřmi bránami — Sluncem a Zemí ve vašem osobnostním a designovém výpočtu.",
+    badge: "Životní poslání",
+    backToChart: "Zpět na mapu",
+    crossType: "Typ kříže",
+    fourGates: "4 brány kříže",
+    whatIs: "Co je inkarnační kříž?",
+    whatIsDesc: "Inkarnační kříž je tvořen čtyřmi bránami — Sluncem a Zemí v osobnostním a designovém výpočtu. Reprezentuje vaše životní téma a poslání, které přinášíte do světa.",
+    personalitySun: "Osobnost — Slunce",
+    personalityEarth: "Osobnost — Země",
+    designSun: "Design — Slunce",
+    designEarth: "Design — Země",
+    gate: "Brána",
+    aiTitle: "AI analýza vašeho životního poslání",
+    aiDesc: "Personalizovaný výklad inkarnačního kříže",
+    aiButton: "Spustit AI analýzu",
+    aiLoginRequired: "Pro AI analýzu je potřeba přihlášení",
+    aiLoginButton: "Přihlásit se a spustit analýzu",
+    aiGenerating: "AI analyzuje váš inkarnační kříž…",
+    aiRegenerate: "Vygenerovat znovu",
+    calculateFirst: "Nejprve si vypočítejte mapu",
+    calculateFirstDesc: "Pro zobrazení analýzy inkarnačního kříže potřebujete nejprve vygenerovat svou Human Design mapu.",
+    calculateButton: "Vypočítat mapu",
+    crossTypes: {
+      "Right Angle Cross": {
+        theme: "Osobní osud",
+        desc: "Pravý Úhlový Kříž je osobní osud — vaše životní téma se rozvíjí skrze osobní zkušenosti a vztahy. Máte karmu, která se zpracovává v tomto životě.",
+      },
+      "Left Angle Cross": {
+        theme: "Transpersonální osud",
+        desc: "Levý Úhlový Kříž je transpersonální osud — vaše životní téma se rozvíjí skrze setkání s druhými. Jste zde, abyste sloužili komunitě a kolektivu.",
+      },
+      "Juxtaposition Cross": {
+        theme: "Fixální osud",
+        desc: "Juxtapoziční Kříž je fixální osud — vaše životní téma je pevně dané a neměnné. Máte specifické poslání, které přinášíte světu bez ohledu na okolnosti.",
+      },
+    },
+  },
+
   // ─── Encyclopedia ─────────────────────────────────────────────────────
   encyclopedia: {
     title: "Encyklopedie Human Designu",

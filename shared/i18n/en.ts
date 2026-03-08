@@ -441,6 +441,48 @@ export const en = {
     },
   },
 
+  // ─── Incarnation Cross Page ─────────────────────────────────────────────
+  incarnationCrossPage: {
+    title: "Incarnation Cross",
+    subtitle: "Your Life Purpose",
+    description: "The Incarnation Cross defines your life theme and the purpose you bring into the world. It is formed by four gates — the Sun and Earth in your Personality and Design calculations.",
+    badge: "Life Purpose",
+    backToChart: "Back to chart",
+    crossType: "Cross Type",
+    fourGates: "4 Gates of the Cross",
+    whatIs: "What is the Incarnation Cross?",
+    whatIsDesc: "The Incarnation Cross is formed by four gates — the Sun and Earth in the Personality and Design calculations. It represents your life theme and the mission you bring into the world.",
+    personalitySun: "Personality — Sun",
+    personalityEarth: "Personality — Earth",
+    designSun: "Design — Sun",
+    designEarth: "Design — Earth",
+    gate: "Gate",
+    aiTitle: "AI Analysis of Your Life Purpose",
+    aiDesc: "Personalized interpretation of the Incarnation Cross",
+    aiButton: "Start AI Analysis",
+    aiLoginRequired: "Sign in to get AI analysis",
+    aiLoginButton: "Sign in and start analysis",
+    aiGenerating: "AI is analyzing your Incarnation Cross…",
+    aiRegenerate: "Regenerate",
+    calculateFirst: "Calculate your chart first",
+    calculateFirstDesc: "To view the Incarnation Cross analysis, you need to generate your Human Design chart first.",
+    calculateButton: "Calculate chart",
+    crossTypes: {
+      "Right Angle Cross": {
+        theme: "Personal Destiny",
+        desc: "The Right Angle Cross is a personal destiny — your life theme unfolds through personal experiences and relationships. You have karma that is being processed in this lifetime.",
+      },
+      "Left Angle Cross": {
+        theme: "Transpersonal Destiny",
+        desc: "The Left Angle Cross is a transpersonal destiny — your life theme unfolds through encounters with others. You are here to serve the community and the collective.",
+      },
+      "Juxtaposition Cross": {
+        theme: "Fixed Destiny",
+        desc: "The Juxtaposition Cross is a fixed destiny — your life theme is set and unchanging. You have a specific mission that you bring to the world regardless of circumstances.",
+      },
+    },
+  },
+
   // ─── Encyclopedia ─────────────────────────────────────────────────────
   encyclopedia: {
     title: "Human Design Encyclopedia",

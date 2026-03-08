@@ -382,3 +382,22 @@
 - [ ] Add EN translations for all remaining Czech strings (Navbar dropdowns, type pages, shared pages)
 - [ ] Prepare TWA Android package (assetlinks.json, TWA manifest, Google Play assets)
 - [ ] Write Google Search Console setup guide with sitemap submission instructions
+
+## Incarnation Cross Detail Page
+- [x] IncarnationCross page with bilingual support (EN/CS)
+- [x] Display 4 gates of the cross with descriptions and gate names
+- [x] AI-generated reading (streaming SSE) for the specific cross
+- [x] Link from ChartResult page (locale-aware link)
+- [x] Add EN/CS translation keys for the page (incarnationCrossPage namespace)
+- [x] Cross type info (Right Angle / Left Angle / Juxtaposition) with color coding
+- [x] Download AI reading as .txt file
+
+## Mobile Navigation — Full-Screen Hamburger Menu
+- [x] Full-screen slide-in drawer on mobile (slide from right, 300ms cubic-bezier)
+- [x] Include ALL nav items: Free Chart, Encyclopedia, AI Guide, Blog, Tools (6 items), Explore (3 items)
+- [x] Language switcher inside mobile menu header
+- [x] Smooth animation (slide from right + backdrop fade)
+- [x] Close on backdrop click, escape key, and nav link click
+- [x] Accessible (aria-modal, aria-hidden, aria-expanded, aria-label)
+- [x] Body scroll lock when drawer is open
+- [x] Auth section in footer (user info + dashboard + sign out / sign in)
