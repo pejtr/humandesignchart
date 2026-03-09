@@ -28,6 +28,8 @@ const BlogArticle = lazy(() => import("./pages/BlogArticle"));
 const IncarnationCross = lazy(() => import("./pages/IncarnationCross"));
 const DailyTransit = lazy(() => import("./pages/DailyTransit"));
 const Pricing = lazy(() => import("./pages/Pricing"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PaymentCancel = lazy(() => import("./pages/PaymentCancel"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -95,6 +97,8 @@ function LocaleRoutes() {
         <Route path="/:locale/incarnation-cross" component={IncarnationCross} />
         <Route path="/:locale/daily-transit" component={DailyTransit} />
         <Route path="/:locale/pricing" component={Pricing} />
+        <Route path="/:locale/payment/success" component={PaymentSuccess} />
+        <Route path="/:locale/payment/cancel" component={PaymentCancel} />
 
         {/* Shared charts (no locale prefix — public links) */}
         <Route path="/shared/:token" component={SharedChart} />
@@ -123,6 +127,8 @@ function LocaleRoutes() {
         <Route path="/incarnation-cross"><LegacyRedirect path="/incarnation-cross" /></Route>
         <Route path="/daily-transit"><LegacyRedirect path="/daily-transit" /></Route>
         <Route path="/pricing"><LegacyRedirect path="/pricing" /></Route>
+        <Route path="/payment/success"><LegacyRedirect path="/payment/success" /></Route>
+        <Route path="/payment/cancel"><LegacyRedirect path="/payment/cancel" /></Route>
 
         {/* 404 */}
         <Route path="/404" component={NotFound} />

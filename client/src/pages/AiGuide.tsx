@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Sparkles, Send, User, Bot, LogIn, Loader2, ChevronDown,
-  Zap, Star, Compass, Moon, Sun, Activity, Circle,
+  Zap, Star, Compass, Moon, Sun, Activity, Circle, Crown,
 } from "lucide-react";
 import { Streamdown } from "streamdown";
 import { Link } from "wouter";
@@ -292,6 +292,12 @@ export default function AiGuide() {
     ? "I'm your AI Human Design guide. Ask me anything about the Human Design system — types, centers, gates, channels, authorities, profiles, transits, and much more. How can I help you?"
     : "Jsem váš AI průvodce Human Designem. Můžete se mě zeptat na cokoliv o systému Human Design — typy, centra, brány, dráhy, autority, profily, tranzity a mnoho dalšího. Jak vám mohu pomoci?";
 
+  // Subscription status for upgrade CTA
+  const { data: subStatus } = trpc.subscription.status.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
+  const isPremium = subStatus?.isPremium ?? false;
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -302,6 +308,10 @@ export default function AiGuide() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Derived values for upgrade CTA
+  const totalMessages = messages.filter(m => m.role === "user").length;
+  const showUpgradeBanner = !isPremium && totalMessages >= 3 && isAuthenticated;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -521,6 +531,35 @@ export default function AiGuide() {
                 )}
                 <div ref={messagesEndRef} />
               </div>
+
+              {/* Upgrade CTA banner — shown after 3 messages for free users */}
+              {showUpgradeBanner && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="my-3 rounded-xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 to-violet-950/40 p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-purple-500/20 flex items-center justify-center shrink-0">
+                    <Crown className="w-4.5 h-4.5 text-purple-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-purple-200">
+                      {isEn ? "Enjoying the AI Guide? ✨" : "Líbí se vám AI průvodce? ✨"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {isEn
+                        ? `You've sent ${totalMessages} messages. Upgrade to Premium for unlimited conversations, AI chart readings, and PDF reports.`
+                        : `Odeslali jste ${totalMessages} zpráv. Upgradujte na Premium pro neomezené konverzace, AI výklady map a PDF reporty.`}
+                    </p>
+                  </div>
+                  <Link href={localePath("/pricing")}>
+                    <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white shrink-0 gap-1.5">
+                      <Zap className="w-3.5 h-3.5" />
+                      {isEn ? "Upgrade" : "Upgradovat"}
+                    </Button>
+                  </Link>
+                </motion.div>
+              )}
 
               {/* Suggested questions */}
               {messages.length <= 1 && (

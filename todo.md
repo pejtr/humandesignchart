@@ -465,3 +465,10 @@
 - [x] Gift voucher redemption (code entry on Pricing page)
 - [x] Dashboard subscription tab (plan status, readings used, upgrade CTA)
 - [x] Navbar Pricing link (CreditCard icon)
+
+## Payment UX — Success/Cancel Pages & Upgrade CTAs
+- [x] Payment success page (/payment/success) with confirmation and next-step CTAs
+- [x] Payment cancel page (/payment/cancel) with retry option and FAQ
+- [x] Add success_url and cancel_url to Stripe checkout pointing to new pages
+- [x] Upgrade CTA banner in AiGuide chat (shown after 3 messages, with message count)
+- [x] Annual plan urgency countdown timer on Pricing page (amber pulse, resets weekly)

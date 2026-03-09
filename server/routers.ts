@@ -591,8 +591,8 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
           if (input.personalMessage) metadata.personal_message = input.personalMessage.slice(0, 500);
         }
 
-        const successUrl = `${input.origin}/${input.locale}/dashboard?payment=success&plan=${input.plan}`;
-        const cancelUrl = `${input.origin}/${input.locale}/pricing?payment=canceled`;
+        const successUrl = `${input.origin}/${input.locale}/payment/success?plan=${input.plan}`;
+        const cancelUrl = `${input.origin}/${input.locale}/payment/cancel`;
 
         if (isSubscription) {
           // Recurring subscription
