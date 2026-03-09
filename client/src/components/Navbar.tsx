@@ -5,7 +5,7 @@ import { Link, useLocation } from "wouter";
 import {
   Menu, X, User, LogOut, LayoutDashboard, Compass, Star, Users,
   Sparkles, GitCompare, BookOpen, Bot, RotateCcw, ChevronDown,
-  Calendar, Hexagon, UtensilsCrossed, Sun, Target,
+  Calendar, Hexagon, UtensilsCrossed, Sun, Target, CreditCard,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -56,6 +56,7 @@ export default function Navbar() {
     { href: "/encyclopedia", label: locale === "cs" ? "Encyklopedie" : "Encyclopedia", icon: BookOpen },
     { href: "/ai-guide", label: locale === "cs" ? "AI průvodce" : "AI Guide", icon: Bot },
     { href: "/blog", label: "Blog", icon: BookOpen },
+    { href: "/pricing", label: locale === "cs" ? "Ceník" : "Pricing", icon: CreditCard },
   ];
 
   const toolsLinks = [

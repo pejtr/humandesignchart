@@ -1,6 +1,6 @@
 import { eq, and, desc, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, charts, InsertChart, aiReadings, InsertAiReading, sharedCharts, InsertSharedChart } from "../drizzle/schema";
+import { InsertUser, users, charts, InsertChart, aiReadings, InsertAiReading, sharedCharts, InsertSharedChart, giftVouchers, InsertGiftVoucher } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -207,4 +207,76 @@ export async function getSharedChart(token: string) {
   // Check expiration
   if (chart.expiresAt && new Date(chart.expiresAt) < new Date()) return null;
   return chart;
+}
+
+// ─── Subscription / User Billing Operations ─────────────────────────────────
+
+export async function updateUserSubscription(userId: number, data: {
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string | null;
+  subscriptionStatus?: "active" | "canceled" | "past_due" | "trialing" | "none";
+  subscriptionPlan?: "monthly" | "annual" | "none";
+  subscriptionCurrentPeriodEnd?: Date | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set(data).where(eq(users.id, userId));
+}
+
+export async function addAiReadingCredits(userId: number, credits: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const user = await db.select({ credits: users.aiReadingCredits }).from(users).where(eq(users.id, userId)).limit(1);
+  const current = user[0]?.credits ?? 0;
+  await db.update(users).set({ aiReadingCredits: current + credits }).where(eq(users.id, userId));
+}
+
+export async function consumeAiReadingCredit(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const user = await db.select({ credits: users.aiReadingCredits }).from(users).where(eq(users.id, userId)).limit(1);
+  const current = user[0]?.credits ?? 0;
+  if (current > 0) {
+    await db.update(users).set({ aiReadingCredits: current - 1 }).where(eq(users.id, userId));
+    return true;
+  }
+  return false;
+}
+
+export async function getUserById(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function countAiReadingsByUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(aiReadings).where(eq(aiReadings.userId, userId));
+  return result.length;
+}
+
+// ─── Gift Voucher Operations ─────────────────────────────────────────────────
+
+export async function createGiftVoucher(voucher: InsertGiftVoucher) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(giftVouchers).values(voucher);
+  return result[0].insertId;
+}
+
+export async function getGiftVoucherByCode(code: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(giftVouchers).where(eq(giftVouchers.code, code)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function redeemGiftVoucher(code: string, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(giftVouchers)
+    .set({ isRedeemed: true, redeemedByUserId: userId, redeemedAt: new Date() })
+    .where(eq(giftVouchers.code, code));
 }

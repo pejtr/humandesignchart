@@ -28,6 +28,7 @@ import {
   TYPE_DESCRIPTIONS, AUTHORITY_DESCRIPTIONS, PROFILE_DESCRIPTIONS,
 } from "@shared/hdContent";
 import OnboardingModal, { useOnboarding } from "@/components/OnboardingModal";
+import PremiumPaywall from "@/components/PremiumPaywall";
 
 // ─── ShareReadingButton ─────────────────────────────────────────────────────
 function ShareReadingButton({ readingId }: { readingId: number }) {
@@ -120,9 +121,11 @@ export default function ChartResult() {
   const [copied, setCopied] = useState(false);
   const [aiReadingType, setAiReadingType] = useState<string | null>(null);
   const [showAiTypes, setShowAiTypes] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
   const aiSectionRef = useRef<HTMLDivElement>(null);
   const streamAbortRef = useRef<AbortController | null>(null);
   const { shouldShow: showOnboarding, triggerOnboarding, markSeen: markOnboardingSeen } = useOnboarding();
+  const { data: subStatus } = trpc.subscription.status.useQuery(undefined, { enabled: isAuthenticated });
 
   const shareMutation = trpc.share.createLink.useMutation({
     onSuccess: (data) => {
@@ -248,6 +251,11 @@ export default function ChartResult() {
 
     fetch(`/api/ai/stream?${params}`, { signal: abort.signal })
       .then(async (res) => {
+        if (res.status === 402) {
+          setAiStreaming(false);
+          setShowPaywall(true);
+          return;
+        }
         if (!res.ok || !res.body) {
           // Fallback to tRPC mutation
           setAiStreaming(false);
@@ -374,6 +382,11 @@ export default function ChartResult() {
                 {shareMutation.isPending ? "Sdílení..." : copied ? "Zkopírováno!" : "Sdílet mapu"}
               </Button>
               <Button variant="outline" size="sm" onClick={() => {
+                if (!subStatus?.isPremium) {
+                  setShowPaywall(true);
+                  toast.info(locale === "cs" ? "PDF report je dostupný pro Premium uživatele" : "PDF report is available for Premium users");
+                  return;
+                }
                 setGeneratingPdf(true);
                 setTimeout(() => {
                   try {
@@ -386,6 +399,7 @@ export default function ChartResult() {
               }} disabled={generatingPdf}>
                 {generatingPdf ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Download className="w-4 h-4 mr-1" />}
                 {generatingPdf ? t.chart.generatingPdf : t.chart.downloadPdf}
+                {!subStatus?.isPremium && <span className="ml-1 text-xs opacity-60">👑</span>}
               </Button>
             </div>
           </div>
@@ -465,7 +479,9 @@ export default function ChartResult() {
 
               {/* ─── AI Výklad — PRIMÁRNÍ SEKCE ─── */}
               <div ref={aiSectionRef}>
-                {!aiReading && !aiStreaming && !aiMutation.isPending ? (
+                {showPaywall ? (
+                  <PremiumPaywall variant="inline" />
+                ) : !aiReading && !aiStreaming && !aiMutation.isPending ? (
                   <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-violet-50 p-6 shadow-md">
                     {/* Decorative glow */}
                     <div className="absolute -top-8 -right-8 w-40 h-40 bg-primary/20 rounded-full blur-3xl pointer-events-none" />

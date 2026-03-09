@@ -27,6 +27,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogArticle = lazy(() => import("./pages/BlogArticle"));
 const IncarnationCross = lazy(() => import("./pages/IncarnationCross"));
 const DailyTransit = lazy(() => import("./pages/DailyTransit"));
+const Pricing = lazy(() => import("./pages/Pricing"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -93,6 +94,7 @@ function LocaleRoutes() {
         <Route path="/:locale/blog/:slug" component={BlogArticle} />
         <Route path="/:locale/incarnation-cross" component={IncarnationCross} />
         <Route path="/:locale/daily-transit" component={DailyTransit} />
+        <Route path="/:locale/pricing" component={Pricing} />
 
         {/* Shared charts (no locale prefix — public links) */}
         <Route path="/shared/:token" component={SharedChart} />
@@ -120,6 +122,7 @@ function LocaleRoutes() {
         <Route path="/blog/:slug">{(params: any) => <LegacyRedirect path={`/blog/${params.slug}`} />}</Route>
         <Route path="/incarnation-cross"><LegacyRedirect path="/incarnation-cross" /></Route>
         <Route path="/daily-transit"><LegacyRedirect path="/daily-transit" /></Route>
+        <Route path="/pricing"><LegacyRedirect path="/pricing" /></Route>
 
         {/* 404 */}
         <Route path="/404" component={NotFound} />

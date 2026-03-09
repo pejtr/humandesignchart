@@ -9,7 +9,14 @@ import {
   deleteChart, toggleFavorite, createAiReading, getAiReadings,
   getAllReadingsByUser, updateReadingRating, getReadingById,
   createSharedChart, getSharedChart,
+  countAiReadingsByUser, updateUserSubscription, addAiReadingCredits,
+  getGiftVoucherByCode, redeemGiftVoucher, createGiftVoucher, getUserById,
 } from "./db";
+import { getStripe } from "./stripeWebhook";
+import { isPremiumUser, canGenerateAiReading, FREE_TIER } from "./stripeProducts";
+import { users } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
+import { getDb } from "./db";
 import crypto from "crypto";
 import { invokeLLM } from "./_core/llm";
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../shared/blogArticles";
@@ -504,6 +511,217 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
         const articleList = isEn ? BLOG_ARTICLES_EN : BLOG_ARTICLES;
         const article = articleList.find(a => a.slug === input.slug);
         return article || null;
+      }),
+  }),
+
+  // ─── Subscription & Payments ───────────────────────────────────────────────────────
+  subscription: router({
+    // Get current user's subscription status
+    status: protectedProcedure.query(async ({ ctx }) => {
+      const user = ctx.user;
+      const totalReadings = await countAiReadingsByUser(user.id);
+      const premium = isPremiumUser(user);
+      return {
+        isPremium: premium,
+        plan: user.subscriptionPlan,
+        status: user.subscriptionStatus,
+        currentPeriodEnd: user.subscriptionCurrentPeriodEnd,
+        aiReadingCredits: user.aiReadingCredits,
+        totalReadings,
+        freeReadingsLeft: premium ? null : Math.max(0, FREE_TIER.AI_READINGS_LIMIT - totalReadings),
+        canGenerateReading: canGenerateAiReading(user, totalReadings).allowed,
+      };
+    }),
+
+    // Create Stripe checkout session
+    createCheckout: protectedProcedure
+      .input(z.object({
+        plan: z.enum(["monthly", "annual", "credits", "gift_monthly", "gift_annual"]),
+        locale: z.string().default("cs"),
+        origin: z.string(),
+        // Gift voucher fields
+        recipientEmail: z.string().email().optional(),
+        recipientName: z.string().optional(),
+        senderName: z.string().optional(),
+        personalMessage: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const stripe = getStripe();
+        if (!stripe) throw new Error("Stripe not configured");
+
+        const user = ctx.user;
+        const isGift = input.plan.startsWith("gift_");
+        const isSubscription = input.plan === "monthly" || input.plan === "annual";
+        const isCzech = input.locale === "cs";
+
+        // Ensure Stripe customer exists
+        let customerId = user.stripeCustomerId;
+        if (!customerId) {
+          const customer = await stripe.customers.create({
+            email: user.email || undefined,
+            name: user.name || undefined,
+            metadata: { user_id: user.id.toString() },
+          });
+          customerId = customer.id;
+          await updateUserSubscription(user.id, { stripeCustomerId: customerId });
+        }
+
+        const priceData = {
+          monthly: { czk: 14900, eur: 599, name: "Human Design Premium — Měsíční" },
+          annual: { czk: 99000, eur: 3900, name: "Human Design Premium — Roční" },
+          credits: { czk: 4900, eur: 199, name: "Human Design AI Credits (5×)" },
+          gift_monthly: { czk: 14900, eur: 599, name: "Dárkový poukaz — Premium Měsíc" },
+          gift_annual: { czk: 99000, eur: 3900, name: "Dárkový poukaz — Premium Rok" },
+        }[input.plan];
+
+        const currency = isCzech ? "czk" : "eur";
+        const unitAmount = isCzech ? priceData.czk : priceData.eur;
+
+        const metadata: Record<string, string> = {
+          user_id: user.id.toString(),
+          customer_email: user.email || "",
+          customer_name: user.name || "",
+          plan: input.plan,
+        };
+
+        if (isGift) {
+          if (input.recipientEmail) metadata.recipient_email = input.recipientEmail;
+          if (input.recipientName) metadata.recipient_name = input.recipientName;
+          if (input.senderName) metadata.sender_name = input.senderName;
+          if (input.personalMessage) metadata.personal_message = input.personalMessage.slice(0, 500);
+        }
+
+        const successUrl = `${input.origin}/${input.locale}/dashboard?payment=success&plan=${input.plan}`;
+        const cancelUrl = `${input.origin}/${input.locale}/pricing?payment=canceled`;
+
+        if (isSubscription) {
+          // Recurring subscription
+          const session = await stripe.checkout.sessions.create({
+            mode: "subscription",
+            customer: customerId,
+            client_reference_id: user.id.toString(),
+            metadata,
+            allow_promotion_codes: true,
+            line_items: [{
+              price_data: {
+                currency,
+                unit_amount: unitAmount,
+                recurring: { interval: input.plan === "monthly" ? "month" : "year" },
+                product_data: {
+                  name: priceData.name,
+                  metadata: { plan: input.plan },
+                },
+              },
+              quantity: 1,
+            }],
+            subscription_data: { metadata: { plan: input.plan } },
+            success_url: successUrl,
+            cancel_url: cancelUrl,
+          });
+          return { url: session.url };
+        } else {
+          // One-time payment (credits or gift)
+          const session = await stripe.checkout.sessions.create({
+            mode: "payment",
+            customer: customerId,
+            client_reference_id: user.id.toString(),
+            metadata,
+            allow_promotion_codes: true,
+            line_items: [{
+              price_data: {
+                currency,
+                unit_amount: unitAmount,
+                product_data: { name: priceData.name },
+              },
+              quantity: 1,
+            }],
+            success_url: successUrl,
+            cancel_url: cancelUrl,
+          });
+          return { url: session.url };
+        }
+      }),
+
+    // Cancel subscription
+    cancel: protectedProcedure.mutation(async ({ ctx }) => {
+      const stripe = getStripe();
+      if (!stripe) throw new Error("Stripe not configured");
+      const user = ctx.user;
+      if (!user.stripeSubscriptionId) throw new Error("No active subscription");
+      await stripe.subscriptions.update(user.stripeSubscriptionId, {
+        cancel_at_period_end: true,
+      });
+      return { success: true };
+    }),
+
+    // Reactivate canceled subscription
+    reactivate: protectedProcedure.mutation(async ({ ctx }) => {
+      const stripe = getStripe();
+      if (!stripe) throw new Error("Stripe not configured");
+      const user = ctx.user;
+      if (!user.stripeSubscriptionId) throw new Error("No subscription found");
+      await stripe.subscriptions.update(user.stripeSubscriptionId, {
+        cancel_at_period_end: false,
+      });
+      return { success: true };
+    }),
+
+    // Manage billing portal
+    portalSession: protectedProcedure
+      .input(z.object({ origin: z.string(), locale: z.string().default("cs") }))
+      .mutation(async ({ ctx, input }) => {
+        const stripe = getStripe();
+        if (!stripe) throw new Error("Stripe not configured");
+        const user = ctx.user;
+        if (!user.stripeCustomerId) throw new Error("No Stripe customer found");
+        const session = await stripe.billingPortal.sessions.create({
+          customer: user.stripeCustomerId,
+          return_url: `${input.origin}/${input.locale}/dashboard`,
+        });
+        return { url: session.url };
+      }),
+  }),
+
+  // ─── Gift Vouchers ───────────────────────────────────────────────────────────────────────
+  giftVoucher: router({
+    // Redeem a gift voucher code
+    redeem: protectedProcedure
+      .input(z.object({ code: z.string().min(1).toUpperCase() }))
+      .mutation(async ({ ctx, input }) => {
+        const voucher = await getGiftVoucherByCode(input.code.trim().toUpperCase());
+        if (!voucher) throw new Error("invalid_code");
+        if (voucher.isRedeemed) throw new Error("already_redeemed");
+        if (voucher.expiresAt && new Date(voucher.expiresAt) < new Date()) throw new Error("expired");
+
+        const user = ctx.user;
+        await redeemGiftVoucher(voucher.code, user.id);
+
+        // Apply the voucher benefit
+        if (voucher.plan === "credits") {
+          await addAiReadingCredits(user.id, voucher.creditsAmount || 5);
+        } else {
+          // Grant subscription
+          const periodEnd = new Date();
+          periodEnd.setMonth(periodEnd.getMonth() + (voucher.plan === "annual" ? 12 : 1));
+          await updateUserSubscription(user.id, {
+            subscriptionStatus: "active",
+            subscriptionPlan: voucher.plan,
+            subscriptionCurrentPeriodEnd: periodEnd,
+          });
+        }
+
+        return { success: true, plan: voucher.plan };
+      }),
+
+    // Check voucher validity without redeeming
+    check: publicProcedure
+      .input(z.object({ code: z.string() }))
+      .query(async ({ input }) => {
+        const voucher = await getGiftVoucherByCode(input.code.trim().toUpperCase());
+        if (!voucher) return { valid: false, reason: "not_found" };
+        if (voucher.isRedeemed) return { valid: false, reason: "already_redeemed" };
+        if (voucher.expiresAt && new Date(voucher.expiresAt) < new Date()) return { valid: false, reason: "expired" };
+        return { valid: true, plan: voucher.plan };
       }),
   }),
 });

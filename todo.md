@@ -448,3 +448,20 @@
 - [x] Update Home.tsx dynamic title useEffect for both locales
 - [x] Update all 9 per-page titles with emoji (EN + CS)
 - [x] Update og:title, twitter:title in index.html with emoji
+
+## Monetization — Stripe + Freemium + PDF + Gift Vouchers
+- [x] Stripe integration setup (webdev_add_feature stripe)
+- [x] Create Stripe products: Premium Monthly (149 CZK), Premium Annual (990 CZK), Credit Pack (49 CZK)
+- [x] Database schema: subscriptions table, gift_vouchers table, aiReadingCredits on users
+- [x] Freemium limit: track AI reading count per user, block after 1× for free users
+- [x] Upgrade prompt/paywall (PremiumPaywall component) when free limit reached
+- [x] Stripe checkout session endpoint (payment.checkout procedure)
+- [x] Stripe webhook handler (subscription created/updated/deleted, payment succeeded)
+- [x] User subscription status (isPremium, plan, canGenerateReading)
+- [x] Pricing page /cs/pricing and /en/pricing with plan comparison
+- [x] Upgrade CTA in ChartResult (paywall after 1st free reading)
+- [x] PDF download button in ChartResult (premium only with 👑 badge)
+- [x] Gift voucher purchase flow (Stripe one-time payment on Pricing page)
+- [x] Gift voucher redemption (code entry on Pricing page)
+- [x] Dashboard subscription tab (plan status, readings used, upgrade CTA)
+- [x] Navbar Pricing link (CreditCard icon)

@@ -12,7 +12,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Plus, Heart, Trash2, Loader2, LayoutDashboard,
   Star, Users, Compass, BookOpen, ThumbsUp, ThumbsDown,
-  Share2, ChevronDown, ChevronUp, Calendar, Sparkles, Sun, Zap,
+  Share2, ChevronDown, ChevronUp, Calendar, Sparkles, Sun, Zap, CreditCard, Crown,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -70,11 +70,12 @@ export default function Dashboard() {
   const utils = trpc.useUtils();
   const { t, localePath, locale } = useLanguage();
   const readingTypeLabels = locale === 'en' ? readingTypeLabelsEN : readingTypeLabelsCS;
-  const [activeTab, setActiveTab] = useState<"charts" | "readings" | "transit">("charts");
+  const [activeTab, setActiveTab] = useState<"charts" | "readings" | "transit" | "subscription">("charts");
   const [expandedReading, setExpandedReading] = useState<number | null>(null);
 
   const chartsQuery = trpc.chart.list.useQuery(undefined, { enabled: isAuthenticated });
   const readingsQuery = trpc.ai.getAllReadings.useQuery(undefined, { enabled: isAuthenticated && activeTab === "readings" });
+  const subQuery = trpc.subscription.status.useQuery(undefined, { enabled: isAuthenticated });
 
   const deleteMutation = trpc.chart.delete.useMutation({
     onSuccess: () => {
@@ -186,6 +187,22 @@ export default function Dashboard() {
             >
               <Sun className="w-4 h-4" />
               {locale === 'en' ? 'Daily Transit' : 'Denní tranzit'}
+            </button>
+            <button
+              onClick={() => setActiveTab("subscription")}
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === "subscription"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <CreditCard className="w-4 h-4" />
+              {locale === 'en' ? 'Subscription' : 'Předplatné'}
+              {subQuery.data?.isPremium && (
+                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 text-xs font-semibold">
+                  <Crown className="w-3 h-3 inline" />
+                </span>
+              )}
             </button>
           </div>
 
@@ -412,18 +429,104 @@ export default function Dashboard() {
             </>
           )}
 
-          {/* ─── Transit Tab ─── */}
+           {/* ─── Transit Tab ─── */}
           {activeTab === "transit" && (
             <DailyTransitWidget charts={charts} />
           )}
+          {/* ─── Subscription Tab ─── */}
+          {activeTab === "subscription" && (
+            <div className="space-y-6">
+              <Card className="border-border/50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Crown className="w-4 h-4 text-primary" />
+                    {locale === 'en' ? 'Your Plan' : 'Váš plán'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {subQuery.isLoading ? (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span className="text-sm">{locale === 'en' ? 'Loading...' : 'Načítám...'}</span>
+                    </div>
+                  ) : subQuery.data?.isPremium ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-purple-500/10 to-primary/10 border border-purple-500/20">
+                        <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                          <Crown className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm">
+                            Premium — {subQuery.data.plan === 'annual' ? (locale === 'en' ? 'Annual' : 'Roční') : (locale === 'en' ? 'Monthly' : 'Měsíční')}
+                          </p>
+                          {subQuery.data.currentPeriodEnd && (
+                            <p className="text-xs text-muted-foreground">
+                              {locale === 'en' ? 'Renews' : 'Obnoví se'}: {new Date(subQuery.data.currentPeriodEnd).toLocaleDateString(locale === 'en' ? 'en-US' : 'cs-CZ')}
+                            </p>
+                          )}
+                        </div>
+                        <Badge className="ml-auto bg-purple-500/20 text-purple-400 border-purple-500/30">
+                          {locale === 'en' ? 'Active' : 'Aktivní'}
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div className="p-3 rounded-lg bg-muted/50">
+                          <p className="text-muted-foreground text-xs mb-1">{locale === 'en' ? 'AI Readings' : 'AI Výklady'}</p>
+                          <p className="font-semibold">{locale === 'en' ? 'Unlimited ∞' : 'Neomezené ∞'}</p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-muted/50">
+                          <p className="text-muted-foreground text-xs mb-1">{locale === 'en' ? 'PDF Reports' : 'PDF Reporty'}</p>
+                          <p className="font-semibold">{locale === 'en' ? 'Included ✓' : 'Zahrnuto ✓'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/40 border border-border/50">
+                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                          <Zap className="w-5 h-5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm">{locale === 'en' ? 'Free Plan' : 'Bezplatný plán'}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {locale === 'en'
+                              ? `${subQuery.data?.totalReadings ?? 0} / 1 free AI reading used`
+                              : `${subQuery.data?.totalReadings ?? 0} / 1 bezplatný AI výklad využit`}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {locale === 'en'
+                          ? 'Upgrade to Premium for unlimited AI readings, PDF reports, and all advanced tools.'
+                          : 'Upgradujte na Premium pro neomezené AI výklady, PDF reporty a všechny pokročilé nástroje.'}
+                      </p>
+                      <Link href={localePath("/pricing")}>
+                        <Button className="bg-primary text-primary-foreground w-full">
+                          <Crown className="w-4 h-4 mr-2" />
+                          {locale === 'en' ? 'Upgrade to Premium — from 83 CZK/month' : 'Upgradovat na Premium — od 83 Kč/měsíc'}
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+              <div className="text-center">
+                <Link href={localePath("/pricing")}>
+                  <Button variant="outline" size="sm">
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    {locale === 'en' ? 'View all plans & gift vouchers' : 'Zobrazit všechny plány a dárkové poukazy'}
+                  </Button>
+                </Link>
+              </div>
+              </div>
+          )}
+
         </div>
       </main>
-
       <Footer />
     </div>
   );
 }
-
 // ─── DailyTransitWidget (inline in Dashboard) ────────────────────────────────
 function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: string }> }) {
   const { localePath, locale } = useLanguage();
