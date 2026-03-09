@@ -101,6 +101,7 @@ export default function Pricing() {
   const isCzech = locale === "cs";
   const isPremium = subStatus?.isPremium;
   const freeReadingsLeft = subStatus?.freeReadingsLeft ?? 1;
+  const isOwner = subStatus?.isOwner;
 
   // Urgency countdown — ends at next Sunday midnight (resets weekly)
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
@@ -170,6 +171,29 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Stripe Sandbox Activation Notice — visible to owner only */}
+      {isOwner && (
+        <div className="fixed top-16 left-0 right-0 z-40 bg-amber-500/95 text-amber-950 text-sm py-2 px-4 flex items-center justify-center gap-3 shadow-lg">
+          <span className="text-base">⚠️</span>
+          <span className="font-medium">
+            {isCzech
+              ? "Stripe sandbox není aktivní — "
+              : "Stripe sandbox not activated — "}
+          </span>
+          <a
+            href="https://dashboard.stripe.com/claim_sandbox/YWNjdF8xVDZZZVhFbWhjTnpzNmpZLDE3NzM1ODQ5MTEv100cqpryh6Z"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline font-bold hover:text-amber-900"
+          >
+            {isCzech ? "Aktivovat testovací prostředí →" : "Activate test environment →"}
+          </a>
+          <span className="text-xs opacity-70">
+            {isCzech ? "(platnost do 7. 5. 2026)" : "(expires May 7, 2026)"}
+          </span>
+        </div>
+      )}
+
       {/* Hero */}
       <div className="relative overflow-hidden bg-gradient-to-b from-purple-950/30 via-background to-background pt-20 pb-12">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent pointer-events-none" />

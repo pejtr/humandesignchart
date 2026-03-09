@@ -8,6 +8,7 @@ import { getUserByOpenId, updateUserSubscription, addAiReadingCredits, createGif
 import { getDb } from "./db";
 import { users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { notifyOwner } from "./_core/notification";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -123,11 +124,32 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
 
   if (mode === "subscription" && session.subscription) {
     // Subscription purchase — handled by subscription.created event
+    const planLabel = session.metadata?.plan === "annual" ? "Roční Premium" : "Měsíční Premium";
+    const customerEmail = session.metadata?.customer_email || session.customer_email || "neznámý";
+    const customerName = session.metadata?.customer_name || "nový zákazník";
+    try {
+      await notifyOwner({
+        title: `🎉 Nové předplatné: ${planLabel}`,
+        content: `Zákazník ${customerName} (${customerEmail}) si zakoupil ${planLabel}.\n\nUser ID: ${userId}\nSession ID: ${session.id}\nČas: ${new Date().toLocaleString("cs-CZ")}`,
+      });
+    } catch (e) {
+      console.warn("[Stripe Webhook] Failed to send owner notification:", e);
+    }
     console.log(`[Stripe Webhook] Subscription checkout completed for user ${userId}`);
   } else if (mode === "payment") {
     // One-time payment: credits or gift voucher
     if (plan === "credits") {
       await addAiReadingCredits(userId, 5);
+      const customerEmail = session.metadata?.customer_email || session.customer_email || "neznámý";
+      const customerName = session.metadata?.customer_name || "zákazník";
+      try {
+        await notifyOwner({
+          title: `💳 Nákup kreditů (5× AI výklad)`,
+          content: `${customerName} (${customerEmail}) zakoupil balíček 5 AI výkladů.\n\nUser ID: ${userId}\nČas: ${new Date().toLocaleString("cs-CZ")}`,
+        });
+      } catch (e) {
+        console.warn("[Stripe Webhook] Failed to send owner notification:", e);
+      }
       console.log(`[Stripe Webhook] Added 5 credits to user ${userId}`);
     } else if (plan === "gift_monthly" || plan === "gift_annual") {
       // Create gift voucher
@@ -149,6 +171,17 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
         isRedeemed: false,
         expiresAt,
       });
+      // Notify owner about gift voucher purchase
+      try {
+        const recipientEmail = session.metadata?.recipient_email || "neznámý";
+        const senderName = session.metadata?.sender_name || "zákazník";
+        await notifyOwner({
+          title: `🎁 Dárkový poukaz zakoupen (${giftPlan})`,
+          content: `${senderName} zakoupil dárkový poukaz pro ${recipientEmail}.\nKód: ${code}\nUser ID: ${userId}\nČas: ${new Date().toLocaleString("cs-CZ")}`,
+        });
+      } catch (e) {
+        console.warn("[Stripe Webhook] Failed to send owner notification:", e);
+      }
       console.log(`[Stripe Webhook] Created gift voucher ${code} for user ${userId}`);
     }
   }

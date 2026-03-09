@@ -472,3 +472,9 @@
 - [x] Add success_url and cancel_url to Stripe checkout pointing to new pages
 - [x] Upgrade CTA banner in AiGuide chat (shown after 3 messages, with message count)
 - [x] Annual plan urgency countdown timer on Pricing page (amber pulse, resets weekly)
+
+## Email + Navbar Credits + Stripe Guide
+- [x] Owner notification after successful payment/subscription/gift voucher (via notifyOwner)
+- [x] Credit pack quick-buy button in Navbar (Zap icon, shown only to logged-in non-premium users)
+- [x] Stripe sandbox activation banner on Pricing page (visible to owner only, links to claim URL)
+- [x] isOwner flag in subscription.status procedure (compares user.openId with ENV.ownerOpenId)

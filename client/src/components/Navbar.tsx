@@ -5,7 +5,7 @@ import { Link, useLocation } from "wouter";
 import {
   Menu, X, User, LogOut, LayoutDashboard, Compass, Star, Users,
   Sparkles, GitCompare, BookOpen, Bot, RotateCcw, ChevronDown,
-  Calendar, Hexagon, UtensilsCrossed, Sun, Target, CreditCard,
+  Calendar, Hexagon, UtensilsCrossed, Sun, Target, CreditCard, Zap,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -155,6 +155,17 @@ export default function Navbar() {
           {/* Desktop auth section + language switcher */}
           <div className="hidden lg:flex items-center gap-2">
             <LanguageSwitcher />
+            {/* Credit pack quick-buy */}
+            <Link href={localePath("/pricing")}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 border-primary/40 text-primary hover:bg-primary/10 font-semibold text-xs px-3"
+              >
+                <Zap className="w-3.5 h-3.5" />
+                {locale === "cs" ? "5 výkladů za 49 Kč" : "5 readings – €1.99"}
+              </Button>
+            </Link>
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

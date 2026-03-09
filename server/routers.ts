@@ -19,6 +19,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "./db";
 import crypto from "crypto";
 import { invokeLLM } from "./_core/llm";
+import { ENV } from "./_core/env";
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../shared/blogArticles";
 import { BLOG_ARTICLES_EN } from "../shared/blogArticlesEn";
 
@@ -521,6 +522,7 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
       const user = ctx.user;
       const totalReadings = await countAiReadingsByUser(user.id);
       const premium = isPremiumUser(user);
+      const isOwner = !!ENV.ownerOpenId && user.openId === ENV.ownerOpenId;
       return {
         isPremium: premium,
         plan: user.subscriptionPlan,
@@ -530,6 +532,7 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
         totalReadings,
         freeReadingsLeft: premium ? null : Math.max(0, FREE_TIER.AI_READINGS_LIMIT - totalReadings),
         canGenerateReading: canGenerateAiReading(user, totalReadings).allowed,
+        isOwner,
       };
     }),
 
