@@ -478,3 +478,8 @@
 - [x] Credit pack quick-buy button in Navbar (Zap icon, shown only to logged-in non-premium users)
 - [x] Stripe sandbox activation banner on Pricing page (visible to owner only, links to claim URL)
 - [x] isOwner flag in subscription.status procedure (compares user.openId with ENV.ownerOpenId)
+
+## Navbar & Mobile Menu Polish
+- [x] Localize credit pack Navbar button (CS: "5 výkladů za 49 Kč", EN: "5 readings – €1.99") — already done in previous session
+- [x] Add subscription status badge to mobile hamburger menu (👑 Premium / Free plan)
+- [x] Add upgrade CTA button in mobile drawer footer for non-premium users ("Upgradovat na Premium")

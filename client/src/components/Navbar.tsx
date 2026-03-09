@@ -10,6 +10,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { trpc } from "@/lib/trpc";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,6 +51,13 @@ export default function Navbar() {
   }, [mobileOpen]);
 
   const isActive = (href: string) => location === localePath(href);
+
+  // Subscription status for mobile menu
+  const { data: subStatus } = trpc.subscription.status.useQuery(undefined, {
+    enabled: isAuthenticated,
+    staleTime: 60_000,
+  });
+  const isPremium = subStatus?.isPremium ?? false;
 
   const primaryLinks = [
     { href: "/calculate", label: t.nav.calculateChart, icon: Compass },
@@ -368,9 +376,29 @@ export default function Navbar() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold truncate">{user?.name || t.common.account}</p>
-                  <p className="text-[11px] text-muted-foreground">{locale === "cs" ? "Přihlášen" : "Signed in"}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    {isPremium ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400">
+                        👑 {locale === "cs" ? "Premium" : "Premium"}
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-muted-foreground">{locale === "cs" ? "Free plán" : "Free plan"}</span>
+                    )}
+                  </div>
                 </div>
               </div>
+              {/* Upgrade CTA for non-premium users */}
+              {!isPremium && (
+                <Link href={localePath("/pricing")}>
+                  <button
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors mb-1"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <Zap className="w-4 h-4" />
+                    {locale === "cs" ? "Upgradovat na Premium" : "Upgrade to Premium"}
+                  </button>
+                </Link>
+              )}
               <Link href={localePath("/dashboard")}>
                 <button
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
