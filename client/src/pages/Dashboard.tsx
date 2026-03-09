@@ -122,6 +122,27 @@ export default function Dashboard() {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
+      {/* Stripe Sandbox Activation Notice — owner only */}
+      {subQuery.data?.isOwner && (
+        <div className="fixed top-16 left-0 right-0 z-40 bg-amber-500/95 text-amber-950 text-sm py-2 px-4 flex items-center justify-center gap-3 shadow-lg">
+          <span className="text-base">⚠️</span>
+          <span className="font-medium">
+            {locale === 'cs' ? 'Stripe sandbox není aktivní — ' : 'Stripe sandbox not activated — '}
+          </span>
+          <a
+            href="https://dashboard.stripe.com/claim_sandbox/YWNjdF8xVDZZZVhFbWhjTnpzNmpZLDE3NzM1ODQ5MTEv100cqpryh6Z"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline font-bold hover:text-amber-900"
+          >
+            {locale === 'cs' ? 'Aktivovat testovací prostředí →' : 'Activate test environment →'}
+          </a>
+          <span className="text-xs opacity-70">
+            {locale === 'cs' ? '(platnost do 7. 5. 2026)' : '(expires May 7, 2026)'}
+          </span>
+        </div>
+      )}
+
       <main className="flex-1 pt-24 pb-16">
         <div className="container max-w-5xl">
           {/* Header */}

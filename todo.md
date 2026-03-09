@@ -483,3 +483,12 @@
 - [x] Localize credit pack Navbar button (CS: "5 výkladů za 49 Kč", EN: "5 readings – €1.99") — already done in previous session
 - [x] Add subscription status badge to mobile hamburger menu (👑 Premium / Free plan)
 - [x] Add upgrade CTA button in mobile drawer footer for non-premium users ("Upgradovat na Premium")
+
+## Navbar Compact Fix
+- [x] Remove username text from desktop navbar auth area (icon-only avatar)
+- [x] Ensure all nav items fit on one line without overflow (reduced to 3 primary + 2 dropdowns + Pricing)
+
+## Bug Fixes — Navbar & Stripe Banner
+- [x] Remove orange Stripe sandbox banner from Pricing page — moved to Dashboard (owner-only)
+- [x] Fix Navbar overflow: reduced primary links, credit pack moved to user dropdown, Blog in Explore dropdown
+- [x] Pricing stays at 149 Kč/měs subscription (user confirmed)

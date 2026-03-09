@@ -52,19 +52,18 @@ export default function Navbar() {
 
   const isActive = (href: string) => location === localePath(href);
 
-  // Subscription status for mobile menu
+  // Subscription status
   const { data: subStatus } = trpc.subscription.status.useQuery(undefined, {
     enabled: isAuthenticated,
     staleTime: 60_000,
   });
   const isPremium = subStatus?.isPremium ?? false;
 
+  // Primary nav links — keep short to avoid overflow
   const primaryLinks = [
     { href: "/calculate", label: t.nav.calculateChart, icon: Compass },
     { href: "/encyclopedia", label: locale === "cs" ? "Encyklopedie" : "Encyclopedia", icon: BookOpen },
     { href: "/ai-guide", label: locale === "cs" ? "AI průvodce" : "AI Guide", icon: Bot },
-    { href: "/blog", label: "Blog", icon: BookOpen },
-    { href: "/pricing", label: locale === "cs" ? "Ceník" : "Pricing", icon: CreditCard },
   ];
 
   const toolsLinks = [
@@ -80,24 +79,25 @@ export default function Navbar() {
     { href: "/celebrities", label: t.nav.celebrities, icon: Users, desc: locale === "cs" ? "Mapy známých osobností" : "Charts of famous people" },
     { href: "/iching", label: t.nav.iChing, icon: Hexagon, desc: locale === "cs" ? "I-Ťing orákulum" : "I Ching Oracle" },
     { href: "/incarnation-cross", label: locale === "cs" ? "Inkarnační kříž" : "Incarnation Cross", icon: Target, desc: locale === "cs" ? "Životní poslání a 4 brány kříže" : "Life purpose and 4 gates of the cross" },
+    { href: "/blog", label: "Blog", icon: BookOpen, desc: locale === "cs" ? "Články o Human Design" : "Human Design articles" },
   ];
 
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <nav className="container flex items-center justify-between h-16">
+        <nav className="container flex items-center justify-between h-16 gap-2">
           {/* Logo */}
-          <Link href={localePath("/")} className="flex items-center gap-2 no-underline">
+          <Link href={localePath("/")} className="flex items-center gap-2 no-underline shrink-0">
             <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-primary" />
             </div>
-            <span className="font-serif text-xl font-semibold text-foreground">
+            <span className="font-serif text-xl font-semibold text-foreground hidden sm:block">
               {t.common.appName}
             </span>
           </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-1">
+          {/* Desktop nav — centered */}
+          <div className="hidden lg:flex items-center gap-0.5 flex-1 justify-center">
             {primaryLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <Button
@@ -124,7 +124,7 @@ export default function Navbar() {
                 {toolsLinks.map(link => (
                   <Link key={link.href} href={localePath(link.href)}>
                     <DropdownMenuItem className="cursor-pointer py-2.5">
-                      <link.icon className="w-4 h-4 mr-2.5 text-primary" />
+                      <link.icon className="w-4 h-4 mr-2.5 text-primary shrink-0" />
                       <div>
                         <p className="text-sm font-medium">{link.label}</p>
                         <p className="text-xs text-muted-foreground">{link.desc}</p>
@@ -148,7 +148,7 @@ export default function Navbar() {
                 {exploreLinks.map(link => (
                   <Link key={link.href} href={localePath(link.href)}>
                     <DropdownMenuItem className="cursor-pointer py-2.5">
-                      <link.icon className="w-4 h-4 mr-2.5 text-primary" />
+                      <link.icon className="w-4 h-4 mr-2.5 text-primary shrink-0" />
                       <div>
                         <p className="text-sm font-medium">{link.label}</p>
                         <p className="text-xs text-muted-foreground">{link.desc}</p>
@@ -158,39 +158,62 @@ export default function Navbar() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
 
-          {/* Desktop auth section + language switcher */}
-          <div className="hidden lg:flex items-center gap-2">
-            <LanguageSwitcher />
-            {/* Credit pack quick-buy */}
+            {/* Pricing link */}
             <Link href={localePath("/pricing")}>
               <Button
-                variant="outline"
+                variant={isActive("/pricing") ? "secondary" : "ghost"}
                 size="sm"
-                className="gap-1.5 border-primary/40 text-primary hover:bg-primary/10 font-semibold text-xs px-3"
+                className="text-sm"
               >
-                <Zap className="w-3.5 h-3.5" />
-                {locale === "cs" ? "5 výkladů za 49 Kč" : "5 readings – €1.99"}
+                <CreditCard className="w-4 h-4 mr-1.5" />
+                {locale === "cs" ? "Ceník" : "Pricing"}
               </Button>
             </Link>
+          </div>
+
+          {/* Desktop right section: language + user */}
+          <div className="hidden lg:flex items-center gap-1.5 shrink-0">
+            <LanguageSwitcher />
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2">
+                  <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full" title={user?.name || t.common.account}>
                     <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center">
                       <User className="w-4 h-4 text-primary" />
                     </div>
-                    <span className="text-sm max-w-[120px] truncate">{user?.name || t.common.account}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-popover text-popover-foreground">
+                <DropdownMenuContent align="end" className="w-52 bg-popover text-popover-foreground">
+                  {/* User name + plan badge */}
+                  <div className="px-3 py-2 border-b border-border/50">
+                    <p className="text-sm font-semibold truncate">{user?.name || t.common.account}</p>
+                    {isPremium ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500 mt-0.5">
+                        👑 Premium
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-muted-foreground">{locale === "cs" ? "Free plán" : "Free plan"}</span>
+                    )}
+                  </div>
                   <Link href={localePath("/dashboard")}>
                     <DropdownMenuItem>
                       <LayoutDashboard className="w-4 h-4 mr-2" />
                       {t.common.dashboard}
                     </DropdownMenuItem>
                   </Link>
+                  {/* Credit pack quick-buy — only for non-premium */}
+                  {!isPremium && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <Link href={localePath("/pricing")}>
+                        <DropdownMenuItem className="text-primary focus:text-primary">
+                          <Zap className="w-4 h-4 mr-2" />
+                          {locale === "cs" ? "5 výkladů za 49 Kč" : "5 readings – €1.99"}
+                        </DropdownMenuItem>
+                      </Link>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => logout()}>
                     <LogOut className="w-4 h-4 mr-2" />
@@ -246,7 +269,7 @@ export default function Navbar() {
         role="dialog"
         aria-modal="true"
         aria-label={locale === "cs" ? "Navigační menu" : "Navigation menu"}
-        className="fixed top-0 right-0 bottom-0 z-[70] w-full max-w-sm bg-background shadow-2xl lg:hidden flex flex-col"
+        className="fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm z-[70] bg-background flex flex-col lg:hidden"
         style={{
           transform: mobileOpen ? "translateX(0)" : "translateX(100%)",
           transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -300,6 +323,22 @@ export default function Navbar() {
                 </button>
               </Link>
             ))}
+            {/* Pricing in main section */}
+            <Link href={localePath("/pricing")}>
+              <button
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-colors mb-1 ${
+                  isActive("/pricing")
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground hover:bg-muted"
+                }`}
+                onClick={() => setMobileOpen(false)}
+              >
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive("/pricing") ? "bg-primary/20" : "bg-muted"}`}>
+                  <CreditCard className="w-4 h-4" />
+                </div>
+                <span>{locale === "cs" ? "Ceník" : "Pricing"}</span>
+              </button>
+            </Link>
           </div>
 
           {/* Divider */}
@@ -379,7 +418,7 @@ export default function Navbar() {
                   <div className="flex items-center gap-1.5 mt-0.5">
                     {isPremium ? (
                       <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400">
-                        👑 {locale === "cs" ? "Premium" : "Premium"}
+                        👑 Premium
                       </span>
                     ) : (
                       <span className="text-[11px] text-muted-foreground">{locale === "cs" ? "Free plán" : "Free plan"}</span>
