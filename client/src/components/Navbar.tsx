@@ -58,6 +58,16 @@ export default function Navbar() {
     staleTime: 60_000,
   });
   const isPremium = subStatus?.isPremium ?? false;
+  // Credits: for premium users show ∞, for free users show numeric credits (incl. referral credits)
+  const credits = subStatus?.aiReadingCredits ?? 0;
+  const freeLeft = subStatus?.freeReadingsLeft ?? 0;
+  // Total available readings = free tier left + bonus credits
+  const totalAvailable = isPremium ? null : freeLeft + credits;
+  const creditsLabel = isPremium
+    ? "∞"
+    : totalAvailable !== null
+    ? String(totalAvailable)
+    : null;
 
   // Primary nav links — keep short to avoid overflow
   const primaryLinks = [
@@ -176,6 +186,21 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-1.5 shrink-0">
             <LanguageSwitcher />
             {isAuthenticated ? (
+              <>
+                {/* Credits badge — links to Dashboard subscription tab */}
+                {creditsLabel !== null && (
+                  <Link href={localePath("/dashboard")}>
+                    <button
+                      title={locale === "cs" ? `${creditsLabel === "∞" ? "Neomezené" : creditsLabel} AI výkladů k dispozici` : `${creditsLabel === "∞" ? "Unlimited" : creditsLabel} AI readings available`}
+                      className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold transition-colors
+                        bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20
+                        hover:bg-purple-500/20 hover:border-purple-500/40"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      {creditsLabel}
+                    </button>
+                  </Link>
+                )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full" title={user?.name || t.common.account}>
@@ -221,6 +246,7 @@ export default function Navbar() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              </>
             ) : (
               <a href={getLoginUrl()}>
                 <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
@@ -415,13 +441,19 @@ export default function Navbar() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold truncate">{user?.name || t.common.account}</p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
+                  <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                     {isPremium ? (
                       <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400">
                         👑 Premium
                       </span>
                     ) : (
                       <span className="text-[11px] text-muted-foreground">{locale === "cs" ? "Free plán" : "Free plan"}</span>
+                    )}
+                    {creditsLabel !== null && (
+                      <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                        <Sparkles className="w-2.5 h-2.5" />
+                        {creditsLabel} {locale === "cs" ? "výkladů" : "readings"}
+                      </span>
                     )}
                   </div>
                 </div>

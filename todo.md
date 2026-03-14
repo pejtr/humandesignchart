@@ -511,3 +511,9 @@
 - [x] Add WhatsApp share button to ReferralWidget
 - [x] Add Telegram share button to ReferralWidget
 - [x] Bilingual share text (CS/EN)
+
+## Credits Badge in Navbar
+- [x] Expose aiReadingCredits via tRPC subscription/credits procedure (reused existing subscription.status)
+- [x] Show credits badge next to user avatar in Navbar (logged-in only, desktop + mobile drawer)
+- [x] Clicking badge links to Dashboard subscription tab
+- [x] Bilingual tooltip (CS/EN)
