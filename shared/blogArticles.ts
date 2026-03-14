@@ -89,10 +89,10 @@ Human Design není víra ani dogma — je to experiment. Ra Uru Hu vždy říkal
   },
   {
     slug: "5-typu-human-design",
-    title: "5 typů v Human Design: Který jste vy?",
-    metaTitle: "5 typů v Human Design: Generátor, Projektor, Manifestor, Reflektor | Průvodce",
-    metaDescription: "Poznejte všech 5 typů v Human Design — Generátor, Manifestující Generátor, Projektor, Manifestor a Reflektor. Zjistěte svůj typ a strategii.",
-    excerpt: "V Human Design existuje 5 základních typů, z nichž každý má svou unikátní energetiku, strategii a roli ve světě. Zjistěte, který typ jste vy a jak žít v souladu se svou přirozeností.",
+    title: "5 typů v Human Designu: Který jste vy?",
+    metaTitle: "5 typů v Human Designu: Generátor, Projektor, Manifestor, Reflektor | Průvodce",
+    metaDescription: "Poznejte všech 5 typů v Human Designu — Generátor, Manifestující Generátor, Projektor, Manifestor a Reflektor. Zjištěte svůj typ a strategii.",
+    excerpt: "V Human Designu existuje 5 základních typů, z nichž každý má svou unikátní energetiku, strategii a roli ve světě. Zjištěte, který typ jste vy a jak žít v souladu se svou přirozeností.",
     category: "typy",
     categoryLabel: "Typy",
     readingTime: 10,
@@ -102,7 +102,7 @@ Human Design není víra ani dogma — je to experiment. Ra Uru Hu vždy říkal
     coverIcon: "Users",
     coverImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80",
     tags: ["typy", "generátor", "projektor", "manifestor", "reflektor"],
-    content: `## Pět typů v Human Design
+    content: `## Pět typů v Human Designu
 
 Typ je nejzákladnější informací ve vašem Human Design chartu. Určuje, jak vaše aura interaguje se světem a jaká je vaše správná strategie pro rozhodování. Existuje 5 typů:
 

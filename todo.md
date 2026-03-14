@@ -517,3 +517,8 @@
 - [x] Show credits badge next to user avatar in Navbar (logged-in only, desktop + mobile drawer)
 - [x] Clicking badge links to Dashboard subscription tab
 - [x] Bilingual tooltip (CS/EN)
+
+## UX Enhancements — Credits Badge & Onboarding
+- [ ] Pulse/glow animation on credits badge when count increases
+- [ ] Onboarding tooltip for new users on first login explaining credits badge
+- [ ] Toast warning when only 1 credit remains after starting an AI reading

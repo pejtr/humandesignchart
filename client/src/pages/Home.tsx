@@ -260,7 +260,7 @@ export default function Home() {
   const blogPosts = isCs
     ? [
         { slug: "co-je-human-design", title: "Co je Human Design?", excerpt: "Kompletní průvodce pro začátečníky — zjistěte, jak systém funguje a jak vám může pomoci.", cat: "Základy HD", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8 },
-        { slug: "5-typu-human-design", title: "5 typů v Human Design", excerpt: "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.", cat: "Typy", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10 },
+        { slug: "5-typu-human-design", title: "5 typů v Human Designu", excerpt: "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.", cat: "Typy", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10 },
         { slug: "strategie-v-human-design", title: "Strategie: Klíč ke správným rozhodnutím", excerpt: "Reagovat, informovat, čekat na pozvání — naučte se svou strategii.", cat: "Strategie", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7 },
       ]
     : [
