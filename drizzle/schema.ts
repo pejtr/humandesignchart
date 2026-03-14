@@ -13,6 +13,7 @@ export const users = mysqlTable("users", {
   subscriptionPlan: mysqlEnum("subscriptionPlan", ["monthly", "annual", "none"]).default("none").notNull(),
   subscriptionCurrentPeriodEnd: timestamp("subscriptionCurrentPeriodEnd"),
   aiReadingCredits: int("aiReadingCredits").default(0).notNull(),
+  referralCode: varchar("referralCode", { length: 16 }).unique(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -87,6 +88,18 @@ export const giftVouchers = mysqlTable("giftVouchers", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+export const referrals = mysqlTable("referrals", {
+  id: int("id").autoincrement().primaryKey(),
+  referrerId: int("referrerId").notNull(),       // user who shared the link
+  referredUserId: int("referredUserId").notNull().unique(), // new user who signed up
+  referralCode: varchar("referralCode", { length: 16 }).notNull(),
+  status: mysqlEnum("status", ["pending", "completed"]).default("pending").notNull(),
+  referrerCredited: boolean("referrerCredited").default(false).notNull(),
+  referredCredited: boolean("referredCredited").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -100,3 +113,5 @@ export type SharedChart = typeof sharedCharts.$inferSelect;
 export type InsertSharedChart = typeof sharedCharts.$inferInsert;
 export type GiftVoucher = typeof giftVouchers.$inferSelect;
 export type InsertGiftVoucher = typeof giftVouchers.$inferInsert;
+export type Referral = typeof referrals.$inferSelect;
+export type InsertReferral = typeof referrals.$inferInsert;

@@ -186,6 +186,15 @@ export default function Home() {
   const { t, locale, localePath } = useLanguage();
   const isCs = locale === "cs";
 
+  // Store referral code from URL (?ref=CODE) into localStorage
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref) {
+      localStorage.setItem("pendingReferralCode", ref.toUpperCase());
+    }
+  }, []);
+
   useEffect(() => {
     if (isCs) {
       document.title = "✨ HUMAN DESIGN – Mapa vašeho Já | Odemkněte svůj potenciál! 🔮";

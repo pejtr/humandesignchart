@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useEffect, useState, useMemo } from "react";
 import { Streamdown } from "streamdown";
+import ReferralWidget from "@/components/ReferralWidget";
 
 const typeColors: Record<string, string> = {
   Manifestor: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -539,6 +540,9 @@ export default function Dashboard() {
                   </Button>
                 </Link>
               </div>
+
+              {/* Referral Widget */}
+              <ReferralWidget />
               </div>
           )}
 

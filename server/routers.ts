@@ -11,6 +11,8 @@ import {
   createSharedChart, getSharedChart,
   countAiReadingsByUser, updateUserSubscription, addAiReadingCredits,
   getGiftVoucherByCode, redeemGiftVoucher, createGiftVoucher, getUserById,
+  getUserByReferralCode, setUserReferralCode, createReferral,
+  getReferralByReferredUser, getReferralsByReferrer,
 } from "./db";
 import { getStripe } from "./stripeWebhook";
 import { isPremiumUser, canGenerateAiReading, FREE_TIER } from "./stripeProducts";
@@ -725,6 +727,90 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
         if (voucher.isRedeemed) return { valid: false, reason: "already_redeemed" };
         if (voucher.expiresAt && new Date(voucher.expiresAt) < new Date()) return { valid: false, reason: "expired" };
         return { valid: true, plan: voucher.plan };
+      }),
+  }),
+
+  // ─── Referral Program ──────────────────────────────────────────────────────────────────────────────────────
+  referral: router({
+    // Get or create the current user's referral code + stats
+    getInfo: protectedProcedure.query(async ({ ctx }) => {
+      let user = await getUserById(ctx.user.id);
+      if (!user) throw new Error("User not found");
+
+      // Auto-generate referral code if not set
+      if (!user.referralCode) {
+        const code = crypto.randomBytes(4).toString("hex").toUpperCase();
+        await setUserReferralCode(user.id, code);
+        user = { ...user, referralCode: code };
+      }
+
+      const allReferrals = await getReferralsByReferrer(user.id);
+      const completed = allReferrals.filter(r => r.status === "completed").length;
+      const pending = allReferrals.filter(r => r.status === "pending").length;
+
+      return {
+        referralCode: user.referralCode!,
+        totalInvited: allReferrals.length,
+        completedReferrals: completed,
+        pendingReferrals: pending,
+        creditsEarned: completed,
+      };
+    }),
+
+    // Called after login when a referral code is found in localStorage
+    applyReferral: protectedProcedure
+      .input(z.object({ referralCode: z.string().min(1).max(16) }))
+      .mutation(async ({ ctx, input }) => {
+        const newUser = ctx.user;
+
+        // Check this user hasn't already been referred
+        const existingReferral = await getReferralByReferredUser(newUser.id);
+        if (existingReferral) return { success: false, reason: "already_referred" };
+
+        // Find the referrer
+        const referrer = await getUserByReferralCode(input.referralCode.toUpperCase());
+        if (!referrer) return { success: false, reason: "invalid_code" };
+
+        // Can't refer yourself
+        if (referrer.id === newUser.id) return { success: false, reason: "self_referral" };
+
+        // Create referral record
+        await createReferral({
+          referrerId: referrer.id,
+          referredUserId: newUser.id,
+          referralCode: input.referralCode.toUpperCase(),
+          status: "completed",
+          referrerCredited: true,
+          referredCredited: true,
+          completedAt: new Date(),
+        });
+
+        // Award 1 credit to referrer
+        await addAiReadingCredits(referrer.id, 1);
+
+        // Award 1 credit to new user
+        await addAiReadingCredits(newUser.id, 1);
+
+        // Notify owner
+        try {
+          const { notifyOwner } = await import("./_core/notification");
+          await notifyOwner({
+            title: "New Referral Completed 🎉",
+            content: `${newUser.name || newUser.openId} signed up via referral code ${input.referralCode} from ${referrer.name || referrer.openId}. Both received 1 free reading credit.`,
+          });
+        } catch {}
+
+        return { success: true, creditsAwarded: 1 };
+      }),
+
+    // Validate a referral code (public — used on landing page)
+    validateCode: publicProcedure
+      .input(z.object({ code: z.string() }))
+      .query(async ({ input }) => {
+        if (!input.code) return { valid: false };
+        const referrer = await getUserByReferralCode(input.code.toUpperCase());
+        if (!referrer) return { valid: false };
+        return { valid: true, referrerName: referrer.name || "a friend" };
       }),
   }),
 });

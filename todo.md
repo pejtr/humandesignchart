@@ -492,3 +492,16 @@
 - [x] Remove orange Stripe sandbox banner from Pricing page — moved to Dashboard (owner-only)
 - [x] Fix Navbar overflow: reduced primary links, credit pack moved to user dropdown, Blog in Explore dropdown
 - [x] Pricing stays at 149 Kč/měs subscription (user confirmed)
+
+## Referral Program — "Pozvi příteľe, získej výklad zdarma"
+- [x] DB schema: referrals table (id, referrerId, referredUserId, code, status, createdAt)
+- [x] DB schema: add referralCode column to users table
+- [x] Server procedure: getReferralInfo (user's code, link, stats)
+- [x] Server procedure: applyReferral (called on new user registration with ref= param)
+- [x] Award 1 free AI reading credit to referrer when referred user registers
+- [x] Award 1 free AI reading credit to new user who used a referral link
+- [x] Referral widget in Dashboard (share link, copy button, stats: invited/earned)
+- [x] Referral landing page /refer/:code with welcome message
+- [x] Auto-apply referral code from URL on registration (store in localStorage)
+- [x] Bilingual UI (CS/EN)
+- [x] Tests for referral procedures (8 tests, all passing)

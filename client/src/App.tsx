@@ -8,6 +8,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import Home from "./pages/Home";
 import { lazy, Suspense, useEffect } from "react";
 import HDLoader from "./components/HDLoader";
+import ReferralApplier from "./components/ReferralApplier";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
 const ChartResult = lazy(() => import("./pages/ChartResult"));
@@ -30,6 +31,7 @@ const DailyTransit = lazy(() => import("./pages/DailyTransit"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const PaymentCancel = lazy(() => import("./pages/PaymentCancel"));
+const ReferralLanding = lazy(() => import("./pages/ReferralLanding"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -100,8 +102,20 @@ function LocaleRoutes() {
         <Route path="/:locale/payment/success" component={PaymentSuccess} />
         <Route path="/:locale/payment/cancel" component={PaymentCancel} />
 
+        {/* Referral landing pages */}
+        <Route path="/:locale/refer/:code">
+          {(params: any) => <ReferralLanding code={params.code} />}
+        </Route>
+
         {/* Shared charts (no locale prefix — public links) */}
         <Route path="/shared/:token" component={SharedChart} />
+        {/* Referral without locale prefix */}
+        <Route path="/refer/:code">
+          {(params: any) => {
+            const locale = detectPreferredLocale();
+            return <Redirect to={`/${locale}/refer/${params.code}`} />;
+          }}
+        </Route>
 
         {/* Root redirect */}
         <Route path="/">
@@ -145,6 +159,7 @@ function App() {
         <TooltipProvider>
           <LanguageProvider>
             <Toaster />
+            <ReferralApplier />
             <LocaleRoutes />
           </LanguageProvider>
         </TooltipProvider>
