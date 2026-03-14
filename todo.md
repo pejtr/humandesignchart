@@ -505,3 +505,9 @@
 - [x] Auto-apply referral code from URL on registration (store in localStorage)
 - [x] Bilingual UI (CS/EN)
 - [x] Tests for referral procedures (8 tests, all passing)
+
+## Referral Widget — Social Sharing Buttons
+- [x] Add Facebook share button to ReferralWidget
+- [x] Add WhatsApp share button to ReferralWidget
+- [x] Add Telegram share button to ReferralWidget
+- [x] Bilingual share text (CS/EN)
