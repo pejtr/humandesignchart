@@ -172,10 +172,10 @@ K zjištění svého typu potřebujete přesné datum, čas a místo narození. 
   },
   {
     slug: "strategie-v-human-design",
-    title: "Strategie v Human Design: Klíč ke správným rozhodnutím",
-    metaTitle: "Strategie v Human Design: Reagovat, Informovat, Čekat na pozvání | Průvodce",
-    metaDescription: "Naučte se svou strategii v Human Design. Reagovat, informovat, čekat na pozvání nebo lunární cyklus — klíč ke správným životním rozhodnutím.",
-    excerpt: "Strategie je nejdůležitější praktický nástroj v Human Design. Říká vám, jak správně interagovat se světem a dělat rozhodnutí, která jsou v souladu s vaší přirozeností.",
+    title: "Strategie v Human Designu: Klíč ke správným rozhodnutím",
+    metaTitle: "Strategie v Human Designu: Reagovat, Informovat, Čekat na pozvání | Průvodce",
+    metaDescription: "Naučte se svou strategii v Human Designu. Reagovat, informovat, čekat na pozvání nebo lunární cyklus — klíč ke správným životním rozhodnutím.",
+    excerpt: "Strategie je nejdůležitější praktický nástroj v Human Designu. Říká vám, jak správně interagovat se světem a dělat rozhodnutí, která jsou v souladu s vaší přirozeností.",
     category: "strategie",
     categoryLabel: "Strategie",
     readingTime: 7,
@@ -185,7 +185,7 @@ K zjištění svého typu potřebujete přesné datum, čas a místo narození. 
     coverIcon: "Target",
     coverImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
     tags: ["strategie", "rozhodování", "reagovat", "informovat", "pozvání"],
-    content: `## Co je strategie v Human Design?
+    content: `## Co je strategie v Human Designu?
 
 Strategie je praktický návod, jak správně interagovat se světem na základě vašeho typu. Je to nejdůležitější informace, kterou můžete z Human Design získat, protože přímo ovlivňuje kvalitu vašeho každodenního života.
 
@@ -237,10 +237,10 @@ Nejdůležitější je všímat si, kdy zažíváte svou signaturu (uspokojení,
   },
   {
     slug: "autorita-v-human-design",
-    title: "Autorita v Human Design: Jak dělat správná rozhodnutí",
-    metaTitle: "Autorita v Human Design: Emocionální, Sakrální, Slezinová | Průvodce rozhodování",
-    metaDescription: "Zjistěte svou autoritu v Human Design — emocionální, sakrální, slezinovou, ego, self nebo lunární. Naučte se dělat rozhodnutí v souladu se svou přirozeností.",
-    excerpt: "Autorita v Human Design určuje váš vnitřní rozhodovací mechanismus. Není to mysl — je to tělesná inteligence, která vám říká, co je pro vás správné.",
+    title: "Autorita v Human Designu: Jak dělat správná rozhodnutí",
+    metaTitle: "Autorita v Human Designu: Emocionální, Sakrální, Slezinová | Průvodce rozhodování",
+    metaDescription: "Zjistěte svou autoritu v Human Designu — emocionální, sakrální, slezinovou, ego, self nebo lunární. Naučte se dělat rozhodnutí v souladu se svou přirozeností.",
+    excerpt: "Autorita v Human Designu určuje váš vnitřní rozhodovací mechanismus. Není to mysl — je to tělesná inteligence, která vám říká, co je pro vás správné.",
     category: "autorita",
     categoryLabel: "Autorita",
     readingTime: 9,
@@ -250,7 +250,7 @@ Nejdůležitější je všímat si, kdy zažíváte svou signaturu (uspokojení,
     coverIcon: "Brain",
     coverImage: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=800&q=80",
     tags: ["autorita", "rozhodování", "emocionální", "sakrální", "slezina"],
-    content: `## Co je autorita v Human Design?
+    content: `## Co je autorita v Human Designu?
 
 Autorita je váš vnitřní rozhodovací mechanismus — říká vám, **jak** dělat rozhodnutí. Zatímco strategie říká **kdy** a **jakým způsobem** interagovat se světem, autorita říká, jak poznat, co je pro vás správné.
 
@@ -310,10 +310,10 @@ Nejřidší forma — pro Projektory, kteří nemají žádné definované centr
   },
   {
     slug: "profily-v-human-design",
-    title: "12 profilů v Human Design: Vaše životní role",
-    metaTitle: "12 profilů v Human Design: 1/3, 2/4, 3/5, 4/6 a další | Kompletní průvodce",
-    metaDescription: "Poznejte svůj profil v Human Design. 12 kombinací od 1/3 po 6/2 — zjistěte svou životní roli, způsob učení a interakce se světem.",
-    excerpt: "Profil v Human Design popisuje vaši životní roli — jak se učíte, jak interagujete s ostatními a jaký je váš životní příběh. Existuje 12 profilů, každý s unikátní kombinací dvou linií.",
+    title: "12 profilů v Human Designu: Vaše životní role",
+    metaTitle: "12 profilů v Human Designu: 1/3, 2/4, 3/5, 4/6 a další | Kompletní průvodce",
+    metaDescription: "Poznejte svůj profil v Human Designu. 12 kombinací od 1/3 po 6/2 — zjistěte svou životní roli, způsob učení a interakce se světem.",
+    excerpt: "Profil v Human Designu popisuje vaši životní roli — jak se učíte, jak interagujete s ostatními a jaký je váš životní příběh. Existuje 12 profilů, každý s unikátní kombinací dvou linií.",
     category: "profil",
     categoryLabel: "Profil",
     readingTime: 11,
@@ -323,7 +323,7 @@ Nejřidší forma — pro Projektory, kteří nemají žádné definované centr
     coverIcon: "Fingerprint",
     coverImage: "https://images.unsplash.com/photo-1545987796-200677ee1011?w=800&q=80",
     tags: ["profil", "životní role", "linie", "profily", "design"],
-    content: `## Co je profil v Human Design?
+    content: `## Co je profil v Human Designu?
 
 Profil je kombinace dvou čísel (např. 4/6), která popisuje vaši **životní roli** — jak se učíte, jak interagujete se světem a jaký je váš životní příběh. První číslo je vaše **vědomá** stránka (osobnost), druhé je **nevědomá** (design).
 
@@ -387,9 +387,9 @@ Profil není něco, co „děláte" — je to něco, čím **jste**. Nejdůleži
   },
   {
     slug: "9-center-v-human-design",
-    title: "9 center v Human Design: Definovaná vs. otevřená",
-    metaTitle: "9 center v Human Design: Hlava, Ajna, Hrdlo, G, Srdce, Sakrální, Solar Plexus, Slezina, Kořen",
-    metaDescription: "Poznejte všech 9 center v Human Design bodygraphu. Zjistěte rozdíl mezi definovanými a otevřenými centry a jak ovlivňují váš život.",
+    title: "9 center v Human Designu: Definovaná vs. otevřená",
+    metaTitle: "9 center v Human Designu: Hlava, Ajna, Hrdlo, G, Srdce, Sakrální, Solar Plexus, Slezina, Kořen",
+    metaDescription: "Poznejte všech 9 center v Human Designu bodygraphu. Zjistěte rozdíl mezi definovanými a otevřenými centry a jak ovlivňují váš život.",
     excerpt: "V Human Design bodygraphu je 9 energetických center. Definovaná centra představují vaši konzistentní energii, otevřená centra jsou místa, kde přijímáte a zesilujete energie okolí.",
     category: "centra",
     categoryLabel: "Centra",
@@ -489,8 +489,8 @@ Podívejte se na svá otevřená centra — tam jste nejvíce ovlivňováni okol
   {
     slug: "generator-strategie-reagovat",
     title: "Generátor: Jak správně reagovat na život",
-    metaTitle: "Generátor v Human Design: Strategie reagování | Praktický průvodce",
-    metaDescription: "Jste Generátor v Human Design? Naučte se správně reagovat na život, naslouchat sakrální odezvě a najít práci, která vás naplňuje.",
+    metaTitle: "Generátor v Human Designu: Strategie reagování | Praktický průvodce",
+    metaDescription: "Jste Generátor v Human Designu? Naučte se správně reagovat na život, naslouchat sakrální odezvě a najít práci, která vás naplňuje.",
     excerpt: "Generátoři tvoří 37% populace a jejich strategie je reagovat na život. Jak ale poznat správnou sakrální odezvu? A co dělat, když se cítíte frustrovaní?",
     category: "strategie",
     categoryLabel: "Strategie",
@@ -503,7 +503,7 @@ Podívejte se na svá otevřená centra — tam jste nejvíce ovlivňováni okol
     tags: ["generátor", "reagovat", "sakrální centrum", "strategie"],
     content: `## Generátor a umění reagování
 
-Jako Generátor máte přístup k nejmocnější energii v Human Design — **sakrální energii**. Je to motor, který vám dává vytrvalost, pracovní kapacitu a životní sílu. Ale tato energie má svá pravidla.
+Jako Generátor máte přístup k nejmocnější energii v Human Designu — **sakrální energii**. Je to motor, který vám dává vytrvalost, pracovní kapacitu a životní sílu. Ale tato energie má svá pravidla.
 
 ## Proč neiniciovat?
 
@@ -559,8 +559,8 @@ Správná práce pro Generátora je taková, na kterou reagoval sakrálním „a
   {
     slug: "projektor-cekat-na-pozvani",
     title: "Projektor: Umění čekat na pozvání",
-    metaTitle: "Projektor v Human Design: Strategie čekání na pozvání | Praktický průvodce",
-    metaDescription: "Jste Projektor v Human Design? Naučte se čekat na pozvání, rozpoznat správné uznání a vyhnout se hořkosti. Praktický průvodce pro Projektory.",
+    metaTitle: "Projektor v Human Designu: Strategie čekání na pozvání | Praktický průvodce",
+    metaDescription: "Jste Projektor v Human Designu? Naučte se čekat na pozvání, rozpoznat správné uznání a vyhnout se hořkosti. Praktický průvodce pro Projektory.",
     excerpt: "Projektoři jsou přirození průvodci a vůdci, ale jejich strategie čekání na pozvání bývá nejnáročnější. Jak poznat správné pozvání a co dělat mezitím?",
     category: "strategie",
     categoryLabel: "Strategie",
@@ -701,9 +701,9 @@ Otevřená centra jsou místa, kde jsme nejvíce ovlivňováni partnerem. Pokud 
   },
   {
     slug: "inkarnacni-kriz-zivotni-ucel",
-    title: "Inkarnační kříž: Váš životní účel v Human Design",
-    metaTitle: "Inkarnační kříž v Human Design: Životní účel a poslání | Průvodce",
-    metaDescription: "Zjistěte, co je inkarnační kříž v Human Design a jak odhaluje váš životní účel. Pravý úhlový, levý úhlový a juxtapoziční kříž vysvětleny.",
+    title: "Inkarnační kříž: Váš životní účel v Human Designu",
+    metaTitle: "Inkarnační kříž v Human Designu: Životní účel a poslání | Průvodce",
+    metaDescription: "Zjistěte, co je inkarnační kříž v Human Designu a jak odhaluje váš životní účel. Pravý úhlový, levý úhlový a juxtapoziční kříž vysvětleny.",
     excerpt: "Inkarnační kříž je nejhlubší vrstvou Human Design — odhaluje váš životní účel a téma, se kterým jste přišli na svět. Zjistěte, co váš kříž znamená.",
     category: "zaklady",
     categoryLabel: "Základy HD",
@@ -759,7 +759,7 @@ Podívejte se na brány svého inkarnačního kříže a přečtěte si jejich p
   {
     slug: "jak-cist-bodygraph",
     title: "Jak číst bodygraph: Průvodce vaší energetickou mapou",
-    metaTitle: "Jak číst bodygraph v Human Design: Centra, kanály, brány | Průvodce pro začátečníky",
+    metaTitle: "Jak číst bodygraph v Human Designu: Centra, kanály, brány | Průvodce pro začátečníky",
     metaDescription: "Naučte se číst svůj Human Design bodygraph krok za krokem. Centra, kanály, brány, aktivace — kompletní průvodce pro začátečníky.",
     excerpt: "Bodygraph je vizuální mapa vaší energetiky. Naučte se ho číst krok za krokem — od center přes kanály až po jednotlivé brány a jejich aktivace.",
     category: "zaklady",

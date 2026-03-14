@@ -522,3 +522,8 @@
 - [ ] Pulse/glow animation on credits badge when count increases
 - [ ] Onboarding tooltip for new users on first login explaining credits badge
 - [ ] Toast warning when only 1 credit remains after starting an AI reading
+
+## Blog Improvements — SEO & Content
+- [x] Audit all blog articles for grammatical errors — fixed 27 occurrences of "v Human Design" → "v Human Designu" (Czech locative)
+- [x] Authority article already existed in DB with correct content; grammar now fixed
+- [x] Implement JSON-LD structured data: enhanced Article schema + BreadcrumbList (image, keywords, wordCount, inLanguage, url, publisher logo)

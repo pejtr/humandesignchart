@@ -69,20 +69,58 @@ export default function BlogArticle() {
         jsonLd.setAttribute("data-blog-jsonld", "true");
         document.head.appendChild(jsonLd);
       }
-      jsonLd.textContent = JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Article",
-        headline: article.title,
-        description: article.metaDescription,
-        datePublished: article.publishedAt,
-        dateModified: article.updatedAt,
-        author: { "@type": "Organization", name: "Human Design Chart" },
-        publisher: { "@type": "Organization", name: "Human Design Chart" },
-        mainEntityOfPage: {
-          "@type": "WebPage",
-          "@id": `https://humandesignchart.app/${locale}/blog/${article.slug}`,
+      const articleUrl = `https://humandesignchart.app/${locale}/blog/${article.slug}`;
+      const wordCount = article.content ? article.content.split(/\s+/).length : 0;
+      const structuredData = [
+        {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: article.title,
+          description: article.metaDescription,
+          datePublished: article.publishedAt,
+          dateModified: article.updatedAt,
+          inLanguage: locale === 'cs' ? 'cs-CZ' : 'en-US',
+          wordCount,
+          keywords: article.tags?.join(', ') ?? '',
+          author: {
+            "@type": "Organization",
+            name: "Human Design Chart",
+            url: "https://humandesignchart.app",
+          },
+          publisher: {
+            "@type": "Organization",
+            name: "Human Design Chart",
+            url: "https://humandesignchart.app",
+            logo: {
+              "@type": "ImageObject",
+              url: "https://humandesignchart.app/favicon.ico",
+            },
+          },
+          ...(article.coverImage ? {
+            image: {
+              "@type": "ImageObject",
+              url: article.coverImage,
+              width: 800,
+              height: 450,
+            },
+          } : {}),
+          mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": articleUrl,
+          },
+          url: articleUrl,
         },
-      });
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: `https://humandesignchart.app/${locale}` },
+            { "@type": "ListItem", position: 2, name: locale === 'cs' ? 'Blog' : 'Blog', item: `https://humandesignchart.app/${locale}/blog` },
+            { "@type": "ListItem", position: 3, name: article.title, item: articleUrl },
+          ],
+        },
+      ];
+      jsonLd.textContent = JSON.stringify(structuredData);
     }
     return () => {
       const el = document.querySelector('script[data-blog-jsonld]');
