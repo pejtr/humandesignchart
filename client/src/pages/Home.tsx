@@ -362,38 +362,35 @@ export default function Home() {
             </h2>
           </motion.div>
 
-          <div className="flex md:grid md:grid-cols-5 gap-4 md:gap-8 mb-12 max-w-5xl mx-auto overflow-x-auto pb-2 md:overflow-visible md:pb-0 snap-x snap-mandatory md:snap-none">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 max-w-6xl mx-auto">
             {typesData.map((tp, i) => (
               <motion.div
                 key={tp.name}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.4 }}
-                className="flex flex-col items-center gap-3 flex-shrink-0 w-40 md:w-auto snap-center"
+                transition={{ delay: i * 0.1, duration: 0.45 }}
+                className={`rounded-2xl border overflow-hidden flex flex-col ${tp.color} shadow-sm hover:shadow-md transition-shadow`}
               >
-                <div className="w-full aspect-[3/4] flex items-center justify-center">
-                  <img src={tp.imgUrl} alt={tp.displayName} className="w-full h-full object-contain drop-shadow-sm" loading="lazy" />
+                {/* Image */}
+                <div className="w-full aspect-[3/4] flex items-center justify-center bg-white/60 px-4 pt-4">
+                  <img
+                    src={tp.imgUrl}
+                    alt={tp.displayName}
+                    className="w-full h-full object-contain drop-shadow-sm"
+                    loading="lazy"
+                  />
                 </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 max-w-5xl mx-auto">
-            {typesData.map((tp, i) => (
-              <motion.div
-                key={tp.name}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08, duration: 0.4 }}
-                className={`rounded-xl p-4 border text-center ${tp.color}`}
-              >
-                <p className="text-[10px] md:text-xs font-bold tracking-widest text-center whitespace-pre-line leading-tight mb-2" style={{ color: '#555' }}>{tp.displayName}</p>
-                <p className={`text-2xl md:text-3xl font-bold leading-none mb-1 ${tp.pctColor}`}>{tp.pct}</p>
-                <p className="text-[10px] text-muted-foreground mb-2">{tp.label}</p>
-                <p className="text-xs text-muted-foreground leading-snug mb-1">{tp.role}</p>
-                <p className="text-[11px] text-muted-foreground leading-snug italic">{tp.strategy}</p>
+                {/* Info */}
+                <div className="p-4 text-center flex flex-col gap-1">
+                  <p className="text-[10px] md:text-xs font-bold tracking-widest whitespace-pre-line leading-tight" style={{ color: '#555' }}>
+                    {tp.displayName}
+                  </p>
+                  <p className={`text-2xl font-bold leading-none ${tp.pctColor}`}>{tp.pct}</p>
+                  <p className="text-[10px] text-muted-foreground">{tp.label}</p>
+                  <p className="text-xs text-muted-foreground leading-snug mt-1">{tp.role}</p>
+                  <p className="text-[11px] text-muted-foreground leading-snug italic">{tp.strategy}</p>
+                </div>
               </motion.div>
             ))}
           </div>

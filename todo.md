@@ -527,3 +527,11 @@
 - [x] Audit all blog articles for grammatical errors — fixed 27 occurrences of "v Human Design" → "v Human Designu" (Czech locative)
 - [x] Authority article already existed in DB with correct content; grammar now fixed
 - [x] Implement JSON-LD structured data: enhanced Article schema + BreadcrumbList (image, keywords, wordCount, inLanguage, url, publisher logo)
+
+## Internal Linking — SEO
+- [ ] Update markdown renderer in BlogArticle.tsx to support [text](url) links
+- [ ] Add internal links to all CS blog articles (blogArticles.ts)
+- [ ] Add internal links to key EN blog articles (blogArticlesEn.ts)
+
+## Homepage Types Section
+- [x] Replace sliding carousel with static 5-card grid (image + description together per card)
