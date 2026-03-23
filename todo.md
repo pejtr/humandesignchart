@@ -535,3 +535,6 @@
 
 ## Homepage Types Section
 - [x] Replace sliding carousel with static 5-card grid (image + description together per card)
+
+## Homepage Types Grid Fix
+- [x] Fix desktop grid: 5 cards side by side — changed to grid-cols-2 mobile / md:grid-cols-5 desktop, square aspect ratio

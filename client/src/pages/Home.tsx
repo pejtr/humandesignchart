@@ -362,7 +362,7 @@ export default function Home() {
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-5xl mx-auto">
             {typesData.map((tp, i) => (
               <motion.div
                 key={tp.name}
@@ -373,7 +373,7 @@ export default function Home() {
                 className={`rounded-2xl border overflow-hidden flex flex-col ${tp.color} shadow-sm hover:shadow-md transition-shadow`}
               >
                 {/* Image */}
-                <div className="w-full aspect-[3/4] flex items-center justify-center bg-white/60 px-4 pt-4">
+                <div className="w-full aspect-square flex items-center justify-center bg-white/60 px-3 pt-3">
                   <img
                     src={tp.imgUrl}
                     alt={tp.displayName}
