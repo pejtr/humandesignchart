@@ -107,12 +107,12 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[90] flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)" }}
+      className="fixed inset-0 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(8px)", zIndex: 99999 }}
     >
       <div
         className="relative w-full max-w-md bg-background rounded-2xl shadow-2xl overflow-hidden"
-        style={{ animation: "fadeSlideUp 0.35s ease-out" }}
+        style={{ animation: "fadeSlideUp 0.35s ease-out", zIndex: 100000 }}
       >
         {/* Close button */}
         <button
