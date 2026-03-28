@@ -230,6 +230,18 @@ export default function ChartResult() {
 
   const handleAiReading = (type: string) => {
     if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+    // Low-credit warning toast
+    if (subStatus && !subStatus.isPremium) {
+      const totalLeft = (subStatus.freeReadingsLeft ?? 0) + (subStatus.aiReadingCredits ?? 0);
+      if (totalLeft === 1) {
+        toast.warning(
+          locale === "cs"
+            ? "⚠️ Poslední výklad! Po tomto výkladu bude potřeba dobrít kredity nebo upgradovat na Premium."
+            : "⚠️ Last reading! After this you'll need to top up credits or upgrade to Premium.",
+          { duration: 5000 }
+        );
+      }
+    }
     // Abort any existing stream
     if (streamAbortRef.current) streamAbortRef.current.abort();
     setAiReading(null);

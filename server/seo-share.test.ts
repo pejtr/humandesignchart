@@ -114,15 +114,15 @@ describe("Sitemap and SEO", () => {
     const xml = await response.text();
     expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>');
     expect(xml).toContain("<urlset");
-    expect(xml).toContain("https://human-design.manus.space/");
+    expect(xml).toContain("https://humandesignchart.app/");
     // Bilingual URLs with /cs/ and /en/ prefixes
-    expect(xml).toContain("https://human-design.manus.space/cs/calculate");
-    expect(xml).toContain("https://human-design.manus.space/en/calculate");
-    expect(xml).toContain("https://human-design.manus.space/cs/types/generator");
-    expect(xml).toContain("https://human-design.manus.space/en/types/generator");
-    expect(xml).toContain("https://human-design.manus.space/cs/types/manifesting-generator");
-    expect(xml).toContain("https://human-design.manus.space/en/types/reflector");
-    expect(xml).toContain("https://human-design.manus.space/cs/encyclopedia");
+    expect(xml).toContain("https://humandesignchart.app/cs/calculate");
+    expect(xml).toContain("https://humandesignchart.app/en/calculate");
+    expect(xml).toContain("https://humandesignchart.app/cs/types/generator");
+    expect(xml).toContain("https://humandesignchart.app/en/types/generator");
+    expect(xml).toContain("https://humandesignchart.app/cs/types/manifesting-generator");
+    expect(xml).toContain("https://humandesignchart.app/en/types/reflector");
+    expect(xml).toContain("https://humandesignchart.app/cs/encyclopedia");
     // hreflang alternates
     expect(xml).toContain('xhtml:link rel="alternate" hreflang="cs"');
     expect(xml).toContain('xhtml:link rel="alternate" hreflang="en"');
@@ -136,6 +136,6 @@ describe("Sitemap and SEO", () => {
     expect(text).toContain("User-agent: *");
     expect(text).toContain("Allow: /");
     expect(text).toContain("Disallow: /api/");
-    expect(text).toContain("Sitemap: https://human-design.manus.space/sitemap.xml");
+    expect(text).toContain("Sitemap: https://humandesignchart.app/sitemap.xml");
   });
 });

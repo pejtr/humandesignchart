@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import { lazy, Suspense, useEffect } from "react";
 import HDLoader from "./components/HDLoader";
 import ReferralApplier from "./components/ReferralApplier";
+import WelcomeModal, { useWelcomeModal } from "./components/WelcomeModal";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
 const ChartResult = lazy(() => import("./pages/ChartResult"));
@@ -152,6 +153,12 @@ function LocaleRoutes() {
   );
 }
 
+function WelcomeModalWrapper() {
+  const { shouldShow, dismiss } = useWelcomeModal();
+  if (!shouldShow) return null;
+  return <WelcomeModal onClose={dismiss} />;
+}
+
 function App() {
   return (
     <ErrorBoundary>
@@ -160,6 +167,7 @@ function App() {
           <LanguageProvider>
             <Toaster />
             <ReferralApplier />
+            <WelcomeModalWrapper />
             <LocaleRoutes />
           </LanguageProvider>
         </TooltipProvider>

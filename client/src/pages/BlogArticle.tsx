@@ -55,16 +55,62 @@ export default function BlogArticle() {
   // Also fetch article list for "related articles" sidebar
   const { data: listData } = trpc.blog.list.useQuery({ locale });
 
+  // Helper to upsert a <meta> tag
+  function setMeta(selector: string, attr: string, value: string) {
+    let el = document.querySelector(selector);
+    if (el) {
+      el.setAttribute(attr, value);
+    } else {
+      el = document.createElement("meta");
+      const parts = selector.match(/\[([^=]+)=["']([^"']+)["']\]/);
+      if (parts) {
+        el.setAttribute(parts[1], parts[2]);
+      }
+      el.setAttribute(attr, value);
+      el.setAttribute("data-blog-meta", "true");
+      document.head.appendChild(el);
+    }
+  }
+
   useEffect(() => {
     if (article) {
+      const articleUrl = `https://humandesignchart.app/${locale}/blog/${article.slug}`;
       document.title = article.metaTitle;
-      let metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) metaDesc.setAttribute("content", article.metaDescription);
-      else {
-        metaDesc = document.createElement("meta");
-        (metaDesc as HTMLMetaElement).name = "description";
-        (metaDesc as HTMLMetaElement).content = article.metaDescription;
-        document.head.appendChild(metaDesc);
+
+      // Standard meta
+      setMeta('meta[name="description"]', "content", article.metaDescription);
+
+      // Open Graph meta tags
+      setMeta('meta[property="og:title"]', "content", article.metaTitle);
+      setMeta('meta[property="og:description"]', "content", article.metaDescription);
+      setMeta('meta[property="og:type"]', "content", "article");
+      setMeta('meta[property="og:url"]', "content", articleUrl);
+      setMeta('meta[property="og:locale"]', "content", locale === 'cs' ? 'cs_CZ' : 'en_US');
+      if (article.coverImage) {
+        setMeta('meta[property="og:image"]', "content", article.coverImage);
+        setMeta('meta[property="og:image:width"]', "content", "800");
+        setMeta('meta[property="og:image:height"]', "content", "450");
+        setMeta('meta[property="og:image:alt"]', "content", article.title);
+      }
+
+      // Twitter Card
+      setMeta('meta[name="twitter:card"]', "content", "summary_large_image");
+      setMeta('meta[name="twitter:title"]', "content", article.metaTitle);
+      setMeta('meta[name="twitter:description"]', "content", article.metaDescription);
+      if (article.coverImage) {
+        setMeta('meta[name="twitter:image"]', "content", article.coverImage);
+      }
+
+      // Canonical URL
+      let canonical = document.querySelector('link[rel="canonical"]');
+      if (canonical) {
+        canonical.setAttribute("href", articleUrl);
+      } else {
+        canonical = document.createElement("link");
+        canonical.setAttribute("rel", "canonical");
+        canonical.setAttribute("href", articleUrl);
+        canonical.setAttribute("data-blog-meta", "true");
+        document.head.appendChild(canonical);
       }
       let jsonLd = document.querySelector('script[data-blog-jsonld]');
       if (!jsonLd) {
@@ -73,7 +119,6 @@ export default function BlogArticle() {
         jsonLd.setAttribute("data-blog-jsonld", "true");
         document.head.appendChild(jsonLd);
       }
-      const articleUrl = `https://humandesignchart.app/${locale}/blog/${article.slug}`;
       const wordCount = article.content ? article.content.split(/\s+/).length : 0;
       const structuredData = [
         {

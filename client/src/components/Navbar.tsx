@@ -69,6 +69,20 @@ export default function Navbar() {
     ? String(totalAvailable)
     : null;
 
+  // Pulse animation when credits increase
+  const prevCreditsRef = useRef<number | null>(null);
+  const [creditsPulse, setCreditsPulse] = useState(false);
+  useEffect(() => {
+    if (totalAvailable !== null && prevCreditsRef.current !== null && totalAvailable > prevCreditsRef.current) {
+      setCreditsPulse(true);
+      const timer = setTimeout(() => setCreditsPulse(false), 1500);
+      return () => clearTimeout(timer);
+    }
+    if (totalAvailable !== null) {
+      prevCreditsRef.current = totalAvailable;
+    }
+  }, [totalAvailable]);
+
   // Primary nav links — keep short to avoid overflow
   const primaryLinks = [
     { href: "/calculate", label: t.nav.calculateChart, icon: Compass },
@@ -192,11 +206,12 @@ export default function Navbar() {
                   <Link href={localePath("/dashboard")}>
                     <button
                       title={locale === "cs" ? `${creditsLabel === "∞" ? "Neomezené" : creditsLabel} AI výkladů k dispozici` : `${creditsLabel === "∞" ? "Unlimited" : creditsLabel} AI readings available`}
-                      className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold transition-colors
+                      className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold transition-all
                         bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20
-                        hover:bg-purple-500/20 hover:border-purple-500/40"
+                        hover:bg-purple-500/20 hover:border-purple-500/40
+                        ${creditsPulse ? 'ring-2 ring-purple-400 ring-offset-1 scale-110 bg-purple-500/20' : ''}`}
                     >
-                      <Sparkles className="w-3 h-3" />
+                      <Sparkles className={`w-3 h-3 ${creditsPulse ? 'animate-spin' : ''}`} />
                       {creditsLabel}
                     </button>
                   </Link>
@@ -450,8 +465,8 @@ export default function Navbar() {
                       <span className="text-[11px] text-muted-foreground">{locale === "cs" ? "Free plán" : "Free plan"}</span>
                     )}
                     {creditsLabel !== null && (
-                      <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/20">
-                        <Sparkles className="w-2.5 h-2.5" />
+                      <span className={`inline-flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/20 transition-all ${creditsPulse ? 'ring-1 ring-purple-400 scale-110' : ''}`}>
+                        <Sparkles className={`w-2.5 h-2.5 ${creditsPulse ? 'animate-spin' : ''}`} />
                         {creditsLabel} {locale === "cs" ? "výkladů" : "readings"}
                       </span>
                     )}

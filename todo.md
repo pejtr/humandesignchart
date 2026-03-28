@@ -519,9 +519,9 @@
 - [x] Bilingual tooltip (CS/EN)
 
 ## UX Enhancements — Credits Badge & Onboarding
-- [ ] Pulse/glow animation on credits badge when count increases
-- [ ] Onboarding tooltip for new users on first login explaining credits badge
-- [ ] Toast warning when only 1 credit remains after starting an AI reading
+- [x] Pulse/glow animation on credits badge when count increases (ring + scale + spin icon)
+- [x] Welcome modal for new users on first visit (3-step: gift credit, how to start, daily rewards)
+- [x] Toast warning when only 1 credit remains after starting an AI reading (ChartResult + bilingual)
 
 ## Blog Improvements — SEO & Content
 - [x] Audit all blog articles for grammatical errors — fixed 27 occurrences of "v Human Design" → "v Human Designu" (Czech locative)
@@ -529,9 +529,19 @@
 - [x] Implement JSON-LD structured data: enhanced Article schema + BreadcrumbList (image, keywords, wordCount, inLanguage, url, publisher logo)
 
 ## Internal Linking — SEO
-- [ ] Update markdown renderer in BlogArticle.tsx to support [text](url) links
+- [x] Markdown renderer in BlogArticle.tsx supports [text](/path) internal links and [text](https://...) external links
 - [ ] Add internal links to all CS blog articles (blogArticles.ts)
 - [ ] Add internal links to key EN blog articles (blogArticlesEn.ts)
+
+## SEO — Canonical URLs & Open Graph
+- [x] Canonical URL updated to humandesignchart.app (was human-design.manus.space)
+- [x] hreflang: CS → humandesignmapa.cz, EN → humandesignchart.app
+- [x] Sitemap.xml base URL updated to humandesignchart.app
+- [x] robots.txt sitemap reference updated to humandesignchart.app
+- [x] Blog articles: Open Graph meta tags (og:title, og:description, og:image, og:url, og:type)
+- [x] Blog articles: Twitter Card meta tags per article
+- [x] Blog articles: canonical URL set per article page
+- [x] schema.org WebApplication URL updated to humandesignchart.app
 
 ## Homepage Types Section
 - [x] Replace sliding carousel with static 5-card grid (image + description together per card)
