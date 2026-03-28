@@ -105,6 +105,11 @@ export const en = {
     birthTimeNote: "Exact birth time is crucial for an accurate calculation. Check your birth certificate.",
     timezoneNote: "Timezone",
     coordinates: "Coordinates",
+    birthDataTitle: "Birth Data",
+    manualCoordinates: "Or enter coordinates manually:",
+    latitude: "Latitude",
+    longitude: "Longitude",
+    utcOffset: "UTC Offset",
   },
 
   // ─── Chart Result ─────────────────────────────────────────────────────

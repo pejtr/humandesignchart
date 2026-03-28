@@ -105,6 +105,11 @@ export const cs = {
     birthTimeNote: "Přesný čas narození je klíčový pro správný výpočet. Zkontrolujte rodný list.",
     timezoneNote: "Časové pásmo",
     coordinates: "Souřadnice",
+    birthDataTitle: "Údaje o narození",
+    manualCoordinates: "Nebo zadejte souřadnice ručně:",
+    latitude: "Zeměpisná šířka",
+    longitude: "Zeměpisná délka",
+    utcOffset: "Posun UTC",
   },
 
   // ─── Chart Result ─────────────────────────────────────────────────────

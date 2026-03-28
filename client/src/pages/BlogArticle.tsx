@@ -346,12 +346,19 @@ export default function BlogArticle() {
               ? "Calculate your free energy map and get a personalized AI reading."
               : "Vypočítejte si svou energetickou mapu zdarma a získejte personalizovaný AI rozbor."}
           </p>
-          <Link href={localePath("/calculate")}>
-            <Button size="lg" className="bg-primary text-primary-foreground">
-              <Compass className="w-5 h-5 mr-2" />
-              {isEn ? "Create My Free Chart" : "Vytvořit moji mapu zdarma"}
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href={localePath("/calculate")}>
+              <Button size="lg" className="bg-primary text-primary-foreground">
+                <Compass className="w-5 h-5 mr-2" />
+                {isEn ? "Create My Free Chart" : "Vytvořit moji mapu zdarma"}
+              </Button>
+            </Link>
+            <Link href={localePath("/dashboard?tab=subscription")}>
+              <Button size="lg" variant="outline" className="border-primary/40 text-primary hover:bg-primary/5">
+                {isEn ? "Invite a friend → free reading" : "Pozvat příteľe → výklad zdarma"}
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

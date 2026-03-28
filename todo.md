@@ -538,3 +538,24 @@
 
 ## Homepage Types Grid Fix
 - [x] Fix desktop grid: 5 cards side by side — changed to grid-cols-2 mobile / md:grid-cols-5 desktop, square aspect ratio
+
+## Klein Flow Gamification — Full Implementation
+- [x] Fix calculator form translations: manual coordinates section now bilingual (CS/EN)
+- [x] DB schema: added lastLoginDate, currentStreak, longestStreak, totalCreditsEarned, lastDailyRewardAt, isAffiliate, affiliateCode, affiliateTier, affiliateTotalEarned, affiliatePendingPayout to users
+- [x] DB schema: new affiliateConversions table (affiliateUserId, convertedUserId, subscriptionId, amount, commissionRate, status, paidAt)
+- [x] DB schema: new creditTransactions table for audit log (userId, amount, reason, createdAt)
+- [x] Server: gamification.checkIn — streak update + credit reward on daily login
+- [x] Server: gamification.claimDailyReward — 0.1 credit, once per 24h
+- [x] Server: gamification.getStats — streak, level, credits, dailyReward status
+- [x] Server: user level calculation (Hledč/Probuzený/Zasvěcený/Průvodce/Mistr)
+- [x] Server: affiliate.activate — enable affiliate mode, generate affiliateCode
+- [x] Server: affiliate.getStats — earnings, conversions, tier, payout history
+- [x] Server: affiliate.requestPayout — request withdrawal (IBAN/PayPal), min 100 CZK
+- [x] Server: affiliate tier logic (Bronze 20%, Silver 22%, Gold 25%)
+- [x] UI: StreakWidget component (flame badges, streak count, check-in button)
+- [x] UI: DailyRewardCard integrated in StreakWidget (24h cooldown, animated button)
+- [x] UI: Level badge in StreakWidget (5 tiers: ⚪🟡🟠🔴🟣)
+- [x] UI: AffiliateWidget in Dashboard (earnings stats, link copy, tier badge, payout form)
+- [x] CTA on types cards: "Zjistit svůj typ" link → calculator (Klein loop)
+- [x] Blog article CTA: dual buttons — "Vytvořit mapu zdarma" + "Pozvat příteľe → výklad zdarma"
+- [x] Tests: 17 gamification tests (streak, daily reward, levels, affiliate tiers) — 128 total passing

@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, float } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -14,6 +14,19 @@ export const users = mysqlTable("users", {
   subscriptionCurrentPeriodEnd: timestamp("subscriptionCurrentPeriodEnd"),
   aiReadingCredits: int("aiReadingCredits").default(0).notNull(),
   referralCode: varchar("referralCode", { length: 16 }).unique(),
+  // Gamification
+  currentStreak: int("currentStreak").default(0).notNull(),
+  longestStreak: int("longestStreak").default(0).notNull(),
+  lastLoginDate: varchar("lastLoginDate", { length: 10 }), // YYYY-MM-DD
+  lastDailyRewardAt: timestamp("lastDailyRewardAt"),
+  level: mysqlEnum("level", ["searcher", "awakened", "initiated", "guide", "master"]).default("searcher").notNull(),
+  totalCreditsEarned: int("totalCreditsEarned").default(0).notNull(),
+  // Affiliate
+  isAffiliate: boolean("isAffiliate").default(false).notNull(),
+  affiliateCode: varchar("affiliateCode", { length: 16 }).unique(),
+  affiliateTier: mysqlEnum("affiliateTier", ["bronze", "silver", "gold"]).default("bronze").notNull(),
+  affiliateTotalEarned: float("affiliateTotalEarned").default(0).notNull(),
+  affiliatePendingPayout: float("affiliatePendingPayout").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -90,14 +103,52 @@ export const giftVouchers = mysqlTable("giftVouchers", {
 
 export const referrals = mysqlTable("referrals", {
   id: int("id").autoincrement().primaryKey(),
-  referrerId: int("referrerId").notNull(),       // user who shared the link
-  referredUserId: int("referredUserId").notNull().unique(), // new user who signed up
+  referrerId: int("referrerId").notNull(),
+  referredUserId: int("referredUserId").notNull().unique(),
   referralCode: varchar("referralCode", { length: 16 }).notNull(),
   status: mysqlEnum("status", ["pending", "completed"]).default("pending").notNull(),
   referrerCredited: boolean("referrerCredited").default(false).notNull(),
   referredCredited: boolean("referredCredited").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   completedAt: timestamp("completedAt"),
+});
+
+// ─── Gamification ─────────────────────────────────────────────────────────────
+
+export const creditTransactions = mysqlTable("creditTransactions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  amount: int("amount").notNull(), // positive = earned, negative = spent
+  reason: varchar("reason", { length: 100 }).notNull(), // 'daily_reward', 'streak_bonus', 'referral', 'affiliate', 'reading_spent', 'registration', 'share'
+  metadata: json("metadata"), // extra context (e.g. streakDay, affiliateConversionId)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// ─── Affiliate ────────────────────────────────────────────────────────────────
+
+export const affiliateConversions = mysqlTable("affiliateConversions", {
+  id: int("id").autoincrement().primaryKey(),
+  affiliateUserId: int("affiliateUserId").notNull(),
+  convertedUserId: int("convertedUserId").notNull(),
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 64 }),
+  amount: float("amount").notNull(), // subscription amount in CZK
+  commissionRate: float("commissionRate").notNull(), // 0.20 = 20%
+  commissionAmount: float("commissionAmount").notNull(),
+  status: mysqlEnum("status", ["pending", "paid", "cancelled"]).default("pending").notNull(),
+  paidAt: timestamp("paidAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const affiliatePayouts = mysqlTable("affiliatePayouts", {
+  id: int("id").autoincrement().primaryKey(),
+  affiliateUserId: int("affiliateUserId").notNull(),
+  amount: float("amount").notNull(),
+  paymentMethod: mysqlEnum("paymentMethod", ["bank_transfer", "paypal"]).default("bank_transfer").notNull(),
+  paymentDetails: text("paymentDetails"), // IBAN or PayPal email (encrypted at app level)
+  status: mysqlEnum("status", ["requested", "processing", "paid", "rejected"]).default("requested").notNull(),
+  note: text("note"),
+  processedAt: timestamp("processedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
 // Types
@@ -115,3 +166,9 @@ export type GiftVoucher = typeof giftVouchers.$inferSelect;
 export type InsertGiftVoucher = typeof giftVouchers.$inferInsert;
 export type Referral = typeof referrals.$inferSelect;
 export type InsertReferral = typeof referrals.$inferInsert;
+export type CreditTransaction = typeof creditTransactions.$inferSelect;
+export type InsertCreditTransaction = typeof creditTransactions.$inferInsert;
+export type AffiliateConversion = typeof affiliateConversions.$inferSelect;
+export type InsertAffiliateConversion = typeof affiliateConversions.$inferInsert;
+export type AffiliatePayout = typeof affiliatePayouts.$inferSelect;
+export type InsertAffiliatePayout = typeof affiliatePayouts.$inferInsert;

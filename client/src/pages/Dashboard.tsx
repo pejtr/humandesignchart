@@ -22,6 +22,8 @@ import {
 import { useEffect, useState, useMemo } from "react";
 import { Streamdown } from "streamdown";
 import ReferralWidget from "@/components/ReferralWidget";
+import { StreakWidget } from "@/components/StreakWidget";
+import { AffiliateWidget } from "@/components/AffiliateWidget";
 
 const typeColors: Record<string, string> = {
   Manifestor: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -541,8 +543,14 @@ export default function Dashboard() {
                 </Link>
               </div>
 
+              {/* Gamification: Streak & Daily Reward */}
+              <StreakWidget />
+
               {/* Referral Widget */}
               <ReferralWidget />
+
+              {/* Affiliate Widget */}
+              <AffiliateWidget />
               </div>
           )}
 

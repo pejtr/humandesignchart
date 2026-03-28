@@ -13,6 +13,10 @@ import {
   getGiftVoucherByCode, redeemGiftVoucher, createGiftVoucher, getUserById,
   getUserByReferralCode, setUserReferralCode, createReferral,
   getReferralByReferredUser, getReferralsByReferrer,
+  processStreakCheckIn, claimDailyReward, calculateUserLevel,
+  addCreditsWithLog, activateAffiliate, getUserByAffiliateCode,
+  createAffiliateConversion, getAffiliateConversions,
+  createAffiliatePayout, getAffiliatePayouts,
 } from "./db";
 import { getStripe } from "./stripeWebhook";
 import { isPremiumUser, canGenerateAiReading, FREE_TIER } from "./stripeProducts";
@@ -803,7 +807,7 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
         return { success: true, creditsAwarded: 1 };
       }),
 
-    // Validate a referral code (public — used on landing page)
+     // Validate a referral code (public — used on landing page)
     validateCode: publicProcedure
       .input(z.object({ code: z.string() }))
       .query(async ({ input }) => {
@@ -813,6 +817,151 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
         return { valid: true, referrerName: referrer.name || "a friend" };
       }),
   }),
-});
 
+  // ─── Gamification ─────────────────────────────────────────────────────────
+  gamification: router({
+    // Called on every login — updates streak and awards milestone credits
+    checkIn: protectedProcedure.mutation(async ({ ctx }) => {
+      const result = await processStreakCheckIn(ctx.user.id);
+      return result;
+    }),
+
+    // Claim daily reward (once per 24h)
+    claimDailyReward: protectedProcedure.mutation(async ({ ctx }) => {
+      const result = await claimDailyReward(ctx.user.id);
+      return result;
+    }),
+
+    // Get gamification stats for the current user
+    getStats: protectedProcedure.query(async ({ ctx }) => {
+      const db = await (await import("./db")).getDb();
+      if (!db) throw new Error("Database not available");
+      const { eq: eqOp } = await import("drizzle-orm");
+      const { users: usersTable, referrals: referralsTable } = await import("../drizzle/schema");
+      const user = await db.select().from(usersTable).where(eqOp(usersTable.id, ctx.user.id)).limit(1);
+      if (!user[0]) throw new Error("User not found");
+      const u = user[0];
+
+      const referralRows = await db.select().from(referralsTable).where(eqOp(referralsTable.referrerId, ctx.user.id));
+      const totalReferrals = referralRows.length;
+
+      // Subscription months (rough estimate)
+      const subMonths = u.subscriptionStatus === "active" ? 1 : 0;
+      const level = calculateUserLevel(u.totalCreditsEarned, totalReferrals, subMonths);
+
+      // Daily reward available?
+      const now = new Date();
+      const lastClaim = u.lastDailyRewardAt;
+      const dailyRewardAvailable = !lastClaim || (now.getTime() - new Date(lastClaim).getTime()) >= 24 * 60 * 60 * 1000;
+
+      return {
+        currentStreak: u.currentStreak,
+        longestStreak: u.longestStreak,
+        level,
+        totalCreditsEarned: u.totalCreditsEarned,
+        aiReadingCredits: u.aiReadingCredits,
+        dailyRewardAvailable,
+        lastDailyRewardAt: u.lastDailyRewardAt,
+        totalReferrals,
+      };
+    }),
+  }),
+
+  // ─── Affiliate ────────────────────────────────────────────────────────────
+  affiliate: router({
+    // Activate affiliate program for current user
+    activate: protectedProcedure.mutation(async ({ ctx }) => {
+      const db = await (await import("./db")).getDb();
+      if (!db) throw new Error("Database not available");
+      const { eq: eqOp } = await import("drizzle-orm");
+      const { users: usersTable } = await import("../drizzle/schema");
+      const user = await db.select({ isAffiliate: usersTable.isAffiliate, affiliateCode: usersTable.affiliateCode }).from(usersTable).where(eqOp(usersTable.id, ctx.user.id)).limit(1);
+      if (!user[0]) throw new Error("User not found");
+      if (user[0].isAffiliate && user[0].affiliateCode) {
+        return { success: true, affiliateCode: user[0].affiliateCode, alreadyActive: true };
+      }
+      // Generate unique affiliate code
+      const code = "AF" + Math.random().toString(36).substring(2, 8).toUpperCase();
+      await activateAffiliate(ctx.user.id, code);
+      return { success: true, affiliateCode: code, alreadyActive: false };
+    }),
+
+    // Get affiliate stats
+    getStats: protectedProcedure.query(async ({ ctx }) => {
+      const db = await (await import("./db")).getDb();
+      if (!db) throw new Error("Database not available");
+      const { eq: eqOp } = await import("drizzle-orm");
+      const { users: usersTable } = await import("../drizzle/schema");
+      const user = await db.select({
+        isAffiliate: usersTable.isAffiliate,
+        affiliateCode: usersTable.affiliateCode,
+        affiliateTier: usersTable.affiliateTier,
+        affiliateTotalEarned: usersTable.affiliateTotalEarned,
+        affiliatePendingPayout: usersTable.affiliatePendingPayout,
+      }).from(usersTable).where(eqOp(usersTable.id, ctx.user.id)).limit(1);
+      if (!user[0]) throw new Error("User not found");
+
+      const conversions = await getAffiliateConversions(ctx.user.id);
+      const payouts = await getAffiliatePayouts(ctx.user.id);
+
+      const activeConversions = conversions.filter(c => c.status !== "cancelled").length;
+      // Determine tier
+      let tier: "bronze" | "silver" | "gold" = "bronze";
+      if (activeConversions >= 21) tier = "gold";
+      else if (activeConversions >= 6) tier = "silver";
+
+      const commissionRate = tier === "gold" ? 0.25 : tier === "silver" ? 0.22 : 0.20;
+
+      return {
+        isAffiliate: user[0].isAffiliate,
+        affiliateCode: user[0].affiliateCode,
+        tier,
+        commissionRate,
+        totalEarned: user[0].affiliateTotalEarned,
+        pendingPayout: user[0].affiliatePendingPayout,
+        totalConversions: activeConversions,
+        conversions: conversions.slice(0, 10),
+        payouts: payouts.slice(0, 5),
+      };
+    }),
+
+    // Request payout
+    requestPayout: protectedProcedure
+      .input(z.object({
+        paymentMethod: z.enum(["bank_transfer", "paypal"]),
+        paymentDetails: z.string().min(5).max(200),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await (await import("./db")).getDb();
+        if (!db) throw new Error("Database not available");
+        const { eq: eqOp } = await import("drizzle-orm");
+        const { users: usersTable } = await import("../drizzle/schema");
+        const user = await db.select({ affiliatePendingPayout: usersTable.affiliatePendingPayout }).from(usersTable).where(eqOp(usersTable.id, ctx.user.id)).limit(1);
+        if (!user[0]) throw new Error("User not found");
+        const pending = user[0].affiliatePendingPayout;
+        if (pending < 100) throw new Error("Minimum payout is 100 CZK");
+
+        await createAffiliatePayout({
+          affiliateUserId: ctx.user.id,
+          amount: pending,
+          paymentMethod: input.paymentMethod,
+          paymentDetails: input.paymentDetails,
+          status: "requested",
+        });
+
+        // Reset pending payout
+        await db.update(usersTable).set({ affiliatePendingPayout: 0 }).where(eqOp(usersTable.id, ctx.user.id));
+
+        try {
+          const { notifyOwner } = await import("./_core/notification");
+          await notifyOwner({
+            title: "Affiliate Payout Requested 💰",
+            content: `User ID ${ctx.user.id} requested payout of ${pending} CZK via ${input.paymentMethod}.`,
+          });
+        } catch {}
+
+        return { success: true, amount: pending };
+      }),
+  }),
+});
 export type AppRouter = typeof appRouter;

@@ -105,7 +105,7 @@ export default function ChartCalculator() {
 
           <Card className="bg-card border-border/50 shadow-sm">
             <CardHeader>
-              <CardTitle className="font-serif text-xl text-foreground">Údaje o narození</CardTitle>
+              <CardTitle className="font-serif text-xl text-foreground">{t.calculator.birthDataTitle}</CardTitle>
               <CardDescription>
                 {t.calculator.birthTimeNote}
               </CardDescription>
@@ -199,11 +199,11 @@ export default function ChartCalculator() {
                 {!locationResolved && (
                   <div className="rounded-lg border border-border/50 p-4 space-y-4">
                     <p className="text-sm text-muted-foreground">
-                      Nebo zadejte souřadnice ručně:
+                      {t.calculator.manualCoordinates}
                     </p>
                     <div className="grid grid-cols-3 gap-3">
                       <div className="space-y-1">
-                        <Label className="text-xs">Zeměpisná šířka</Label>
+                        <Label className="text-xs">{t.calculator.latitude}</Label>
                         <Input
                           placeholder="50.08"
                           value={latitude}
@@ -211,7 +211,7 @@ export default function ChartCalculator() {
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs">Zeměpisná délka</Label>
+                        <Label className="text-xs">{t.calculator.longitude}</Label>
                         <Input
                           placeholder="14.44"
                           value={longitude}
@@ -219,7 +219,7 @@ export default function ChartCalculator() {
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs">UTC Offset</Label>
+                        <Label className="text-xs">{t.calculator.utcOffset}</Label>
                         <Input
                           type="number"
                           placeholder="1"

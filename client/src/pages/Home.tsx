@@ -390,6 +390,11 @@ export default function Home() {
                   <p className="text-[10px] text-muted-foreground">{tp.label}</p>
                   <p className="text-xs text-muted-foreground leading-snug mt-1">{tp.role}</p>
                   <p className="text-[11px] text-muted-foreground leading-snug italic">{tp.strategy}</p>
+                  <Link href={localePath("/calculate")} className="mt-2 block">
+                    <span className="inline-flex items-center justify-center gap-1 text-[10px] font-semibold text-primary hover:underline">
+                      {isCs ? "Zjistit svůj typ" : "Find your type"} <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </Link>
                 </div>
               </motion.div>
             ))}

@@ -1,6 +1,6 @@
 import { eq, and, desc, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, charts, InsertChart, aiReadings, InsertAiReading, sharedCharts, InsertSharedChart, giftVouchers, InsertGiftVoucher, referrals, InsertReferral } from "../drizzle/schema";
+import { InsertUser, users, charts, InsertChart, aiReadings, InsertAiReading, sharedCharts, InsertSharedChart, giftVouchers, InsertGiftVoucher, referrals, InsertReferral, creditTransactions, affiliateConversions, InsertAffiliateConversion, affiliatePayouts, InsertAffiliatePayout } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -322,4 +322,183 @@ export async function markReferralCompleted(referralId: number) {
   await db.update(referrals)
     .set({ status: "completed", referrerCredited: true, referredCredited: true, completedAt: new Date() })
     .where(eq(referrals.id, referralId));
+}
+
+// ─── Gamification Operations ──────────────────────────────────────────────────
+
+export async function logCreditTransaction(userId: number, amount: number, reason: string, metadata?: Record<string, unknown>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(creditTransactions).values({ userId, amount, reason, metadata: metadata ?? null });
+}
+
+export async function addCreditsWithLog(userId: number, amount: number, reason: string, metadata?: Record<string, unknown>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const user = await db.select({ credits: users.aiReadingCredits, totalEarned: users.totalCreditsEarned }).from(users).where(eq(users.id, userId)).limit(1);
+  const current = user[0]?.credits ?? 0;
+  const totalEarned = user[0]?.totalEarned ?? 0;
+  await db.update(users).set({
+    aiReadingCredits: current + amount,
+    totalCreditsEarned: totalEarned + (amount > 0 ? amount : 0),
+  }).where(eq(users.id, userId));
+  await logCreditTransaction(userId, amount, reason, metadata);
+}
+
+export async function processStreakCheckIn(userId: number): Promise<{ streakUpdated: boolean; newStreak: number; creditsAwarded: number; streakBroken: boolean }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const user = await db.select({
+    currentStreak: users.currentStreak,
+    longestStreak: users.longestStreak,
+    lastLoginDate: users.lastLoginDate,
+    aiReadingCredits: users.aiReadingCredits,
+    totalCreditsEarned: users.totalCreditsEarned,
+  }).from(users).where(eq(users.id, userId)).limit(1);
+
+  if (!user[0]) throw new Error("User not found");
+
+  const { currentStreak, longestStreak, lastLoginDate } = user[0];
+
+  // Already checked in today
+  if (lastLoginDate === today) {
+    return { streakUpdated: false, newStreak: currentStreak, creditsAwarded: 0, streakBroken: false };
+  }
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+
+  let newStreak: number;
+  let streakBroken = false;
+
+  if (lastLoginDate === yesterdayStr) {
+    // Consecutive day
+    newStreak = currentStreak + 1;
+  } else {
+    // Streak broken
+    newStreak = 1;
+    streakBroken = currentStreak >= 3;
+  }
+
+  const newLongest = Math.max(longestStreak, newStreak);
+
+  // Award 0.1 credit per day (stored as integer: 1 = 0.1 credits via 10x multiplier)
+  // We use integer credits, so award 1 credit per 10 days, or use a fractional approach
+  // For simplicity: award 1 credit every 7-day streak milestone, 0 otherwise
+  let creditsAwarded = 0;
+  if (newStreak % 7 === 0) {
+    creditsAwarded = 1; // 1 free reading every 7-day streak
+  }
+
+  await db.update(users).set({
+    currentStreak: newStreak,
+    longestStreak: newLongest,
+    lastLoginDate: today,
+    aiReadingCredits: user[0].aiReadingCredits + creditsAwarded,
+    totalCreditsEarned: user[0].totalCreditsEarned + creditsAwarded,
+  }).where(eq(users.id, userId));
+
+  if (creditsAwarded > 0) {
+    await logCreditTransaction(userId, creditsAwarded, "streak_bonus", { streakDay: newStreak });
+  }
+
+  return { streakUpdated: true, newStreak, creditsAwarded, streakBroken };
+}
+
+export async function claimDailyReward(userId: number): Promise<{ success: boolean; creditsAwarded: number; alreadyClaimed: boolean }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const user = await db.select({
+    lastDailyRewardAt: users.lastDailyRewardAt,
+    aiReadingCredits: users.aiReadingCredits,
+    totalCreditsEarned: users.totalCreditsEarned,
+  }).from(users).where(eq(users.id, userId)).limit(1);
+
+  if (!user[0]) throw new Error("User not found");
+
+  const now = new Date();
+  const lastClaim = user[0].lastDailyRewardAt;
+
+  // Check if already claimed today (24h cooldown)
+  if (lastClaim) {
+    const hoursSince = (now.getTime() - new Date(lastClaim).getTime()) / (1000 * 60 * 60);
+    if (hoursSince < 24) {
+      return { success: false, creditsAwarded: 0, alreadyClaimed: true };
+    }
+  }
+
+  // Random reward: 1 credit (simplified — could be 0.1-0.5 with fractional system)
+  const creditsAwarded = 1;
+
+  await db.update(users).set({
+    lastDailyRewardAt: now,
+    aiReadingCredits: user[0].aiReadingCredits + creditsAwarded,
+    totalCreditsEarned: user[0].totalCreditsEarned + creditsAwarded,
+  }).where(eq(users.id, userId));
+
+  await logCreditTransaction(userId, creditsAwarded, "daily_reward");
+
+  return { success: true, creditsAwarded, alreadyClaimed: false };
+}
+
+export function calculateUserLevel(totalCreditsEarned: number, totalReferrals: number, subscriptionMonths: number): "searcher" | "awakened" | "initiated" | "guide" | "master" {
+  if (subscriptionMonths >= 12 || totalReferrals >= 50) return "master";
+  if (totalReferrals >= 21) return "guide";
+  if (subscriptionMonths >= 1 || totalReferrals >= 5) return "initiated";
+  if (totalCreditsEarned >= 3 || totalReferrals >= 1) return "awakened";
+  return "searcher";
+}
+
+// ─── Affiliate Operations ─────────────────────────────────────────────────────
+
+export async function activateAffiliate(userId: number, affiliateCode: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ isAffiliate: true, affiliateCode }).where(eq(users.id, userId));
+}
+
+export async function getUserByAffiliateCode(code: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(users).where(eq(users.affiliateCode, code)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function createAffiliateConversion(data: InsertAffiliateConversion) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(affiliateConversions).values(data);
+  // Update affiliate's pending payout
+  await db.update(users).set({
+    affiliateTotalEarned: (await db.select({ v: users.affiliateTotalEarned }).from(users).where(eq(users.id, data.affiliateUserId)).limit(1))[0]?.v ?? 0 + data.commissionAmount,
+    affiliatePendingPayout: (await db.select({ v: users.affiliatePendingPayout }).from(users).where(eq(users.id, data.affiliateUserId)).limit(1))[0]?.v ?? 0 + data.commissionAmount,
+  }).where(eq(users.id, data.affiliateUserId));
+  return result[0].insertId;
+}
+
+export async function getAffiliateConversions(affiliateUserId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(affiliateConversions)
+    .where(eq(affiliateConversions.affiliateUserId, affiliateUserId))
+    .orderBy(desc(affiliateConversions.createdAt));
+}
+
+export async function createAffiliatePayout(data: InsertAffiliatePayout) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(affiliatePayouts).values(data);
+  return result[0].insertId;
+}
+
+export async function getAffiliatePayouts(affiliateUserId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(affiliatePayouts)
+    .where(eq(affiliatePayouts.affiliateUserId, affiliateUserId))
+    .orderBy(desc(affiliatePayouts.createdAt));
 }
