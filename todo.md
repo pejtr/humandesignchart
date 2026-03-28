@@ -559,3 +559,11 @@
 - [x] CTA on types cards: "Zjistit svůj typ" link → calculator (Klein loop)
 - [x] Blog article CTA: dual buttons — "Vytvořit mapu zdarma" + "Pozvat příteľe → výklad zdarma"
 - [x] Tests: 17 gamification tests (streak, daily reward, levels, affiliate tiers) — 128 total passing
+
+## Stripe Webhook Verification
+- [x] Audit existing webhook handler at /api/stripe/webhook — all events correctly handled
+- [x] checkout.session.completed: grants Premium (via subscription.created), credits, gift vouchers
+- [x] Add affiliate trackConversion on Premium purchase (Bronze 20%, Silver 22%, Gold 25%)
+- [x] Self-referral prevention: affiliate cannot earn commission on own purchase
+- [x] Test event handling: evt_test_ prefix returns {verified: true} immediately
+- [x] Webhook tests: 19 tests covering commissions, tiers, voucher codes, self-referral — 147 total passing

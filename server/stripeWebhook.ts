@@ -4,7 +4,7 @@
  */
 import Stripe from "stripe";
 import { Express, Request, Response } from "express";
-import { getUserByOpenId, updateUserSubscription, addAiReadingCredits, createGiftVoucher, getUserById } from "./db";
+import { getUserByOpenId, updateUserSubscription, addAiReadingCredits, createGiftVoucher, getUserById, getUserByAffiliateCode, createAffiliateConversion, addCreditsWithLog, logCreditTransaction } from "./db";
 import { getDb } from "./db";
 import { users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
@@ -127,6 +127,55 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
     const planLabel = session.metadata?.plan === "annual" ? "Roční Premium" : "Měsíční Premium";
     const customerEmail = session.metadata?.customer_email || session.customer_email || "neznámý";
     const customerName = session.metadata?.customer_name || "nový zákazník";
+
+    // --- Affiliate commission tracking ---
+    const affiliateCode = session.metadata?.affiliate_code;
+    if (affiliateCode) {
+      try {
+        const affiliate = await getUserByAffiliateCode(affiliateCode);
+        if (affiliate && affiliate.isAffiliate && affiliate.id !== userId) {
+          // Determine commission rate based on tier
+          const rateMap: Record<string, number> = { bronze: 0.20, silver: 0.22, gold: 0.25 };
+          const commissionRate = rateMap[affiliate.affiliateTier ?? "bronze"] ?? 0.20;
+          // Amount in CZK (from Stripe amount_total in haléře → CZK)
+          const amountCzk = session.amount_total ? session.amount_total / 100 : (session.metadata?.plan === "annual" ? 990 : 149);
+          const commissionAmount = Math.round(amountCzk * commissionRate * 100) / 100;
+
+          await createAffiliateConversion({
+            affiliateUserId: affiliate.id,
+            convertedUserId: userId,
+            stripeSubscriptionId: session.subscription as string || null,
+            amount: amountCzk,
+            commissionRate,
+            commissionAmount,
+            status: "pending",
+          });
+
+          // Log credit transaction for audit
+          await logCreditTransaction(affiliate.id, 0, "affiliate_commission", {
+            convertedUserId: userId,
+            commissionAmount,
+            commissionRate,
+            sessionId: session.id,
+          });
+
+          console.log(`[Stripe Webhook] Affiliate commission: ${commissionAmount} CZK (${commissionRate * 100}%) for affiliate ${affiliate.id} from user ${userId}`);
+
+          try {
+            await notifyOwner({
+              title: `🤝 Affiliate konverze: ${commissionAmount} CZK`,
+              content: `Affiliate ${affiliate.name || affiliate.id} (kód: ${affiliateCode}) získal provizi ${commissionAmount} CZK (${commissionRate * 100}%) za konverzi uživatele ${userId}.\nSesion: ${session.id}`,
+            });
+          } catch (e) {
+            console.warn("[Stripe Webhook] Failed to notify owner about affiliate conversion:", e);
+          }
+        }
+      } catch (e) {
+        console.error("[Stripe Webhook] Affiliate commission error:", e);
+      }
+    }
+    // --- End affiliate tracking ---
+
     try {
       await notifyOwner({
         title: `🎉 Nové předplatné: ${planLabel}`,
