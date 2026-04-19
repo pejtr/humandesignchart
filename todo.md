@@ -530,8 +530,8 @@
 
 ## Internal Linking — SEO
 - [x] Markdown renderer in BlogArticle.tsx supports [text](/path) internal links and [text](https://...) external links
-- [ ] Add internal links to all CS blog articles (blogArticles.ts)
-- [ ] Add internal links to key EN blog articles (blogArticlesEn.ts)
+- [x] Add internal links to all CS blog articles (blogArticles.ts) — 53 internal links across 11 articles
+- [x] Add internal links to all EN blog articles (blogArticlesEn.ts) — 76 internal links across 27 articles
 
 ## SEO — Canonical URLs & Open Graph
 - [x] Canonical URL updated to humandesignchart.app (was human-design.manus.space)
