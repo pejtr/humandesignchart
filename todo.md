@@ -577,3 +577,11 @@
 - [x] Self-referral prevention: affiliate cannot earn commission on own purchase
 - [x] Test event handling: evt_test_ prefix returns {verified: true} immediately
 - [x] Webhook tests: 19 tests covering commissions, tiers, voucher codes, self-referral — 147 total passing
+
+## Related Articles Sidebar — BlogArticle
+- [x] Smart scoring: same category (+3 pts) + shared tags (+1 pt each), top 4 shown
+- [x] Thumbnail image (64×64 rounded) with lazy loading and scale-on-hover animation
+- [x] Fallback icon tile for articles without coverImage (uses coverColor gradient)
+- [x] Reading time badge with Clock icon
+- [x] Hover highlight (bg-muted/40) on entire card row
+- [x] Divider lines between cards, header with BookOpen icon

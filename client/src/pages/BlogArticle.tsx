@@ -213,9 +213,18 @@ export default function BlogArticle() {
     );
   }
 
-  const relatedArticles = (listData?.articles ?? [])
-    .filter(a => a.category === article.category && a.slug !== article.slug)
-    .slice(0, 3);
+  // Smart related articles: score by shared tags + same category
+  const relatedArticles = (() => {
+    const all = (listData?.articles ?? []).filter(a => a.slug !== article.slug);
+    const scored = all.map(a => {
+      let score = 0;
+      if (a.category === article.category) score += 3;
+      const sharedTags = (a.tags ?? []).filter(t => (article.tags ?? []).includes(t));
+      score += sharedTags.length;
+      return { ...a, score };
+    });
+    return scored.sort((a, b) => b.score - a.score).slice(0, 4);
+  })();
 
   const allArticles = listData?.articles ?? [];
   const currentIdx = allArticles.findIndex(a => a.slug === article.slug);
@@ -300,25 +309,46 @@ export default function BlogArticle() {
                 </Card>
 
                 {relatedArticles.length > 0 && (
-                  <Card className="border-border/50">
-                    <CardContent className="p-4">
-                      <h4 className="font-serif text-sm font-semibold mb-3 flex items-center gap-1.5">
-                        <BookOpen className="w-3.5 h-3.5" />
+                  <Card className="border-border/50 overflow-hidden">
+                    <div className="px-4 pt-4 pb-2 border-b border-border/40">
+                      <h4 className="font-serif text-sm font-semibold flex items-center gap-1.5">
+                        <BookOpen className="w-3.5 h-3.5 text-primary" />
                         {isEn ? "Related articles" : "Související články"}
                       </h4>
-                      <div className="space-y-3">
-                        {relatedArticles.map(ra => (
-                          <Link key={ra.slug} href={localePath(`/blog/${ra.slug}`)} className="no-underline block group">
-                            <p className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-2">
-                              {ra.title}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              {ra.readingTime} {isEn ? "min read" : "min čtení"}
-                            </p>
-                          </Link>
-                        ))}
-                      </div>
-                    </CardContent>
+                    </div>
+                    <div className="divide-y divide-border/30">
+                      {relatedArticles.map(ra => (
+                        <Link key={ra.slug} href={localePath(`/blog/${ra.slug}`)} className="no-underline block group">
+                          <div className="flex gap-3 p-3 hover:bg-muted/40 transition-colors">
+                            {/* Thumbnail */}
+                            <div className="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden bg-muted">
+                              {ra.coverImage ? (
+                                <img
+                                  src={ra.coverImage}
+                                  alt={ra.title}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <div className={`w-full h-full flex items-center justify-center text-2xl ${ra.coverColor ?? 'bg-primary/10'}`}>
+                                  <BookOpen className="w-6 h-6 text-primary/40" />
+                                </div>
+                              )}
+                            </div>
+                            {/* Text */}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium leading-snug group-hover:text-primary transition-colors line-clamp-3 mb-1">
+                                {ra.title}
+                              </p>
+                              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {ra.readingTime} {isEn ? "min" : "min"}
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
                   </Card>
                 )}
 
