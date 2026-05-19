@@ -601,3 +601,11 @@
 - [x] IncarnationCross: canonical URL
 - [x] IncarnationCross: JSON-LD WebApplication + BreadcrumbList structured data
 - [x] IncarnationCross: cleanup on unmount
+
+## I-Ching Oracle — Czech Translations
+- [x] All 64 hexagram names translated to Czech (nameCz)
+- [x] All 64 hexagram keywords translated to Czech (meaningCz)
+- [x] All 64 hexagram judgments (výroky) translated to Czech (judgmentCz)
+- [x] All 64 hexagram images (obrazy) translated to Czech (imageCz)
+- [x] Rendering switched by locale: isEn ? EN field : CS field
+- [x] Section labels "Judgment"/"Výrok" and "Image"/"Obraz" already locale-aware
