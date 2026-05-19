@@ -601,3 +601,9 @@
 - [x] IncarnationCross: canonical URL
 - [x] IncarnationCross: JSON-LD WebApplication + BreadcrumbList structured data
 - [x] IncarnationCross: cleanup on unmount
+
+## Encyclopedia — Bilingual Support (EN/CS)
+- [x] Add nameEn, descriptionEn, themeEn, giftKeywordEn, shadowKeywordEn to all 64 gates in hdContent.ts
+- [x] Add nameEn, descriptionEn, themeEn to all 36 channels in hdContent.ts
+- [x] Encyclopedia.tsx renders EN fields when locale is EN (gate cards, channel cards, detail dialogs)
+- [x] I-Ching Oracle: all 64 hexagrams translated to Czech (nameCz, meaningCz, judgmentCz, imageCz)

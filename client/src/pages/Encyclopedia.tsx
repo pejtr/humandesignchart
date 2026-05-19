@@ -247,7 +247,7 @@ export default function Encyclopedia() {
                             </div>
                             <div>
                               <CardTitle className="text-sm font-semibold">
-                                {isEN ? data.name : (GATE_NAMES_CS[num] || data.name)}
+                                {isEN ? (data.nameEn || data.name) : (GATE_NAMES_CS[num] || data.name)}
                               </CardTitle>
                               <p className="text-xs text-muted-foreground">{data.iChing}</p>
                             </div>
@@ -256,7 +256,7 @@ export default function Encyclopedia() {
                         </div>
                       </CardHeader>
                       <CardContent className="pt-0">
-                        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{data.theme}</p>
+                        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{isEN ? (data.themeEn || data.theme) : data.theme}</p>
                         <div className="flex gap-1.5 flex-wrap">
                           <Badge variant="outline" className={`text-[10px] ${CIRCUIT_COLORS[data.circuit] || ""}`}>
                             {circuitNames[data.circuit]}
@@ -294,8 +294,8 @@ export default function Encyclopedia() {
                       <CardHeader className="pb-2">
                         <div className="flex items-start justify-between">
                           <div>
-                            <CardTitle className="text-sm font-semibold">{data.name}</CardTitle>
-                            <p className="text-xs text-muted-foreground mt-0.5">{data.theme}</p>
+                            <CardTitle className="text-sm font-semibold">{isEN ? (data.nameEn || data.name) : data.name}</CardTitle>
+                            <p className="text-xs text-muted-foreground mt-0.5">{isEN ? (data.themeEn || data.theme) : data.theme}</p>
                           </div>
                           <div className="flex items-center gap-1 text-primary font-bold text-sm shrink-0">
                             {data.gates[0]}
@@ -305,7 +305,7 @@ export default function Encyclopedia() {
                         </div>
                       </CardHeader>
                       <CardContent className="pt-0">
-                        <p className="text-xs text-muted-foreground mb-2 line-clamp-3">{data.description}</p>
+                        <p className="text-xs text-muted-foreground mb-2 line-clamp-3">{isEN ? (data.descriptionEn || data.description) : data.description}</p>
                         <div className="flex gap-1.5 flex-wrap">
                           <Badge variant="outline" className={`text-[10px] ${CIRCUIT_COLORS[data.circuit] || ""}`}>
                             {circuitNames[data.circuit]}
@@ -392,7 +392,7 @@ export default function Encyclopedia() {
                   </div>
                   <div>
                     <DialogTitle className="text-xl">
-                      {isEN ? selectedGate.data.name : (GATE_NAMES_CS[selectedGate.gateNum] || selectedGate.data.name)}
+                      {isEN ? (selectedGate.data.nameEn || selectedGate.data.name) : (GATE_NAMES_CS[selectedGate.gateNum] || selectedGate.data.name)}
                     </DialogTitle>
                     <p className="text-sm text-muted-foreground">
                       {selectedGate.data.iChing} {selectedGate.data.hexagram}
@@ -411,20 +411,20 @@ export default function Encyclopedia() {
                 </div>
                 <div>
                   <h4 className="text-sm font-semibold mb-1">{isEN ? "Theme" : "Téma"}</h4>
-                  <p className="text-sm text-muted-foreground">{selectedGate.data.theme}</p>
+                  <p className="text-sm text-muted-foreground">{isEN ? (selectedGate.data.themeEn || selectedGate.data.theme) : selectedGate.data.theme}</p>
                 </div>
                 <div>
                   <h4 className="text-sm font-semibold mb-1">{isEN ? "Description" : "Popis"}</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{selectedGate.data.description}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{isEN ? (selectedGate.data.descriptionEn || selectedGate.data.description) : selectedGate.data.description}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 rounded-lg bg-green-50 border border-green-200">
                     <p className="text-xs font-semibold text-green-700 mb-0.5">{isEN ? "Gift" : "Dar (Gift)"}</p>
-                    <p className="text-sm font-medium text-green-800">{selectedGate.data.giftKeyword}</p>
+                    <p className="text-sm font-medium text-green-800">{isEN ? (selectedGate.data.giftKeywordEn || selectedGate.data.giftKeyword) : selectedGate.data.giftKeyword}</p>
                   </div>
                   <div className="p-3 rounded-lg bg-red-50 border border-red-200">
                     <p className="text-xs font-semibold text-red-700 mb-0.5">{isEN ? "Shadow" : "Stín (Shadow)"}</p>
-                    <p className="text-sm font-medium text-red-800">{selectedGate.data.shadowKeyword}</p>
+                    <p className="text-sm font-medium text-red-800">{isEN ? (selectedGate.data.shadowKeywordEn || selectedGate.data.shadowKeyword) : selectedGate.data.shadowKeyword}</p>
                   </div>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/50 border">
@@ -451,8 +451,8 @@ export default function Encyclopedia() {
                     {selectedChannel.data.gates[1]}
                   </div>
                   <div>
-                    <DialogTitle className="text-xl">{selectedChannel.data.name}</DialogTitle>
-                    <p className="text-sm text-muted-foreground">{selectedChannel.data.theme}</p>
+                    <DialogTitle className="text-xl">{isEN ? (selectedChannel.data.nameEn || selectedChannel.data.name) : selectedChannel.data.name}</DialogTitle>
+                    <p className="text-sm text-muted-foreground">{isEN ? (selectedChannel.data.themeEn || selectedChannel.data.theme) : selectedChannel.data.theme}</p>
                   </div>
                 </div>
               </DialogHeader>
@@ -467,7 +467,7 @@ export default function Encyclopedia() {
                 </div>
                 <div>
                   <h4 className="text-sm font-semibold mb-1">{isEN ? "Description" : "Popis"}</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{selectedChannel.data.description}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{isEN ? (selectedChannel.data.descriptionEn || selectedChannel.data.description) : selectedChannel.data.description}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {selectedChannel.data.gates.map(gateNum => {
@@ -478,7 +478,7 @@ export default function Encyclopedia() {
                           {isEN ? `Gate ${gateNum}` : `Brána ${gateNum}`}
                         </p>
                         <p className="text-sm font-medium">
-                          {isEN ? gateData.name : (GATE_NAMES_CS[gateNum] || gateData.name)}
+                          {isEN ? (gateData.nameEn || gateData.name) : (GATE_NAMES_CS[gateNum] || gateData.name)}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">{gateData.iChing} {gateData.hexagram}</p>
                         <p className="text-xs text-muted-foreground mt-1">{centerNames[gateData.center]}</p>
