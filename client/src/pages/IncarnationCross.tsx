@@ -48,15 +48,98 @@ export default function IncarnationCross() {
 
   useEffect(() => {
     const isEn = locale === 'en';
-    if (isEn) {
-      document.title = 'Incarnation Cross — Life Purpose & Human Design Reading';
-      document.querySelector('meta[name="description"]')?.setAttribute('content', 'Discover the meaning of your Incarnation Cross in Human Design. Explore your 4 gates, life purpose, themes, and get an AI-generated personal reading.');
+    const title = isEn
+      ? 'Incarnation Cross — Life Purpose, Gates & Human Design AI Reading'
+      : 'Inkarnační Kříž — Životní Poslání, Brány a AI Výklad Human Designu';
+    const description = isEn
+      ? 'Discover the meaning of your Incarnation Cross in Human Design. Explore your 4 defining gates, life purpose themes, and get a personalized AI-generated reading of your unique cross.'
+      : 'Objevte význam svého Inkarnačního kříže v Human Designu. Prozkoumejte 4 definující brány, témata životního poslání a získejte personalizovaný AI výklad vašeho jedinečného kříže.';
+    const pageUrl = isEn
+      ? 'https://humandesignchart.app/en/incarnation-cross'
+      : 'https://humandesignmapa.cz/cs/incarnation-cross';
+    const ogImage = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80';
+
+    document.title = title;
+
+    // Helper to upsert a meta tag
+    const setMeta = (selector: string, attr: string, value: string) => {
+      let el = document.querySelector(selector);
+      if (el) {
+        el.setAttribute(attr, value);
+      } else {
+        el = document.createElement('meta');
+        const parts = selector.match(/\[([^=]+)=["']([^"']+)["']\]/);
+        if (parts) el.setAttribute(parts[1], parts[2]);
+        el.setAttribute(attr, value);
+        el.setAttribute('data-page-meta', 'incarnation-cross');
+        document.head.appendChild(el);
+      }
+    };
+
+    setMeta('meta[name="description"]', 'content', description);
+    setMeta('meta[property="og:title"]', 'content', title);
+    setMeta('meta[property="og:description"]', 'content', description);
+    setMeta('meta[property="og:type"]', 'content', 'website');
+    setMeta('meta[property="og:url"]', 'content', pageUrl);
+    setMeta('meta[property="og:image"]', 'content', ogImage);
+    setMeta('meta[property="og:image:width"]', 'content', '1200');
+    setMeta('meta[property="og:image:height"]', 'content', '630');
+    setMeta('meta[property="og:locale"]', 'content', isEn ? 'en_US' : 'cs_CZ');
+    setMeta('meta[name="twitter:card"]', 'content', 'summary_large_image');
+    setMeta('meta[name="twitter:title"]', 'content', title);
+    setMeta('meta[name="twitter:description"]', 'content', description);
+    setMeta('meta[name="twitter:image"]', 'content', ogImage);
+
+    // Canonical URL
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) {
+      canonical.setAttribute('href', pageUrl);
     } else {
-      document.title = 'Inkarnační Kříž — Životní Poslání a Human Design Výklad';
-      document.querySelector('meta[name="description"]')?.setAttribute('content', 'Objevťe význam svého Inkarnačního kříže v Human Designu. Prozkoumejte 4 brány, životní poslání a získejte AI výklad vašeho kříže.');
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      canonical.setAttribute('href', pageUrl);
+      canonical.setAttribute('data-page-meta', 'incarnation-cross');
+      document.head.appendChild(canonical);
     }
+
+    // JSON-LD structured data
+    let jsonLd = document.querySelector('script[data-page-jsonld="incarnation-cross"]');
+    if (!jsonLd) {
+      jsonLd = document.createElement('script');
+      jsonLd.setAttribute('type', 'application/ld+json');
+      jsonLd.setAttribute('data-page-jsonld', 'incarnation-cross');
+      document.head.appendChild(jsonLd);
+    }
+    jsonLd.textContent = JSON.stringify([
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebApplication',
+        name: title,
+        description,
+        url: pageUrl,
+        applicationCategory: 'LifestyleApplication',
+        inLanguage: isEn ? 'en-US' : 'cs-CZ',
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        provider: {
+          '@type': 'Organization',
+          name: 'Human Design Chart',
+          url: 'https://humandesignchart.app',
+        },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: isEn ? 'https://humandesignchart.app/en' : 'https://humandesignmapa.cz/cs' },
+          { '@type': 'ListItem', position: 2, name: isEn ? 'Incarnation Cross' : 'Inkarnační Kříž', item: pageUrl },
+        ],
+      },
+    ]);
+
     return () => {
       document.title = isEn ? 'Free Human Design Chart Calculator & AI Reading' : 'Human Design Mapa Zdarma — Kalkulačka a AI Výklad';
+      document.querySelectorAll('[data-page-meta="incarnation-cross"]').forEach(el => el.remove());
+      document.querySelector('script[data-page-jsonld="incarnation-cross"]')?.remove();
     };
   }, [locale]);
 

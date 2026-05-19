@@ -585,3 +585,19 @@
 - [x] Reading time badge with Clock icon
 - [x] Hover highlight (bg-muted/40) on entire card row
 - [x] Divider lines between cards, header with BookOpen icon
+
+## SEO — AiGuide & IncarnationCross Pages
+- [x] AiGuide: unique document.title (CS + EN)
+- [x] AiGuide: meta description (CS + EN)
+- [x] AiGuide: Open Graph tags (og:title, og:description, og:type, og:url, og:image, og:locale)
+- [x] AiGuide: Twitter Card tags
+- [x] AiGuide: canonical URL (humandesignchart.app/en/ai-guide, humandesignmapa.cz/cs/ai-guide)
+- [x] AiGuide: JSON-LD WebApplication structured data
+- [x] AiGuide: cleanup on unmount (removes injected tags)
+- [x] IncarnationCross: unique document.title (CS + EN)
+- [x] IncarnationCross: meta description (CS + EN)
+- [x] IncarnationCross: Open Graph tags
+- [x] IncarnationCross: Twitter Card tags
+- [x] IncarnationCross: canonical URL
+- [x] IncarnationCross: JSON-LD WebApplication + BreadcrumbList structured data
+- [x] IncarnationCross: cleanup on unmount
