@@ -567,8 +567,8 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
   const effectiveChartId = selectedChartId ?? (charts[0]?.id ?? null);
 
   const stableInput = useMemo(
-    () => (effectiveChartId ? { chartId: effectiveChartId } : undefined),
-    [effectiveChartId]
+    () => (effectiveChartId ? { chartId: effectiveChartId, locale } : undefined),
+    [effectiveChartId, locale]
   );
 
   const transitQuery = trpc.transit.personalized.useQuery(

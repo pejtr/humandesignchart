@@ -376,8 +376,9 @@ Pravidla:
 
     // Personalized daily transit: compares current transits with user's natal chart
     personalized: protectedProcedure
-      .input(z.object({ chartId: z.number() }))
+      .input(z.object({ chartId: z.number(), locale: z.string().optional() }))
       .query(async ({ ctx, input }) => {
+        const isEn = input.locale === 'en';
         const { calculatePlanetaryPositions, dateToJD } = await import("./humandesign/ephemeris");
         const { GATE_WHEEL, PLANET_NAMES } = await import("./humandesign/constants");
 
@@ -441,16 +442,26 @@ Pravidla:
           "North Node": "☊", "South Node": "☋",
         };
         const transitSummary = transitGates
-          .map(t => `${PLANET_SYMBOLS[t.planet] || t.planet} ${t.planet}: Brána ${t.gate}.${t.line}`)
+          .map(t => `${PLANET_SYMBOLS[t.planet] || t.planet} ${t.planet}: ${isEn ? 'Gate' : 'Brána'} ${t.gate}.${t.line}`)
           .join(", ");
         const channelSummary = activatedChannels.length > 0
-          ? activatedChannels.map(c => `Dráha ${c.gate1}-${c.gate2}`).join(", ")
-          : "Žádné aktivované dráhy dnes";
+          ? activatedChannels.map(c => `${isEn ? 'Channel' : 'Dráha'} ${c.gate1}-${c.gate2}`).join(", ")
+          : (isEn ? "No activated channels today" : "Žádné aktivované dráhy dnes");
         const reinforcedSummary = reinforcedGates.length > 0
-          ? reinforcedGates.map(g => `Brána ${g.gate} (${g.planet})`).join(", ")
-          : "Žádné zesilování";
+          ? reinforcedGates.map(g => `${isEn ? 'Gate' : 'Brána'} ${g.gate} (${g.planet})`).join(", ")
+          : (isEn ? "No reinforcement" : "Žádné zesilování");
 
-        const systemPrompt = `Jsi expert na Human Design a tranzity. Popiš jak dnešní planetární tranzity ovlivňují konkrétní osobu.
+        const systemPrompt = isEn
+          ? `You are an expert in Human Design and transits. Describe how today's planetary transits affect this specific person.
+
+Rules:
+1. ALWAYS respond in English
+2. Be specific, practical, and encouraging
+3. Structure: Introduction (2 sentences) | Key Transits (3-4 points) | Recommendations for today (2-3 points)
+4. Use HD terminology in English
+5. Max 350 words
+6. Do not start with a greeting like "Hello" — begin directly with the reading or a section heading`
+          : `Jsi expert na Human Design a tranzity. Popiš jak dnešní planetární tranzity ovlivňují konkrétní osobu.
 
 Pravidla:
 1. VžDY odpovídej v češtině
@@ -460,7 +471,18 @@ Pravidla:
 5. Max 350 slov
 6. Nezmíňuj "Ahoj" ani úvodní pozdrav`;
 
-        const userMsg = `Typ: ${chartData.type}, Profil: ${chartData.profile}, Autorita: ${chartData.authority}
+        const userMsg = isEn
+          ? `Type: ${chartData.type}, Profile: ${chartData.profile}, Authority: ${chartData.authority}
+Natal gates: ${Array.from(natalGates).sort((a,b)=>a-b).join(", ")}
+
+Today's transits (${now.toLocaleDateString("en-US")}):
+${transitSummary}
+
+Activated channels by transit: ${channelSummary}
+Reinforced natal gates: ${reinforcedSummary}
+
+Create a personalized daily transit reading for this person.`
+          : `Typ: ${chartData.type}, Profil: ${chartData.profile}, Autorita: ${chartData.authority}
 Natalální brány: ${Array.from(natalGates).sort((a,b)=>a-b).join(", ")}
 
 Dnešní tranzity (${now.toLocaleDateString("cs-CZ")}):
@@ -478,7 +500,7 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
           ],
         });
         const rawContent = response.choices?.[0]?.message?.content;
-        const interpretation = typeof rawContent === "string" ? rawContent : "Nepodařilo se vygenerovat výklad.";
+        const interpretation = typeof rawContent === "string" ? rawContent : (isEn ? "Failed to generate reading." : "Nepodařilo se vygenerovat výklad.");
 
         return {
           timestamp: now.toISOString(),
