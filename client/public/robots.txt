@@ -3,4 +3,4 @@ Allow: /
 Disallow: /api/
 Disallow: /dashboard/
 
-Sitemap: https://humandesignchart.app/sitemap.xml
+Sitemap: https://humandesignmapa.cz/sitemap.xml

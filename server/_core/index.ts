@@ -41,7 +41,7 @@ async function startServer() {
 
   // ─── SEO: Sitemap.xml (bilingual with hreflang) ─────────────────────
   app.get("/sitemap.xml", (_req, res) => {
-    const baseUrl = "https://humandesignchart.app";
+    const baseUrl = "https://humandesignmapa.cz";
     const now = new Date().toISOString().split("T")[0];
     const pages = [
       { loc: "/", priority: "1.0", changefreq: "weekly" },

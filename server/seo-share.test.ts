@@ -114,15 +114,15 @@ describe("Sitemap and SEO", () => {
     const xml = await response.text();
     expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>');
     expect(xml).toContain("<urlset");
-    expect(xml).toContain("https://humandesignchart.app/");
+    expect(xml).toContain("https://humandesignmapa.cz/");
     // Bilingual URLs with /cs/ and /en/ prefixes
-    expect(xml).toContain("https://humandesignchart.app/cs/calculate");
-    expect(xml).toContain("https://humandesignchart.app/en/calculate");
-    expect(xml).toContain("https://humandesignchart.app/cs/types/generator");
-    expect(xml).toContain("https://humandesignchart.app/en/types/generator");
-    expect(xml).toContain("https://humandesignchart.app/cs/types/manifesting-generator");
-    expect(xml).toContain("https://humandesignchart.app/en/types/reflector");
-    expect(xml).toContain("https://humandesignchart.app/cs/encyclopedia");
+    expect(xml).toContain("https://humandesignmapa.cz/cs/calculate");
+    expect(xml).toContain("https://humandesignmapa.cz/en/calculate");
+    expect(xml).toContain("https://humandesignmapa.cz/cs/types/generator");
+    expect(xml).toContain("https://humandesignmapa.cz/en/types/generator");
+    expect(xml).toContain("https://humandesignmapa.cz/cs/types/manifesting-generator");
+    expect(xml).toContain("https://humandesignmapa.cz/en/types/reflector");
+    expect(xml).toContain("https://humandesignmapa.cz/cs/encyclopedia");
     // hreflang alternates
     expect(xml).toContain('xhtml:link rel="alternate" hreflang="cs"');
     expect(xml).toContain('xhtml:link rel="alternate" hreflang="en"');
@@ -136,6 +136,6 @@ describe("Sitemap and SEO", () => {
     expect(text).toContain("User-agent: *");
     expect(text).toContain("Allow: /");
     expect(text).toContain("Disallow: /api/");
-    expect(text).toContain("Sitemap: https://humandesignchart.app/sitemap.xml");
+    expect(text).toContain("Sitemap: https://humandesignmapa.cz/sitemap.xml");
   });
 });

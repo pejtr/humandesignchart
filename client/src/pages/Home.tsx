@@ -497,36 +497,83 @@ export default function Home() {
       {/* ── Testimonials ──────────────────────────────────────────────────── */}
       <TestimonialsSection isCs={isCs} />
 
-      {/* ── Blog Preview ────────────────────────────────────────────────────── */}
+      {/* ── Blog Preview — Editorial Layout ──────────────────────────────── */}
       <section className="py-20 border-t border-border/50">
         <div className="container">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="text-center mb-12">
-            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-3">
-              {isCs ? "Z našeho blogu" : "From our blog"}
-            </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              {isCs ? "Prozkoumejte svět Human Designu s našimi články a průvodci." : "Explore the world of Human Design with our articles and guides."}
-            </p>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+            <div>
+              <h2 className="font-serif text-3xl md:text-4xl font-bold mb-2">
+                {isCs ? "Z našeho blogu" : "From our blog"}
+              </h2>
+              <p className="text-muted-foreground max-w-lg">
+                {isCs ? "Prozkoumejte svět Human Designu s našimi články a průvodci." : "Explore the world of Human Design with our articles and guides."}
+              </p>
+            </div>
+            <Link href={localePath("/blog")} className="hidden md:flex">
+              <Button variant="outline" className="rounded-full">
+                {isCs ? "Všechny články" : "All articles"}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {blogPosts.map((post, i) => (
-              <motion.div key={post.slug} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={scaleIn}>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+            {/* Featured article — large card */}
+            {blogPosts.filter(p => p.featured).map((post) => (
+              <motion.div key={post.slug} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={scaleIn} className="lg:col-span-7">
                 <Link href={localePath(`/blog/${post.slug}`)} className="no-underline">
-                  <div className="group border border-border/50 rounded-xl overflow-hidden hover:shadow-lg transition-all h-full bg-card">
-                    <div className="p-6">
+                  <div className="group relative rounded-2xl overflow-hidden hover:shadow-xl transition-all h-full min-h-[320px] md:min-h-[400px] bg-card border border-border/40">
+                    <img
+                      src={post.cover}
+                      alt={post.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)' }} />
+                    <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
                       <div className="flex items-center gap-2 mb-3">
-                        <span className={`text-xs px-2 py-0.5 rounded-full border ${post.catStyle}`}>{post.cat}</span>
-                        <span className="text-xs text-muted-foreground">{post.time} min</span>
+                        <span className="text-[10px] uppercase tracking-wider font-semibold text-white/90 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20">{post.cat}</span>
+                        <span className="text-xs text-white/70">{post.time} min</span>
                       </div>
-                      <h3 className="font-serif text-lg font-bold mb-2 group-hover:text-primary transition-colors">{post.title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{post.excerpt}</p>
+                      <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">{post.title}</h3>
+                      <p className="text-sm text-white/80 leading-relaxed line-clamp-2 max-w-lg">{post.excerpt}</p>
                     </div>
                   </div>
                 </Link>
               </motion.div>
             ))}
+
+            {/* Compact grid — remaining articles */}
+            <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+              {blogPosts.filter(p => !p.featured).slice(0, 5).map((post, i) => (
+                <motion.div key={post.slug} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i + 1} variants={scaleIn}>
+                  <Link href={localePath(`/blog/${post.slug}`)} className="no-underline">
+                    <div className="group flex gap-3.5 p-3 rounded-xl border border-border/40 bg-card hover:shadow-md hover:border-primary/20 transition-all h-full">
+                      <div className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-muted">
+                        <img
+                          src={post.cover}
+                          alt={post.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="flex flex-col justify-center gap-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full border font-medium ${post.catStyle}`}>{post.cat}</span>
+                          <span className="text-[10px] text-muted-foreground">{post.time} min</span>
+                        </div>
+                        <h4 className="text-sm font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">{post.title}</h4>
+                        <p className="text-xs text-muted-foreground line-clamp-1 hidden sm:block lg:block">{post.excerpt}</p>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
           </div>
-          <div className="text-center">
+
+          {/* Mobile-only "All articles" button */}
+          <div className="text-center md:hidden">
             <Link href={localePath("/blog")}>
               <Button variant="outline" className="rounded-full">
                 {isCs ? "Všechny články" : "All articles"}

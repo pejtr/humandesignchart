@@ -611,7 +611,7 @@
 ## UX Improvements — Mobile & Transit
 - [x] Mobile "Related articles" horizontal scroll strip below article body in BlogArticle.tsx (premium design: gradient bg, fade edges, category badges, excerpt, CTA card)
 - [ ] Share button on Daily Transit widget (copy text + social share links)
-- [ ] Skeleton loader for Daily Transit AI reading generation
+- [x] Skeleton loader for Daily Transit AI reading generation
 
 ## Social Media Scheduler — Backend Fix
 - [x] Fix social.ts TypeScript errors (32 errors — corrupted syntax at line 195, missing closing brace in publishPost return)
@@ -625,3 +625,15 @@
 - [x] Add cover, featured fields to blogPosts array in Home.tsx
 - [x] CS articles: co-je-human-design, 5-typu-human-design, strategie, autorita, profily, vztahy
 - [x] EN articles: what-is-human-design, 5-types, strategy, authority, profiles, relationships
+
+## UX Improvements — Batch 2
+- [x] Share button on Daily Transit widget (copy text + WhatsApp/Telegram/Facebook share)
+- [x] Blog editorial layout on Home.tsx (first article as large featured card, rest in compact grid)
+- [x] Skeleton loader for Daily Transit AI reading generation
+
+## SEO — Primary Domain Update
+- [x] Update canonical URLs: CS → humandesignmapa.cz, EN → humandesignchart.app
+- [x] Update sitemap.xml base URLs for both locales
+- [x] Update hreflang alternates
+- [x] Update OG meta tags (og:url) per locale
+- [x] Update robots.txt sitemap reference

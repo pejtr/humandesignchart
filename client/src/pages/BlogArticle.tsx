@@ -74,7 +74,7 @@ export default function BlogArticle() {
 
   useEffect(() => {
     if (article) {
-      const articleUrl = `https://humandesignchart.app/${locale}/blog/${article.slug}`;
+      const articleUrl = `https://${locale === 'cs' ? 'humandesignmapa.cz' : 'humandesignchart.app'}/${locale}/blog/${article.slug}`;
       document.title = article.metaTitle;
 
       // Standard meta
@@ -134,15 +134,15 @@ export default function BlogArticle() {
           author: {
             "@type": "Organization",
             name: "Human Design Chart",
-            url: "https://humandesignchart.app",
+            url: locale === 'cs' ? "https://humandesignmapa.cz" : "https://humandesignchart.app",
           },
           publisher: {
             "@type": "Organization",
-            name: "Human Design Chart",
-            url: "https://humandesignchart.app",
+            name: locale === 'cs' ? "Human Design Mapa" : "Human Design Chart",
+            url: locale === 'cs' ? "https://humandesignmapa.cz" : "https://humandesignchart.app",
             logo: {
               "@type": "ImageObject",
-              url: "https://humandesignchart.app/favicon.ico",
+              url: locale === 'cs' ? "https://humandesignmapa.cz/favicon.ico" : "https://humandesignchart.app/favicon.ico",
             },
           },
           ...(article.coverImage ? {
@@ -163,8 +163,8 @@ export default function BlogArticle() {
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: `https://humandesignchart.app/${locale}` },
-            { "@type": "ListItem", position: 2, name: locale === 'cs' ? 'Blog' : 'Blog', item: `https://humandesignchart.app/${locale}/blog` },
+            { "@type": "ListItem", position: 1, name: "Home", item: `https://${locale === 'cs' ? 'humandesignmapa.cz' : 'humandesignchart.app'}/${locale}` },
+            { "@type": "ListItem", position: 2, name: locale === 'cs' ? 'Blog' : 'Blog', item: `https://${locale === 'cs' ? 'humandesignmapa.cz' : 'humandesignchart.app'}/${locale}/blog` },
             { "@type": "ListItem", position: 3, name: article.title, item: articleUrl },
           ],
         },

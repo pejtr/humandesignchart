@@ -326,7 +326,7 @@ export default function AiGuide() {
       provider: {
         '@type': 'Organization',
         name: 'Human Design Chart',
-        url: 'https://humandesignchart.app',
+        url: isEn ? 'https://humandesignchart.app' : 'https://humandesignmapa.cz',
       },
     });
 
