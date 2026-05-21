@@ -285,3 +285,19 @@ async function startServer() {
 }
 
 startServer().catch(console.error);
+
+// ─── Social Media Publisher Cron Job (every 5 minutes) ───────────────────────
+async function runSocialPublisher() {
+  try {
+    const { publishScheduledPosts } = await import("../routers/social");
+    await publishScheduledPosts();
+  } catch (err) {
+    console.error("[SocialPublisher] Error:", err);
+  }
+}
+
+// Start publisher 15s after server init to avoid startup race conditions
+setTimeout(() => {
+  runSocialPublisher();
+  setInterval(runSocialPublisher, 5 * 60 * 1000); // every 5 minutes
+}, 15_000);

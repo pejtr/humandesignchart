@@ -5,7 +5,7 @@ import { Link, useLocation } from "wouter";
 import {
   Menu, X, User, LogOut, LayoutDashboard, Compass, Star, Users,
   Sparkles, GitCompare, BookOpen, Bot, RotateCcw, ChevronDown,
-  Calendar, Hexagon, UtensilsCrossed, Sun, Target, CreditCard, Zap,
+  Calendar, Hexagon, UtensilsCrossed, Sun, Target, CreditCard, Zap, Share2,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -97,6 +97,7 @@ export default function Navbar() {
     { href: "/transits", label: t.nav.transits, icon: Star, desc: locale === "cs" ? "Aktuální planetární tranzity" : "Current planetary transits" },
     { href: "/transit-calendar", label: locale === "cs" ? "Tranzitní kalendář" : "Transit Calendar", icon: Calendar, desc: locale === "cs" ? "Denní a týdní přehled tranzitů" : "Daily and weekly transit overview" },
     { href: "/variables", label: locale === "cs" ? "Proměnné (PHS)" : "Variables (PHS)", icon: UtensilsCrossed, desc: locale === "cs" ? "Strávení, prostředí, perspektiva, vědomí" : "Digestion, environment, perspective, awareness" },
+    { href: "/social-scheduler", label: locale === "cs" ? "Plánovač sítí" : "Social Scheduler", icon: Share2, desc: locale === "cs" ? "Plánujte příspěvky na sociálních sítích" : "Schedule posts to social media" },
   ];
 
   const exploreLinks = [

@@ -1,6 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
+import { socialRouter } from "./routers/social";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { calculateChart } from "./humandesign";
@@ -31,6 +32,7 @@ import { BLOG_ARTICLES_EN } from "../shared/blogArticlesEn";
 
 export const appRouter = router({
   system: systemRouter,
+  social: socialRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

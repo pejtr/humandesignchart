@@ -33,6 +33,7 @@ const Pricing = lazy(() => import("./pages/Pricing"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const PaymentCancel = lazy(() => import("./pages/PaymentCancel"));
 const ReferralLanding = lazy(() => import("./pages/ReferralLanding"));
+const SocialScheduler = lazy(() => import("./pages/SocialScheduler"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -99,6 +100,7 @@ function LocaleRoutes() {
         <Route path="/:locale/blog/:slug" component={BlogArticle} />
         <Route path="/:locale/incarnation-cross" component={IncarnationCross} />
         <Route path="/:locale/daily-transit" component={DailyTransit} />
+        <Route path="/:locale/social-scheduler" component={SocialScheduler} />
         <Route path="/:locale/pricing" component={Pricing} />
         <Route path="/:locale/payment/success" component={PaymentSuccess} />
         <Route path="/:locale/payment/cancel" component={PaymentCancel} />

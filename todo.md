@@ -607,3 +607,21 @@
 - [x] Add nameEn, descriptionEn, themeEn to all 36 channels in hdContent.ts
 - [x] Encyclopedia.tsx renders EN fields when locale is EN (gate cards, channel cards, detail dialogs)
 - [x] I-Ching Oracle: all 64 hexagrams translated to Czech (nameCz, meaningCz, judgmentCz, imageCz)
+
+## UX Improvements — Mobile & Transit
+- [ ] Mobile "Related articles" horizontal scroll strip below article body in BlogArticle.tsx
+- [ ] Share button on Daily Transit widget (copy text + social share links)
+- [ ] Skeleton loader for Daily Transit AI reading generation
+
+## Social Media Scheduler — Backend Fix
+- [x] Fix social.ts TypeScript errors (32 errors — corrupted syntax at line 195, missing closing brace in publishPost return)
+- [x] Correctly export publishScheduledPosts as standalone async function before socialRouter
+- [x] Simplify publishDuePosts router procedure to call publishScheduledPosts() (no duplicate logic)
+- [x] TypeScript clean (0 errors), 147 tests passing
+
+## Blog Section — Homepage Update
+- [x] Expand blog section from 3 to 6 articles with cover images (Unsplash)
+- [x] Add featured flag to first article
+- [x] Add cover, featured fields to blogPosts array in Home.tsx
+- [x] CS articles: co-je-human-design, 5-typu-human-design, strategie, autorita, profily, vztahy
+- [x] EN articles: what-is-human-design, 5-types, strategy, authority, profiles, relationships

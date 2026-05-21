@@ -151,6 +151,56 @@ export const affiliatePayouts = mysqlTable("affiliatePayouts", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+// ─── Social Media Scheduler ──────────────────────────────────────────────────
+
+export const socialAccounts = mysqlTable("socialAccounts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  platform: mysqlEnum("platform", ["facebook", "instagram", "linkedin", "pinterest"]).notNull(),
+  accountId: varchar("accountId", { length: 128 }).notNull(),   // platform user/page ID
+  accountName: varchar("accountName", { length: 255 }).notNull(),
+  accountHandle: varchar("accountHandle", { length: 128 }),
+  accountAvatar: text("accountAvatar"),
+  accessToken: text("accessToken").notNull(),                   // encrypted OAuth token
+  refreshToken: text("refreshToken"),
+  tokenExpiresAt: timestamp("tokenExpiresAt"),
+  pageId: varchar("pageId", { length: 128 }),                   // FB page / IG business account
+  pageName: varchar("pageName", { length: 255 }),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const socialPosts = mysqlTable("socialPosts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  title: varchar("title", { length: 255 }),                     // internal label
+  caption: text("caption").notNull(),                           // post text/caption
+  imageUrl: text("imageUrl"),                                   // S3 URL of generated image
+  imagePrompt: text("imagePrompt"),                             // AI prompt used to generate image
+  postType: mysqlEnum("postType", ["hd_type", "quote", "infographic", "transit", "iching", "promo", "custom"]).default("custom").notNull(),
+  locale: mysqlEnum("locale", ["cs", "en"]).default("cs").notNull(),
+  hashtags: text("hashtags"),                                   // space-separated hashtags
+  scheduledAt: timestamp("scheduledAt"),                        // null = draft
+  publishedAt: timestamp("publishedAt"),                        // null = not yet published
+  status: mysqlEnum("status", ["draft", "scheduled", "publishing", "published", "failed"]).default("draft").notNull(),
+  errorMessage: text("errorMessage"),
+  platforms: json("platforms").notNull(),                       // string[] of platform names
+  platformPostIds: json("platformPostIds"),                     // { facebook: 'xxx', instagram: 'yyy' }
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const socialPostAccounts = mysqlTable("socialPostAccounts", {
+  id: int("id").autoincrement().primaryKey(),
+  postId: int("postId").notNull(),
+  accountId: int("accountId").notNull(),
+  status: mysqlEnum("status", ["pending", "published", "failed"]).default("pending").notNull(),
+  platformPostId: varchar("platformPostId", { length: 255 }),
+  errorMessage: text("errorMessage"),
+  publishedAt: timestamp("publishedAt"),
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -172,3 +222,9 @@ export type AffiliateConversion = typeof affiliateConversions.$inferSelect;
 export type InsertAffiliateConversion = typeof affiliateConversions.$inferInsert;
 export type AffiliatePayout = typeof affiliatePayouts.$inferSelect;
 export type InsertAffiliatePayout = typeof affiliatePayouts.$inferInsert;
+export type SocialAccount = typeof socialAccounts.$inferSelect;
+export type InsertSocialAccount = typeof socialAccounts.$inferInsert;
+export type SocialPost = typeof socialPosts.$inferSelect;
+export type InsertSocialPost = typeof socialPosts.$inferInsert;
+export type SocialPostAccount = typeof socialPostAccounts.$inferSelect;
+export type InsertSocialPostAccount = typeof socialPostAccounts.$inferInsert;
