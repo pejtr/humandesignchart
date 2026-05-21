@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
-import { X, Sparkles, Star } from "lucide-react";
+import { X, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const STORAGE_KEY = "hd_newsletter_dismissed";
@@ -15,12 +15,8 @@ export default function NewsletterPopup() {
   const [errorMsg, setErrorMsg] = useState("");
 
   const subscribeMutation = trpc.newsletter.subscribe.useMutation({
-    onSuccess: (data) => {
-      if (data.alreadySubscribed) {
-        setStatus("success");
-      } else {
-        setStatus("success");
-      }
+    onSuccess: () => {
+      setStatus("success");
       localStorage.setItem(STORAGE_KEY, "true");
     },
     onError: (err) => {
@@ -30,14 +26,9 @@ export default function NewsletterPopup() {
   });
 
   useEffect(() => {
-    // Only show once — never again after dismissal or subscription
     const dismissed = localStorage.getItem(STORAGE_KEY);
     if (dismissed) return;
-
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 30000); // 30 seconds
-
+    const timer = setTimeout(() => setIsVisible(true), 30000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -56,100 +47,87 @@ export default function NewsletterPopup() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={handleDismiss}
       />
 
-      {/* Modal */}
-      <div className="relative w-full max-w-md animate-in zoom-in-95 fade-in duration-400">
-        {/* Decorative glow */}
-        <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-violet-500/30 via-purple-500/20 to-amber-500/30 blur-xl" />
-
-        <div className="relative rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900 via-slate-900 to-violet-950 p-8 shadow-2xl overflow-hidden">
-          {/* Background sacred geometry pattern */}
-          <div className="absolute inset-0 opacity-5">
-            <svg viewBox="0 0 400 400" className="w-full h-full">
-              <circle cx="200" cy="200" r="150" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-violet-300" />
-              <circle cx="200" cy="200" r="100" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-violet-300" />
-              <circle cx="200" cy="200" r="50" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-violet-300" />
-              <polygon points="200,50 350,200 200,350 50,200" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-amber-300" />
-              <polygon points="200,80 320,200 200,320 80,200" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-amber-300" />
-            </svg>
-          </div>
+      {/* Modal — bottom sheet on mobile, centered on desktop */}
+      <div className="relative w-full sm:max-w-sm sm:rounded-2xl rounded-t-2xl overflow-hidden shadow-2xl">
+        {/* Cosmic header graphic with AI-generated art */}
+        <div className="relative h-36 sm:h-44 overflow-hidden">
+          <img
+            src="https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/newsletter-cosmic-art_8a1b6665.png"
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          {/* Gradient overlay for smooth transition to white content */}
+          <div className="absolute inset-x-0 bottom-0 h-12" style={{ background: 'linear-gradient(transparent, white)' }} />
 
           {/* Close button */}
           <button
             onClick={handleDismiss}
-            className="absolute top-4 right-4 text-white/40 hover:text-white/80 transition-colors"
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center transition-colors backdrop-blur-sm"
             aria-label="Close"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 text-white" />
           </button>
+        </div>
 
-          {/* Content */}
-          <div className="relative text-center">
-            {/* Icon */}
-            <div className="mx-auto mb-5 w-16 h-16 rounded-full bg-gradient-to-br from-violet-500/20 to-amber-500/20 border border-violet-400/30 flex items-center justify-center">
-              <Sparkles className="w-8 h-8 text-amber-300" />
-            </div>
-
-            {/* Heading */}
-            <h3 className="font-serif text-2xl font-bold text-white mb-2">
+        {/* Content area — solid white background for maximum readability */}
+        <div className="bg-white px-6 py-6 sm:px-8 sm:py-7">
+          <div className="text-center">
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-gray-900 mb-2">
               {isEn ? "Weekly Cosmic Insights" : "Týdenní kosmické vhledy"}
             </h3>
 
-            {/* Subheading */}
-            <p className="text-violet-200/80 text-sm mb-6 max-w-xs mx-auto leading-relaxed">
+            <p className="text-gray-600 text-sm leading-relaxed mb-5 max-w-xs mx-auto">
               {isEn
                 ? "Receive personalized Human Design transit forecasts and spiritual guidance every Monday."
                 : "Každé pondělí obdržíte personalizovanou předpověď tranzitů Human Design a duchovní vedení."}
             </p>
 
             {status === "success" ? (
-              <div className="py-4">
-                <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center">
-                  <Star className="w-6 h-6 text-emerald-300" />
+              <div className="py-3">
+                <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                  <Star className="w-6 h-6 text-emerald-500" />
                 </div>
-                <p className="text-emerald-300 font-medium">
+                <p className="text-emerald-700 font-medium text-sm">
                   {isEn ? "Welcome to the cosmic tribe!" : "Vítejte v kosmickém kmeni!"}
                 </p>
-                <p className="text-violet-200/60 text-xs mt-2">
-                  {isEn
-                    ? "Check your inbox for the first insight."
-                    : "Zkontrolujte svou schránku pro první vhled."}
+                <p className="text-gray-500 text-xs mt-1">
+                  {isEn ? "Check your inbox for the first insight." : "Zkontrolujte svou schránku pro první vhled."}
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-3">
-                <div className="relative">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder={isEn ? "your@email.com" : "vas@email.cz"}
-                    required
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-violet-400/50 focus:ring-1 focus:ring-violet-400/30 transition-all text-sm"
-                  />
-                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={isEn ? "your@email.com" : "vas@email.cz"}
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all text-sm"
+                />
 
                 {status === "error" && (
-                  <p className="text-red-400 text-xs">{errorMsg || (isEn ? "Something went wrong" : "Něco se pokazilo")}</p>
+                  <p className="text-red-500 text-xs">{errorMsg || (isEn ? "Something went wrong" : "Něco se pokazilo")}</p>
                 )}
 
                 <Button
                   type="submit"
                   disabled={status === "loading"}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-medium text-sm shadow-lg shadow-violet-500/25 transition-all duration-200 disabled:opacity-50"
+                  className="w-full py-3 rounded-xl text-white font-medium text-sm shadow-lg transition-all duration-200 disabled:opacity-50"
+                  style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', boxShadow: '0 4px 14px rgba(124,58,237,0.3)' }}
                 >
                   {status === "loading"
                     ? (isEn ? "Subscribing..." : "Přihlašuji...")
                     : (isEn ? "Receive Weekly Insights" : "Přihlásit se k odběru")}
                 </Button>
 
-                <p className="text-white/30 text-[11px] mt-3">
+                <p className="text-gray-400 text-[11px] pt-1">
                   {isEn
                     ? "No spam. Unsubscribe anytime. Your energy is sacred."
                     : "Žádný spam. Odhlášení kdykoliv. Vaše energie je posvátná."}

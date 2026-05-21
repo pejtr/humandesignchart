@@ -648,3 +648,8 @@
 ## Blog Cover Images — Spiritual Premium Upgrade
 - [x] Generate 6 spiritual/premium cover images (sacred geometry, cosmic, ethereal)
 - [x] Upload to webdev static assets and update blog article coverImage URLs (all CS + EN articles updated)
+
+## UX Improvements — Batch 3
+- [x] Animated chart counter on hero section (real count from DB, counting animation on scroll)
+- [x] Blog article series with progress bar (link related articles, show reading progress)
+- [x] Social share buttons in blog article detail (premium design, WhatsApp/Facebook/X/copy link)

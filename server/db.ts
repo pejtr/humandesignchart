@@ -257,6 +257,13 @@ export async function countAiReadingsByUser(userId: number) {
   return result.length;
 }
 
+export async function countTotalCharts(): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db.select().from(charts);
+  return result.length;
+}
+
 // ─── Gift Voucher Operations ─────────────────────────────────────────────────
 
 export async function createGiftVoucher(voucher: InsertGiftVoucher) {

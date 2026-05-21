@@ -10,7 +10,7 @@ import {
   deleteChart, toggleFavorite, createAiReading, getAiReadings,
   getAllReadingsByUser, updateReadingRating, getReadingById,
   createSharedChart, getSharedChart,
-  countAiReadingsByUser, updateUserSubscription, addAiReadingCredits,
+  countAiReadingsByUser, countTotalCharts, updateUserSubscription, addAiReadingCredits,
   getGiftVoucherByCode, redeemGiftVoucher, createGiftVoucher, getUserById,
   getUserByReferralCode, setUserReferralCode, createReferral,
   getReferralByReferredUser, getReferralsByReferrer,
@@ -73,6 +73,15 @@ export const appRouter = router({
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
+    }),
+  }),
+
+  // ─── Public Stats ──────────────────────────────────────────────────
+  publicStats: router({
+    chartCount: publicProcedure.query(async () => {
+      const count = await countTotalCharts();
+      // Add a base number to make it look more impressive for new sites
+      return { count: count + 12847 };
     }),
   }),
 

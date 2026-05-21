@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -11,6 +12,54 @@ import {
   FileText, Zap, ArrowRight, CheckCircle2, Eye, Lightbulb,
   Heart, Shield, Leaf, ChevronLeft, ChevronRight,
 } from "lucide-react";
+
+// ─── Animated Chart Counter ──────────────────────────────────────────────────
+function ChartCounter({ isCs }: { isCs: boolean }) {
+  const { data } = trpc.publicStats.chartCount.useQuery(undefined, {
+    staleTime: 60_000,
+  });
+  const [displayCount, setDisplayCount] = useState(0);
+  const targetCount = data?.count ?? 12847;
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    if (hasAnimated.current) return;
+    if (!data) return;
+    hasAnimated.current = true;
+    const duration = 2000;
+    const steps = 60;
+    const increment = targetCount / steps;
+    let current = 0;
+    const interval = setInterval(() => {
+      current += increment;
+      if (current >= targetCount) {
+        setDisplayCount(targetCount);
+        clearInterval(interval);
+      } else {
+        setDisplayCount(Math.floor(current));
+      }
+    }, duration / steps);
+    return () => clearInterval(interval);
+  }, [data, targetCount]);
+
+  const formatted = displayCount.toLocaleString(isCs ? "cs-CZ" : "en-US");
+
+  return (
+    <div className="flex items-center gap-3 px-4 py-2.5 rounded-full border bg-white/80 shadow-sm" style={{ borderColor: '#d4af37' }}>
+      <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: '#fef3c7', border: '2px solid #d4af37' }}>
+        <BarChart3 className="w-4 h-4" style={{ color: '#92400e' }} />
+      </div>
+      <div className="text-left">
+        <p className="text-sm font-semibold leading-none tabular-nums" style={{ color: '#1a1a1a' }}>
+          {formatted}+
+        </p>
+        <p className="text-xs" style={{ color: '#777' }}>
+          {isCs ? "vygenerovaných map" : "charts generated"}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -333,15 +382,7 @@ export default function Home() {
                 </Button>
               </Link>
 
-              <div className="flex items-center gap-3 px-4 py-2.5 rounded-full border bg-white/80 shadow-sm" style={{ borderColor: '#d4af37' }}>
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: '#fef3c7', border: '2px solid #d4af37', color: '#92400e' }}>
-                  TRS
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-semibold leading-none" style={{ color: '#1a1a1a' }}>{isCs ? "Přes 1 200" : "Over 1,200"}</p>
-                  <p className="text-xs" style={{ color: '#777' }}>{isCs ? "spokojených uživatelů" : "satisfied users"}</p>
-                </div>
-              </div>
+              <ChartCounter isCs={isCs} />
             </motion.div>
 
             <motion.div
