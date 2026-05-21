@@ -3,9 +3,10 @@ import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "wouter";
 import {
-  Menu, X, User, LogOut, LayoutDashboard, Compass, Star, Users,
+  Menu, X, User, LogOut, LayoutDashboard, Star, Users,
   Sparkles, GitCompare, BookOpen, Bot, RotateCcw, ChevronDown,
-  Calendar, Hexagon, UtensilsCrossed, Sun, Target, CreditCard, Zap, Share2,
+  Hexagon, Sun, Target, CreditCard, Zap, Share2,
+  Orbit, Flame, Eye, Layers, Crown, Gem,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -85,9 +86,9 @@ export default function Navbar() {
 
   // Primary nav links — keep short to avoid overflow
   const primaryLinks = [
-    { href: "/calculate", label: t.nav.calculateChart, icon: Compass },
-    { href: "/encyclopedia", label: locale === "cs" ? "Encyklopedie" : "Encyclopedia", icon: BookOpen },
-    { href: "/ai-guide", label: locale === "cs" ? "AI průvodce" : "AI Guide", icon: Bot },
+    { href: "/calculate", label: locale === "cs" ? "Tvoje mapa" : "Your Chart", icon: Orbit },
+    { href: "/encyclopedia", label: locale === "cs" ? "Encyklopedie" : "Encyclopedia", icon: Layers },
+    { href: "/ai-guide", label: locale === "cs" ? "AI Průvodce" : "AI Guide", icon: Eye },
   ];
 
   const toolsLinks = [
@@ -95,8 +96,8 @@ export default function Navbar() {
     { href: "/return-chart", label: locale === "cs" ? "Return charty" : "Return Charts", icon: RotateCcw, desc: locale === "cs" ? "Solární, Saturnův a další Return charty" : "Solar, Saturn, and other Return charts" },
     { href: "/compare", label: t.nav.compare, icon: GitCompare, desc: locale === "cs" ? "Porovnání dvou Human Design map" : "Compare two Human Design charts" },
     { href: "/transits", label: t.nav.transits, icon: Star, desc: locale === "cs" ? "Aktuální planetární tranzity" : "Current planetary transits" },
-    { href: "/transit-calendar", label: locale === "cs" ? "Tranzitní kalendář" : "Transit Calendar", icon: Calendar, desc: locale === "cs" ? "Denní a týdní přehled tranzitů" : "Daily and weekly transit overview" },
-    { href: "/variables", label: locale === "cs" ? "Proměnné (PHS)" : "Variables (PHS)", icon: UtensilsCrossed, desc: locale === "cs" ? "Strávení, prostředí, perspektiva, vědomí" : "Digestion, environment, perspective, awareness" },
+    { href: "/transit-calendar", label: locale === "cs" ? "Tranzitní kalendář" : "Transit Calendar", icon: Flame, desc: locale === "cs" ? "Denní a týdní přehled tranzitů" : "Daily and weekly transit overview" },
+    { href: "/variables", label: locale === "cs" ? "Proměnné (PHS)" : "Variables (PHS)", icon: Gem, desc: locale === "cs" ? "Strávení, prostředí, perspektiva, vědomí" : "Digestion, environment, perspective, awareness" },
     { href: "/social-scheduler", label: locale === "cs" ? "Plánovač sítí" : "Social Scheduler", icon: Share2, desc: locale === "cs" ? "Plánujte příspěvky na sociálních sítích" : "Schedule posts to social media" },
   ];
 
@@ -111,13 +112,23 @@ export default function Navbar() {
     <>
       <header className="fixed top-0 left-0 right-0 z-50 navbar-mystical bg-background/80 backdrop-blur-xl">
         <nav className="container flex items-center justify-between h-16 gap-2">
-          {/* Logo */}
-          <Link href={localePath("/")} className="flex items-center gap-2 no-underline shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary" />
+          {/* Logo — custom HD bodygraph symbol */}
+          <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline shrink-0 group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="12" cy="4" r="2" />
+                <circle cx="12" cy="12" r="2.5" />
+                <circle cx="12" cy="20" r="2" />
+                <circle cx="6" cy="8" r="1.5" />
+                <circle cx="18" cy="8" r="1.5" />
+                <line x1="12" y1="6" x2="12" y2="9.5" />
+                <line x1="12" y1="14.5" x2="12" y2="18" />
+                <line x1="7.2" y1="7" x2="10" y2="10.5" />
+                <line x1="16.8" y1="7" x2="14" y2="10.5" />
+              </svg>
             </div>
-            <span className="font-serif text-xl font-semibold text-foreground hidden sm:block">
-              {t.common.appName}
+            <span className="font-serif text-xl font-bold tracking-tight text-foreground hidden sm:block">
+              Human Design
             </span>
           </Link>
 
@@ -140,7 +151,7 @@ export default function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-sm gap-1">
-                  <Calendar className="w-4 h-4" />
+                  <Flame className="w-4 h-4" />
                   {locale === "cs" ? "Nástroje" : "Tools"}
                   <ChevronDown className="w-3 h-3 opacity-60" />
                 </Button>
@@ -191,8 +202,8 @@ export default function Navbar() {
                 size="sm"
                 className="text-sm"
               >
-                <CreditCard className="w-4 h-4 mr-1.5" />
-                {locale === "cs" ? "Ceník" : "Pricing"}
+                <Crown className="w-4 h-4 mr-1.5" />
+                {locale === "cs" ? "Premium" : "Premium"}
               </Button>
             </Link>
           </div>
@@ -321,11 +332,21 @@ export default function Navbar() {
       >
         {/* Drawer header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border/50 shrink-0">
-          <Link href={localePath("/")} className="flex items-center gap-2 no-underline" onClick={() => setMobileOpen(false)}>
-            <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary" />
+          <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline" onClick={() => setMobileOpen(false)}>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-sm">
+              <svg viewBox="0 0 24 24" className="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="12" cy="4" r="2" />
+                <circle cx="12" cy="12" r="2.5" />
+                <circle cx="12" cy="20" r="2" />
+                <circle cx="6" cy="8" r="1.5" />
+                <circle cx="18" cy="8" r="1.5" />
+                <line x1="12" y1="6" x2="12" y2="9.5" />
+                <line x1="12" y1="14.5" x2="12" y2="18" />
+                <line x1="7.2" y1="7" x2="10" y2="10.5" />
+                <line x1="16.8" y1="7" x2="14" y2="10.5" />
+              </svg>
             </div>
-            <span className="font-serif text-lg font-semibold text-foreground">{t.common.appName}</span>
+            <span className="font-serif text-lg font-bold tracking-tight text-foreground">Human Design</span>
           </Link>
           <div className="flex items-center gap-1">
             <LanguageSwitcher />

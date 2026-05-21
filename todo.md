@@ -673,3 +673,9 @@
 - [x] Sacred geometry SVG background decoration
 - [x] Update price to 88 CZK for premium monthly
 - [x] Mystical gradient hero section
+
+## UX Improvements — Batch 5
+- [x] Mobile hamburger menu (full navigation on phones, animated open/close) — already existed in Navbar.tsx
+- [x] FAQ section under pricing page (bilingual accordion with 4 questions about cancellation, payment, trial, gift vouchers)
+- [x] Testimonials carousel auto-scroll (5s interval, pause on hover, enhanced card hover effects, scale/glow animations)
+- [x] Navbar icon/logo upgrade: custom HD bodygraph SVG logo (purple gradient), new icons (Orbit, Layers, Eye, Flame, Gem, Crown), "Premium" label

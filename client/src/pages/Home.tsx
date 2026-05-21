@@ -161,8 +161,18 @@ function getTestimonials(isCs: boolean) {
 function TestimonialsSection({ isCs }: { isCs: boolean }) {
   const testimonials = getTestimonials(isCs);
   const [active, setActive] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const count = testimonials.length;
   const visible = [active, (active + 1) % count, (active + 2) % count];
+
+  // Auto-scroll every 5 seconds, pauses on hover
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setActive((prev) => (prev + 1) % count);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isPaused, count]);
 
   return (
     <section className="py-20 relative overflow-hidden bg-gradient-to-b from-purple-950/5 via-background to-background">
@@ -190,26 +200,30 @@ function TestimonialsSection({ isCs }: { isCs: boolean }) {
             {isCs ? "Reference" : "Testimonials"}
           </h2>
         </motion.div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-8">
+        <div
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-8"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
           {visible.map((idx) => {
             const tm = testimonials[idx];
             return (
               <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                className="rounded-2xl p-6 border border-purple-200/30 dark:border-purple-500/20 bg-card/80 backdrop-blur-sm shadow-lg hover:shadow-purple-500/5 transition-shadow flex flex-col"
+                key={`${active}-${idx}`}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="rounded-2xl p-6 border border-purple-200/30 dark:border-purple-500/20 bg-card/80 backdrop-blur-sm shadow-lg hover:shadow-purple-500/20 hover:border-purple-400/40 hover:-translate-y-1 transition-all duration-300 flex flex-col group cursor-default"
               >
                 <div className="flex gap-1 mb-3">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400 group-hover:scale-110 transition-transform" />
                   ))}
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4 italic flex-1">“{tm.text}”</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4 italic flex-1 group-hover:text-foreground/80 transition-colors">"{tm.text}"</p>
                 <div className="flex items-center gap-3 pt-3 border-t border-border/30">
                   <div
-                    className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs"
+                    className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs group-hover:ring-2 group-hover:ring-purple-400/30 transition-all"
                     style={{ background: tm.color, color: '#555' }}
                   >
                     {tm.initials}
@@ -223,7 +237,7 @@ function TestimonialsSection({ isCs }: { isCs: boolean }) {
         <div className="flex items-center justify-center gap-4">
           <button
             onClick={() => setActive((active - 1 + count) % count)}
-            className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+            className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-purple-500/10 hover:border-purple-400/50 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -232,17 +246,24 @@ function TestimonialsSection({ isCs }: { isCs: boolean }) {
               <button
                 key={i}
                 onClick={() => setActive(i)}
-                className="w-2.5 h-2.5 rounded-full transition-colors"
-                style={{ background: i === active ? '#2a9d8f' : '#ccc' }}
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === active ? 'bg-purple-500 scale-125' : 'bg-muted-foreground/30 hover:bg-purple-400/50'}`}
               />
             ))}
           </div>
           <button
             onClick={() => setActive((active + 1) % count)}
-            className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+            className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-purple-500/10 hover:border-purple-400/50 transition-colors"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
+        </div>
+        {/* Auto-scroll indicator */}
+        <div className="flex justify-center mt-4">
+          <span className="text-xs text-muted-foreground/50">
+            {isPaused
+              ? (isCs ? "⏸ Pozastaveno" : "⏸ Paused")
+              : (isCs ? "▶ Automatické přepínání" : "▶ Auto-scrolling")}
+          </span>
         </div>
       </div>
     </section>

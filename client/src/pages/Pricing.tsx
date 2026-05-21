@@ -544,6 +544,38 @@ export default function Pricing() {
             <Lock className="w-3 h-3 inline" />
           </p>
         </div>
+
+        {/* FAQ Section */}
+        <div className="mt-20">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold mb-3 bg-gradient-to-r from-purple-300 via-violet-200 to-indigo-300 bg-clip-text text-transparent">
+              {isCzech ? "Často kladené otázky" : "Frequently Asked Questions"}
+            </h2>
+            <p className="text-muted-foreground">
+              {isCzech
+                ? "Vše, co potřebujete vědět o Human Design Premium"
+                : "Everything you need to know about Human Design Premium"}
+            </p>
+          </div>
+          <div className="max-w-2xl mx-auto">
+            <Accordion type="single" collapsible className="space-y-3">
+              {faqItems.map((item, idx) => (
+                <AccordionItem
+                  key={idx}
+                  value={`faq-${idx}`}
+                  className="border border-border/50 rounded-xl px-5 bg-card/50 backdrop-blur-sm data-[state=open]:border-purple-500/30 data-[state=open]:bg-purple-500/5 transition-colors"
+                >
+                  <AccordionTrigger className="text-left font-medium text-foreground hover:text-purple-300 transition-colors py-4 [&[data-state=open]>svg]:text-purple-400">
+                    {item.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground pb-4 leading-relaxed">
+                    {item.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </div>
       </div>
       <Footer />
     </div>
