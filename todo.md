@@ -609,7 +609,7 @@
 - [x] I-Ching Oracle: all 64 hexagrams translated to Czech (nameCz, meaningCz, judgmentCz, imageCz)
 
 ## UX Improvements — Mobile & Transit
-- [ ] Mobile "Related articles" horizontal scroll strip below article body in BlogArticle.tsx
+- [x] Mobile "Related articles" horizontal scroll strip below article body in BlogArticle.tsx (premium design: gradient bg, fade edges, category badges, excerpt, CTA card)
 - [ ] Share button on Daily Transit widget (copy text + social share links)
 - [ ] Skeleton loader for Daily Transit AI reading generation
 

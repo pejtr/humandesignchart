@@ -374,6 +374,112 @@ export default function BlogArticle() {
         </div>
       </section>
 
+      {/* ── Mobile Related Articles Strip (hidden on lg+) ─────────────────── */}
+      {relatedArticles.length > 0 && (
+        <section className="py-8 lg:hidden relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.04) 0%, rgba(42,157,143,0.04) 100%)' }}>
+          {/* Top decorative line */}
+          <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.3), rgba(42,157,143,0.3), transparent)' }} />
+
+          <div className="container max-w-4xl">
+            <div className="flex items-center justify-between mb-5">
+              <h4 className="font-serif text-base font-bold flex items-center gap-2 text-foreground">
+                <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                  <BookOpen className="w-3.5 h-3.5 text-primary" />
+                </span>
+                {isEn ? "Also read" : "Také si přečtěte"}
+              </h4>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
+                {isEn ? "Swipe" : "Posuňte"} →
+              </span>
+            </div>
+
+            {/* Scroll container with fade edges */}
+            <div className="relative">
+              {/* Left fade */}
+              <div className="absolute left-0 top-0 bottom-0 w-6 z-10 pointer-events-none" style={{ background: 'linear-gradient(90deg, rgba(250,249,255,0.9), transparent)' }} />
+              {/* Right fade */}
+              <div className="absolute right-0 top-0 bottom-0 w-6 z-10 pointer-events-none" style={{ background: 'linear-gradient(270deg, rgba(250,249,255,0.9), transparent)' }} />
+
+              <div className="flex gap-3.5 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide -mx-4 px-6">
+                {relatedArticles.map(ra => (
+                  <Link
+                    key={ra.slug}
+                    href={localePath(`/blog/${ra.slug}`)}
+                    className="no-underline flex-shrink-0 snap-start w-52"
+                  >
+                    <div className="group rounded-2xl border border-border/40 bg-card overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+                      {/* Thumbnail with gradient overlay */}
+                      <div className="w-full h-28 overflow-hidden bg-muted flex-shrink-0 relative">
+                        {ra.coverImage ? (
+                          <img
+                            src={ra.coverImage}
+                            alt={ra.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className={`w-full h-full flex items-center justify-center ${ra.coverColor ?? 'bg-gradient-to-br from-primary/10 to-primary/5'}`}>
+                            <BookOpen className="w-7 h-7 text-primary/25" />
+                          </div>
+                        )}
+                        {/* Bottom gradient overlay on image */}
+                        <div className="absolute inset-x-0 bottom-0 h-8" style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.15))' }} />
+                        {/* Category badge on image */}
+                        <span className={`absolute top-2 left-2 text-[9px] font-semibold px-2 py-0.5 rounded-full border backdrop-blur-sm ${CATEGORY_STYLES[ra.category] || 'bg-muted text-muted-foreground border-border'}`}>
+                          {ra.categoryLabel}
+                        </span>
+                      </div>
+                      {/* Content */}
+                      <div className="p-3.5 flex flex-col gap-1.5 flex-1">
+                        <p className="text-[13px] font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                          {ra.title}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2 flex-1">
+                          {ra.excerpt}
+                        </p>
+                        <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-border/30">
+                          <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            <Clock className="w-2.5 h-2.5" />
+                            {ra.readingTime} min
+                          </p>
+                          <span className="text-[10px] font-medium text-primary group-hover:translate-x-0.5 transition-transform">
+                            {isEn ? "Read" : "Číst"} →
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+                {/* Premium CTA card */}
+                <Link
+                  href={localePath("/calculate")}
+                  className="no-underline flex-shrink-0 snap-start w-52"
+                >
+                  <div className="group rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 h-full flex flex-col items-center justify-center p-5 text-center gap-3 relative" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(42,157,143,0.08) 50%, rgba(212,175,55,0.08) 100%)', border: '1px solid rgba(139,92,246,0.2)' }}>
+                    {/* Decorative ring */}
+                    <div className="absolute inset-3 rounded-xl border border-dashed border-primary/15 pointer-events-none" />
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <Compass className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-primary leading-snug mb-0.5">
+                        {isEn ? "Free Chart" : "Mapa zdarma"}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        {isEn ? "Discover your unique energy blueprint" : "Objevte svou jedinečnou energetickou mapu"}
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-semibold text-primary/80 uppercase tracking-wider">
+                      {isEn ? "Start now" : "Začít"} →
+                    </span>
+                  </div>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="py-8 border-t border-border/50">
         <div className="container max-w-4xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
