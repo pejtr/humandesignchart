@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import { lazy, Suspense, useEffect } from "react";
 import HDLoader from "./components/HDLoader";
 import ReferralApplier from "./components/ReferralApplier";
+import NewsletterPopup from "./components/NewsletterPopup";
 import WelcomeModal, { useWelcomeModal } from "./components/WelcomeModal";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
@@ -170,6 +171,7 @@ function App() {
             <Toaster />
             <ReferralApplier />
             <WelcomeModalWrapper />
+            <NewsletterPopup />
             <LocaleRoutes />
           </LanguageProvider>
         </TooltipProvider>

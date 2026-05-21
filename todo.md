@@ -637,3 +637,14 @@
 - [x] Update hreflang alternates
 - [x] Update OG meta tags (og:url) per locale
 - [x] Update robots.txt sitemap reference
+
+## Newsletter Popup — Weekly HD Horoscope
+- [x] DB table: newsletter_subscribers (email, locale, subscribedAt, source)
+- [x] tRPC procedure: newsletter.subscribe (public, validates email, prevents duplicates)
+- [x] Frontend component: NewsletterPopup (elegant modal, 30s delay, shown once via localStorage)
+- [x] Bilingual CS/EN copy with weekly horoscope offer
+- [x] Integration with existing notification system for owner alerts on new subscribers
+
+## Blog Cover Images — Spiritual Premium Upgrade
+- [x] Generate 6 spiritual/premium cover images (sacred geometry, cosmic, ethereal)
+- [x] Upload to webdev static assets and update blog article coverImage URLs (all CS + EN articles updated)

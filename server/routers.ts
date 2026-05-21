@@ -21,7 +21,7 @@ import {
 } from "./db";
 import { getStripe } from "./stripeWebhook";
 import { isPremiumUser, canGenerateAiReading, FREE_TIER } from "./stripeProducts";
-import { users } from "../drizzle/schema";
+import { users, newsletterSubscribers } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { getDb } from "./db";
 import crypto from "crypto";
@@ -33,6 +33,40 @@ import { BLOG_ARTICLES_EN } from "../shared/blogArticlesEn";
 export const appRouter = router({
   system: systemRouter,
   social: socialRouter,
+
+  // ─── Newsletter ─────────────────────────────────────────────────────
+  newsletter: router({
+    subscribe: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        locale: z.string().default("cs"),
+        source: z.string().default("popup"),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database unavailable");
+        // Check for existing subscriber
+        const existing = await db.select().from(newsletterSubscribers)
+          .where(eq(newsletterSubscribers.email, input.email.toLowerCase())).limit(1);
+        if (existing.length > 0) {
+          return { success: true, alreadySubscribed: true };
+        }
+        await db.insert(newsletterSubscribers).values({
+          email: input.email.toLowerCase(),
+          locale: input.locale,
+          source: input.source,
+        });
+        // Notify owner
+        try {
+          const { notifyOwner } = await import("./_core/notification");
+          await notifyOwner({
+            title: "New Newsletter Subscriber ✨",
+            content: `${input.email} subscribed (locale: ${input.locale}, source: ${input.source})`,
+          });
+        } catch {}
+        return { success: true, alreadySubscribed: false };
+      }),
+  }),
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

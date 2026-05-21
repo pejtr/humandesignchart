@@ -40,7 +40,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-amber-50 to-orange-50",
     coverIcon: "Compass",
-    coverImage: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&q=80",
+    coverImage: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-cover-what-is-hd-9eTivLzbjfpYqb3AY3wvyb.webp",
     tags: ["human design", "základy", "sebepoznání", "začátečníci"],
     content: `## Co je Human Design?
 
@@ -102,7 +102,7 @@ Human Design není víra ani dogma — je to experiment. Ra Uru Hu vždy říkal
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-violet-50 to-purple-50",
     coverIcon: "Users",
-    coverImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80",
+    coverImage: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-cover-5-types-YY6JuStBBaYytjF8swFTEz.webp",
     tags: ["typy", "generátor", "projektor", "manifestor", "reflektor"],
     content: `## Pět typů v Human Designu
 
@@ -185,7 +185,7 @@ K zjištění svého typu potřebujete přesné datum, čas a místo narození. 
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-emerald-50 to-teal-50",
     coverIcon: "Target",
-    coverImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
+    coverImage: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-cover-strategy-QJVhQQszbuzrXhxog29apU.webp",
     tags: ["strategie", "rozhodování", "reagovat", "informovat", "pozvání"],
     content: `## Co je strategie v Human Designu?
 
@@ -245,7 +245,7 @@ Chcete zjistit svou strategii? **[Vypočítejte si svůj Human Design chart](/cs
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-blue-50 to-indigo-50",
     coverIcon: "Brain",
-    coverImage: "https://images.unsplash.com/photo-1509909756405-be0199881695?w=800&q=80",
+    coverImage: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-cover-authority-QGccsjASgJwE2xu6AUbTAN.webp",
     tags: ["autorita", "rozhodování", "sakrální", "emocionální", "slezinová"],
     content: `## Co je autorita v Human Designu?
 
@@ -324,7 +324,7 @@ Pamatujte: autorita vždy pracuje společně se [strategií](/cs/blog/strategie-
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-rose-50 to-pink-50",
     coverIcon: "Star",
-    coverImage: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=800&q=80",
+    coverImage: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-cover-profiles-SYULYkCAeC979gZ6rELWp7.webp",
     tags: ["profil", "životní role", "linie", "1/3", "2/4", "5/1", "6/2"],
     content: `## Co je profil v Human Designu?
 
@@ -400,7 +400,7 @@ Profil úzce souvisí s vaším [inkarnačním křížem](/cs/blog/inkarnacni-kr
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-orange-50 to-amber-50",
     coverIcon: "Circle",
-    coverImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
+    coverImage: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-cover-authority-QGccsjASgJwE2xu6AUbTAN.webp",
     tags: ["centra", "definovaná centra", "otevřená centra", "kondicionování", "bodygraph"],
     content: `## Co jsou centra v Human Designu?
 
@@ -486,7 +486,7 @@ Vaše definovaná a otevřená centra jsou viditelná v bodygraphu. **[Vypočít
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-yellow-50 to-amber-50",
     coverIcon: "Zap",
-    coverImage: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=800&q=80",
+    coverImage: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-cover-strategy-QJVhQQszbuzrXhxog29apU.webp",
     tags: ["generátor", "reagovat", "sakrální centrum", "strategie"],
     content: `## Generátor a umění reagování
 
@@ -562,7 +562,7 @@ Chcete zjistit, zda jste Generátor? **[Vypočítejte si svůj Human Design char
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-violet-50 to-indigo-50",
     coverIcon: "Eye",
-    coverImage: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=800&q=80",
+    coverImage: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-cover-5-types-YY6JuStBBaYytjF8swFTEz.webp",
     tags: ["projektor", "pozvání", "uznání", "strategie", "průvodce"],
     content: `## Projektor — průvodce nové éry
 
@@ -641,7 +641,7 @@ Chcete zjistit, zda jste Projektor? **[Vypočítejte si svůj Human Design chart
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-pink-50 to-rose-50",
     coverIcon: "Heart",
-    coverImage: "https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=800&q=80",
+    coverImage: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-cover-relationships-6e7CiBwXEvELkByKScTSMr.webp",
     tags: ["vztahy", "kompatibilita", "elektromagnetické spojení", "partnerské charty"],
     content: `## Human Design a vztahy
 
@@ -708,7 +708,7 @@ Reflektor zrcadlí partnera. Je důležité, aby Reflektor měl prostor pro svou
     updatedAt: "2026-03-03",
     coverColor: "bg-gradient-to-br from-teal-50 to-cyan-50",
     coverIcon: "Star",
-    coverImage: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80",
+    coverImage: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-cover-what-is-hd-9eTivLzbjfpYqb3AY3wvyb.webp",
     tags: ["inkarnační kříž", "životní účel", "brány", "poslání", "slunce"],
     content: `## Co je inkarnační kříž?
 
@@ -766,7 +766,7 @@ Váš inkarnační kříž je součástí vašeho Human Design chartu. **[Vypoč
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-slate-50 to-gray-100",
     coverIcon: "FileText",
-    coverImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80",
+    coverImage: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-cover-profiles-SYULYkCAeC979gZ6rELWp7.webp",
     tags: ["bodygraph", "jak číst", "začátečníci", "brány", "kanály"],
     content: `## Co je bodygraph?
 

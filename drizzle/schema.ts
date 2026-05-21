@@ -228,3 +228,16 @@ export type SocialPost = typeof socialPosts.$inferSelect;
 export type InsertSocialPost = typeof socialPosts.$inferInsert;
 export type SocialPostAccount = typeof socialPostAccounts.$inferSelect;
 export type InsertSocialPostAccount = typeof socialPostAccounts.$inferInsert;
+
+// ─── Newsletter Subscribers ──────────────────────────────────────────────────
+export const newsletterSubscribers = mysqlTable("newsletter_subscribers", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  locale: varchar("locale", { length: 5 }).default("cs").notNull(),
+  source: varchar("source", { length: 50 }).default("popup").notNull(),
+  subscribedAt: timestamp("subscribedAt").defaultNow().notNull(),
+  unsubscribedAt: timestamp("unsubscribedAt"),
+});
+
+export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
+export type InsertNewsletterSubscriber = typeof newsletterSubscribers.$inferInsert;
