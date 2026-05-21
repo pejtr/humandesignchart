@@ -109,7 +109,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <header className="fixed top-0 left-0 right-0 z-50 navbar-mystical bg-background/80 backdrop-blur-xl">
         <nav className="container flex items-center justify-between h-16 gap-2">
           {/* Logo */}
           <Link href={localePath("/")} className="flex items-center gap-2 no-underline shrink-0">

@@ -6,8 +6,10 @@ export default function Footer() {
   const { t, locale, localePath } = useLanguage();
 
   return (
-    <footer className="border-t border-border/50 bg-background/50 backdrop-blur-sm">
-      <div className="container py-12">
+    <footer className="footer-mystical bg-background/50 backdrop-blur-sm relative">
+      {/* Mystical sacred geometry decoration */}
+      <div className="absolute inset-0 bg-sacred-geometry pointer-events-none opacity-50" />
+      <div className="container py-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
@@ -95,7 +97,8 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-border/50 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="mystical-divider mt-8 mb-8" />
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} {t.footer.copyright}
           </p>

@@ -10,38 +10,38 @@ export const STRIPE_PRODUCTS = {
   PREMIUM_MONTHLY: {
     name: "Human Design Premium — Měsíční / Monthly",
     description: "Neomezené AI výklady, PDF reporty, všechny nástroje | Unlimited AI readings, PDF reports, all tools",
-    pricesCzk: 14900, // 149 CZK in haléře
-    pricesEur: 599,   // 5.99 EUR in cents
+    pricesCzk: 8800, // 88 CZK in haléře
+    pricesEur: 349,   // 3.49 EUR in cents
     interval: "month" as const,
     metadata: { plan: "monthly" },
   },
   PREMIUM_ANNUAL: {
     name: "Human Design Premium — Roční / Annual",
     description: "Vše z měsíčního plánu + úspora 44 % | Everything in monthly + 44% savings",
-    pricesCzk: 99000, // 990 CZK in haléře
-    pricesEur: 3900,  // 39 EUR in cents
+    pricesCzk: 88800, // 888 CZK in haléře
+    pricesEur: 3500,  // 35 EUR in cents
     interval: "year" as const,
     metadata: { plan: "annual" },
   },
   CREDIT_PACK: {
     name: "Human Design AI Credits — 5 výkladů / 5 readings",
     description: "5 AI výkladů bez předplatného | 5 AI readings without subscription",
-    pricesCzk: 4900, // 49 CZK in haléře
-    pricesEur: 199,  // 1.99 EUR in cents
+    pricesCzk: 4400, // 44 CZK in haléře
+    pricesEur: 179,  // 1.79 EUR in cents
     metadata: { plan: "credits", credits: "5" },
   },
   GIFT_MONTHLY: {
     name: "Dárkový poukaz — Premium Měsíc / Gift Voucher Monthly",
     description: "Dárkový poukaz na 1 měsíc Premium | Gift voucher for 1 month Premium",
-    pricesCzk: 14900,
-    pricesEur: 599,
+    pricesCzk: 8800,
+    pricesEur: 349,
     metadata: { plan: "gift_monthly" },
   },
   GIFT_ANNUAL: {
     name: "Dárkový poukaz — Premium Rok / Gift Voucher Annual",
     description: "Dárkový poukaz na 1 rok Premium | Gift voucher for 1 year Premium",
-    pricesCzk: 99000,
-    pricesEur: 3900,
+    pricesCzk: 88800,
+    pricesEur: 3500,
     metadata: { plan: "gift_annual" },
   },
 } as const;

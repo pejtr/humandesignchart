@@ -12,6 +12,7 @@ import {
   Share2, Link2, Check,
 } from "lucide-react";
 import HDLoader from "@/components/HDLoader";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 const CATEGORY_STYLES: Record<string, string> = {
   zaklady: "bg-amber-100 text-amber-800 border-amber-200",
@@ -313,10 +314,11 @@ export default function BlogArticle() {
 
       <section className={`${article.coverImage ? 'pt-8' : 'pt-24'} pb-8 bg-gradient-to-b from-primary/5 to-background`}>
         <div className="container max-w-4xl">
-          <Button variant="ghost" size="sm" onClick={() => navigate(localePath("/blog"))} className="mb-6">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {isEn ? "Back to blog" : "Zpět na blog"}
-          </Button>
+          <Breadcrumbs items={[
+            { label: "Blog", href: "/blog" },
+            { label: article.categoryLabel, href: `/blog?category=${article.category}` },
+            { label: article.title }
+          ]} />
 
           <div className="flex items-center gap-3 mb-4">
             <Badge className={`${CATEGORY_STYLES[article.category] || ""} border`}>

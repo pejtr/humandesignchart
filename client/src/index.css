@@ -335,6 +335,121 @@
 }
 
 
+/* ── Mystical Design System ─────────────────────────────────────────────── */
+
+/* Sacred geometry background pattern */
+.bg-sacred-geometry {
+  background-image:
+    radial-gradient(circle at 50% 50%, oklch(0.55 0.22 300 / 3%) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, oklch(0.7 0.15 80 / 4%) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, oklch(0.55 0.18 200 / 3%) 0%, transparent 40%);
+}
+
+/* Mystical section divider — golden line with center diamond */
+.mystical-divider {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, oklch(0.7 0.15 80 / 30%), oklch(0.55 0.22 300 / 40%), oklch(0.7 0.15 80 / 30%), transparent);
+}
+.mystical-divider::after {
+  content: '◇';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  color: oklch(0.7 0.15 80);
+  background: var(--background);
+  padding: 0 8px;
+}
+
+/* Subtle shimmer animation for buttons and CTAs */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.btn-mystical {
+  position: relative;
+  overflow: hidden;
+}
+.btn-mystical::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 30%, oklch(1 0 0 / 15%) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Ethereal glow for cards on hover */
+.card-mystical {
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+.card-mystical:hover {
+  box-shadow:
+    0 4px 20px oklch(0.55 0.22 300 / 8%),
+    0 0 40px oklch(0.7 0.15 80 / 5%),
+    inset 0 0 0 1px oklch(0.7 0.15 80 / 10%);
+  border-color: oklch(0.7 0.15 80 / 20%);
+}
+
+/* Mystical star sparkle decoration */
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+.sparkle-star {
+  animation: sparkle 3s ease-in-out infinite;
+}
+
+/* Golden accent line under headings */
+.heading-mystical::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 2px;
+  margin-top: 12px;
+  background: linear-gradient(90deg, oklch(0.7 0.15 80), oklch(0.55 0.22 300), transparent);
+  border-radius: 1px;
+}
+
+/* Navbar mystical bottom glow */
+.navbar-mystical {
+  border-bottom: 1px solid oklch(0.90 0.01 280);
+  box-shadow: 0 1px 0 0 oklch(0.7 0.15 80 / 8%), 0 4px 12px oklch(0.55 0.22 300 / 3%);
+}
+
+/* Footer mystical top border */
+.footer-mystical {
+  border-top: 1px solid oklch(0.7 0.15 80 / 20%);
+  background:
+    linear-gradient(180deg, oklch(0.97 0.01 300 / 50%) 0%, oklch(0.99 0.002 280) 100%),
+    radial-gradient(ellipse at 50% 0%, oklch(0.55 0.22 300 / 5%) 0%, transparent 60%);
+}
+
+/* Floating mystical particles background */
+@keyframes floatUp {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+}
+.mystical-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Ethereal section background */
+.bg-ethereal {
+  background:
+    radial-gradient(ellipse at 30% 20%, oklch(0.55 0.22 300 / 4%) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, oklch(0.7 0.15 80 / 3%) 0%, transparent 50%),
+    oklch(0.99 0.002 280);
+}
+
 /* ── Scrollbar hide utility ─────────────────────────────────────────────── */
 .scrollbar-hide {
   -ms-overflow-style: none;

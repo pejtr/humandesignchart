@@ -14,6 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import { Check, Sparkles, Gift, CreditCard, Zap, Star, Crown, Lock } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function Pricing() {
   const { t, locale } = useLanguage();
@@ -170,9 +172,29 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Navbar />
       {/* Hero */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-purple-950/30 via-background to-background pt-20 pb-12">
+      <div className="relative overflow-hidden bg-gradient-to-b from-purple-950/30 via-background to-background pt-28 pb-12">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent pointer-events-none" />
+        {/* Sacred Geometry Background */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-[0.04]" viewBox="0 0 400 400" fill="none">
+            <circle cx="200" cy="200" r="180" stroke="currentColor" strokeWidth="0.5" className="text-purple-300" />
+            <circle cx="200" cy="200" r="140" stroke="currentColor" strokeWidth="0.5" className="text-purple-300" />
+            <circle cx="200" cy="200" r="100" stroke="currentColor" strokeWidth="0.5" className="text-purple-300" />
+            <circle cx="200" cy="200" r="60" stroke="currentColor" strokeWidth="0.5" className="text-purple-300" />
+            {/* Flower of Life petals */}
+            <circle cx="200" cy="140" r="60" stroke="currentColor" strokeWidth="0.3" className="text-violet-300" />
+            <circle cx="252" cy="170" r="60" stroke="currentColor" strokeWidth="0.3" className="text-violet-300" />
+            <circle cx="252" cy="230" r="60" stroke="currentColor" strokeWidth="0.3" className="text-violet-300" />
+            <circle cx="200" cy="260" r="60" stroke="currentColor" strokeWidth="0.3" className="text-violet-300" />
+            <circle cx="148" cy="230" r="60" stroke="currentColor" strokeWidth="0.3" className="text-violet-300" />
+            <circle cx="148" cy="170" r="60" stroke="currentColor" strokeWidth="0.3" className="text-violet-300" />
+            {/* Triangle */}
+            <polygon points="200,50 350,310 50,310" stroke="currentColor" strokeWidth="0.4" fill="none" className="text-amber-300" />
+            <polygon points="200,350 50,90 350,90" stroke="currentColor" strokeWidth="0.4" fill="none" className="text-amber-300" />
+          </svg>
+        </div>
         <div className="container max-w-4xl text-center relative z-10">
           <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30 px-4 py-1">
             <Sparkles className="w-3 h-3 mr-1" />
@@ -260,7 +282,7 @@ export default function Pricing() {
                     <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">{p.monthlyPlan}</Badge>
                   </div>
                   <CardTitle className="text-2xl">
-                    {isCzech ? "149 Kč" : "€5.99"}
+                    {isCzech ? "88 Kč" : "€3.49"}
                     <span className="text-sm font-normal text-muted-foreground ml-1">{p.perMonth}</span>
                   </CardTitle>
                   <CardDescription>{isCzech ? "Zrušte kdykoli" : "Cancel anytime"}</CardDescription>
@@ -306,11 +328,11 @@ export default function Pricing() {
                     <Badge variant="outline" className="text-green-400 border-green-500/30 text-xs">{p.savePercent}</Badge>
                   </div>
                   <CardTitle className="text-2xl">
-                    {isCzech ? "990 Kč" : "€39"}
+                    {isCzech ? "888 Kč" : "€35"}
                     <span className="text-sm font-normal text-muted-foreground ml-1">{p.perYear}</span>
                   </CardTitle>
                   <CardDescription>
-                    {isCzech ? "≈ 83 Kč/měsíc · " : "≈ €3.25/month · "}{p.billedAnnually}
+                    {isCzech ? "≈ 74 Kč/měsíc · " : "≈ €2.92/month · "}{p.billedAnnually}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -342,7 +364,7 @@ export default function Pricing() {
                     <div className="font-semibold flex items-center gap-2">
                       {p.creditPack}
                       <Badge variant="outline" className="text-amber-400 border-amber-500/30 text-xs">
-                        {isCzech ? "49 Kč" : "€1.99"}
+                        {isCzech ? "44 Kč" : "€1.79"}
                       </Badge>
                     </div>
                     <div className="text-sm text-muted-foreground">{p.creditPackDesc}</div>
@@ -436,7 +458,7 @@ export default function Pricing() {
                     >
                       <Gift className="w-4 h-4 mr-2" />
                       {p.giftMonthly}
-                      <span className="ml-auto text-xs opacity-70">{isCzech ? "149 Kč" : "€5.99"}</span>
+                      <span className="ml-auto text-xs opacity-70">{isCzech ? "88 Kč" : "€3.49"}</span>
                     </Button>
                     <Button
                       className="bg-pink-600 hover:bg-pink-700 text-white"
@@ -445,7 +467,7 @@ export default function Pricing() {
                     >
                       <Gift className="w-4 h-4 mr-2" />
                       {p.giftAnnual}
-                      <span className="ml-auto text-xs opacity-70">{isCzech ? "990 Kč" : "€39"}</span>
+                      <span className="ml-auto text-xs opacity-70">{isCzech ? "888 Kč" : "€35"}</span>
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground text-center">
@@ -523,6 +545,7 @@ export default function Pricing() {
           </p>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

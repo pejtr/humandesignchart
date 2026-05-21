@@ -653,3 +653,23 @@
 - [x] Animated chart counter on hero section (real count from DB, counting animation on scroll)
 - [x] Blog article series with progress bar (link related articles, show reading progress)
 - [x] Social share buttons in blog article detail (premium design, WhatsApp/Facebook/X/copy link)
+
+## UX Improvements — Batch 4
+- [x] Exit-intent popup with 10% discount on first AI reading (mouseleave detection, shown once)
+- [x] Breadcrumb navigation for blog articles and subpages (SEO + user orientation)
+- [x] Testimonials carousel on homepage (social proof, mystical design with sacred geometry)
+
+## Mystical Design System — Global Upgrade
+- [x] Global CSS: add mystical textures, sacred geometry patterns, ethereal gradients
+- [x] Navbar: subtle mystical accent (golden line, star motif)
+- [x] Footer: mystical gradient background with sacred geometry
+- [x] Section dividers: replace plain borders with mystical separators
+- [x] Typography: add serif mystical headings with golden accents
+- [x] Cards: add subtle glow/aura effects on hover
+- [x] Buttons: mystical gradient with subtle shimmer
+
+## Pricing Page — Redesign
+- [x] Add Navbar and Footer to Pricing page
+- [x] Sacred geometry SVG background decoration
+- [x] Update price to 88 CZK for premium monthly
+- [x] Mystical gradient hero section

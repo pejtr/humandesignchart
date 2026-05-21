@@ -165,17 +165,31 @@ function TestimonialsSection({ isCs }: { isCs: boolean }) {
   const visible = [active, (active + 1) % count, (active + 2) % count];
 
   return (
-    <section className="py-20 border-t border-border/50" style={{ background: '#fff' }}>
-      <div className="container">
-        <motion.h2
+    <section className="py-20 relative overflow-hidden bg-gradient-to-b from-purple-950/5 via-background to-background">
+      {/* Sacred geometry background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-[0.03]" viewBox="0 0 400 400" fill="none">
+          <circle cx="200" cy="200" r="180" stroke="currentColor" strokeWidth="0.5" className="text-purple-400" />
+          <circle cx="200" cy="200" r="120" stroke="currentColor" strokeWidth="0.5" className="text-purple-400" />
+          <circle cx="200" cy="200" r="60" stroke="currentColor" strokeWidth="0.5" className="text-purple-400" />
+        </svg>
+      </div>
+      <div className="container relative z-10">
+        <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="font-serif text-3xl md:text-4xl font-bold text-center mb-12"
-          style={{ color: '#1a1a1a' }}
+          className="text-center mb-12"
         >
-          {isCs ? "Reference" : "Testimonials"}
-        </motion.h2>
+          <span className="inline-flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 font-medium mb-3">
+            <Star className="w-4 h-4 fill-amber-400" />
+            {isCs ? "Co říkají naši uživatelé" : "What our users say"}
+            <Star className="w-4 h-4 fill-amber-400" />
+          </span>
+          <h2 className="font-serif text-3xl md:text-4xl font-bold">
+            {isCs ? "Reference" : "Testimonials"}
+          </h2>
+        </motion.div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-8">
           {visible.map((idx) => {
             const tm = testimonials[idx];
@@ -185,16 +199,21 @@ function TestimonialsSection({ isCs }: { isCs: boolean }) {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="rounded-2xl p-6 border border-border/40 bg-card shadow-sm flex gap-4 items-start"
+                className="rounded-2xl p-6 border border-purple-200/30 dark:border-purple-500/20 bg-card/80 backdrop-blur-sm shadow-lg hover:shadow-purple-500/5 transition-shadow flex flex-col"
               >
-                <div
-                  className="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-sm"
-                  style={{ background: tm.color, color: '#555' }}
-                >
-                  {tm.initials}
+                <div className="flex gap-1 mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  ))}
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-3 italic">"{tm.text}"</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4 italic flex-1">“{tm.text}”</p>
+                <div className="flex items-center gap-3 pt-3 border-t border-border/30">
+                  <div
+                    className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs"
+                    style={{ background: tm.color, color: '#555' }}
+                  >
+                    {tm.initials}
+                  </div>
                   <p className="text-sm font-semibold text-foreground">{tm.name}</p>
                 </div>
               </motion.div>
@@ -398,10 +417,10 @@ export default function Home() {
             </motion.div>
           </div>
         </div>
-      </section>
+      </section>      <div className="mystical-divider" />
 
-      {/* ── 5 Types Section ───────────────────────────────────────────────── */}
-      <section className="py-20 bg-gradient-to-b from-white to-purple-50/40">
+      {/* ── 5 Types Section ─────────────────────────────────────────────────── */}
+      <section className="py-20 bg-gradient-to-b from-white to-purple-50/40 bg-sacred-geometry">
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} custom={0} variants={fadeUp} className="text-center mb-14">
             <h2 className="font-serif text-3xl md:text-5xl font-bold text-foreground">
@@ -449,8 +468,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── How to start — 3 steps ───────────────────────────────────────── */}
-      <section className="py-20 border-t border-border/50">
+       <div className="mystical-divider" />
+
+      {/* ── How to start — 3 steps ─────────────────────────────────────── */}
+      <section className="py-20">
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="text-center mb-14">
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">
@@ -482,8 +503,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Features Grid ────────────────────────────────────────────────── */}
-      <section className="py-20 bg-muted/30">
+      <div className="mystical-divider" />
+
+      {/* ── Features Grid ────────────────────────────────────────────── */}
+      <section className="py-20 bg-muted/30 bg-sacred-geometry">
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="text-center mb-12">
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">{t.home.featuresTitle}</h2>
@@ -508,8 +531,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── How it works ─────────────────────────────────────────────── */}
-      <section className="py-20 border-t border-border/50" style={{ background: '#f9f7f2' }}>
+      <div className="mystical-divider" />
+
+      {/* ── How it works ───────────────────────────────────────────── */}
+      <section className="py-20 bg-ethereal" style={{ background: '#f9f7f2' }}>
         <div className="container">
           <motion.h2
             initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
@@ -538,8 +563,10 @@ export default function Home() {
       {/* ── Testimonials ──────────────────────────────────────────────────── */}
       <TestimonialsSection isCs={isCs} />
 
-      {/* ── Blog Preview — Editorial Layout ──────────────────────────────── */}
-      <section className="py-20 border-t border-border/50">
+      <div className="mystical-divider" />
+
+      {/* ── Blog Preview — Editorial Layout ──────────────────────────── */}
+      <section className="py-20">
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
@@ -625,8 +652,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CTA Section ──────────────────────────────────────────────────── */}
-      <section className="py-20 border-t border-border/50 relative overflow-hidden">
+      <div className="mystical-divider" />
+
+      {/* ── CTA Section ──────────────────────────────────────────────── */}
+      <section className="py-20 relative overflow-hidden bg-sacred-geometry">
         <div className="absolute inset-0 bg-dots opacity-30 pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
         <div className="container relative z-10">
@@ -637,7 +666,7 @@ export default function Home() {
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">{t.home.ctaTitle}</h2>
             <p className="text-muted-foreground mb-8">{t.home.ctaDescription}</p>
             <Link href={localePath("/calculate")}>
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg shadow-primary/20 transition-all hover:scale-105 rounded-full">
+              <Button size="lg" className="btn-mystical bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg shadow-primary/20 transition-all hover:scale-105 rounded-full">
                 {t.home.ctaButton}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>

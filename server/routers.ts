@@ -643,11 +643,11 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
         }
 
         const priceData = {
-          monthly: { czk: 14900, eur: 599, name: "Human Design Premium — Měsíční" },
-          annual: { czk: 99000, eur: 3900, name: "Human Design Premium — Roční" },
-          credits: { czk: 4900, eur: 199, name: "Human Design AI Credits (5×)" },
-          gift_monthly: { czk: 14900, eur: 599, name: "Dárkový poukaz — Premium Měsíc" },
-          gift_annual: { czk: 99000, eur: 3900, name: "Dárkový poukaz — Premium Rok" },
+          monthly: { czk: 8800, eur: 349, name: "Human Design Premium — Měsíční" },
+          annual: { czk: 88800, eur: 3500, name: "Human Design Premium — Roční" },
+          credits: { czk: 4400, eur: 179, name: "Human Design AI Credits (5×)" },
+          gift_monthly: { czk: 8800, eur: 349, name: "Dárkový poukaz — Premium Měsíc" },
+          gift_annual: { czk: 88800, eur: 3500, name: "Dárkový poukaz — Premium Rok" },
         }[input.plan];
 
         const currency = isCzech ? "czk" : "eur";
