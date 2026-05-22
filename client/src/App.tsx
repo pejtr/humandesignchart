@@ -12,6 +12,7 @@ import ReferralApplier from "./components/ReferralApplier";
 import NewsletterPopup from "./components/NewsletterPopup";
 import ExitIntentPopup from "./components/ExitIntentPopup";
 import WelcomeModal, { useWelcomeModal } from "./components/WelcomeModal";
+import PageTransition from "./components/PageTransition";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
 const ChartResult = lazy(() => import("./pages/ChartResult"));
@@ -79,6 +80,7 @@ function LegacyRedirect({ path }: { path: string }) {
 /** All app routes, rendered inside a locale prefix */
 function LocaleRoutes() {
   return (
+    <PageTransition>
     <Suspense fallback={<PageLoader />}>
       <Switch>
         {/* Locale root = home */}
@@ -154,6 +156,7 @@ function LocaleRoutes() {
         <Route component={NotFound} />
       </Switch>
     </Suspense>
+    </PageTransition>
   );
 }
 

@@ -196,18 +196,18 @@ export default function Pricing() {
           </svg>
         </div>
         <div className="container max-w-4xl text-center relative z-10">
-          <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30 px-4 py-1">
+          <Badge className="mb-4 bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30 px-4 py-1">
             <Sparkles className="w-3 h-3 mr-1" />
             {isCzech ? "Odemkněte svůj potenciál" : "Unlock your potential"}
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-300 via-violet-200 to-indigo-300 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-700 via-violet-600 to-indigo-700 dark:from-purple-300 dark:via-violet-200 dark:to-indigo-300 bg-clip-text text-transparent">
             {p.pageTitle}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             {p.pageSubtitle}
           </p>
           {user && !isPremium && (
-            <div className="mt-4 inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-2 text-sm text-amber-300">
+            <div className="mt-4 inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-2 text-sm text-amber-700 dark:text-amber-300">
               <Zap className="w-4 h-4" />
               {isCzech
                 ? `Zbývá vám ${freeReadingsLeft} bezplatný výklad`
@@ -215,7 +215,7 @@ export default function Pricing() {
             </div>
           )}
           {isPremium && (
-            <div className="mt-4 inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-2 text-sm text-purple-300">
+            <div className="mt-4 inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-2 text-sm text-purple-700 dark:text-purple-300">
               <Crown className="w-4 h-4" />
               {isCzech ? "Jste Premium člen!" : "You are a Premium member!"}
             </div>
@@ -279,7 +279,7 @@ export default function Pricing() {
                 </div>
                 <CardHeader className="pb-4 pt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">{p.monthlyPlan}</Badge>
+                    <Badge className="bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30">{p.monthlyPlan}</Badge>
                   </div>
                   <CardTitle className="text-2xl">
                     {isCzech ? "88 Kč" : "€3.49"}
@@ -308,7 +308,7 @@ export default function Pricing() {
               <Card className="border-violet-500/50 bg-violet-950/10 relative">
                 {/* Urgency timer banner */}
                 <div className="absolute -top-8 left-0 right-0 flex justify-center">
-                  <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-3 py-1 text-xs text-amber-300">
+                  <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-3 py-1 text-xs text-amber-700 dark:text-amber-300">
                     <span className="animate-pulse w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
                     {isCzech ? "Sleva končí za" : "Offer ends in"}
                     <span className="font-mono font-bold">
@@ -372,7 +372,7 @@ export default function Pricing() {
                 </div>
                 <Button
                   variant="outline"
-                  className="border-amber-500/50 text-amber-300 hover:bg-amber-500/10 shrink-0"
+                  className="border-amber-500/50 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 shrink-0"
                   disabled={createCheckout.isPending}
                   onClick={() => handleCheckout("credits")}
                 >
@@ -452,7 +452,7 @@ export default function Pricing() {
                   <div className="grid grid-cols-2 gap-3 pt-2">
                     <Button
                       variant="outline"
-                      className="border-pink-500/50 text-pink-300 hover:bg-pink-500/10"
+                      className="border-pink-500/50 text-pink-700 dark:text-pink-300 hover:bg-pink-500/10"
                       disabled={createCheckout.isPending}
                       onClick={() => handleCheckout("gift_monthly")}
                     >
@@ -548,7 +548,7 @@ export default function Pricing() {
         {/* FAQ Section */}
         <div className="mt-20">
           <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold mb-3 bg-gradient-to-r from-purple-300 via-violet-200 to-indigo-300 bg-clip-text text-transparent">
+            <h2 className="text-2xl md:text-3xl font-bold mb-3 bg-gradient-to-r from-purple-700 via-violet-600 to-indigo-700 dark:from-purple-300 dark:via-violet-200 dark:to-indigo-300 bg-clip-text text-transparent">
               {isCzech ? "Často kladené otázky" : "Frequently Asked Questions"}
             </h2>
             <p className="text-muted-foreground">

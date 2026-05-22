@@ -688,3 +688,8 @@
 - [x] Add dark mode HD-specific CSS variables (personality, design, defined, undefined, gold, centers)
 - [x] Add dark mode overrides for mystical utilities (navbar, footer, ethereal bg, card hover)
 - [x] Theme preference persisted in localStorage
+
+## UX Enhancements — Batch 6
+- [x] Page transition animations (fade + translateY between routes, 250ms ease-out, pauses during content swap)
+- [x] Dark mode contrast fixes on Pricing, Blog, and Encyclopedia pages (dual-mode text colors, gradient headings, info boxes)
+- [x] Theme toggle "System" option (3-state cycle: light → dark → system, Monitor icon, OS media query listener)

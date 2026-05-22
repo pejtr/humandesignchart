@@ -5,7 +5,7 @@ import { Link, useLocation } from "wouter";
 import {
   Menu, X, User, LogOut, LayoutDashboard, Star, Users,
   Sparkles, GitCompare, BookOpen, Bot, RotateCcw, ChevronDown,
-  Hexagon, Sun, Moon, Target, CreditCard, Zap, Share2,
+  Hexagon, Sun, Moon, Monitor, Target, CreditCard, Zap, Share2,
   Orbit, Flame, Eye, Layers, Crown, Gem,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
@@ -26,7 +26,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [location] = useLocation();
   const { t, locale, localePath } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, preference, toggleTheme } = useTheme();
   const drawerRef = useRef<HTMLDivElement>(null);
 
   // Close drawer on route change
@@ -218,12 +218,18 @@ export default function Navbar() {
               size="icon"
               className="w-8 h-8 rounded-full"
               onClick={toggleTheme}
-              title={theme === "dark" ? (locale === "cs" ? "Přepnout na světlý režim" : "Switch to light mode") : (locale === "cs" ? "Přepnout na tmavý režim" : "Switch to dark mode")}
+              title={
+                preference === "light" ? (locale === "cs" ? "Světlý → Tmavý" : "Light → Dark") :
+                preference === "dark" ? (locale === "cs" ? "Tmavý → Systém" : "Dark → System") :
+                (locale === "cs" ? "Systém → Světlý" : "System → Light")
+              }
             >
-              {theme === "dark" ? (
-                <Sun className="w-4 h-4 text-amber-400 transition-transform hover:rotate-45" />
+              {preference === "dark" ? (
+                <Moon className="w-4 h-4 text-indigo-400 transition-transform hover:-rotate-12" />
+              ) : preference === "system" ? (
+                <Monitor className="w-4 h-4 text-emerald-500 transition-transform hover:scale-110" />
               ) : (
-                <Moon className="w-4 h-4 text-indigo-500 transition-transform hover:-rotate-12" />
+                <Sun className="w-4 h-4 text-amber-500 transition-transform hover:rotate-45" />
               )}
             </Button>
             <LanguageSwitcher />
@@ -371,12 +377,18 @@ export default function Navbar() {
               size="icon"
               className="w-8 h-8 rounded-full"
               onClick={toggleTheme}
-              title={theme === "dark" ? (locale === "cs" ? "Světlý režim" : "Light mode") : (locale === "cs" ? "Tmavý režim" : "Dark mode")}
+              title={
+                preference === "light" ? (locale === "cs" ? "Světlý" : "Light") :
+                preference === "dark" ? (locale === "cs" ? "Tmavý" : "Dark") :
+                (locale === "cs" ? "Systém" : "System")
+              }
             >
-              {theme === "dark" ? (
-                <Sun className="w-4 h-4 text-amber-400" />
+              {preference === "dark" ? (
+                <Moon className="w-4 h-4 text-indigo-400" />
+              ) : preference === "system" ? (
+                <Monitor className="w-4 h-4 text-emerald-500" />
               ) : (
-                <Moon className="w-4 h-4 text-indigo-500" />
+                <Sun className="w-4 h-4 text-amber-500" />
               )}
             </Button>
             <LanguageSwitcher />

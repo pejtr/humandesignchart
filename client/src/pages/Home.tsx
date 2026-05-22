@@ -45,7 +45,7 @@ function ChartCounter({ isCs }: { isCs: boolean }) {
   const formatted = displayCount.toLocaleString(isCs ? "cs-CZ" : "en-US");
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 rounded-full border bg-white/80 shadow-sm" style={{ borderColor: '#d4af37' }}>
+    <div className="flex items-center gap-3 px-4 py-2.5 rounded-full border bg-white/80 dark:bg-card/80 shadow-sm" style={{ borderColor: '#d4af37' }}>
       <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: '#fef3c7', border: '2px solid #d4af37' }}>
         <BarChart3 className="w-4 h-4" style={{ color: '#92400e' }} />
       </div>
@@ -460,7 +460,7 @@ export default function Home() {
                 className={`rounded-2xl border overflow-hidden flex flex-col ${tp.color} shadow-sm hover:shadow-md transition-shadow`}
               >
                 {/* Image */}
-                <div className="w-full aspect-square flex items-center justify-center bg-white/60 px-3 pt-3">
+                <div className="w-full aspect-square flex items-center justify-center bg-white/60 dark:bg-card/60 px-3 pt-3">
                   <img
                     src={tp.imgUrl}
                     alt={tp.displayName}

@@ -351,23 +351,23 @@ export default function Encyclopedia() {
                       <CardContent>
                         <p className="text-sm font-medium text-primary mb-3">{data.theme}</p>
                         <div className="space-y-3">
-                          <div className="p-3 rounded-lg bg-green-50 border border-green-200">
-                            <p className="text-xs font-semibold text-green-700 mb-1">
+                          <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
+                            <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-1">
                               ✦ {isEN ? "Defined center" : "Definované centrum"}
                             </p>
-                            <p className="text-xs text-green-800">{data.definedMeaning}</p>
+                            <p className="text-xs text-green-800 dark:text-green-300">{data.definedMeaning}</p>
                           </div>
-                          <div className="p-3 rounded-lg bg-gray-50 border border-gray-200">
-                            <p className="text-xs font-semibold text-gray-700 mb-1">
+                          <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700">
+                            <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
                               ○ {isEN ? "Open center" : "Otevřené centrum"}
                             </p>
-                            <p className="text-xs text-gray-800">{data.openMeaning}</p>
+                            <p className="text-xs text-gray-800 dark:text-gray-200">{data.openMeaning}</p>
                           </div>
-                          <div className="p-3 rounded-lg bg-amber-50 border border-amber-200">
-                            <p className="text-xs font-semibold text-amber-700 mb-1">
+                          <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                            <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">
                               ? {isEN ? "Not-Self question" : "Otázka Ne-Já"}
                             </p>
-                            <p className="text-xs text-amber-800 italic">{data.notSelfQuestion}</p>
+                            <p className="text-xs text-amber-800 dark:text-amber-300 italic">{data.notSelfQuestion}</p>
                           </div>
                         </div>
                       </CardContent>
