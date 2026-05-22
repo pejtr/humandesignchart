@@ -7,6 +7,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ParticleField } from "@/components/ParticleField";
+import { TiltCard } from "@/components/TiltCard";
+import { ProgressiveImage } from "@/components/ProgressiveImage";
+import { SocialProof } from "@/components/SocialProof";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
   Compass, Brain, Users, Star, BarChart3,
@@ -475,7 +478,7 @@ export default function Home() {
       </section>      <div className="mystical-divider" />
 
       {/* ── 5 Types Section ─────────────────────────────────────────────────── */}
-      <section className="py-20 bg-gradient-to-b from-white to-purple-50/40 bg-sacred-geometry">
+      <section className="py-20 bg-gradient-to-b from-white to-purple-50/40 bg-sacred-geometry overflow-hidden">
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} custom={0} variants={fadeUp} className="text-center mb-14">
             <h2 className="font-serif text-3xl md:text-5xl font-bold text-foreground">
@@ -483,7 +486,7 @@ export default function Home() {
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
             {typesData.map((tp, i) => (
               <motion.div
                 key={tp.name}
@@ -491,15 +494,14 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.45 }}
-                className={`rounded-2xl border overflow-hidden flex flex-col ${tp.color} shadow-sm hover:shadow-md transition-shadow`}
               >
+                <TiltCard className={`rounded-2xl border overflow-hidden flex flex-col ${tp.color} shadow-sm hover:shadow-md transition-shadow h-full`}>
                 {/* Image */}
                 <div className="w-full aspect-square flex items-center justify-center bg-white/60 dark:bg-card/60 px-3 pt-3">
-                  <img
+                  <ProgressiveImage
                     src={tp.imgUrl}
                     alt={tp.displayName}
                     className="w-full h-full object-contain drop-shadow-sm"
-                    loading="lazy"
                   />
                 </div>
                 {/* Info */}
@@ -517,6 +519,7 @@ export default function Home() {
                     </span>
                   </Link>
                 </div>
+                </TiltCard>
               </motion.div>
             ))}
           </div>
@@ -727,7 +730,10 @@ export default function Home() {
 
       <div className="mystical-divider" />
 
-      {/* ── CTA Section ──────────────────────────────────────────────── */}
+        {/* ── Social Proof Section ──────────────────────────────────── */}
+      <SocialProof />
+
+      {/* ── CTA Section ────────────────────────────────────────────── */}
       <section className="py-20 relative overflow-hidden bg-sacred-geometry">
         <div className="absolute inset-0 bg-dots opacity-30 pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />

@@ -714,3 +714,10 @@
 - [x] Parallax scrolling on hero (background-attachment: fixed, content fades/moves on scroll via framer-motion useScroll)
 - [x] Count-up animation for statistics (IntersectionObserver triggers 2.2s count-up when scrolled into view)
 - [x] Fixed bottom navigation bar on mobile (Home, Mapa, AI Guide, Blog, Profil — hidden on desktop, active indicator)
+
+## UX Enhancements — Batch 10
+- [ ] Fix duplicate key bug in MobileBottomNav (use id instead of href as key)
+- [ ] TiltCard 3D hover micro-interactions on blog/type cards with hermeticism glare (sacred geometry glow)
+- [ ] Progressive image loading with blur placeholder (ProgressiveImage component)
+- [ ] Social proof section with hermeticism design (Flower of Life background, alchemical symbols, golden ratio layout)
+- [ ] Hermeticism visual elements throughout: sacred geometry patterns, Metatron's cube, golden spiral accents

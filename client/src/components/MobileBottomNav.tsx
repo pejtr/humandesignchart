@@ -16,26 +16,31 @@ export function MobileBottomNav() {
 
   const navItems = [
     {
+      id: "home",
       href: localePath("/"),
       icon: Home,
       label: isCs ? "Domů" : "Home",
     },
     {
+      id: "chart",
       href: localePath("/calculate"),
       icon: Map,
       label: isCs ? "Mapa" : "Chart",
     },
     {
+      id: "ai-guide",
       href: localePath("/ai-guide"),
       icon: Sparkles,
       label: "AI Guide",
     },
     {
+      id: "blog",
       href: localePath("/blog"),
       icon: BookOpen,
       label: "Blog",
     },
     {
+      id: "profile",
       href: isAuthenticated ? localePath("/dashboard") : localePath("/calculate"),
       icon: User,
       label: isCs ? "Profil" : "Profile",
@@ -52,7 +57,7 @@ export function MobileBottomNav() {
           const Icon = item.icon;
 
           return (
-            <Link key={item.href} href={item.href}>
+            <Link key={item.id} href={item.href}>
               <button className="flex flex-col items-center justify-center gap-0.5 w-14 h-14 rounded-xl transition-all">
                 <Icon
                   className={`w-5 h-5 transition-colors ${

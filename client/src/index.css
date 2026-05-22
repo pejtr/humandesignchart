@@ -136,9 +136,20 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    overflow-x: hidden;
+  }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
+    overflow-x: hidden;
+    /* Reserve space for mobile bottom nav (64px = h-16) */
+    padding-bottom: 4rem;
+  }
+  @media (min-width: 768px) {
+    body {
+      padding-bottom: 0;
+    }
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-serif);

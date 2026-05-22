@@ -134,6 +134,17 @@ export default function Navbar() {
             </span>
           </Link>
 
+          {/* Golden Halo — floating sacred ellipse, visible on mobile in the empty space */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none lg:hidden">
+            <div
+              className="w-16 h-8 rounded-[50%] border-2 border-amber-400/60 dark:border-amber-300/50"
+              style={{
+                boxShadow: '0 0 12px rgba(212,175,55,0.3), inset 0 0 8px rgba(212,175,55,0.15)',
+                animation: 'haloFloat 4s ease-in-out infinite',
+              }}
+            />
+          </div>
+
           {/* Desktop nav — centered */}
           <div className="hidden lg:flex items-center gap-0.5 flex-1 justify-center">
             {primaryLinks.map(link => (
