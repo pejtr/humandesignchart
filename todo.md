@@ -709,3 +709,8 @@
 - [x] Hero orbs responsive on mobile (use min() for viewport-relative sizing)
 - [x] Steps section redesigned: gradient accent bars, large gradient number circles, color-coded buttons, hover scale effect
 - [x] Steps section: overflow-hidden to prevent horizontal scroll on mobile
+
+## UX Enhancements — Batch 9
+- [x] Parallax scrolling on hero (background-attachment: fixed, content fades/moves on scroll via framer-motion useScroll)
+- [x] Count-up animation for statistics (IntersectionObserver triggers 2.2s count-up when scrolled into view)
+- [x] Fixed bottom navigation bar on mobile (Home, Mapa, AI Guide, Blog, Profil — hidden on desktop, active indicator)

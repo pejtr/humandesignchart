@@ -7,14 +7,14 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ParticleField } from "@/components/ParticleField";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   Compass, Brain, Users, Star, BarChart3,
   FileText, Zap, ArrowRight, CheckCircle2, Eye, Lightbulb,
   Heart, Shield, Leaf, ChevronLeft, ChevronRight,
 } from "lucide-react";
 
-// ─── Animated Chart Counter ──────────────────────────────────────────────────
+// ─── Animated Chart Counter (count-up on scroll into view) ────────────────────────────────────
 function ChartCounter({ isCs }: { isCs: boolean }) {
   const { data } = trpc.publicStats.chartCount.useQuery(undefined, {
     staleTime: 60_000,
@@ -22,31 +22,40 @@ function ChartCounter({ isCs }: { isCs: boolean }) {
   const [displayCount, setDisplayCount] = useState(0);
   const targetCount = data?.count ?? 12847;
   const hasAnimated = useRef(false);
+  const counterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (hasAnimated.current) return;
-    if (!data) return;
-    hasAnimated.current = true;
-    const duration = 2000;
-    const steps = 60;
-    const increment = targetCount / steps;
-    let current = 0;
-    const interval = setInterval(() => {
-      current += increment;
-      if (current >= targetCount) {
-        setDisplayCount(targetCount);
-        clearInterval(interval);
-      } else {
-        setDisplayCount(Math.floor(current));
-      }
-    }, duration / steps);
-    return () => clearInterval(interval);
+    if (!counterRef.current || hasAnimated.current || !data) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated.current) {
+          hasAnimated.current = true;
+          const duration = 2200;
+          const steps = 80;
+          const increment = targetCount / steps;
+          let current = 0;
+          const interval = setInterval(() => {
+            current += increment;
+            if (current >= targetCount) {
+              setDisplayCount(targetCount);
+              clearInterval(interval);
+            } else {
+              setDisplayCount(Math.floor(current));
+            }
+          }, duration / steps);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(counterRef.current);
+    return () => observer.disconnect();
   }, [data, targetCount]);
 
   const formatted = displayCount.toLocaleString(isCs ? "cs-CZ" : "en-US");
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 rounded-full border bg-white/80 dark:bg-card/80 shadow-sm" style={{ borderColor: '#d4af37' }}>
+    <div ref={counterRef} className="flex items-center gap-3 px-4 py-2.5 rounded-full border bg-white/80 dark:bg-card/80 shadow-sm" style={{ borderColor: '#d4af37' }}>
       <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: '#fef3c7', border: '2px solid #d4af37' }}>
         <BarChart3 className="w-4 h-4" style={{ color: '#92400e' }} />
       </div>
@@ -276,6 +285,15 @@ export default function Home() {
   const { t, locale, localePath } = useLanguage();
   const isCs = locale === "cs";
 
+  // Parallax scroll effect for hero
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress: heroScrollProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const heroY = useTransform(heroScrollProgress, [0, 1], ["0%", "30%"]);
+  const heroOpacity = useTransform(heroScrollProgress, [0, 0.8], [1, 0.3]);
+
   // Store referral code from URL (?ref=CODE) into localStorage
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -371,12 +389,14 @@ export default function Home() {
 
       {/* ── Hero Section ─────────────────────────────────────────────────── */}
       <section
+        ref={heroRef}
         className="relative flex flex-col justify-center overflow-hidden"
         style={{
           minHeight: '55vh',
           backgroundImage: 'url(https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/WUcqCUXbXPPoyTKt.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
           backgroundColor: '#f5f0f8',
         }}
       >
@@ -399,7 +419,10 @@ export default function Home() {
         {/* Floating particle animation */}
         <ParticleField />
 
-        <div className="container relative z-10 py-32">
+        <motion.div
+          className="container relative z-10 py-32"
+          style={{ y: heroY, opacity: heroOpacity }}
+        >
           <div className="max-w-3xl mx-auto text-center">
             <motion.h1
               initial="hidden" animate="visible" custom={0} variants={fadeUp}
@@ -448,7 +471,7 @@ export default function Home() {
               ))}
             </motion.div>
           </div>
-        </div>
+        </motion.div>
       </section>      <div className="mystical-divider" />
 
       {/* ── 5 Types Section ─────────────────────────────────────────────────── */}

@@ -15,6 +15,7 @@ import WelcomeModal, { useWelcomeModal } from "./components/WelcomeModal";
 import PageTransition from "./components/PageTransition";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
+import { MobileBottomNav } from "./components/MobileBottomNav";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
 const ChartResult = lazy(() => import("./pages/ChartResult"));
@@ -181,6 +182,7 @@ function App() {
             <ExitIntentPopup />
             <ScrollToTop />
             <CookieConsent />
+            <MobileBottomNav />
             <LocaleRoutes />
           </LanguageProvider>
         </TooltipProvider>
