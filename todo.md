@@ -679,3 +679,12 @@
 - [x] FAQ section under pricing page (bilingual accordion with 4 questions about cancellation, payment, trial, gift vouchers)
 - [x] Testimonials carousel auto-scroll (5s interval, pause on hover, enhanced card hover effects, scale/glow animations)
 - [x] Navbar icon/logo upgrade: custom HD bodygraph SVG logo (purple gradient), new icons (Orbit, Layers, Eye, Flame, Gem, Crown), "Premium" label
+
+## Dark/Light Mode Toggle
+- [x] Enable switchable theme in ThemeProvider (App.tsx)
+- [x] Add theme toggle button in Navbar desktop section (Sun/Moon icons with hover animation)
+- [x] Add theme toggle button in mobile drawer header
+- [x] Fix sonner.tsx to use project ThemeContext instead of next-themes
+- [x] Add dark mode HD-specific CSS variables (personality, design, defined, undefined, gold, centers)
+- [x] Add dark mode overrides for mystical utilities (navbar, footer, ethereal bg, card hover)
+- [x] Theme preference persisted in localStorage

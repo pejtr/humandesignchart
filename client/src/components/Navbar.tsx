@@ -5,11 +5,12 @@ import { Link, useLocation } from "wouter";
 import {
   Menu, X, User, LogOut, LayoutDashboard, Star, Users,
   Sparkles, GitCompare, BookOpen, Bot, RotateCcw, ChevronDown,
-  Hexagon, Sun, Target, CreditCard, Zap, Share2,
+  Hexagon, Sun, Moon, Target, CreditCard, Zap, Share2,
   Orbit, Flame, Eye, Layers, Crown, Gem,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { trpc } from "@/lib/trpc";
 import {
@@ -25,6 +26,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [location] = useLocation();
   const { t, locale, localePath } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const drawerRef = useRef<HTMLDivElement>(null);
 
   // Close drawer on route change
@@ -208,8 +210,22 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop right section: language + user */}
+          {/* Desktop right section: theme toggle + language + user */}
           <div className="hidden lg:flex items-center gap-1.5 shrink-0">
+            {/* Theme toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-8 h-8 rounded-full"
+              onClick={toggleTheme}
+              title={theme === "dark" ? (locale === "cs" ? "Přepnout na světlý režim" : "Switch to light mode") : (locale === "cs" ? "Přepnout na tmavý režim" : "Switch to dark mode")}
+            >
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4 text-amber-400 transition-transform hover:rotate-45" />
+              ) : (
+                <Moon className="w-4 h-4 text-indigo-500 transition-transform hover:-rotate-12" />
+              )}
+            </Button>
             <LanguageSwitcher />
             {isAuthenticated ? (
               <>
@@ -349,6 +365,20 @@ export default function Navbar() {
             <span className="font-serif text-lg font-bold tracking-tight text-foreground">Human Design</span>
           </Link>
           <div className="flex items-center gap-1">
+            {/* Theme toggle — mobile */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-8 h-8 rounded-full"
+              onClick={toggleTheme}
+              title={theme === "dark" ? (locale === "cs" ? "Světlý režim" : "Light mode") : (locale === "cs" ? "Tmavý režim" : "Dark mode")}
+            >
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-indigo-500" />
+              )}
+            </Button>
             <LanguageSwitcher />
             <Button
               variant="ghost"

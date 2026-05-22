@@ -121,6 +121,15 @@
   --sidebar-accent-foreground: oklch(0.93 0.01 280);
   --sidebar-border: oklch(0.28 0.03 280);
   --sidebar-ring: oklch(0.72 0.18 300);
+
+  /* HD-specific colors — dark mode */
+  --hd-personality: oklch(0.75 0.12 280);
+  --hd-design: oklch(0.65 0.2 25);
+  --hd-defined: oklch(0.72 0.18 300);
+  --hd-undefined: oklch(0.22 0.02 280);
+  --hd-gold: oklch(0.75 0.15 80);
+  --hd-center-defined: oklch(0.72 0.18 300);
+  --hd-center-undefined: oklch(0.2 0.02 280);
 }
 
 @layer base {
@@ -450,7 +459,32 @@
     oklch(0.99 0.002 280);
 }
 
-/* ── Scrollbar hide utility ─────────────────────────────────────────────── */
+/* Dark mode overrides for mystical utilities */
+.dark .navbar-mystical {
+  border-bottom: 1px solid oklch(0.28 0.03 280);
+  box-shadow: 0 1px 0 0 oklch(0.72 0.18 300 / 10%), 0 4px 12px oklch(0.13 0.02 280 / 40%);
+}
+.dark .footer-mystical {
+  border-top: 1px solid oklch(0.72 0.18 300 / 20%);
+  background:
+    linear-gradient(180deg, oklch(0.15 0.02 280) 0%, oklch(0.13 0.02 280) 100%),
+    radial-gradient(ellipse at 50% 0%, oklch(0.72 0.18 300 / 8%) 0%, transparent 60%);
+}
+.dark .bg-ethereal {
+  background:
+    radial-gradient(ellipse at 30% 20%, oklch(0.72 0.18 300 / 6%) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, oklch(0.75 0.15 80 / 4%) 0%, transparent 50%),
+    oklch(0.13 0.02 280);
+}
+.dark .card-mystical:hover {
+  box-shadow:
+    0 4px 20px oklch(0.72 0.18 300 / 12%),
+    0 0 40px oklch(0.75 0.15 80 / 8%),
+    inset 0 0 0 1px oklch(0.75 0.15 80 / 15%);
+  border-color: oklch(0.75 0.15 80 / 25%);
+}
+
+/* ── Scrollbar hide utility ───────────────────────────────────────────────────────────────── */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
