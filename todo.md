@@ -721,3 +721,14 @@
 - [ ] Progressive image loading with blur placeholder (ProgressiveImage component)
 - [ ] Social proof section with hermeticism design (Flower of Life background, alchemical symbols, golden ratio layout)
 - [ ] Hermeticism visual elements throughout: sacred geometry patterns, Metatron's cube, golden spiral accents
+
+## SEO & Open Graph — Batch 11
+- [x] Shared useSEO hook (client/src/hooks/useSEO.ts) — centralized meta tag management
+- [x] Premium AI-generated OG images (1200×630px): Homepage, Calculator, Blog, Pricing, AI Guide
+- [x] Homepage — useSEO with new OG image, extended keywords (cs/en)
+- [x] Pricing page — useSEO with pricing OG image
+- [x] Blog page — useSEO with blog OG image
+- [x] ChartCalculator page — useSEO with calculator OG image
+- [x] AiGuide page — updated to use premium AI guide OG image
+- [x] BlogArticle page — OG image dimensions updated to 1200×630, og:site_name added
+- [x] index.html — default OG/Twitter images updated to new premium homepage image

@@ -149,9 +149,10 @@ export default function BlogArticle() {
       setMeta('meta[property="og:locale"]', "content", locale === 'cs' ? 'cs_CZ' : 'en_US');
       if (article.coverImage) {
         setMeta('meta[property="og:image"]', "content", article.coverImage);
-        setMeta('meta[property="og:image:width"]', "content", "800");
-        setMeta('meta[property="og:image:height"]', "content", "450");
+        setMeta('meta[property="og:image:width"]', "content", "1200");
+        setMeta('meta[property="og:image:height"]', "content", "630");
         setMeta('meta[property="og:image:alt"]', "content", article.title);
+        setMeta('meta[property="og:site_name"]', "content", "Human Design Mapa");
       }
 
       // Twitter Card

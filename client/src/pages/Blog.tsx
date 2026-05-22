@@ -1,5 +1,6 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState, useEffect, useMemo } from "react";
+import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import { Link } from "wouter";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -39,22 +40,19 @@ export default function Blog() {
     activeCategory ? { category: activeCategory, locale } : { locale }
   );
 
-  useEffect(() => {
-    document.title = isEn
-      ? "Human Design Blog | Articles, Guides & Tips"
-      : "Blog o Human Design | Články, průvodci a tipy";
-    const metaDesc = document.querySelector('meta[name="description"]');
-    const desc = isEn
-      ? "Read Human Design articles in English. Types, strategies, authority, profiles, centers — everything you need to know about your design."
-      : "Čtěte články o Human Design v češtině. Typy, strategie, autorita, profily, centra — vše, co potřebujete vědět o svém designu.";
-    if (metaDesc) metaDesc.setAttribute("content", desc);
-    else {
-      const meta = document.createElement("meta");
-      meta.name = "description";
-      meta.content = desc;
-      document.head.appendChild(meta);
-    }
-  }, [isEn]);
+  useSEO(isEn ? {
+    title: "Human Design Blog | Articles, Guides & Tips",
+    description: "Read Human Design articles in English. Types, strategies, authority, profiles, centers — everything you need to know about your design.",
+    ogImage: OG_IMAGES.blog,
+    keywords: "human design blog, human design articles, human design types, human design authority, bodygraph",
+    locale: "en_US",
+  } : {
+    title: "Blog o Human Design | Články, průvodci a tipy",
+    description: "Čtěte články o Human Design v češtině. Typy, strategie, autorita, profily, centra — vše, co potřebujete vědět o svém designu.",
+    ogImage: OG_IMAGES.blog,
+    keywords: "human design blog, human design články, human design typy, human design autorita, bodygraph",
+    locale: "cs_CZ",
+  });
 
   const articles = data?.articles ?? [];
   const categories = data?.categories ?? [];

@@ -11,11 +11,26 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Compass, Loader2, MapPin, Calendar, Clock, Info } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 
 export default function ChartCalculator() {
   const [, navigate] = useLocation();
   const { isAuthenticated } = useAuth();
-  const { t, localePath } = useLanguage();
+  const { t, localePath, locale } = useLanguage();
+  const isEn = locale === "en";
+  useSEO(isEn ? {
+    title: "✨ Free Human Design Chart Calculator 🔮",
+    description: "Calculate your free Human Design bodygraph chart. Enter your birth date, time and place to discover your type, strategy, authority and profile.",
+    ogImage: OG_IMAGES.calculator,
+    keywords: "human design calculator, bodygraph calculator, free human design chart, human design birth chart",
+    locale: "en_US",
+  } : {
+    title: "✨ Kalkulačka Human Design mapy zdarma 🔮",
+    description: "Vypočítejte svou Human Design mapu zdarma. Zadejte datum, čas a místo narození a zjistěte svůj typ, strategii, autoritu a profil.",
+    ogImage: OG_IMAGES.calculator,
+    keywords: "human design kalkulačka, bodygraph kalkulačka, human design mapa zdarma, human design narození",
+    locale: "cs_CZ",
+  });
 
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -32,16 +33,20 @@ export default function Pricing() {
   const [voucherCode, setVoucherCode] = useState("");
 
   // Set page title
-  useEffect(() => {
-    const isEn = locale === "en";
-    document.title = isEn
-      ? `✨ Pricing — Human Design Premium 🔮`
-      : `✨ Ceník — Human Design Premium 🔮`;
-    const desc = document.querySelector('meta[name="description"]');
-    if (desc) desc.setAttribute("content", isEn
-      ? "Upgrade to Human Design Premium for unlimited AI readings, PDF reports, and all tools."
-      : "Upgradujte na Human Design Premium pro neomezené AI výklady, PDF reporty a všechny nástroje.");
-  }, [locale]);
+  const isEn = locale === "en";
+  useSEO(isEn ? {
+    title: "✨ Pricing — Human Design Premium 🔮",
+    description: "Upgrade to Human Design Premium for unlimited AI readings, PDF reports, and all tools.",
+    ogImage: OG_IMAGES.pricing,
+    keywords: "human design premium, human design subscription, human design AI reading",
+    locale: "en_US",
+  } : {
+    title: "✨ Ceník — Human Design Premium 🔮",
+    description: "Upgradujte na Human Design Premium pro neomezené AI výklady, PDF reporty a všechny nástroje.",
+    ogImage: OG_IMAGES.pricing,
+    keywords: "human design premium, human design předplatné, human design AI výklad",
+    locale: "cs_CZ",
+  });
 
   const { data: subStatus } = trpc.subscription.status.useQuery(undefined, {
     enabled: !!user,

@@ -11,6 +11,7 @@ import { TiltCard } from "@/components/TiltCard";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 import { SocialProof } from "@/components/SocialProof";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import {
   Compass, Brain, Users, Star, BarChart3,
   FileText, Zap, ArrowRight, CheckCircle2, Eye, Lightbulb,
@@ -306,29 +307,19 @@ export default function Home() {
     }
   }, []);
 
-  useEffect(() => {
-    if (isCs) {
-      document.title = "✨ HUMAN DESIGN – Mapa vašeho Já | Odemkněte svůj potenciál! 🔮";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "🌟 Vypočítejte svou Human Design mapu zdarma. Zjistěte svůj typ, strategii, autoritu a získejte AI výklad svého životního poslání."
-      );
-      document.querySelector('meta[name="keywords"]')?.setAttribute(
-        "content",
-        "human design, human design mapa, bodygraph kalkulačka, human design zdarma"
-      );
-    } else {
-      document.title = "✨ Free Human Design Chart Calculator & AI Reading 🔮";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Calculate your free Human Design chart. Discover your type, strategy, authority and get a personalized AI reading."
-      );
-      document.querySelector('meta[name="keywords"]')?.setAttribute(
-        "content",
-        "human design, human design chart, bodygraph calculator, free human design"
-      );
-    }
-  }, [locale, isCs]);
+  useSEO(isCs ? {
+    title: "✨ HUMAN DESIGN – Mapa vašeho Já | Odemkněte svůj potenciál! 🔮",
+    description: "🌟 Vypočítejte svou Human Design mapu zdarma. Zjistěte svůj typ, strategii, autoritu a získejte AI výklad svého životního poslání.",
+    ogImage: OG_IMAGES.homepage,
+    keywords: "human design, human design mapa, bodygraph kalkulačka, human design zdarma, human design typ, human design autorita",
+    locale: "cs_CZ",
+  } : {
+    title: "✨ Free Human Design Chart Calculator & AI Reading 🔮",
+    description: "Calculate your free Human Design chart. Discover your type, strategy, authority and get a personalized AI reading.",
+    ogImage: OG_IMAGES.homepage,
+    keywords: "human design, human design chart, bodygraph calculator, free human design, human design type, human design authority",
+    locale: "en_US",
+  });
   const typesData = getTypesData(isCs);
 
   const features = [
