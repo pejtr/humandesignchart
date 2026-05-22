@@ -336,32 +336,32 @@ export default function Home() {
 
   const howItWorks = isCs
     ? [
-        { Icon: CheckCircle2, title: "1. Pochopte své dary", desc: "Zjistěte svůj typ, profil a autoritu. Poznejte, jak přirozeně fungujete a co vás skutečně naplňuje." },
-        { Icon: Users, title: "2. Zlepšete své vztahy", desc: "Porovnejte mapy s blízkými. Pochopte dynamiku vašich vztahů a jak spolu lépe fungovat." },
-        { Icon: Lightbulb, title: "3. Najděte svůj účel", desc: "Prozkoumejte svůj inkarnační kříž a brány. Objevte své životní poslání a směr." },
+        { image: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/how-gifts-eGS8ZgX5CLuYpBcwPhCjpT.webp", title: "1. Pochopte své dary", desc: "Zjistěte svůj typ, profil a autoritu. Poznejte, jak přirozeně fungujete a co vás skutečně naplňuje." },
+        { image: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/how-relationships-DC73aXQjL3itwepfxavAvR.webp", title: "2. Zlepšete své vztahy", desc: "Porovnejte mapy s blízkými. Pochopte dynamiku vašich vztahů a jak spolu lépe fungovat." },
+        { image: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/how-purpose-WT5fgPEHLBT9f6EjEZDj5E.webp", title: "3. Najděte svůj účel", desc: "Prozkoumejte svůj inkarnační kříž a brány. Objevte své životní poslání a směr." },
       ]
     : [
-        { Icon: CheckCircle2, title: "1. Understand your gifts", desc: "Discover your type, profile, and authority. Learn how you naturally operate and what truly fulfills you." },
-        { Icon: Users, title: "2. Improve your relationships", desc: "Compare charts with loved ones. Understand the dynamics of your relationships and how to work better together." },
-        { Icon: Lightbulb, title: "3. Find your purpose", desc: "Explore your incarnation cross and gates. Discover your life mission and direction." },
+        { image: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/how-gifts-eGS8ZgX5CLuYpBcwPhCjpT.webp", title: "1. Understand your gifts", desc: "Discover your type, profile, and authority. Learn how you naturally operate and what truly fulfills you." },
+        { image: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/how-relationships-DC73aXQjL3itwepfxavAvR.webp", title: "2. Improve your relationships", desc: "Compare charts with loved ones. Understand the dynamics of your relationships and how to work better together." },
+        { image: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/how-purpose-WT5fgPEHLBT9f6EjEZDj5E.webp", title: "3. Find your purpose", desc: "Explore your incarnation cross and gates. Discover your life mission and direction." },
       ];
 
   const blogPosts = isCs
     ? [
-        { slug: "co-je-human-design", title: "Co je Human Design?", excerpt: "Kompletní průvodce pro začátečníky — zjistěte, jak systém funguje a jak vám může pomoci.", cat: "Základy HD", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&q=80", featured: true },
-        { slug: "5-typu-human-design", title: "5 typů v Human Designu", excerpt: "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.", cat: "Typy", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80", featured: false },
-        { slug: "strategie-v-human-design", title: "Strategie: Klíč ke správným rozhodnutím", excerpt: "Reagovat, informovat, čekat na pozvání — naučte se svou strategii.", cat: "Strategie", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80", featured: false },
-        { slug: "autorita-v-human-design", title: "Autorita: Jak dělat správná rozhodnutí", excerpt: "Emocionální, sakrální, slezinná — každý typ má svůj vnitřní kompas rozhodování.", cat: "Autorita", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "https://images.unsplash.com/photo-1509909756405-be0199881695?w=800&q=80", featured: false },
-        { slug: "profily-v-human-design", title: "12 profilů v Human Designu", excerpt: "Váš profil odhaluje vaši životní roli a způsob, jakým se učíte a rostete.", cat: "Profily", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=800&q=80", featured: false },
-        { slug: "human-design-a-vztahy", title: "Human Design a vztahy", excerpt: "Jak porozumět partnerské dynamice a zlepšit komunikaci s blízkými.", cat: "Vztahy", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=800&q=80", featured: false },
+        { slug: "co-je-human-design", title: "Co je Human Design?", excerpt: "Kompletní průvodce pro začátečníky — zjistěte, jak systém funguje a jak vám může pomoci.", cat: "Základy HD", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-what-is-hd-43WNJvfutfhJuzR4yJTFDP.webp", featured: true },
+        { slug: "5-typu-human-design", title: "5 typů v Human Designu", excerpt: "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.", cat: "Typy", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-5-types-fEmgd8eitQZqUVMyp8ovc9.webp", featured: false },
+        { slug: "strategie-v-human-design", title: "Strategie: Klíč ke správným rozhodnutím", excerpt: "Reagovat, informovat, čekat na pozvání — naučte se svou strategii.", cat: "Strategie", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-strategy-3cZa4q36bjHbc7YaSLdJnZ.webp", featured: false },
+        { slug: "autorita-v-human-design", title: "Autorita: Jak dělat správná rozhodnutí", excerpt: "Emocionální, sakrální, slezinná — každý typ má svůj vnitřní kompas rozhodování.", cat: "Autorita", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-authority-HgBsivLWhdBShyvJUTrcWj.webp", featured: false },
+        { slug: "profily-v-human-design", title: "12 profilů v Human Designu", excerpt: "Váš profil odhaluje vaši životní roli a způsob, jakým se učíte a rostete.", cat: "Profily", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-profiles-CfRJ5N3rUpES9bRhQcQYBQ.webp", featured: false },
+        { slug: "human-design-a-vztahy", title: "Human Design a vztahy", excerpt: "Jak porozumět partnerské dynamice a zlepšit komunikaci s blízkými.", cat: "Vztahy", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-relationships-SpGoW2up6Yzx3i23csHKSH.webp", featured: false },
       ]
     : [
-        { slug: "what-is-human-design", title: "What is Human Design?", excerpt: "A complete beginner's guide — learn how the system works and how it can help you.", cat: "HD Basics", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&q=80", featured: true },
-        { slug: "5-types-human-design", title: "5 Human Design Types", excerpt: "Discover all 5 types — Generator, Projector, Manifestor, MG, and Reflector.", cat: "Types", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80", featured: false },
-        { slug: "human-design-strategy", title: "Strategy: The Key to Right Decisions", excerpt: "Respond, inform, wait for the invitation — learn your unique strategy.", cat: "Strategy", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80", featured: false },
-        { slug: "human-design-authority", title: "Inner Authority Explained", excerpt: "Emotional, sacral, splenic — every type has its own inner compass for decisions.", cat: "Authority", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "https://images.unsplash.com/photo-1509909756405-be0199881695?w=800&q=80", featured: false },
-        { slug: "human-design-profiles", title: "12 Human Design Profiles", excerpt: "Your profile reveals your life role and the way you learn, grow, and connect.", cat: "Profiles", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=800&q=80", featured: false },
-        { slug: "human-design-relationships", title: "Human Design & Relationships", excerpt: "Understand partnership dynamics and improve communication with loved ones.", cat: "Relationships", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=800&q=80", featured: false },
+        { slug: "what-is-human-design", title: "What is Human Design?", excerpt: "A complete beginner's guide — learn how the system works and how it can help you.", cat: "HD Basics", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-what-is-hd-43WNJvfutfhJuzR4yJTFDP.webp", featured: true },
+        { slug: "5-types-human-design", title: "5 Human Design Types", excerpt: "Discover all 5 types — Generator, Projector, Manifestor, MG, and Reflector.", cat: "Types", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-5-types-fEmgd8eitQZqUVMyp8ovc9.webp", featured: false },
+        { slug: "human-design-strategy", title: "Strategy: The Key to Right Decisions", excerpt: "Respond, inform, wait for the invitation — learn your unique strategy.", cat: "Strategy", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-strategy-3cZa4q36bjHbc7YaSLdJnZ.webp", featured: false },
+        { slug: "human-design-authority", title: "Inner Authority Explained", excerpt: "Emotional, sacral, splenic — every type has its own inner compass for decisions.", cat: "Authority", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-authority-HgBsivLWhdBShyvJUTrcWj.webp", featured: false },
+        { slug: "human-design-profiles", title: "12 Human Design Profiles", excerpt: "Your profile reveals your life role and the way you learn, grow, and connect.", cat: "Profiles", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-profiles-CfRJ5N3rUpES9bRhQcQYBQ.webp", featured: false },
+        { slug: "human-design-relationships", title: "Human Design & Relationships", excerpt: "Understand partnership dynamics and improve communication with loved ones.", cat: "Relationships", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/blog-relationships-SpGoW2up6Yzx3i23csHKSH.webp", featured: false },
       ];
 
   return (
@@ -555,26 +555,26 @@ export default function Home() {
       <div className="mystical-divider" />
 
       {/* ── How it works ───────────────────────────────────────────── */}
-      <section className="py-20 bg-ethereal" style={{ background: '#f9f7f2' }}>
+      <section className="py-20 bg-ethereal dark:bg-card" style={{ background: 'var(--tw-dark, #f9f7f2)' }}>
         <div className="container">
           <motion.h2
             initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="font-serif text-3xl md:text-4xl font-bold text-center mb-14" style={{ color: '#1a1a1a' }}
+            className="font-serif text-3xl md:text-4xl font-bold text-center mb-14 text-foreground"
           >
             {isCs ? "Jak to funguje" : "How it works"}
           </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-4xl mx-auto">
-            {howItWorks.map(({ Icon, title, desc }, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto">
+            {howItWorks.map(({ image, title, desc }, i) => (
               <motion.div
                 key={title}
-                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }}
-                className="flex flex-col items-center text-center gap-4"
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
+                className="flex flex-col items-center text-center gap-5 group"
               >
-                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: '#e6f4f2', border: '2px solid #2a9d8f' }}>
-                  <Icon className="w-7 h-7" style={{ color: '#2a9d8f' }} />
+                <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300 ring-2 ring-purple-200/50 dark:ring-purple-500/30">
+                  <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                 </div>
-                <h3 className="font-semibold text-base" style={{ color: '#1a1a1a' }}>{title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: '#666' }}>{desc}</p>
+                <h3 className="font-semibold text-lg text-foreground">{title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground max-w-[260px]">{desc}</p>
               </motion.div>
             ))}
           </div>

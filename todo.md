@@ -693,3 +693,12 @@
 - [x] Page transition animations (fade + translateY between routes, 250ms ease-out, pauses during content swap)
 - [x] Dark mode contrast fixes on Pricing, Blog, and Encyclopedia pages (dual-mode text colors, gradient headings, info boxes)
 - [x] Theme toggle "System" option (3-state cycle: light → dark → system, Monitor icon, OS media query listener)
+
+## UX Enhancements — Batch 7
+- [x] Floating scroll-to-top button (purple, appears after 400px scroll, smooth animation)
+- [x] Skeleton loading placeholders (CardSkeleton, HeroSkeleton, ChartSkeleton, ArticleSkeleton, ListSkeleton)
+- [x] GDPR cookie consent banner (3 categories: necessary/analytics/marketing, settings panel, localStorage, 1.5s delay)
+
+## Visual Upgrades — Batch 7
+- [x] Premium spiritual AI thumbnails for all 6 blog articles (cosmic bodygraph, 5 silhouettes, compass, crystal heart, galaxy profiles, DNA helix)
+- [x] "How it works" section: replaced icons with large AI graphics (golden lotus, DNA helix, star gate portal)

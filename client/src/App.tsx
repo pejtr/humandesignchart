@@ -13,6 +13,8 @@ import NewsletterPopup from "./components/NewsletterPopup";
 import ExitIntentPopup from "./components/ExitIntentPopup";
 import WelcomeModal, { useWelcomeModal } from "./components/WelcomeModal";
 import PageTransition from "./components/PageTransition";
+import { ScrollToTop } from "./components/ScrollToTop";
+import { CookieConsent } from "./components/CookieConsent";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
 const ChartResult = lazy(() => import("./pages/ChartResult"));
@@ -177,6 +179,8 @@ function App() {
             <WelcomeModalWrapper />
             <NewsletterPopup />
             <ExitIntentPopup />
+            <ScrollToTop />
+            <CookieConsent />
             <LocaleRoutes />
           </LanguageProvider>
         </TooltipProvider>
