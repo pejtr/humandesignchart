@@ -6,6 +6,7 @@ import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { ParticleField } from "@/components/ParticleField";
 import { motion } from "framer-motion";
 import {
   Compass, Brain, Users, Star, BarChart3,
@@ -379,14 +380,24 @@ export default function Home() {
           backgroundColor: '#f5f0f8',
         }}
       >
-        {/* Animated orbs */}
-        <div className="hero-orb-1 absolute pointer-events-none" style={{ width: '520px', height: '520px', borderRadius: '50%', background: 'radial-gradient(circle at 40% 40%, rgba(139,92,246,0.45) 0%, rgba(167,139,250,0.20) 50%, transparent 70%)', top: '-120px', left: '-80px', filter: 'blur(40px)', zIndex: 1 }} />
-        <div className="hero-orb-2 absolute pointer-events-none" style={{ width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle at 60% 60%, rgba(251,191,36,0.38) 0%, rgba(252,211,77,0.18) 50%, transparent 70%)', bottom: '-160px', right: '-100px', filter: 'blur(50px)', zIndex: 1 }} />
-        <div className="hero-orb-3 absolute pointer-events-none" style={{ width: '380px', height: '380px', borderRadius: '50%', background: 'radial-gradient(circle at 50% 50%, rgba(42,157,143,0.35) 0%, rgba(94,234,212,0.15) 50%, transparent 70%)', top: '30%', left: '55%', filter: 'blur(35px)', zIndex: 1 }} />
-        <div className="hero-orb-4 absolute pointer-events-none" style={{ width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle at 50% 50%, rgba(244,114,182,0.32) 0%, rgba(251,207,232,0.14) 50%, transparent 70%)', top: '10%', right: '20%', filter: 'blur(30px)', zIndex: 1 }} />
+        {/* Decorative sacred circle — always visible including mobile */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 1 }}>
+          <div className="w-[280px] h-[280px] md:w-[500px] md:h-[500px] rounded-full border-2 border-purple-300/40 animate-[spin_60s_linear_infinite]" />
+          <div className="absolute w-[220px] h-[220px] md:w-[400px] md:h-[400px] rounded-full border border-purple-200/30 animate-[spin_45s_linear_infinite_reverse]" />
+          <div className="absolute w-[160px] h-[160px] md:w-[300px] md:h-[300px] rounded-full border border-amber-200/25" />
+        </div>
+
+        {/* Animated orbs — responsive for mobile */}
+        <div className="hero-orb-1 absolute pointer-events-none" style={{ width: 'min(520px, 80vw)', height: 'min(520px, 80vw)', borderRadius: '50%', background: 'radial-gradient(circle at 40% 40%, rgba(139,92,246,0.45) 0%, rgba(167,139,250,0.20) 50%, transparent 70%)', top: '-10%', left: '-15%', filter: 'blur(40px)', zIndex: 1 }} />
+        <div className="hero-orb-2 absolute pointer-events-none" style={{ width: 'min(600px, 90vw)', height: 'min(600px, 90vw)', borderRadius: '50%', background: 'radial-gradient(circle at 60% 60%, rgba(251,191,36,0.38) 0%, rgba(252,211,77,0.18) 50%, transparent 70%)', bottom: '-20%', right: '-15%', filter: 'blur(50px)', zIndex: 1 }} />
+        <div className="hero-orb-3 absolute pointer-events-none" style={{ width: 'min(380px, 60vw)', height: 'min(380px, 60vw)', borderRadius: '50%', background: 'radial-gradient(circle at 50% 50%, rgba(42,157,143,0.35) 0%, rgba(94,234,212,0.15) 50%, transparent 70%)', top: '30%', left: '55%', filter: 'blur(35px)', zIndex: 1 }} />
+        <div className="hero-orb-4 absolute pointer-events-none" style={{ width: 'min(300px, 50vw)', height: 'min(300px, 50vw)', borderRadius: '50%', background: 'radial-gradient(circle at 50% 50%, rgba(244,114,182,0.32) 0%, rgba(251,207,232,0.14) 50%, transparent 70%)', top: '10%', right: '10%', filter: 'blur(30px)', zIndex: 1 }} />
 
         {/* White overlay */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(255,255,255,0.42)', zIndex: 2 }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(255,255,255,0.35)', zIndex: 2 }} />
+
+        {/* Floating particle animation */}
+        <ParticleField />
 
         <div className="container relative z-10 py-32">
           <div className="max-w-3xl mx-auto text-center">
@@ -492,7 +503,7 @@ export default function Home() {
        <div className="mystical-divider" />
 
       {/* ── How to start — 3 steps ─────────────────────────────────────── */}
-      <section className="py-20">
+      <section className="py-20 overflow-hidden">
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="text-center mb-14">
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">
@@ -502,24 +513,42 @@ export default function Home() {
               {isCs ? "Tři jednoduché kroky k pochopení vašeho jedinečného designu." : "Three simple steps to understanding your unique design."}
             </p>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {steps.map((s, i) => (
-              <motion.div
-                key={s.step}
-                initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} custom={i} variants={fadeUp}
-                className="bg-card rounded-2xl border border-border/50 p-8 text-center shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="w-14 h-14 rounded-full bg-primary/10 text-primary font-serif text-2xl font-bold flex items-center justify-center mx-auto mb-5">{s.step}</div>
-                <h3 className="font-serif text-xl font-semibold mb-3 text-foreground">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-5">{s.desc}</p>
-                <Link href={localePath("/calculate")}>
-                  <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/5">
-                    {s.cta}
-                    <ArrowRight className="w-4 h-4 ml-1.5" />
-                  </Button>
-                </Link>
-              </motion.div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
+            {steps.map((s, i) => {
+              const gradients = [
+                "from-purple-500 to-violet-600",
+                "from-teal-500 to-emerald-600",
+                "from-amber-500 to-orange-600",
+              ];
+              const btnStyles = [
+                "border-purple-400 text-purple-600 hover:bg-purple-500 hover:text-white hover:border-transparent",
+                "border-teal-400 text-teal-600 hover:bg-teal-500 hover:text-white hover:border-transparent",
+                "border-amber-400 text-amber-600 hover:bg-amber-500 hover:text-white hover:border-transparent",
+              ];
+              return (
+                <motion.div
+                  key={s.step}
+                  initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} custom={i} variants={fadeUp}
+                  whileHover={{ y: -6, scale: 1.02 }}
+                  className="relative bg-card rounded-2xl border border-border/40 p-7 md:p-8 text-center shadow-md hover:shadow-xl transition-all group overflow-hidden"
+                >
+                  {/* Gradient accent top bar */}
+                  <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${gradients[i]}`} />
+                  {/* Large gradient step number */}
+                  <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${gradients[i]} text-white font-serif text-2xl font-bold flex items-center justify-center mx-auto mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    {s.step}
+                  </div>
+                  <h3 className="font-serif text-xl font-semibold mb-3 text-foreground">{s.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-5">{s.desc}</p>
+                  <Link href={localePath("/calculate")}>
+                    <Button variant="outline" size="sm" className={`border-2 font-medium transition-all ${btnStyles[i]}`}>
+                      {s.cta}
+                      <ArrowRight className="w-4 h-4 ml-1.5" />
+                    </Button>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>

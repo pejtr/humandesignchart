@@ -702,3 +702,10 @@
 ## Visual Upgrades — Batch 7
 - [x] Premium spiritual AI thumbnails for all 6 blog articles (cosmic bodygraph, 5 silhouettes, compass, crystal heart, galaxy profiles, DNA helix)
 - [x] "How it works" section: replaced icons with large AI graphics (golden lotus, DNA helix, star gate portal)
+
+## UX Enhancements — Batch 8
+- [x] Hero sacred circle visible on mobile (3 concentric rings, responsive sizing, slow rotation animation)
+- [x] Hero particle animation (canvas-based floating purple dots with glow, IntersectionObserver for performance)
+- [x] Hero orbs responsive on mobile (use min() for viewport-relative sizing)
+- [x] Steps section redesigned: gradient accent bars, large gradient number circles, color-coded buttons, hover scale effect
+- [x] Steps section: overflow-hidden to prevent horizontal scroll on mobile
