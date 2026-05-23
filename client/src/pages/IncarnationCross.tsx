@@ -467,14 +467,46 @@ export default function IncarnationCross() {
               borderLeft: `3px solid ${crossColor}`,
             }}
           >
-            {/* Hermetic background pattern */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-5">
-              <svg viewBox="0 0 400 200" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
-                <circle cx="350" cy="100" r="120" fill="none" stroke={crossColor} strokeWidth="1" />
-                <circle cx="350" cy="100" r="90" fill="none" stroke={crossColor} strokeWidth="0.5" />
-                <circle cx="350" cy="100" r="60" fill="none" stroke={crossColor} strokeWidth="0.5" />
-                <line x1="230" y1="100" x2="470" y2="100" stroke={crossColor} strokeWidth="0.5" />
-                <line x1="350" y1="-20" x2="350" y2="220" stroke={crossColor} strokeWidth="0.5" />
+            {/* Hermetic background pattern — animated sacred geometry */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {/* Breathing glow orb */}
+              <div
+                className="sacred-glow-breathe absolute right-0 top-0 w-64 h-64 rounded-full"
+                style={{ background: `radial-gradient(circle, ${crossColor}30 0%, ${crossColor}10 40%, transparent 70%)`, transform: 'translate(25%, -25%)' }}
+              />
+              <svg viewBox="0 0 400 200" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                {/* Outer rotating ring group */}
+                <g className="sacred-rotate-cw" style={{ transformOrigin: '350px 100px' }}>
+                  <circle cx="350" cy="100" r="120" fill="none" stroke={crossColor} strokeWidth="0.8" className="sacred-ring-1" />
+                  {/* Hexagonal points on outer ring */}
+                  {[0, 60, 120, 180, 240, 300].map((deg, i) => {
+                    const rad = (deg * Math.PI) / 180;
+                    const x = 350 + 120 * Math.cos(rad);
+                    const y = 100 + 120 * Math.sin(rad);
+                    return <circle key={i} cx={x} cy={y} r="2.5" fill={crossColor} fillOpacity="0.25" />;
+                  })}
+                </g>
+                {/* Middle counter-rotating ring */}
+                <g className="sacred-rotate-ccw" style={{ transformOrigin: '350px 100px' }}>
+                  <circle cx="350" cy="100" r="90" fill="none" stroke={crossColor} strokeWidth="0.5" className="sacred-ring-2" />
+                  {/* Diamond points on middle ring */}
+                  {[45, 135, 225, 315].map((deg, i) => {
+                    const rad = (deg * Math.PI) / 180;
+                    const x = 350 + 90 * Math.cos(rad);
+                    const y = 100 + 90 * Math.sin(rad);
+                    return <circle key={i} cx={x} cy={y} r="1.8" fill={crossColor} fillOpacity="0.2" />;
+                  })}
+                </g>
+                {/* Inner static ring */}
+                <circle cx="350" cy="100" r="60" fill="none" stroke={crossColor} strokeWidth="0.4" className="sacred-ring-3" />
+                {/* Cross lines — pulsing */}
+                <line x1="230" y1="100" x2="470" y2="100" stroke={crossColor} strokeWidth="0.6" className="sacred-cross-line" />
+                <line x1="350" y1="-20" x2="350" y2="220" stroke={crossColor} strokeWidth="0.6" className="sacred-cross-line" />
+                {/* Diagonal lines for Star of David effect */}
+                <line x1="246" y1="31" x2="454" y2="169" stroke={crossColor} strokeWidth="0.3" className="sacred-ring-3" />
+                <line x1="246" y1="169" x2="454" y2="31" stroke={crossColor} strokeWidth="0.3" className="sacred-ring-3" />
+                {/* Center dot */}
+                <circle cx="350" cy="100" r="3" fill={crossColor} fillOpacity="0.35" className="sacred-ring-1" />
               </svg>
             </div>
             <div className="relative flex items-start gap-4">

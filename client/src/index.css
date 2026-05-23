@@ -503,3 +503,44 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+/* Sacred Geometry Pulse Animations */
+@keyframes sacredRingPulse1 {
+  0%, 100% { stroke-opacity: 0.12; }
+  50%       { stroke-opacity: 0.55; }
+}
+@keyframes sacredRingPulse2 {
+  0%, 100% { stroke-opacity: 0.08; }
+  50%       { stroke-opacity: 0.40; }
+}
+@keyframes sacredRingPulse3 {
+  0%, 100% { stroke-opacity: 0.05; }
+  50%       { stroke-opacity: 0.28; }
+}
+@keyframes sacredCrossLinePulse {
+  0%, 100% { stroke-opacity: 0.10; }
+  50%       { stroke-opacity: 0.45; }
+}
+@keyframes sacredGlowBreathe {
+  0%, 100% { opacity: 0.03; transform: scale(1); }
+  50%       { opacity: 0.18; transform: scale(1.04); }
+}
+@keyframes sacredRotateSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes sacredRotateReverse {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+.sacred-ring-1 { animation: sacredRingPulse1 4s ease-in-out infinite; }
+.sacred-ring-2 { animation: sacredRingPulse2 5.5s ease-in-out 0.8s infinite; }
+.sacred-ring-3 { animation: sacredRingPulse3 7s ease-in-out 1.6s infinite; }
+.sacred-cross-line { animation: sacredCrossLinePulse 4s ease-in-out infinite; }
+.sacred-glow-breathe { animation: sacredGlowBreathe 4s ease-in-out infinite; transform-origin: center; }
+.sacred-rotate-cw { transform-origin: center; animation: sacredRotateSlow 40s linear infinite; }
+.sacred-rotate-ccw { transform-origin: center; animation: sacredRotateReverse 55s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .sacred-ring-1, .sacred-ring-2, .sacred-ring-3,
+  .sacred-cross-line, .sacred-glow-breathe,
+  .sacred-rotate-cw, .sacred-rotate-ccw { animation: none; }
+}
