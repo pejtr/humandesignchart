@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import { GATE_DESCRIPTIONS } from "../../shared/hdContent";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -139,7 +140,24 @@ async function startServer() {
       type_strategy: `Provide a deep analysis of being a ${chart.type} with the strategy "${chart.strategy}". Explain the signature theme "${chart.signature}" and the not-self theme "${chart.notSelf}". Describe the aura type "${chart.aura}" and how it affects interactions. Give practical advice for living as this type.`,
       profile: `Analyze the profile ${chart.profile} (${chart.profileName}) in depth. Explain the conscious line ${(chart.profile as string)?.split("/")[0]} and unconscious line ${(chart.profile as string)?.split("/")[1]}. Describe how these lines interact, the life themes, and practical implications for relationships, career, and personal growth.`,
       authority: `Explain the ${chart.authority} authority in detail. How should this person make decisions? What does it feel like when they follow their authority correctly vs. when they don't? Give practical exercises and tips for developing trust in this authority.`,
-      incarnation_cross: `Analyze the incarnation cross: ${(chart.incarnationCross as any)?.name}. This is a ${(chart.incarnationCross as any)?.type}. The gates involved are ${(chart.incarnationCross as any)?.gates?.join(", ")}. Explain the life purpose, the themes of each gate in the cross, and how they work together to fulfill the person's destiny.`,
+      incarnation_cross: (() => {
+        const crossName = (chart.incarnationCross as any)?.name || '';
+        const crossType = (chart.incarnationCross as any)?.type || '';
+        const gates: number[] = (chart.incarnationCross as any)?.gates || [];
+        const gateDetails = gates.map((g: number) => {
+          const d = GATE_DESCRIPTIONS[g];
+          if (!d) return `Gate ${g}`;
+          const name = isEn ? d.nameEn : d.name;
+          const theme = isEn ? d.themeEn : d.theme;
+          const gift = isEn ? d.giftKeywordEn : d.giftKeyword;
+          const shadow = isEn ? d.shadowKeyword : d.shadowKeyword;
+          const desc = isEn ? d.descriptionEn : d.description;
+          return `Gate ${g} (${name}, ${d.iChing} ${d.hexagram}, Center: ${d.center}, Circuit: ${d.circuit}): Theme — ${theme}. Gift: ${gift}, Shadow: ${shadow}. ${desc}`;
+        }).join('\n\n');
+        return isEn
+          ? `Analyze the Incarnation Cross: "${crossName}" (${crossType}). The four gates are:\n\n${gateDetails}\n\nProvide a deep, structured analysis with these sections:\n1. **Life Theme & Purpose** — What is the core life mission of this cross? How do all 4 gates work together?\n2. **Conscious Gates (Personality Sun & Earth)** — Analyze gates ${gates[0]} and ${gates[1]}: their gifts, themes, and how they shape conscious identity\n3. **Unconscious Gates (Design Sun & Earth)** — Analyze gates ${gates[2]} and ${gates[3]}: their deeper unconscious gifts and how others see this person\n4. **How to Live This Cross** — Practical, specific guidance: daily practices, environments, relationships, and situations that support this cross\n5. **Challenges & Shadow Work** — What are the shadow aspects to be aware of? How to transform them?\n6. **Affirmation** — A powerful, personalized affirmation for this cross`
+          : `Analyzuj Inkarnační kříž: "${crossName}" (${crossType}). Čtyři brány jsou:\n\n${gateDetails}\n\nPoskytni hlubokou, strukturovanou analýzu s těmito sekcemi:\n1. **Životní téma a poslání** — Jaké je základní životní poslání tohoto kříže? Jak všechny 4 brány spolupracují?\n2. **Vědomé brány (Osobnost — Slunce a Země)** — Analyzuj brány ${gates[0]} a ${gates[1]}: jejich dary, témata a jak formují vědomou identitu\n3. **Nevědomé brány (Design — Slunce a Země)** — Analyzuj brány ${gates[2]} a ${gates[3]}: jejich hlubší nevědomé dary a jak tě ostatní vnímají\n4. **Jak žít svůj kříž** — Praktické, konkrétní vedení: každodenní praxe, prostředí, vztahy a situace, které podporují tento kříž\n5. **Výzvy a práce se stínem** — Jaké jsou stínové aspekty, na které si dát pozor? Jak je transformovat?\n6. **Afirmace** — Silná, personalizovaná afirmace pro tento kříž`;
+      })(),
       channels: `Analyze the defined channels: ${(chart.channels as any[])?.map((c: any) => `${c.gate1}-${c.gate2} (${c.centerA} to ${c.centerB})`).join("; ")}. For each channel, explain its energy, gifts, and challenges. Describe how these channels work together as a whole.`,
       relationships: `Based on this chart (Type: ${chart.type}, Profile: ${chart.profile}, Authority: ${chart.authority}, Definition: ${chart.definition}), provide relationship guidance. What type of partners are most compatible? How does their definition affect partnerships? What electromagnetic connections should they look for?`,
       career: `Based on this chart (Type: ${chart.type}, Profile: ${chart.profile}, Authority: ${chart.authority}, Defined channels: ${(chart.channels as any[])?.map((c: any) => `${c.gate1}-${c.gate2}`).join(", ")}), provide career guidance. What types of work environments suit them? What roles align with their design? How should they approach career decisions using their authority?`,

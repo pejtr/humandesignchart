@@ -732,3 +732,20 @@
 - [x] AiGuide page — updated to use premium AI guide OG image
 - [x] BlogArticle page — OG image dimensions updated to 1200×630, og:site_name added
 - [x] index.html — default OG/Twitter images updated to new premium homepage image
+
+## Inkarnační Kříž — AI Výklad
+- [ ] Gate data (64 bran s názvy, klíčovými slovy, hexagramy)
+- [ ] Cross lookup tabulka (64×64 kombinace → název kříže)
+- [ ] Backend tRPC procedura: getCrossReading (4 brány → AI streaming výklad)
+- [ ] IncarnationCross stránka s vizualizací 4 bran a SSE streaming AI čtením
+- [ ] Integrace odkazu z ChartResult stránky
+- [ ] SEO meta tagy pro stránku kříže
+
+## Inkarnační Kříž — Detailní stránka (Batch 12)
+- [x] Sacred Geometry SVG diagram kříže s Flower of Life, Metatron's Cube motivy a 4 uzly bran
+- [x] GateDetailCard — rozšiřitelné karty bran s I-Ching hexagramem, darem, stínem, centrem, okruhem
+- [x] HowToLiveSection — sekce "Jak žít svůj kříž" s 3 kategoriemi tipů dle typu kříže
+- [x] Hermetické vizuální prvky v hero headeru (sacred geometry SVG overlay)
+- [x] Vylepšený AI prompt — 6 strukturovaných sekcí + kompletní data bran z GATE_DESCRIPTIONS
+- [x] useSEO hook integrace na IncarnationCross stránce (nahrazení inline meta logiky)
+- [x] TiltCard 3D hover micro-interactions na blog compact kartách v Home.tsx

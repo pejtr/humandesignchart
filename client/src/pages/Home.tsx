@@ -683,7 +683,7 @@ export default function Home() {
               {blogPosts.filter(p => !p.featured).slice(0, 5).map((post, i) => (
                 <motion.div key={post.slug} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i + 1} variants={scaleIn}>
                   <Link href={localePath(`/blog/${post.slug}`)} className="no-underline">
-                    <div className="group flex gap-3.5 p-3 rounded-xl border border-border/40 bg-card hover:shadow-md hover:border-primary/20 transition-all h-full">
+                    <TiltCard className="group flex gap-3.5 p-3 rounded-xl border border-border/40 bg-card hover:shadow-md hover:border-primary/20 transition-all h-full" maxTilt={5} scale={1.01} hermeticGlow={true}>
                       <div className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-muted">
                         <img
                           src={post.cover}
@@ -700,7 +700,7 @@ export default function Home() {
                         <h4 className="text-sm font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">{post.title}</h4>
                         <p className="text-xs text-muted-foreground line-clamp-1 hidden sm:block lg:block">{post.excerpt}</p>
                       </div>
-                    </div>
+                    </TiltCard>
                   </Link>
                 </motion.div>
               ))}

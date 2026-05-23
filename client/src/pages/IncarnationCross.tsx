@@ -12,12 +12,13 @@ import { toast } from "sonner";
 import { Streamdown } from "streamdown";
 import {
   ArrowLeft, Sparkles, Loader2, Sun,
-  Target, Compass, BookOpen, Info, Lock, Download,
-  Star,
+  Target, Compass, BookOpen, Lock, Download,
+  Star, Zap, Eye, Heart, Flame,
 } from "lucide-react";
 import type { HumanDesignChartData } from "@shared/types";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { GATE_DESCRIPTIONS } from "@shared/hdContent";
+import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 
 const CROSS_TYPE_CS: Record<string, string> = {
   "Right Angle Cross": "Pravý Úhlový Kříž",
@@ -34,114 +35,287 @@ function translateCrossName(name: string, locale: string): string {
   return result;
 }
 
+// ─── Sacred Geometry Cross SVG Diagram ────────────────────────────────────────
+interface DiagramGate {
+  label: string;
+  gate?: number;
+  color: string;
+  position: "top" | "bottom" | "left" | "right";
+}
+
+function CrossDiagram({
+  gates,
+  crossColor,
+  locale,
+}: {
+  gates: DiagramGate[];
+  crossColor: string;
+  locale: string;
+}) {
+  return (
+    <div className="relative w-full aspect-square max-w-[260px] mx-auto select-none">
+      <svg viewBox="0 0 280 280" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        {/* Outer sacred circles */}
+        <circle cx="140" cy="140" r="130" fill="none" stroke={crossColor} strokeWidth="0.5" strokeOpacity="0.15" />
+        <circle cx="140" cy="140" r="110" fill="none" stroke={crossColor} strokeWidth="0.5" strokeOpacity="0.1" />
+        <circle cx="140" cy="140" r="90" fill="none" stroke={crossColor} strokeWidth="0.5" strokeOpacity="0.08" />
+        {/* Flower of Life petals */}
+        {[0, 60, 120, 180, 240, 300].map((angle, i) => {
+          const rad = (angle * Math.PI) / 180;
+          const cx = 140 + 35 * Math.cos(rad);
+          const cy = 140 + 35 * Math.sin(rad);
+          return (
+            <circle key={i} cx={cx} cy={cy} r="35" fill="none" stroke={crossColor} strokeWidth="0.4" strokeOpacity="0.12" />
+          );
+        })}
+        <circle cx="140" cy="140" r="35" fill="none" stroke={crossColor} strokeWidth="0.4" strokeOpacity="0.12" />
+        {/* Cross arms */}
+        <line x1="140" y1="10" x2="140" y2="270" stroke={crossColor} strokeWidth="1.5" strokeOpacity="0.3" />
+        <line x1="10" y1="140" x2="270" y2="140" stroke={crossColor} strokeWidth="1.5" strokeOpacity="0.3" />
+        {/* Diagonal lines */}
+        <line x1="40" y1="40" x2="240" y2="240" stroke={crossColor} strokeWidth="0.5" strokeOpacity="0.1" />
+        <line x1="240" y1="40" x2="40" y2="240" stroke={crossColor} strokeWidth="0.5" strokeOpacity="0.1" />
+        {/* Center mandala */}
+        <circle cx="140" cy="140" r="22" fill={`${crossColor}18`} stroke={crossColor} strokeWidth="1" strokeOpacity="0.4" />
+        <circle cx="140" cy="140" r="14" fill={`${crossColor}25`} stroke={crossColor} strokeWidth="0.8" strokeOpacity="0.5" />
+        <circle cx="140" cy="140" r="6" fill={crossColor} fillOpacity="0.7" />
+        {/* 4 gate nodes */}
+        <circle cx="140" cy="40" r="20" fill={`${gates[0]?.color || crossColor}20`} stroke={gates[0]?.color || crossColor} strokeWidth="1.5" />
+        <circle cx="140" cy="240" r="20" fill={`${gates[1]?.color || crossColor}20`} stroke={gates[1]?.color || crossColor} strokeWidth="1.5" />
+        <circle cx="40" cy="140" r="20" fill={`${gates[2]?.color || crossColor}20`} stroke={gates[2]?.color || crossColor} strokeWidth="1.5" />
+        <circle cx="240" cy="140" r="20" fill={`${gates[3]?.color || crossColor}20`} stroke={gates[3]?.color || crossColor} strokeWidth="1.5" />
+        {/* Gate numbers */}
+        <text x="140" y="45" textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="bold" fill={gates[0]?.color || crossColor} fillOpacity="0.9">{gates[0]?.gate ?? "?"}</text>
+        <text x="140" y="245" textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="bold" fill={gates[1]?.color || crossColor} fillOpacity="0.9">{gates[1]?.gate ?? "?"}</text>
+        <text x="40" y="145" textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="bold" fill={gates[2]?.color || crossColor} fillOpacity="0.9">{gates[2]?.gate ?? "?"}</text>
+        <text x="240" y="145" textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="bold" fill={gates[3]?.color || crossColor} fillOpacity="0.9">{gates[3]?.gate ?? "?"}</text>
+        {/* Symbols */}
+        <text x="140" y="22" textAnchor="middle" fontSize="9" fill={gates[0]?.color || "#f59e0b"} fillOpacity="0.7">☀</text>
+        <text x="140" y="266" textAnchor="middle" fontSize="9" fill={gates[1]?.color || "#6b7280"} fillOpacity="0.7">⊕</text>
+        <text x="22" y="144" textAnchor="middle" fontSize="9" fill={gates[2]?.color || "#ef4444"} fillOpacity="0.7">☀</text>
+        <text x="258" y="144" textAnchor="middle" fontSize="9" fill={gates[3]?.color || "#9ca3af"} fillOpacity="0.7">⊕</text>
+      </svg>
+      {/* Labels */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-0.5 text-center pointer-events-none">
+        <span className="text-[8px] font-medium text-muted-foreground whitespace-nowrap">
+          {locale === "cs" ? "Osobnost ☀" : "Personality ☀"}
+        </span>
+      </div>
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-0.5 text-center pointer-events-none">
+        <span className="text-[8px] font-medium text-muted-foreground whitespace-nowrap">
+          {locale === "cs" ? "Osobnost ⊕" : "Personality ⊕"}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Deep Gate Card ────────────────────────────────────────────────────────────
+function GateDetailCard({
+  gateNumber,
+  label,
+  color,
+  icon,
+  locale,
+}: {
+  gateNumber: number | undefined;
+  label: string;
+  color: string;
+  icon: React.ReactNode;
+  locale: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  if (!gateNumber) return null;
+  const gateDesc = GATE_DESCRIPTIONS[gateNumber];
+  if (!gateDesc) return null;
+  const isCs = locale === "cs";
+  const name = isCs ? gateDesc.name : gateDesc.nameEn;
+  const theme = isCs ? gateDesc.theme : gateDesc.themeEn;
+  const description = isCs ? gateDesc.description : gateDesc.descriptionEn;
+  const gift = isCs ? gateDesc.giftKeyword : gateDesc.giftKeywordEn;
+  const shadow = isCs ? gateDesc.shadowKeyword : gateDesc.shadowKeywordEn;
+  return (
+    <div
+      className="rounded-xl border border-border/50 overflow-hidden cursor-pointer hover:border-primary/30 transition-all"
+      style={{ background: `linear-gradient(135deg, ${color}08, ${color}04)` }}
+      onClick={() => setExpanded(!expanded)}
+    >
+      <div className="p-3 flex items-start gap-3">
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-sm font-bold"
+          style={{ background: `${color}18`, color }}
+        >
+          {gateNumber}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            {icon}
+            <span className="text-[10px] text-muted-foreground font-medium">{label}</span>
+          </div>
+          <p className="text-sm font-semibold leading-tight">{name}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">{gateDesc.iChing} {gateDesc.hexagram}</p>
+        </div>
+        <div className="flex flex-col items-end gap-1 shrink-0">
+          <span
+            className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
+            style={{ background: `${color}20`, color }}
+          >
+            {gift}
+          </span>
+          <span className="text-[9px] text-muted-foreground px-1.5 py-0.5 rounded-full bg-muted/50">
+            {shadow}
+          </span>
+        </div>
+      </div>
+      {expanded && (
+        <div className="px-3 pb-3 pt-0 border-t border-border/30 mt-1">
+          <div className="flex flex-wrap gap-1.5 mb-2 mt-2">
+            <span className="text-[9px] px-2 py-0.5 rounded-full bg-muted/60 text-muted-foreground">
+              {isCs ? "Centrum:" : "Center:"} {gateDesc.center}
+            </span>
+            <span className="text-[9px] px-2 py-0.5 rounded-full bg-muted/60 text-muted-foreground">
+              {isCs ? "Okruh:" : "Circuit:"} {gateDesc.circuit}
+            </span>
+            <span className="text-[9px] px-2 py-0.5 rounded-full bg-muted/60 text-muted-foreground">
+              {isCs ? "Téma:" : "Theme:"} {theme}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
+        </div>
+      )}
+      <div className="px-3 pb-2 flex items-center justify-end">
+        <span className="text-[9px] text-muted-foreground/60">
+          {expanded ? (isCs ? "▲ Skrýt" : "▲ Hide") : (isCs ? "▼ Více" : "▼ More")}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── How to Live Your Cross Section ────────────────────────────────────────────
+function HowToLiveSection({
+  crossType,
+  crossColor,
+  locale,
+}: {
+  crossType: string;
+  crossColor: string;
+  locale: string;
+}) {
+  const isCs = locale === "cs";
+  type TipSection = { title: string; items: string[] };
+  const tips: Record<string, { cs: TipSection[]; en: TipSection[] }> = {
+    "Right Angle Cross": {
+      cs: [
+        { title: "Osobní zkušenost", items: ["Žij plně svůj osobní příběh", "Každá zkušenost je součástí tvého osudu", "Nezkoušej měnit ostatní — měň sebe"] },
+        { title: "Vztahy a setkání", items: ["Hledej lidi, kteří tě inspirují k růstu", "Buď otevřený karmickým setkáním", "Tvé vztahy jsou zrcadlem tvého vývoje"] },
+        { title: "Kariéra a naplnění", items: ["Sleduj svou autoritu při rozhodování", "Hledej práci, která rezonuje s tvými bránami", "Osobní naplnění je klíčem k úspěchu"] },
+      ],
+      en: [
+        { title: "Personal Experience", items: ["Live your personal story fully", "Every experience is part of your destiny", "Don't try to change others — change yourself"] },
+        { title: "Relationships", items: ["Seek people who inspire your growth", "Be open to karmic encounters", "Your relationships mirror your evolution"] },
+        { title: "Career & Fulfillment", items: ["Follow your authority in decisions", "Find work that resonates with your gates", "Personal fulfillment is the key to success"] },
+      ],
+    },
+    "Left Angle Cross": {
+      cs: [
+        { title: "Komunita a kolektiv", items: ["Tvé poslání se naplňuje skrze druhé", "Hledej komunitu, kde můžeš sloužit", "Transpersonální setkání jsou tvým palivem"] },
+        { title: "Vliv a vedení", items: ["Sdílej svou moudrost s ostatními", "Buď průvodcem, ne zachráncem", "Tvá přítomnost sama o sobě léčí"] },
+        { title: "Každodenní praxe", items: ["Vytvářej prostor pro setkávání", "Buď otevřený neočekávaným setkáním", "Tvůj vliv roste přirozeně"] },
+      ],
+      en: [
+        { title: "Community & Collective", items: ["Your mission fulfills through others", "Seek community where you can serve", "Transpersonal encounters are your fuel"] },
+        { title: "Influence & Leadership", items: ["Share your wisdom with others", "Be a guide, not a savior", "Your presence itself heals"] },
+        { title: "Daily Practice", items: ["Create space for encounters", "Be open to unexpected meetings", "Your influence grows naturally"] },
+      ],
+    },
+    "Juxtaposition Cross": {
+      cs: [
+        { title: "Přijetí fixního osudu", items: ["Tvé poslání je pevně dané — přijmi ho", "Neodporuj svému přirozenému toku", "Tvá jedinečnost je tvou silou"] },
+        { title: "Autentičnost", items: ["Buď věrný svému designu za každých okolností", "Ostatní tě potřebují takového, jaký jsi", "Tvá konzistence inspiruje druhé"] },
+        { title: "Rituály a reflexe", items: ["Praktikuj každodenní rituály v souladu s bránami", "Meditace a reflexe posilují tvůj kříž", "Sleduj synchronicity ve svém životě"] },
+      ],
+      en: [
+        { title: "Accepting Fixed Destiny", items: ["Your mission is fixed — accept it", "Don't resist your natural flow", "Your uniqueness is your strength"] },
+        { title: "Authenticity", items: ["Stay true to your design in all circumstances", "Others need you exactly as you are", "Your consistency inspires others"] },
+        { title: "Rituals & Reflection", items: ["Practice daily rituals aligned with your gates", "Meditation and reflection strengthen your cross", "Watch for synchronicities in your life"] },
+      ],
+    },
+  };
+  const crossTips = tips[crossType] || tips["Right Angle Cross"];
+  const tipList = isCs ? crossTips.cs : crossTips.en;
+  const icons = [<Zap className="w-4 h-4" />, <Heart className="w-4 h-4" />, <Flame className="w-4 h-4" />];
+  return (
+    <Card className="overflow-hidden">
+      <div className="h-1" style={{ background: `linear-gradient(90deg, ${crossColor}, #2a9d8f, ${crossColor})` }} />
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Eye className="w-4 h-4 text-primary" />
+          {isCs ? "Jak žít svůj kříž" : "How to Live Your Cross"}
+        </CardTitle>
+        <p className="text-xs text-muted-foreground">
+          {isCs
+            ? "Praktické vedení pro naplnění vašeho životního poslání"
+            : "Practical guidance for fulfilling your life purpose"}
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {tipList.map((section, i) => (
+          <div key={i}>
+            <div className="flex items-center gap-2 mb-2">
+              <div
+                className="w-6 h-6 rounded-md flex items-center justify-center"
+                style={{ background: `${crossColor}20`, color: crossColor }}
+              >
+                {icons[i] || <Star className="w-3 h-3" />}
+              </div>
+              <p className="text-sm font-semibold">{section.title}</p>
+            </div>
+            <ul className="space-y-1 ml-8">
+              {section.items.map((item, j) => (
+                <li key={j} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                  <span style={{ color: crossColor }} className="mt-0.5 shrink-0">◆</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function IncarnationCross() {
   const [, navigate] = useLocation();
   const { isAuthenticated } = useAuth();
   const { t, locale, localePath } = useLanguage();
   const tp = t.incarnationCrossPage;
-
   const [chart, setChart] = useState<HumanDesignChartData | null>(null);
   const [chartMeta, setChartMeta] = useState<any>(null);
   const [aiContent, setAiContent] = useState<string>("");
   const [isStreaming, setIsStreaming] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const isCs = locale === "cs";
 
-  useEffect(() => {
-    const isEn = locale === 'en';
-    const title = isEn
-      ? 'Incarnation Cross — Life Purpose, Gates & Human Design AI Reading'
-      : 'Inkarnační Kříž — Životní Poslání, Brány a AI Výklad Human Designu';
-    const description = isEn
-      ? 'Discover the meaning of your Incarnation Cross in Human Design. Explore your 4 defining gates, life purpose themes, and get a personalized AI-generated reading of your unique cross.'
-      : 'Objevte význam svého Inkarnačního kříže v Human Designu. Prozkoumejte 4 definující brány, témata životního poslání a získejte personalizovaný AI výklad vašeho jedinečného kříže.';
-    const pageUrl = isEn
-      ? 'https://humandesignchart.app/en/incarnation-cross'
-      : 'https://humandesignmapa.cz/cs/incarnation-cross';
-    const ogImage = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80';
-
-    document.title = title;
-
-    // Helper to upsert a meta tag
-    const setMeta = (selector: string, attr: string, value: string) => {
-      let el = document.querySelector(selector);
-      if (el) {
-        el.setAttribute(attr, value);
-      } else {
-        el = document.createElement('meta');
-        const parts = selector.match(/\[([^=]+)=["']([^"']+)["']\]/);
-        if (parts) el.setAttribute(parts[1], parts[2]);
-        el.setAttribute(attr, value);
-        el.setAttribute('data-page-meta', 'incarnation-cross');
-        document.head.appendChild(el);
-      }
-    };
-
-    setMeta('meta[name="description"]', 'content', description);
-    setMeta('meta[property="og:title"]', 'content', title);
-    setMeta('meta[property="og:description"]', 'content', description);
-    setMeta('meta[property="og:type"]', 'content', 'website');
-    setMeta('meta[property="og:url"]', 'content', pageUrl);
-    setMeta('meta[property="og:image"]', 'content', ogImage);
-    setMeta('meta[property="og:image:width"]', 'content', '1200');
-    setMeta('meta[property="og:image:height"]', 'content', '630');
-    setMeta('meta[property="og:locale"]', 'content', isEn ? 'en_US' : 'cs_CZ');
-    setMeta('meta[name="twitter:card"]', 'content', 'summary_large_image');
-    setMeta('meta[name="twitter:title"]', 'content', title);
-    setMeta('meta[name="twitter:description"]', 'content', description);
-    setMeta('meta[name="twitter:image"]', 'content', ogImage);
-
-    // Canonical URL
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (canonical) {
-      canonical.setAttribute('href', pageUrl);
-    } else {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      canonical.setAttribute('href', pageUrl);
-      canonical.setAttribute('data-page-meta', 'incarnation-cross');
-      document.head.appendChild(canonical);
-    }
-
-    // JSON-LD structured data
-    let jsonLd = document.querySelector('script[data-page-jsonld="incarnation-cross"]');
-    if (!jsonLd) {
-      jsonLd = document.createElement('script');
-      jsonLd.setAttribute('type', 'application/ld+json');
-      jsonLd.setAttribute('data-page-jsonld', 'incarnation-cross');
-      document.head.appendChild(jsonLd);
-    }
-    jsonLd.textContent = JSON.stringify([
-      {
-        '@context': 'https://schema.org',
-        '@type': 'WebApplication',
-        name: title,
-        description,
-        url: pageUrl,
-        applicationCategory: 'LifestyleApplication',
-        inLanguage: isEn ? 'en-US' : 'cs-CZ',
-        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-        provider: {
-          '@type': 'Organization',
-          name: 'Human Design Chart',
-          url: isEn ? 'https://humandesignchart.app' : 'https://humandesignmapa.cz',
-        },
-      },
-      {
-        '@context': 'https://schema.org',
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: isEn ? 'https://humandesignchart.app/en' : 'https://humandesignmapa.cz/cs' },
-          { '@type': 'ListItem', position: 2, name: isEn ? 'Incarnation Cross' : 'Inkarnační Kříž', item: pageUrl },
-        ],
-      },
-    ]);
-
-    return () => {
-      document.title = isEn ? 'Free Human Design Chart Calculator & AI Reading' : 'Human Design Mapa Zdarma — Kalkulačka a AI Výklad';
-      document.querySelectorAll('[data-page-meta="incarnation-cross"]').forEach(el => el.remove());
-      document.querySelector('script[data-page-jsonld="incarnation-cross"]')?.remove();
-    };
-  }, [locale]);
+  // SEO
+  useSEO({
+    title: isCs
+      ? "Inkarnační Kříž — Životní Poslání, Brány a AI Výklad Human Designu"
+      : "Incarnation Cross — Life Purpose, Gates & Human Design AI Reading",
+    description: isCs
+      ? "Objevte význam svého Inkarnačního kříže v Human Designu. Prozkoumejte 4 definující brány, témata životního poslání a získejte personalizovaný AI výklad vašeho jedinečného kříže."
+      : "Discover the meaning of your Incarnation Cross in Human Design. Explore your 4 defining gates, life purpose themes, and get a personalized AI-generated reading of your unique cross.",
+    ogImage: OG_IMAGES.calculator,
+    ogUrl: isCs
+      ? "https://humandesignmapa.cz/cs/incarnation-cross"
+      : "https://humandesignchart.app/en/incarnation-cross",
+    locale: isCs ? "cs_CZ" : "en_US",
+    keywords: isCs
+      ? "inkarnační kříž, human design, životní poslání, 4 brány, pravý úhlový kříž, levý úhlový kříž, juxtapoziční kříž, AI výklad"
+      : "incarnation cross, human design, life purpose, 4 gates, right angle cross, left angle cross, juxtaposition cross, AI reading",
+  });
 
   useEffect(() => {
     const stored = sessionStorage.getItem("chartResult");
@@ -156,57 +330,42 @@ export default function IncarnationCross() {
       return;
     }
     if (!chart) return;
-
-    // Abort any existing stream
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
-
     setAiContent("");
     setIsStreaming(true);
-
     try {
       const chartEncoded = encodeURIComponent(JSON.stringify(chart));
       const url = `/api/ai/stream?chartData=${chartEncoded}&readingType=incarnation_cross&locale=${locale}`;
       const response = await fetch(url, { signal: controller.signal });
-
       if (!response.ok || !response.body) {
         throw new Error("Stream failed");
       }
-
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
-
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n");
         buffer = lines.pop() || "";
-
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
           const data = line.slice(6).trim();
           if (!data) continue;
           try {
             const parsed = JSON.parse(data);
-            if (parsed.token) {
-              setAiContent(prev => prev + parsed.token);
-            }
-            if (parsed.done) {
-              setIsStreaming(false);
-            }
-            if (parsed.error) {
-              throw new Error(parsed.error);
-            }
+            if (parsed.token) setAiContent(prev => prev + parsed.token);
+            if (parsed.done) setIsStreaming(false);
+            if (parsed.error) throw new Error(parsed.error);
           } catch { /* skip malformed */ }
         }
       }
     } catch (err: any) {
       if (err.name !== "AbortError") {
-        toast.error(locale === "cs" ? "AI analýza selhala" : "AI analysis failed");
+        toast.error(isCs ? "AI analýza selhala" : "AI analysis failed");
       }
     } finally {
       setIsStreaming(false);
@@ -220,19 +379,24 @@ export default function IncarnationCross() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${locale === "cs" ? "inkarnacni-kriz" : "incarnation-cross"}-${crossName.toLowerCase().replace(/\s+/g, "-")}.txt`;
+    a.download = `${isCs ? "inkarnacni-kriz" : "incarnation-cross"}-${crossName.toLowerCase().replace(/\s+/g, "-")}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
+  // ─── Empty state ────────────────────────────────────────────────────────────
   if (!chart) {
     return (
       <div className="min-h-screen flex flex-col bg-background text-foreground">
         <Navbar />
         <main className="flex-1 pt-24 pb-16 flex items-center justify-center">
           <div className="text-center max-w-md px-4">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-              <Target className="w-8 h-8 text-primary" />
+            <div className="relative w-24 h-24 mx-auto mb-6">
+              <div className="absolute inset-0 rounded-full border-2 border-primary/20 animate-spin" style={{ animationDuration: "20s" }} />
+              <div className="absolute inset-2 rounded-full border border-primary/15 animate-spin" style={{ animationDuration: "15s", animationDirection: "reverse" }} />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Target className="w-10 h-10 text-primary/60" />
+              </div>
             </div>
             <h2 className="font-serif text-2xl font-bold mb-3">{tp.calculateFirst}</h2>
             <p className="text-muted-foreground mb-6">{tp.calculateFirstDesc}</p>
@@ -247,58 +411,43 @@ export default function IncarnationCross() {
     );
   }
 
+  // ─── Derived data ────────────────────────────────────────────────────────────
   const crossData = chart.incarnationCross;
   const crossName = crossData?.name || "Unknown Cross";
   const displayCrossName = translateCrossName(crossName, locale);
   const crossType = (Object.keys(CROSS_TYPE_CS) as string[]).find(k => crossName.includes(k)) || "Right Angle Cross";
   const crossTypeInfo = (tp.crossTypes as any)[crossType];
-
-  // Color based on cross type
   const crossColor = crossType === "Right Angle Cross"
     ? "#7c3aed"
     : crossType === "Left Angle Cross"
     ? "#2a9d8f"
     : "#d4af37";
 
-  // Get the 4 gates of the cross
   const sunGate = chart.personalityActivations?.find(p => p.planet === "Sun")?.gate;
   const earthGate = chart.personalityActivations?.find(p => p.planet === "Earth")?.gate;
   const designSunGate = chart.designActivations?.find(p => p.planet === "Sun")?.gate;
   const designEarthGate = chart.designActivations?.find(p => p.planet === "Earth")?.gate;
   const crossGateNumbers = crossData?.gates || [];
 
-  const crossGates = [
-    {
-      label: tp.personalitySun,
-      gate: sunGate || crossGateNumbers[0],
-      icon: <Sun className="w-4 h-4" style={{ color: "#f59e0b" }} />,
-      color: "#f59e0b",
-    },
-    {
-      label: tp.personalityEarth,
-      gate: earthGate || crossGateNumbers[1],
-      icon: <span className="text-sm" style={{ color: "#6b7280" }}>⊕</span>,
-      color: "#6b7280",
-    },
-    {
-      label: tp.designSun,
-      gate: designSunGate || crossGateNumbers[2],
-      icon: <Sun className="w-4 h-4" style={{ color: "#ef4444" }} />,
-      color: "#ef4444",
-    },
-    {
-      label: tp.designEarth,
-      gate: designEarthGate || crossGateNumbers[3],
-      icon: <span className="text-sm" style={{ color: "#9ca3af" }}>⊕</span>,
-      color: "#9ca3af",
-    },
-  ].filter(g => g.gate !== undefined);
+  const diagramGates: DiagramGate[] = [
+    { label: tp.personalitySun, gate: sunGate || crossGateNumbers[0], color: "#f59e0b", position: "top" },
+    { label: tp.personalityEarth, gate: earthGate || crossGateNumbers[1], color: "#6b7280", position: "bottom" },
+    { label: tp.designSun, gate: designSunGate || crossGateNumbers[2], color: "#ef4444", position: "left" },
+    { label: tp.designEarth, gate: designEarthGate || crossGateNumbers[3], color: "#9ca3af", position: "right" },
+  ];
+
+  const gateCardData = [
+    { label: tp.personalitySun, gate: sunGate || crossGateNumbers[0], color: "#f59e0b", icon: <Sun className="w-3.5 h-3.5" style={{ color: "#f59e0b" }} /> },
+    { label: tp.personalityEarth, gate: earthGate || crossGateNumbers[1], color: "#6b7280", icon: <span className="text-sm" style={{ color: "#6b7280" }}>⊕</span> },
+    { label: tp.designSun, gate: designSunGate || crossGateNumbers[2], color: "#ef4444", icon: <Sun className="w-3.5 h-3.5" style={{ color: "#ef4444" }} /> },
+    { label: tp.designEarth, gate: designEarthGate || crossGateNumbers[3], color: "#9ca3af", icon: <span className="text-sm" style={{ color: "#9ca3af" }}>⊕</span> },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
       <main className="flex-1 pt-24 pb-16">
-        <div className="container max-w-4xl">
+        <div className="container max-w-5xl">
           {/* Back button */}
           <Button
             variant="ghost"
@@ -310,17 +459,33 @@ export default function IncarnationCross() {
             {tp.backToChart}
           </Button>
 
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-3">
+          {/* ─── Hero Header ─────────────────────────────────────────────── */}
+          <div
+            className="relative mb-8 rounded-2xl overflow-hidden p-6 md:p-8"
+            style={{
+              background: `linear-gradient(135deg, ${crossColor}15 0%, ${crossColor}08 50%, transparent 100%)`,
+              borderLeft: `3px solid ${crossColor}`,
+            }}
+          >
+            {/* Hermetic background pattern */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-5">
+              <svg viewBox="0 0 400 200" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
+                <circle cx="350" cy="100" r="120" fill="none" stroke={crossColor} strokeWidth="1" />
+                <circle cx="350" cy="100" r="90" fill="none" stroke={crossColor} strokeWidth="0.5" />
+                <circle cx="350" cy="100" r="60" fill="none" stroke={crossColor} strokeWidth="0.5" />
+                <line x1="230" y1="100" x2="470" y2="100" stroke={crossColor} strokeWidth="0.5" />
+                <line x1="350" y1="-20" x2="350" y2="220" stroke={crossColor} strokeWidth="0.5" />
+              </svg>
+            </div>
+            <div className="relative flex items-start gap-4">
               <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md"
+                className="w-14 h-14 rounded-xl flex items-center justify-center shadow-md shrink-0"
                 style={{ background: `${crossColor}20`, color: crossColor }}
               >
-                <Target className="w-6 h-6" />
+                <Target className="w-7 h-7" />
               </div>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
                   <p className="text-sm text-muted-foreground font-medium">{tp.title}</p>
                   <Badge
                     className="text-white text-xs px-2 py-0.5"
@@ -329,80 +494,48 @@ export default function IncarnationCross() {
                     {crossTypeInfo?.theme || tp.badge}
                   </Badge>
                 </div>
-                <h1 className="font-serif text-2xl md:text-3xl font-bold">{displayCrossName}</h1>
+                <h1 className="font-serif text-2xl md:text-3xl font-bold leading-tight">{displayCrossName}</h1>
                 {chartMeta?.name && (
-                  <p className="text-sm text-muted-foreground mt-0.5">
-                    {locale === "cs" ? `pro ${chartMeta.name}` : `for ${chartMeta.name}`}
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {isCs ? `pro ${chartMeta.name}` : `for ${chartMeta.name}`}
+                  </p>
+                )}
+                {crossTypeInfo && (
+                  <p className="text-sm text-muted-foreground mt-2 max-w-2xl leading-relaxed">
+                    {crossTypeInfo.desc}
                   </p>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Left column */}
-            <div className="md:col-span-1 space-y-4">
-              {/* Cross type explanation */}
-              {crossTypeInfo && (
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Info className="w-4 h-4 text-primary" />
-                      {tp.crossType}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {crossTypeInfo.desc}
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
+          {/* ─── Main Grid ─────────────────────────────────────────────────── */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-              {/* The 4 gates */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Star className="w-4 h-4 text-primary" />
-                    {tp.fourGates}
+            {/* ─── Left Panel (2 cols) ──────────────────────────────────────── */}
+            <div className="lg:col-span-2 space-y-5">
+
+              {/* Sacred Geometry Cross Diagram */}
+              <Card className="overflow-hidden">
+                <div className="h-0.5" style={{ background: `linear-gradient(90deg, transparent, ${crossColor}, transparent)` }} />
+                <CardHeader className="pb-2 pt-4">
+                  <CardTitle className="text-sm flex items-center gap-2 text-muted-foreground font-medium">
+                    <Star className="w-3.5 h-3.5" style={{ color: crossColor }} />
+                    {isCs ? "Diagram kříže" : "Cross Diagram"}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  {crossGates.map((g, i) => {
-                    const gateDesc = GATE_DESCRIPTIONS[g.gate as number];
-                    return (
-                      <div key={i} className="flex items-center gap-3">
-                        <div
-                          className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                          style={{ background: `${g.color}15`, color: g.color }}
-                        >
-                          {g.icon}
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground">{g.label}</p>
-                          <p className="text-sm font-semibold">
-                            {tp.gate} {g.gate}
-                            {gateDesc && (
-                              <span className="text-xs text-muted-foreground font-normal ml-1">
-                                — {gateDesc.name}
-                              </span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {crossGates.length === 0 && (
-                    <p className="text-sm text-muted-foreground">
-                      {locale === "cs" ? "Data bran nejsou dostupná." : "Gate data not available."}
-                    </p>
-                  )}
+                <CardContent className="pb-4">
+                  <CrossDiagram
+                    gates={diagramGates}
+                    crossColor={crossColor}
+                    locale={locale}
+                  />
                 </CardContent>
               </Card>
 
-              {/* What is incarnation cross */}
-              <Card style={{ background: "linear-gradient(135deg, #f5f0ff 0%, #fef9e7 100%)" }}>
-                <CardContent className="pt-4">
+              {/* What is Incarnation Cross */}
+              <Card style={{ background: `linear-gradient(135deg, ${crossColor}08, transparent)` }}>
+                <CardContent className="pt-4 pb-4">
                   <div className="flex items-start gap-2">
                     <BookOpen className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                     <div>
@@ -414,11 +547,53 @@ export default function IncarnationCross() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* How to Live Your Cross */}
+              <HowToLiveSection
+                crossType={crossType}
+                crossColor={crossColor}
+                locale={locale}
+              />
             </div>
 
-            {/* Right column — AI analysis */}
-            <div className="md:col-span-2">
-              <Card className="h-full">
+            {/* ─── Right Panel (3 cols) ─────────────────────────────────────── */}
+            <div className="lg:col-span-3 space-y-5">
+
+              {/* The 4 Gates — Deep Cards */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Star className="w-4 h-4 text-primary" />
+                    {tp.fourGates}
+                  </CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    {isCs
+                      ? "Klikněte na bránu pro zobrazení podrobností"
+                      : "Click a gate to see details"}
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {gateCardData.map((g, i) => (
+                    <GateDetailCard
+                      key={i}
+                      gateNumber={g.gate}
+                      label={g.label}
+                      color={g.color}
+                      icon={g.icon}
+                      locale={locale}
+                    />
+                  ))}
+                  {gateCardData.every(g => !g.gate) && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      {isCs ? "Data bran nejsou dostupná." : "Gate data not available."}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* AI Analysis Card */}
+              <Card className="overflow-hidden">
+                <div className="h-1" style={{ background: `linear-gradient(90deg, ${crossColor}, #2a9d8f, ${crossColor})` }} />
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-primary" />
@@ -426,31 +601,29 @@ export default function IncarnationCross() {
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
                     {tp.aiDesc}
-                    {chartMeta?.name ? (locale === "cs" ? ` pro ${chartMeta.name}` : ` for ${chartMeta.name}`) : ""}
+                    {chartMeta?.name ? (isCs ? ` pro ${chartMeta.name}` : ` for ${chartMeta.name}`) : ""}
                   </p>
                 </CardHeader>
                 <CardContent>
                   {/* Not started */}
                   {!aiContent && !isStreaming && (
-                    <div className="text-center py-10">
-                      <div
-                        className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg"
-                        style={{
-                          background: `linear-gradient(135deg, ${crossColor}20, ${crossColor}10)`,
-                          color: crossColor,
-                        }}
-                      >
-                        <Target className="w-10 h-10" />
+                    <div className="text-center py-8">
+                      <div className="relative w-24 h-24 mx-auto mb-5">
+                        <div className="absolute inset-0 rounded-full animate-spin" style={{ animationDuration: "25s", border: `1px solid ${crossColor}30` }} />
+                        <div className="absolute inset-2 rounded-full animate-spin" style={{ animationDuration: "18s", animationDirection: "reverse", border: `1px solid ${crossColor}20` }} />
+                        <div
+                          className="absolute inset-0 rounded-full flex items-center justify-center"
+                          style={{ background: `${crossColor}10`, color: crossColor }}
+                        >
+                          <Target className="w-10 h-10" />
+                        </div>
                       </div>
-                      <h3 className="font-serif text-xl font-bold mb-2">
-                        {displayCrossName}
-                      </h3>
+                      <h3 className="font-serif text-xl font-bold mb-2">{displayCrossName}</h3>
                       <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
-                        {locale === "cs"
+                        {isCs
                           ? "Nechte AI odhalit hlubší smysl vašeho inkarnačního kříže — vaše životní téma, výzvy a dary, které přinášíte světu."
                           : "Let AI reveal the deeper meaning of your Incarnation Cross — your life theme, challenges, and gifts you bring to the world."}
                       </p>
-
                       {isAuthenticated ? (
                         <Button
                           onClick={handleAiAnalysis}
@@ -481,18 +654,19 @@ export default function IncarnationCross() {
                       )}
                     </div>
                   )}
-
                   {/* Streaming in progress */}
                   {isStreaming && !aiContent && (
                     <div className="flex flex-col items-center justify-center py-12 gap-4">
-                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                      <div className="relative">
+                        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                        <div className="absolute inset-0 rounded-full animate-ping opacity-20" style={{ background: crossColor }} />
+                      </div>
                       <p className="text-sm text-muted-foreground">{tp.aiGenerating}</p>
                     </div>
                   )}
-
                   {/* Streaming content */}
                   {(aiContent || isStreaming) && aiContent && (
-                    <div className="prose prose-sm max-w-none">
+                    <div className="prose prose-sm max-w-none dark:prose-invert">
                       <Streamdown>{aiContent}</Streamdown>
                       {isStreaming && (
                         <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-0.5 align-middle" />
@@ -501,19 +675,11 @@ export default function IncarnationCross() {
                         <>
                           <Separator className="my-4" />
                           <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={handleAiAnalysis}
-                            >
+                            <Button variant="outline" size="sm" onClick={handleAiAnalysis}>
                               <Sparkles className="w-4 h-4 mr-1.5" />
                               {tp.aiRegenerate}
                             </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={handleDownload}
-                            >
+                            <Button variant="outline" size="sm" onClick={handleDownload}>
                               <Download className="w-4 h-4 mr-1.5" />
                               {t.common.download}
                             </Button>
