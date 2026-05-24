@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { socialRouter } from "./routers/social";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { calculateChart } from "./humandesign";
 import {
@@ -1028,6 +1029,125 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
         } catch {}
 
         return { success: true, amount: pending };
+      }),
+  }),
+
+  // ─── Composite Chart ────────────────────────────────────────────────────────
+  composite: router({
+    analyze: protectedProcedure
+      .input(z.object({
+        chartIdA: z.number(),
+        chartIdB: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const chartA = await getChartById(input.chartIdA, ctx.user.id);
+        const chartB = await getChartById(input.chartIdB, ctx.user.id);
+        if (!chartA || !chartB) throw new Error("Chart not found");
+        const dataA = chartA.chartData as any;
+        const dataB = chartB.chartData as any;
+        const gatesA = new Set<number>(dataA.activatedGates || []);
+        const gatesB = new Set<number>(dataB.activatedGates || []);
+        const CHANNELS: [number, number][] = [
+          [1,8],[2,14],[3,60],[4,63],[5,15],[6,59],[7,31],[9,52],[10,20],[10,34],[10,57],
+          [11,56],[12,22],[13,33],[16,48],[17,62],[18,58],[19,49],[20,34],[20,57],
+          [21,45],[23,43],[24,61],[25,51],[26,44],[27,50],[28,38],[29,46],[30,41],
+          [32,54],[34,57],[35,36],[37,40],[39,55],[42,53],[47,64],
+        ];
+        const electromagnetic: Array<{ gate1: number; gate2: number; fromA: number; fromB: number }> = [];
+        for (const [g1, g2] of CHANNELS) {
+          if (gatesA.has(g1) && gatesB.has(g2) && !gatesA.has(g2) && !gatesB.has(g1)) {
+            electromagnetic.push({ gate1: g1, gate2: g2, fromA: g1, fromB: g2 });
+          } else if (gatesB.has(g1) && gatesA.has(g2) && !gatesB.has(g2) && !gatesA.has(g1)) {
+            electromagnetic.push({ gate1: g1, gate2: g2, fromA: g2, fromB: g1 });
+          }
+        }
+        const shared: Array<{ gate1: number; gate2: number }> = [];
+        for (const [g1, g2] of CHANNELS) {
+          const aHasBoth = gatesA.has(g1) && gatesA.has(g2);
+          const bHasBoth = gatesB.has(g1) && gatesB.has(g2);
+          if (aHasBoth || bHasBoth) shared.push({ gate1: g1, gate2: g2 });
+        }
+        const centersA: Record<string, boolean> = {};
+        const centersB: Record<string, boolean> = {};
+        for (const c of (dataA.centers || [])) centersA[c.name] = c.defined;
+        for (const c of (dataB.centers || [])) centersB[c.name] = c.defined;
+        const centerNames = ["Head","Ajna","Throat","G","Heart","Sacral","Solar Plexus","Spleen","Root"];
+        const centerCompatibility = centerNames.map(name => ({
+          name,
+          aState: centersA[name] ?? false,
+          bState: centersB[name] ?? false,
+          interaction: centersA[name] && !centersB[name] ? "conditioning" :
+                       !centersA[name] && centersB[name] ? "conditioning" :
+                       centersA[name] && centersB[name] ? "amplification" : "open",
+        }));
+        const emScore = Math.min(electromagnetic.length * 15, 45);
+        const sharedScore = Math.min(shared.length * 5, 20);
+        const typeScore = dataA.type === dataB.type ? 10 :
+          (["Generator","Manifesting Generator"].includes(dataA.type) && ["Generator","Manifesting Generator"].includes(dataB.type)) ? 8 : 5;
+        const defScore = dataA.definition === dataB.definition ? 10 : 5;
+        const compatibilityScore = Math.min(emScore + sharedScore + typeScore + defScore + 20, 100);
+        return {
+          chartA: { id: chartA.id, name: chartA.name, data: dataA },
+          chartB: { id: chartB.id, name: chartB.name, data: dataB },
+          electromagnetic,
+          sharedChannels: shared,
+          centerCompatibility,
+          compatibilityScore,
+          summary: { totalConnections: electromagnetic.length + shared.length },
+        };
+      }),
+
+    aiReading: protectedProcedure
+      .input(z.object({
+        chartIdA: z.number(),
+        chartIdB: z.number(),
+        locale: z.string().default("cs"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const userRecord = await getUserById(ctx.user.id);
+        if (!userRecord) throw new TRPCError({ code: "UNAUTHORIZED", message: "User not found" });
+        const totalReadings = await countAiReadingsByUser(ctx.user.id);
+        const canRead = canGenerateAiReading(userRecord, totalReadings);
+        if (!canRead.allowed) throw new TRPCError({ code: "PAYMENT_REQUIRED", message: "Premium required" });
+        const chartA = await getChartById(input.chartIdA, ctx.user.id);
+        const chartB = await getChartById(input.chartIdB, ctx.user.id);
+        if (!chartA || !chartB) throw new Error("Chart not found");
+        const dA = chartA.chartData as any;
+        const dB = chartB.chartData as any;
+        const gatesA = new Set<number>(dA.activatedGates || []);
+        const gatesB = new Set<number>(dB.activatedGates || []);
+        const CHANNELS: [number, number][] = [
+          [1,8],[2,14],[3,60],[4,63],[5,15],[6,59],[7,31],[9,52],[10,20],[10,34],[10,57],
+          [11,56],[12,22],[13,33],[16,48],[17,62],[18,58],[19,49],[20,34],[20,57],
+          [21,45],[23,43],[24,61],[25,51],[26,44],[27,50],[28,38],[29,46],[30,41],
+          [32,54],[34,57],[35,36],[37,40],[39,55],[42,53],[47,64],
+        ];
+        const em: string[] = [];
+        for (const [g1, g2] of CHANNELS) {
+          if (gatesA.has(g1) && gatesB.has(g2) && !gatesA.has(g2) && !gatesB.has(g1)) em.push(`${g1}-${g2}`);
+          else if (gatesB.has(g1) && gatesA.has(g2) && !gatesB.has(g2) && !gatesA.has(g1)) em.push(`${g1}-${g2}`);
+        }
+        const gatesAArr = Array.from(gatesA).sort((a,b)=>a-b);
+        const gatesBArr = Array.from(gatesB).sort((a,b)=>a-b);
+        const isCs = input.locale === "cs";
+        const prompt = isCs
+          ? `Jsi expert na Human Design vztahovou anal\u00fdzu.\n\n${chartA.name}: Typ ${dA.type}, Profil ${dA.profile} ${dA.profileName}, Autorita ${dA.authority}, Definice ${dA.definition}\nBr\u00e1ny: ${gatesAArr.join(", ")}\n\n${chartB.name}: Typ ${dB.type}, Profil ${dB.profile} ${dB.profileName}, Autorita ${dB.authority}, Definice ${dB.definition}\nBr\u00e1ny: ${gatesBArr.join(", ")}\n\nElektromagnetick\u00e1 spojen\u00ed: ${em.length > 0 ? em.join(", ") : "\u017e\u00e1dn\u00e1"}\n\nNapi\u0161 hlubokou vztahovou anal\u00fdzu v \u010de\u0161tin\u011b:\n## 1. Dynamika vztahu\n## 2. Elektromagnetick\u00e1 p\u0159ita\u017elivost\n## 3. V\u00fdzvy a t\u0159ec\u00ed plochy\n## 4. Jak spolu fungovat nejl\u00e9pe\n## 5. Kondicionov\u00e1n\u00ed a vliv\n## 6. Doporu\u010den\u00ed pro vztah`
+          : `You are a Human Design relationship expert.\n\n${chartA.name}: Type ${dA.type}, Profile ${dA.profile} ${dA.profileName}, Authority ${dA.authority}\nGates: ${gatesAArr.join(", ")}\n\n${chartB.name}: Type ${dB.type}, Profile ${dB.profile} ${dB.profileName}, Authority ${dB.authority}\nGates: ${gatesBArr.join(", ")}\n\nElectromagnetic connections: ${em.length > 0 ? em.join(", ") : "none"}\n\nWrite a deep relationship analysis:\n## 1. Relationship Dynamics\n## 2. Electromagnetic Attraction\n## 3. Challenges and Friction\n## 4. How to Function Best Together\n## 5. Conditioning and Influence\n## 6. Relationship Recommendations`;
+        const response = await invokeLLM({
+          messages: [
+            { role: "system", content: isCs ? "Jsi expert na Human Design a vztahovou anal\u00fdzu. P\u00ed\u0161e\u0161 v \u010de\u0161tin\u011b, hluboce a empaticky." : "You are a Human Design relationship expert. Write deeply and empathetically." },
+            { role: "user", content: prompt },
+          ],
+        });
+        const content = response.choices[0]?.message?.content || "";
+        // Deduct credit by updating user record directly
+        const db = await getDb();
+        if (db && !isPremiumUser(userRecord)) {
+          if (userRecord.aiReadingCredits > 0) {
+            await db.update(users).set({ aiReadingCredits: userRecord.aiReadingCredits - 1 }).where(eq(users.id, ctx.user.id));
+          }
+        }
+        return { content };
       }),
   }),
 });

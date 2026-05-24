@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE users SET subscriptionStatus = 'active', subscriptionPlan = 'annual', subscriptionCurrentPeriodEnd = '2027-12-31 23:59:59', aiReadingCredits = 999, role = 'admin' WHERE id = 1380004;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4VFjuiBDjCy66KV.7c2c51242608 --database SJUUMjJfby3uu5HSPh4u4R --execute UPDATE users SET subscriptionStatus = 'active', subscriptionPlan = 'annual', subscriptionCurrentPeriodEnd = '2027-12-31 23:59:59', aiReadingCredits = 999, role = 'admin' WHERE id = 1380004;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 280
+}

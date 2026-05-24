@@ -749,3 +749,12 @@
 - [x] Vylepšený AI prompt — 6 strukturovaných sekcí + kompletní data bran z GATE_DESCRIPTIONS
 - [x] useSEO hook integrace na IncarnationCross stránce (nahrazení inline meta logiky)
 - [x] TiltCard 3D hover micro-interactions na blog compact kartách v Home.tsx
+
+## Composite Chart & Správa osob (Batch 13)
+- [x] Dialog pro uložení mapy s výběrem kategorie vztahu (já/rodina/přátelé/klient/celebrita/jiné)
+- [x] Tlačítko "Composite" v ChartResult po uložení mapy (navigace na /composite?chartId=X)
+- [x] Server endpoint composite.analyze — elektromagnetická spojení, sdílené kanály, kompatibilita center, skóre
+- [x] Server endpoint composite.aiReading — AI výklad vztahu v 6 sekcích (CZ/EN)
+- [x] Stránka /composite s výběrem dvou map, SVG diagramem, score ring, kartami EM kanálů, center grid a AI výkladem
+- [x] Route /composite přidána do App.tsx
+- [x] Oprava TypeScript chyb (Set iteration, TRPCError import, deductAiCredit)

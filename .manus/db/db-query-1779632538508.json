@@ -1,0 +1,226 @@
+{
+  "query": "DESCRIBE users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4VFjuiBDjCy66KV.7c2c51242608 --database SJUUMjJfby3uu5HSPh4u4R --execute DESCRIBE users;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "openId",
+      "Type": "varchar(64)",
+      "Null": "NO",
+      "Key": "UNI",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "name",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "email",
+      "Type": "varchar(320)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "loginMethod",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "role",
+      "Type": "enum('user','admin')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "user",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "lastSignedIn",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "stripeCustomerId",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "stripeSubscriptionId",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "subscriptionStatus",
+      "Type": "enum('active','canceled','past_due','trialing','none')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "none",
+      "Extra": ""
+    },
+    {
+      "Field": "subscriptionPlan",
+      "Type": "enum('monthly','annual','none')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "none",
+      "Extra": ""
+    },
+    {
+      "Field": "subscriptionCurrentPeriodEnd",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "aiReadingCredits",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "referralCode",
+      "Type": "varchar(16)",
+      "Null": "YES",
+      "Key": "UNI",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "currentStreak",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "longestStreak",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "lastLoginDate",
+      "Type": "varchar(10)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "lastDailyRewardAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "level",
+      "Type": "enum('searcher','awakened','initiated','guide','master')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "searcher",
+      "Extra": ""
+    },
+    {
+      "Field": "totalCreditsEarned",
+      "Type": "int",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "isAffiliate",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "affiliateCode",
+      "Type": "varchar(16)",
+      "Null": "YES",
+      "Key": "UNI",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "affiliateTier",
+      "Type": "enum('bronze','silver','gold')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "bronze",
+      "Extra": ""
+    },
+    {
+      "Field": "affiliateTotalEarned",
+      "Type": "float",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "affiliatePendingPayout",
+      "Type": "float",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint\tNO\tPRI\tNULL\tauto_increment\nopenId\tvarchar(64)\tNO\tUNI\tNULL\t\nname\ttext\tYES\t\tNULL\t\nemail\tvarchar(320)\tYES\t\tNULL\t\nloginMethod\tvarchar(64)\tYES\t\tNULL\t\nrole\tenum('user','admin')\tNO\t\tuser\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\nlastSignedIn\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nstripeCustomerId\tvarchar(64)\tYES\t\tNULL\t\nstripeSubscriptionId\tvarchar(64)\tYES\t\tNULL\t\nsubscriptionStatus\tenum('active','canceled','past_due','trialing','none')\tNO\t\tnone\t\nsubscriptionPlan\tenum('monthly','annual','none')\tNO\t\tnone\t\nsubscriptionCurrentPeriodEnd\ttimestamp\tYES\t\tNULL\t\naiReadingCredits\tint\tNO\t\t0\t\nreferralCode\tvarchar(16)\tYES\tUNI\tNULL\t\ncurrentStreak\tint\tNO\t\t0\t\nlongestStreak\tint\tNO\t\t0\t\nlastLoginDate\tvarchar(10)\tYES\t\tNULL\t\nlastDailyRewardAt\ttimestamp\tYES\t\tNULL\t\nlevel\tenum('searcher','awakened','initiated','guide','master')\tNO\t\tsearcher\t\ntotalCreditsEarned\tint\tNO\t\t0\t\nisAffiliate\ttinyint(1)\tNO\t\t0\t\naffiliateCode\tvarchar(16)\tYES\tUNI\tNULL\t\naffiliateTier\tenum('bronze','silver','gold')\tNO\t\tbronze\t\naffiliateTotalEarned\tfloat\tNO\t\t0\t\naffiliatePendingPayout\tfloat\tNO\t\t0\t\n",
+  "stderr": "",
+  "execution_time_ms": 256
+}

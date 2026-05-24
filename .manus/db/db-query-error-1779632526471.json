@@ -1,0 +1,8 @@
+{
+  "query": "DESCRIBE user; SELECT id, name, email, role, subscription_status, subscription_tier FROM user LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4VFjuiBDjCy66KV.7c2c51242608 --database SJUUMjJfby3uu5HSPh4u4R --execute DESCRIBE user; SELECT id, name, email, role, subscription_status, subscription_tier FROM user LIMIT 10;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'sjuumjjfby3uu5hsph4u4r.user' doesn't exist"
+  ]
+}

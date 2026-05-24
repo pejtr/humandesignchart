@@ -10,7 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
@@ -20,6 +22,7 @@ import {
   Save, Sparkles, ArrowLeft, Brain, Compass, Star, Sun, Moon,
   Loader2, Eye, Zap, Shield, Target, FileText, Download,
   ChevronRight, Info, Hexagon, CircleDot, Globe, Share2, Copy, Check,
+  User, Users, Heart, Briefcase, UserCheck, HelpCircle, GitCompare,
 } from "lucide-react";
 import { generateChartPDF } from "@/lib/pdfExport";
 import type { HumanDesignChartData } from "@shared/types";
@@ -122,6 +125,8 @@ export default function ChartResult() {
   const [aiReadingType, setAiReadingType] = useState<string | null>(null);
   const [showAiTypes, setShowAiTypes] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [saveCategory, setSaveCategory] = useState<"self" | "family" | "friend" | "client" | "celebrity" | "other">("self");
   const aiSectionRef = useRef<HTMLDivElement>(null);
   const streamAbortRef = useRef<AbortController | null>(null);
   const { shouldShow: showOnboarding, triggerOnboarding, markSeen: markOnboardingSeen } = useOnboarding();
@@ -215,6 +220,11 @@ export default function ChartResult() {
   const handleSave = () => {
     if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
     if (!chart || !chartMeta) return;
+    setShowSaveDialog(true);
+  };
+
+  const confirmSave = () => {
+    if (!chart || !chartMeta) return;
     saveMutation.mutate({
       name: chartMeta.name,
       birthDate: chartMeta.birthDate || chart.birthDate,
@@ -223,9 +233,10 @@ export default function ChartResult() {
       latitude: String(chartMeta.latitude || "0"),
       longitude: String(chartMeta.longitude || "0"),
       timezone: chartMeta.timezone || chart.timezone,
-      category: "self",
+      category: saveCategory,
       chartData: chart,
     });
+    setShowSaveDialog(false);
   };
 
   const handleAiReading = (type: string) => {
@@ -348,6 +359,67 @@ export default function ChartResult() {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
+      {/* ─── Save Category Dialog ─── */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent className="bg-popover text-popover-foreground max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl flex items-center gap-2">
+              <Save className="w-5 h-5 text-primary" />
+              {locale === "cs" ? "Uložit mapu" : "Save Chart"}
+            </DialogTitle>
+            <DialogDescription>
+              {locale === "cs" ? `Ukládám mapu pro: ${chartMeta?.name || ""}` : `Saving chart for: ${chartMeta?.name || ""}`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">
+                {locale === "cs" ? "Komu patří tato mapa?" : "Who is this chart for?"}
+              </Label>
+              <Select value={saveCategory} onValueChange={(v) => setSaveCategory(v as any)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="self">
+                    <div className="flex items-center gap-2"><User className="w-4 h-4 text-primary" /> {locale === "cs" ? "Já (moje vlastní mapa)" : "Myself"}</div>
+                  </SelectItem>
+                  <SelectItem value="family">
+                    <div className="flex items-center gap-2"><Heart className="w-4 h-4 text-rose-400" /> {locale === "cs" ? "Rodina (partner, rodiče, děti)" : "Family (partner, parents, kids)"}</div>
+                  </SelectItem>
+                  <SelectItem value="friend">
+                    <div className="flex items-center gap-2"><Users className="w-4 h-4 text-blue-400" /> {locale === "cs" ? "Přátelé" : "Friends"}</div>
+                  </SelectItem>
+                  <SelectItem value="client">
+                    <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-amber-400" /> {locale === "cs" ? "Klient / Kolega" : "Client / Colleague"}</div>
+                  </SelectItem>
+                  <SelectItem value="celebrity">
+                    <div className="flex items-center gap-2"><UserCheck className="w-4 h-4 text-violet-400" /> {locale === "cs" ? "Celebrita / Veřejná osobnost" : "Celebrity / Public figure"}</div>
+                  </SelectItem>
+                  <SelectItem value="other">
+                    <div className="flex items-center gap-2"><HelpCircle className="w-4 h-4 text-muted-foreground" /> {locale === "cs" ? "Jiné" : "Other"}</div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {saveCategory !== "self" && (
+              <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 text-xs text-muted-foreground">
+                💡 {locale === "cs"
+                  ? "Po uložení můžete tuto mapu porovnat se svou vlastní mapou pomocí Composite analýzy."
+                  : "After saving, you can compare this chart with your own using Composite analysis."}
+              </div>
+            )}
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>{locale === "cs" ? "Zrušit" : "Cancel"}</Button>
+            <Button onClick={confirmSave} disabled={saveMutation.isPending}>
+              {saveMutation.isPending ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Save className="w-4 h-4 mr-1.5" />}
+              {locale === "cs" ? "Uložit" : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Onboarding modal for first-time users */}
       {showOnboarding && chart && (
         <OnboardingModal
@@ -388,7 +460,20 @@ export default function ChartResult() {
                   {saveMutation.isPending ? t.chart.saving : t.chart.saveChart}
                 </Button>
               )}
-              {savedChartId && <Badge variant="secondary" className="py-1.5 px-3">{t.common.saved}</Badge>}
+              {savedChartId && (
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="py-1.5 px-3">{t.common.saved}</Badge>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(localePath("/compare") + `?chartId=${savedChartId}`)}
+                    className="border-primary/30 text-primary hover:bg-primary/10"
+                  >
+                    <GitCompare className="w-4 h-4 mr-1.5" />
+                    {locale === "cs" ? "Composite" : "Composite"}
+                  </Button>
+                </div>
+              )}
               <Button variant="outline" size="sm" onClick={handleShare} disabled={shareMutation.isPending}>
                 {shareMutation.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : copied ? <Check className="w-4 h-4 mr-1 text-green-500" /> : <Share2 className="w-4 h-4 mr-1" />}
                 {shareMutation.isPending ? "Sdílení..." : copied ? "Zkopírováno!" : "Sdílet mapu"}

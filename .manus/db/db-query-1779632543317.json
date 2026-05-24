@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, name, email, role, subscriptionStatus, subscriptionPlan, aiReadingCredits FROM users WHERE name LIKE '%Petr%' OR name LIKE '%Pejtr%' OR role = 'admin' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4VFjuiBDjCy66KV.7c2c51242608 --database SJUUMjJfby3uu5HSPh4u4R --execute SELECT id, name, email, role, subscriptionStatus, subscriptionPlan, aiReadingCredits FROM users WHERE name LIKE '%Petr%' OR name LIKE '%Pejtr%' OR role = 'admin' LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "AI CREDITS",
+      "email": "jad3tru3@gmail.com",
+      "role": "admin",
+      "subscriptionStatus": "none",
+      "subscriptionPlan": "none",
+      "aiReadingCredits": "0"
+    },
+    {
+      "id": "180002",
+      "name": "Veronika Petru",
+      "email": "veronika@petru.vip",
+      "role": "user",
+      "subscriptionStatus": "none",
+      "subscriptionPlan": "none",
+      "aiReadingCredits": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tsubscriptionStatus\tsubscriptionPlan\taiReadingCredits\n1\tAI CREDITS\tjad3tru3@gmail.com\tadmin\tnone\tnone\t0\n180002\tVeronika Petru\tveronika@petru.vip\tuser\tnone\tnone\t0\n",
+  "stderr": "",
+  "execution_time_ms": 274
+}
