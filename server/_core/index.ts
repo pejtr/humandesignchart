@@ -6,6 +6,7 @@ import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStripeWebhook } from "../stripeWebhook";
+import { registerLeadOSWebhook } from "../leadosWebhook";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -34,6 +35,8 @@ async function startServer() {
   const server = createServer(app);
   // ⚠️ Stripe webhook MUST be registered BEFORE express.json() to allow raw body for signature verification
   registerStripeWebhook(app);
+  // ⚠️ LeadOS webhook also needs raw body for HMAC-SHA256 signature verification
+  registerLeadOSWebhook(app);
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));

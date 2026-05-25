@@ -758,3 +758,14 @@
 - [x] Stránka /composite s výběrem dvou map, SVG diagramem, score ring, kartami EM kanálů, center grid a AI výkladem
 - [x] Route /composite přidána do App.tsx
 - [x] Oprava TypeScript chyb (Set iteration, TRPCError import, deductAiCredit)
+
+## LeadOS CRM Integrace (2026-05-25)
+
+- [x] Server-side LeadOS API helper (server/leados.ts) s HMAC-SHA256 webhook verifikací
+- [x] tRPC router (server/routers/leados.ts) — admin-only procedury: getAnalytics, getLeads, updateLead, getOrders, getEmailSequences, sendEmail
+- [x] Webhook endpoint /api/leados/webhook s raw body a signature verifikací
+- [x] Automatická synchronizace nových uživatelů jako leads při OAuth registraci (server/_core/oauth.ts)
+- [x] Admin CRM panel (client/src/pages/AdminCRM.tsx) — přehled statistik, leads management, objednávky, email odesílání
+- [x] Route /admin/crm přidána do App.tsx (admin-only, redirect pro non-admin)
+- [x] Vitest testy pro LeadOS webhook verifikaci (6 testů, všechny prošly)
+- [x] LeadOS API klíč nastaven přes webdev_request_secrets
