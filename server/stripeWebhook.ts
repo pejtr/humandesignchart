@@ -138,7 +138,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
           const rateMap: Record<string, number> = { bronze: 0.20, silver: 0.22, gold: 0.25 };
           const commissionRate = rateMap[affiliate.affiliateTier ?? "bronze"] ?? 0.20;
           // Amount in CZK (from Stripe amount_total in haléře → CZK)
-          const amountCzk = session.amount_total ? session.amount_total / 100 : (session.metadata?.plan === "annual" ? 990 : 149);
+          const amountCzk = session.amount_total ? session.amount_total / 100 : (session.metadata?.plan === "annual" ? 888 : 88);
           const commissionAmount = Math.round(amountCzk * commissionRate * 100) / 100;
 
           await createAffiliateConversion({

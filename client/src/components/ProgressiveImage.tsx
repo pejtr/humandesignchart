@@ -3,7 +3,10 @@ import { useState, useRef, useEffect, type CSSProperties } from "react";
 interface ProgressiveImageProps {
   src: string;
   alt: string;
+  /** Applied to the wrapper div (controls size/layout) */
   className?: string;
+  /** Applied directly to the <img> element (controls object-fit, object-position, etc.) */
+  imgClassName?: string;
   style?: CSSProperties;
   placeholderColor?: string;
 }
@@ -12,11 +15,15 @@ interface ProgressiveImageProps {
  * Progressive image loading with blur-to-sharp transition.
  * Shows a colored placeholder with blur, then fades in the full image.
  * Uses IntersectionObserver for lazy loading.
+ *
+ * Use `imgClassName` to control object-fit on the actual <img> element.
+ * The default is `object-contain` which prevents portrait images from being cropped.
  */
 export function ProgressiveImage({
   src,
   alt,
   className = "",
+  imgClassName = "object-contain",
   style,
   placeholderColor = "rgba(168,85,247,0.08)",
 }: ProgressiveImageProps) {
@@ -63,7 +70,7 @@ export function ProgressiveImage({
         <img
           src={src}
           alt={alt}
-          className={`w-full h-full object-cover transition-all duration-700 ${
+          className={`w-full h-full transition-all duration-700 ${imgClassName} ${
             isLoaded ? "opacity-100 blur-0 scale-100" : "opacity-0 blur-sm scale-105"
           }`}
           onLoad={() => setIsLoaded(true)}

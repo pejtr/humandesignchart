@@ -488,11 +488,12 @@ export default function Home() {
               >
                 <TiltCard className={`rounded-2xl border overflow-hidden flex flex-col ${tp.color} shadow-sm hover:shadow-md transition-shadow h-full`}>
                 {/* Image */}
-                <div className="w-full aspect-square flex items-center justify-center bg-white/60 dark:bg-card/60 px-3 pt-3">
+                <div className="w-full bg-white/60 dark:bg-card/60" style={{ height: '260px' }}>
                   <ProgressiveImage
                     src={tp.imgUrl}
                     alt={tp.displayName}
-                    className="w-full h-full object-contain drop-shadow-sm"
+                    className="w-full h-full"
+                    imgClassName="object-contain object-top drop-shadow-sm"
                   />
                 </div>
                 {/* Info */}

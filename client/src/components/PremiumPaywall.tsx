@@ -73,7 +73,7 @@ export default function PremiumPaywall({ variant = "inline", onClose }: PremiumP
             onClick={() => handleUpgrade("monthly")}
           >
             <Crown className="w-3 h-3 mr-1" />
-            {isCzech ? "Premium 149 Kč/měs" : "Premium €5.99/mo"}
+            {isCzech ? "Premium 88 Kč/měs" : "Premium €3.49/mo"}
           </Button>
         </div>
       </div>
@@ -106,7 +106,7 @@ export default function PremiumPaywall({ variant = "inline", onClose }: PremiumP
               onClick={() => handleUpgrade("monthly")}
             >
               <Crown className="w-4 h-4 mr-2" />
-              {isCzech ? "Premium — 149 Kč/měsíc" : "Premium — €5.99/month"}
+              {isCzech ? "Premium — 88 Kč/měsíc" : "Premium — €3.49/month"}
             </Button>
             <Button
               variant="outline"
@@ -158,7 +158,7 @@ export default function PremiumPaywall({ variant = "inline", onClose }: PremiumP
           onClick={() => handleUpgrade("monthly")}
         >
           <Crown className="w-4 h-4 mr-1.5" />
-          {isCzech ? "Premium 149 Kč/měs" : "Premium €5.99/mo"}
+          {isCzech ? "Premium 88 Kč/měs" : "Premium €3.49/mo"}
         </Button>
         <Button
           size="sm"
