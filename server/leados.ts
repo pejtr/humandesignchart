@@ -180,6 +180,68 @@ export function verifyLeadOSWebhook(
   }
 }
 
+// ─── Event tracking → LeadOS ────────────────────────────────────────────────
+
+export type LeadOSEventType =
+  | "new_user"
+  | "chart_created"
+  | "subscription_upgraded"
+  | "ai_reading_used"
+  | "chart_shared";
+
+export interface LeadOSEventPayload {
+  event: LeadOSEventType;
+  data: {
+    userId?: number;
+    name?: string;
+    email?: string;
+    source?: string;
+    tags?: string[];
+    score?: number;
+    chartType?: string;
+    hdType?: string;
+    plan?: string;
+    amount?: number;
+    currency?: string;
+    [key: string]: unknown;
+  };
+}
+
+/**
+ * Fire-and-forget event to LeadOS.
+ * Sends a POST to /events endpoint — errors are logged but never thrown
+ * so they cannot break the main request flow.
+ */
+export async function sendLeadOSEvent(payload: LeadOSEventPayload): Promise<void> {
+  try {
+    const apiKey = getApiKey();
+    if (!apiKey) return;
+
+    const url = `${LEADOS_BASE_URL}/events`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...payload,
+        timestamp: new Date().toISOString(),
+        source: "humandesignmapa.cz",
+      }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      console.warn(`[LeadOS] Event '${payload.event}' failed ${res.status}: ${text}`);
+    } else {
+      console.log(`[LeadOS] Event '${payload.event}' sent for userId=${payload.data.userId}`);
+    }
+  } catch (err) {
+    console.error(`[LeadOS] sendLeadOSEvent error:`, err);
+  }
+}
+
 // ─── Sync user to LeadOS as lead ──────────────────────────────────────────────
 
 export async function syncUserAsLead(user: {

@@ -801,14 +801,14 @@
 - [x] index.html — česká klíčová slova v meta keywords
 
 ## LeadOS CRM Full Integration — MCP + REST Events (2026-05-30)
-- [ ] DB schema — přidat crmStatus, crmNote, crmUpdatedAt do users tabulky
-- [ ] DB migrace — pnpm db:push
-- [ ] server/leados.ts — přidat sendLeadOSEvent() funkci pro REST eventy
-- [ ] server/_core/oauth.ts — event new_user po registraci
-- [ ] server/routers.ts chart.save — event chart_created po uložení mapy
-- [ ] server/stripeWebhook.ts — event subscription_upgraded po platbě
-- [ ] server/leadosWebhook.ts — handler lead_status_changed (sync CRM status do HDM DB)
-- [ ] server/leadosWebhook.ts — handler new_campaign
-- [ ] server/mcp/leados-mcp-server.ts — MCP server s nástroji get_hdm_stats, get_hdm_leads, sync_lead_status
-- [ ] package.json — přidat @modelcontextprotocol/sdk
-- [ ] Vitest testy pro LeadOS integraci
+- [x] DB schema — přidat crmStatus, crmNote, crmUpdatedAt do users tabulky
+- [x] DB migrace — pnpm db:push (migrace 0011_superb_swarm.sql aplikována)
+- [x] server/leados.ts — přidat sendLeadOSEvent() funkci pro REST eventy
+- [x] server/_core/oauth.ts — event new_user po registraci
+- [x] server/routers.ts chart.save — event chart_created po uložení mapy
+- [x] server/stripeWebhook.ts — event subscription_upgraded po platbě
+- [x] server/leadosWebhook.ts — handler lead_status_changed (sync CRM status do HDM DB)
+- [x] server/leadosWebhook.ts — handler new_campaign
+- [x] server/mcp/leados-mcp-server.ts — MCP server s nástroji get_hdm_stats, get_hdm_leads, sync_lead_status
+- [x] package.json — přidat @modelcontextprotocol/sdk
+- [x] Vitest testy pro LeadOS integraci (13 test fileů, 162 testů, všechny prošly)

@@ -32,6 +32,7 @@ import { invokeLLM } from "./_core/llm";
 import { ENV } from "./_core/env";
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../shared/blogArticles";
 import { BLOG_ARTICLES_EN } from "../shared/blogArticlesEn";
+import { sendLeadOSEvent } from "./leados";
 
 export const appRouter = router({
   system: systemRouter,
@@ -142,6 +143,19 @@ export const appRouter = router({
           category: input.category,
           chartData: input.chartData,
         });
+
+        // Fire chart_created event to LeadOS for lead scoring
+        sendLeadOSEvent({
+          event: "chart_created",
+          data: {
+            userId: ctx.user.id,
+            email: ctx.user.email ?? undefined,
+            chartType: "bodygraph",
+            hdType: (input.chartData as any)?.type ?? undefined,
+            score: 65,
+          },
+        });
+
         return { id };
       }),
 

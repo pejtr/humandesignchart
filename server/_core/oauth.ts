@@ -3,7 +3,7 @@ import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
 import { sdk } from "./sdk";
-import { syncUserAsLead } from "../leados";
+import { syncUserAsLead, sendLeadOSEvent } from "../leados";
 
 function getQueryParam(req: Request, key: string): string | undefined {
   const value = req.query[key];
@@ -43,11 +43,25 @@ export function registerOAuthRoutes(app: Express) {
 
       // Sync new user to LeadOS CRM (non-blocking, best-effort)
       if (isNewUser && userInfo.email) {
+        const freshUser = await db.getUserByOpenId(userInfo.openId);
         syncUserAsLead({
           name: userInfo.name || "",
           email: userInfo.email,
           source: "humandesignmapa.cz",
         }).catch((err) => console.error("[LeadOS] Sync failed:", err));
+
+        // Fire structured event for lead scoring
+        sendLeadOSEvent({
+          event: "new_user",
+          data: {
+            userId: freshUser?.id,
+            name: userInfo.name || "",
+            email: userInfo.email,
+            source: "human_design_app",
+            tags: ["hdm", "free_user"],
+            score: 45,
+          },
+        });
       }
 
       const sessionToken = await sdk.createSessionToken(userInfo.openId, {

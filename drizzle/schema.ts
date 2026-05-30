@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, float } from "drizzle-orm/mysql-core";
+import { int, bigint, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, float } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -27,6 +27,10 @@ export const users = mysqlTable("users", {
   affiliateTier: mysqlEnum("affiliateTier", ["bronze", "silver", "gold"]).default("bronze").notNull(),
   affiliateTotalEarned: float("affiliateTotalEarned").default(0).notNull(),
   affiliatePendingPayout: float("affiliatePendingPayout").default(0).notNull(),
+  // LeadOS CRM sync
+  crmStatus: varchar("crm_status", { length: 32 }),
+  crmNote: text("crm_note"),
+  crmUpdatedAt: bigint("crm_updated_at", { mode: "number" }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

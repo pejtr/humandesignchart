@@ -7,9 +7,12 @@
 import express, { type Express } from "express";
 import { verifyLeadOSWebhook } from "./leados";
 import { notifyOwner } from "./_core/notification";
+import { getDb } from "./db";
+import { users } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 export interface LeadOSWebhookPayload {
-  event: "new_lead" | "lead_status_changed" | "new_order" | "quiz_completed";
+  event: "new_lead" | "lead_status_changed" | "new_order" | "quiz_completed" | "new_campaign";
   timestamp: string;
   data: {
     id?: number;
@@ -86,14 +89,58 @@ async function handleLeadOSEvent(payload: LeadOSWebhookPayload): Promise<void> {
     }
 
     case "lead_status_changed": {
-      const { name, email, oldStatus, newStatus } = payload.data;
+      const { name, email, oldStatus, newStatus, note } = payload.data;
+      const userId = payload.data.userId as number | undefined;
       console.log(`[LeadOS] Lead status changed: ${name} ${oldStatus} → ${newStatus}`);
+
+      // Sync CRM status back to HDM database
+      if (userId) {
+        try {
+          const db = await getDb();
+          if (db) await db.update(users)
+            .set({
+              crmStatus: newStatus ?? null,
+              crmNote: (note as string | undefined) ?? null,
+              crmUpdatedAt: Date.now(),
+            })
+            .where(eq(users.id, userId));
+          console.log(`[LeadOS] CRM status synced to user ${userId}: ${newStatus}`);
+        } catch (err) {
+          console.error(`[LeadOS] Failed to sync CRM status for user ${userId}:`, err);
+        }
+      } else if (email) {
+        // Fallback: find user by email
+        try {
+          const db = await getDb();
+          if (db) await db.update(users)
+            .set({
+              crmStatus: newStatus ?? null,
+              crmNote: (note as string | undefined) ?? null,
+              crmUpdatedAt: Date.now(),
+            })
+            .where(eq(users.email, email as string));
+          console.log(`[LeadOS] CRM status synced to user by email ${email}: ${newStatus}`);
+        } catch (err) {
+          console.error(`[LeadOS] Failed to sync CRM status by email ${email}:`, err);
+        }
+      }
+
       if (newStatus === "converted") {
         await notifyOwner({
           title: `💰 Lead konvertován v LeadOS!`,
-          content: `**${name || email}** byl označen jako konvertovaný zákazník.`,
+          content: `**${name || email}** byl označen jako konvertovaný zákazník.${note ? `\nPoznámka: ${note}` : ""}`,
         }).catch(() => {});
       }
+      break;
+    }
+
+    case "new_campaign": {
+      const { campaignName, targetCount, email } = payload.data as { campaignName?: string; targetCount?: number; email?: string };
+      console.log(`[LeadOS] New campaign launched: ${campaignName} (${targetCount} recipients)`);
+      await notifyOwner({
+        title: `📧 LeadOS: Nová email kampaň spustěna`,
+        content: `Kampaň: **${campaignName || "Neznámá"}**\nPočet příjemců: ${targetCount ?? "neznámo"}${email ? `\nSpouštěcč: ${email}` : ""}`,
+      }).catch(() => {});
       break;
     }
 

@@ -9,6 +9,7 @@ import { getDb } from "./db";
 import { users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { notifyOwner } from "./_core/notification";
+import { sendLeadOSEvent } from "./leados";
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -184,6 +185,18 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
     } catch (e) {
       console.warn("[Stripe Webhook] Failed to send owner notification:", e);
     }
+    // Fire subscription_upgraded event to LeadOS
+    sendLeadOSEvent({
+      event: "subscription_upgraded",
+      data: {
+        userId: userId ?? undefined,
+        email: session.metadata?.customer_email || (session as any).customer_email || undefined,
+        plan: "premium",
+        amount: session.amount_total ? session.amount_total / 100 : undefined,
+        currency: session.currency?.toUpperCase() ?? "CZK",
+        score: 100,
+      },
+    });
     console.log(`[Stripe Webhook] Subscription checkout completed for user ${userId}`);
   } else if (mode === "payment") {
     // One-time payment: credits or gift voucher

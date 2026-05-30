@@ -139,7 +139,7 @@ describe("ChartResult Streaming Integration", () => {
       "utf-8"
     );
     expect(chartContent).toContain("animate-pulse");
-    expect(chartContent).toContain("{aiStreaming && (");
+    expect(chartContent).toContain("{aiStreaming && aiReadingType");
   });
 
   it("should abort previous stream when new reading type is selected", async () => {
