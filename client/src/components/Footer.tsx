@@ -63,23 +63,32 @@ export default function Footer() {
           <div>
             <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{locale === "cs" ? "Další projekty" : "Partner Sites"}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>
+              <li className="relative group/tip">
                 <a href="https://bezmasajidla.cz" target="_blank" rel="noopener noreferrer"
                   className="hover:text-primary transition-colors">
                   Bezmasá Jídla
                 </a>
+                <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-52 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
+                  Recepty bez masa — zdravé, chutné a jednoduché vaření pro každý den.
+                </span>
               </li>
-              <li>
+              <li className="relative group/tip">
                 <a href="https://katastr-online.cz" target="_blank" rel="noopener noreferrer"
                   className="hover:text-primary transition-colors">
                   Katastr Online
                 </a>
+                <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-56 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
+                  Vyhledávání v katastru nemovitostí — parcely, vlastníci a listy vlastnictví online.
+                </span>
               </li>
-              <li>
+              <li className="relative group/tip">
                 <a href="https://cajovny-praha.cz" target="_blank" rel="noopener noreferrer"
                   className="hover:text-primary transition-colors">
                   Čajovny Praha
                 </a>
+                <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-52 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
+                  Průvodce čajovnami v Praze — klidná místa pro relaxaci s výběrovým čajem.
+                </span>
               </li>
             </ul>
           </div>
