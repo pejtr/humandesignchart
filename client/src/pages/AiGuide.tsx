@@ -381,6 +381,7 @@ export default function AiGuide() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isChatMinimized, setIsChatMinimized] = useState(false);
 
   // Derived values for upgrade CTA
   const totalMessages = messages.filter(m => m.role === "user").length;
@@ -491,7 +492,7 @@ export default function AiGuide() {
       <AmbientOrbs />
       <Navbar />
 
-      <main className="flex-1 pt-20 pb-4 flex flex-col relative z-10">
+      <main className="flex-1 pt-20 pb-20 md:pb-4 flex flex-col relative z-10">
         <div className="container max-w-6xl flex-1 flex flex-col">
           {/* Layout: profile panel left + chat right */}
           <div className="flex-1 flex gap-6 py-4">
@@ -545,12 +546,23 @@ export default function AiGuide() {
                   <Sparkles className="w-3 h-3 mr-1" />
                   AI
                 </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 ml-1"
+                  onClick={() => setIsChatMinimized(v => !v)}
+                  title={isChatMinimized ? (isEn ? 'Expand chat' : 'Rozbalit chat') : (isEn ? 'Minimize chat' : 'Minimalizovat chat')}
+                >
+                  {isChatMinimized ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
+                </Button>
               </div>
 
+              {/* Minimizable chat body */}
+              {!isChatMinimized && <>
               {/* Messages */}
               <div
                 className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1"
-                style={{ maxHeight: "calc(100vh - 300px)" }}
+                style={{ maxHeight: "calc(100vh - 300px - env(safe-area-inset-bottom, 0px))" }}
               >
                 <AnimatePresence>
                   {messages.map(msg => (
@@ -679,6 +691,7 @@ export default function AiGuide() {
                   </Button>
                 </form>
               </div>
+              </>}
             </div>
           </div>
         </div>

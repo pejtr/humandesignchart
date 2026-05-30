@@ -71,6 +71,13 @@
       "when": 1780175729635,
       "tag": "0009_melted_nebula",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1780177209513,
+      "tag": "0010_rich_war_machine",
+      "breakpoints": true
     }
   ]
 }

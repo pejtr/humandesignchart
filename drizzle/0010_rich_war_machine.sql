@@ -1,0 +1,1 @@
+ALTER TABLE `charts` ADD `roleTag` enum('partner','partnerka','manzel','manzelka','sef','sefova','kolega','pritel','pritelkyne','rodic','dite','sourozenec','kamarad','klient','mentor','jine') DEFAULT 'jine';

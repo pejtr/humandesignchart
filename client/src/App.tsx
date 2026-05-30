@@ -42,6 +42,7 @@ const ReferralLanding = lazy(() => import("./pages/ReferralLanding"));
 const SocialScheduler = lazy(() => import("./pages/SocialScheduler"));
 const CompositeChart = lazy(() => import("./pages/CompositeChart"));
 const AdminCRM = lazy(() => import("./pages/AdminCRM"));
+const RoleCompatibility = lazy(() => import("./pages/RoleCompatibility"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -111,6 +112,7 @@ function LocaleRoutes() {
         <Route path="/:locale/daily-transit" component={DailyTransit} />
         <Route path="/:locale/social-scheduler" component={SocialScheduler} />
         <Route path="/:locale/composite" component={CompositeChart} />
+        <Route path="/:locale/role-compatibility" component={RoleCompatibility} />
         <Route path="/:locale/admin/crm" component={AdminCRM} />
         <Route path="/:locale/pricing" component={Pricing} />
         <Route path="/:locale/payment/success" component={PaymentSuccess} />

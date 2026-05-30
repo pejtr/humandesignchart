@@ -779,3 +779,36 @@
 - [ ] Opravit z-index prokliků — hero sekce container z-10 vs dekorativní prvky z-1/2/3
 - [ ] Opravit AI průvodce — zdvojené pozdravy v systémovém promptu
 - [ ] Opravit AI průvodce — odpovědi max 2 odstavce
+
+## roleTag Feature — Rolové štítky na mapách (2026-05-30)
+- [x] drizzle/schema.ts — přidán roleTag enum sloupec do tabulky charts (partner/partnerka/manžel/manželka/šéf/šéfová/kolega/přítel/přítelkyně/rodič/dítě/sourozenec/kamarád/klient/mentor/jiné)
+- [x] DB migrace 0010_rich_war_machine.sql aplikována (pnpm db:push)
+- [x] server/routers.ts — chart.update procedura přijímá roleTag (nullable enum)
+- [x] server/routers.ts — composite.roleCompatibility endpoint — AI analýza vztahu dle role (CZ/EN)
+- [x] Dashboard.tsx — inline roleTag editor na kartách map (Popover s 16 rolemi, optimistické aktualizace)
+- [x] Dashboard.tsx — roleTag badge zobrazen v kartě pod type/profile badges
+- [x] RoleCompatibility.tsx — nová stránka pro analýzu vztahu dle role (výběr map, výběr role, compatibility score ring, EM kanály, AI výklad)
+- [x] App.tsx — route /:locale/role-compatibility přidána
+
+## AiGuide Mobile Fix (2026-05-30)
+- [x] Opravit mobilní layout AI průvodce — pb-20 md:pb-4 pro spodní nav clearance
+- [x] Přidat tlačítko minimalizace/chevron-down do hlavičky AI průvodce
+- [x] Minimalizovatelný chat body (messages + input) přes isChatMinimized state
+
+## Czech OG Tags (2026-05-30)
+- [x] index.html — og:title, og:description, og:locale přepnuty na češtinu
+- [x] index.html — přidán og:url, og:site_name, twitter:site
+- [x] index.html — česká klíčová slova v meta keywords
+
+## LeadOS CRM Full Integration — MCP + REST Events (2026-05-30)
+- [ ] DB schema — přidat crmStatus, crmNote, crmUpdatedAt do users tabulky
+- [ ] DB migrace — pnpm db:push
+- [ ] server/leados.ts — přidat sendLeadOSEvent() funkci pro REST eventy
+- [ ] server/_core/oauth.ts — event new_user po registraci
+- [ ] server/routers.ts chart.save — event chart_created po uložení mapy
+- [ ] server/stripeWebhook.ts — event subscription_upgraded po platbě
+- [ ] server/leadosWebhook.ts — handler lead_status_changed (sync CRM status do HDM DB)
+- [ ] server/leadosWebhook.ts — handler new_campaign
+- [ ] server/mcp/leados-mcp-server.ts — MCP server s nástroji get_hdm_stats, get_hdm_leads, sync_lead_status
+- [ ] package.json — přidat @modelcontextprotocol/sdk
+- [ ] Vitest testy pro LeadOS integraci

@@ -43,6 +43,7 @@ export const charts = mysqlTable("charts", {
   longitude: varchar("longitude", { length: 30 }).notNull(),
   timezone: varchar("timezone", { length: 100 }).notNull(),
   category: mysqlEnum("category", ["self", "family", "friend", "client", "celebrity", "other"]).default("other").notNull(),
+  roleTag: mysqlEnum("roleTag", ["partner", "partnerka", "manzel", "manzelka", "sef", "sefova", "kolega", "pritel", "pritelkyne", "rodic", "dite", "sourozenec", "kamarad", "klient", "mentor", "jine"]).default("jine"),
   chartData: json("chartData"),
   isFavorite: boolean("isFavorite").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

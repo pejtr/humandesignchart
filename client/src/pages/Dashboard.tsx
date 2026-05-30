@@ -19,11 +19,15 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { Streamdown } from "streamdown";
 import ReferralWidget from "@/components/ReferralWidget";
 import { StreakWidget } from "@/components/StreakWidget";
 import { AffiliateWidget } from "@/components/AffiliateWidget";
+import {
+  Popover, PopoverContent, PopoverTrigger,
+} from "@/components/ui/popover";
+import { Tag } from "lucide-react";
 
 const typeColors: Record<string, string> = {
   Manifestor: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -41,6 +45,27 @@ const categoryIcons: Record<string, typeof Users> = {
   celebrity: Star,
   other: LayoutDashboard,
 };
+
+const ROLE_TAGS = [
+  { value: "partner",    label: "💑 Partner",       color: "bg-pink-500/20 text-pink-300 border-pink-500/30" },
+  { value: "partnerka",  label: "💑 Partnerka",     color: "bg-pink-500/20 text-pink-300 border-pink-500/30" },
+  { value: "manzel",     label: "💍 Manžel",        color: "bg-rose-500/20 text-rose-300 border-rose-500/30" },
+  { value: "manzelka",   label: "💍 Manželka",      color: "bg-rose-500/20 text-rose-300 border-rose-500/30" },
+  { value: "sef",        label: "👔 Šéf",           color: "bg-blue-500/20 text-blue-300 border-blue-500/30" },
+  { value: "sefova",     label: "👔 Šéfová",        color: "bg-blue-500/20 text-blue-300 border-blue-500/30" },
+  { value: "kolega",     label: "🤝 Kolega",        color: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30" },
+  { value: "pritel",     label: "👫 Přítel",        color: "bg-green-500/20 text-green-300 border-green-500/30" },
+  { value: "pritelkyne", label: "👫 Přítelkyně",    color: "bg-green-500/20 text-green-300 border-green-500/30" },
+  { value: "rodic",      label: "👨‍👩‍👧 Rodič",          color: "bg-amber-500/20 text-amber-300 border-amber-500/30" },
+  { value: "dite",       label: "🧒 Dítě",          color: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30" },
+  { value: "sourozenec", label: "👫 Sourozenec",    color: "bg-orange-500/20 text-orange-300 border-orange-500/30" },
+  { value: "kamarad",    label: "😊 Kamarád",       color: "bg-teal-500/20 text-teal-300 border-teal-500/30" },
+  { value: "klient",     label: "💼 Klient",        color: "bg-indigo-500/20 text-indigo-300 border-indigo-500/30" },
+  { value: "mentor",     label: "🎓 Mentor",        color: "bg-violet-500/20 text-violet-300 border-violet-500/30" },
+  { value: "jine",       label: "✨ Jiné",          color: "bg-slate-500/20 text-slate-300 border-slate-500/30" },
+] as const;
+
+type RoleTagValue = typeof ROLE_TAGS[number]["value"];
 
 const readingTypeLabelsCS: Record<string, string> = {
   overview: "Kompletní přehled",
@@ -75,6 +100,7 @@ export default function Dashboard() {
   const readingTypeLabels = locale === 'en' ? readingTypeLabelsEN : readingTypeLabelsCS;
   const [activeTab, setActiveTab] = useState<"charts" | "readings" | "transit" | "subscription">("charts");
   const [expandedReading, setExpandedReading] = useState<number | null>(null);
+  const [roleTagOpen, setRoleTagOpen] = useState<number | null>(null);
 
   const chartsQuery = trpc.chart.list.useQuery(undefined, { enabled: isAuthenticated });
   const readingsQuery = trpc.ai.getAllReadings.useQuery(undefined, { enabled: isAuthenticated && activeTab === "readings" });
@@ -88,6 +114,20 @@ export default function Dashboard() {
   });
   const favMutation = trpc.chart.toggleFavorite.useMutation({
     onSuccess: () => utils.chart.list.invalidate(),
+  });
+  const updateMutation = trpc.chart.update.useMutation({
+    onMutate: async (vars) => {
+      await utils.chart.list.cancel();
+      const prev = utils.chart.list.getData();
+      utils.chart.list.setData(undefined, old =>
+        old?.map(c => c.id === vars.id ? { ...c, roleTag: vars.roleTag ?? c.roleTag } : c)
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) utils.chart.list.setData(undefined, ctx.prev);
+    },
+    onSettled: () => utils.chart.list.invalidate(),
   });
   const rateMutation = trpc.ai.rateReading.useMutation({
     onSuccess: () => utils.ai.getAllReadings.invalidate(),
@@ -260,6 +300,8 @@ export default function Dashboard() {
                     const CategoryIcon = categoryIcons[chart.category] || LayoutDashboard;
                     const czType = data ? ((t.types as any)[data.type] || data.type) : "";
                     const czDef = data ? ((t.hd.definitionTypes as any)[data.definition] || data.definition) : "";
+                    const currentRole = ROLE_TAGS.find(r => r.value === (chart as any).roleTag);
+                    const isNotSelf = chart.category !== "self";
 
                     return (
                       <Card
@@ -274,6 +316,62 @@ export default function Dashboard() {
                               <CardTitle className="font-serif text-lg">{chart.name}</CardTitle>
                             </div>
                             <div className="flex gap-1" onClick={e => e.stopPropagation()}>
+                              {/* Role Tag Popover — only for non-self charts */}
+                              {isNotSelf && (
+                                <Popover open={roleTagOpen === chart.id} onOpenChange={open => setRoleTagOpen(open ? chart.id : null)}>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 px-1.5 text-xs gap-1"
+                                      title={locale === 'en' ? 'Set role tag' : 'Nastavit roli'}
+                                    >
+                                      {currentRole ? (
+                                        <span className={`px-1.5 py-0.5 rounded text-xs border ${currentRole.color}`}>
+                                          {currentRole.label}
+                                        </span>
+                                      ) : (
+                                        <Tag className="w-3.5 h-3.5 text-muted-foreground" />
+                                      )}
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-52 p-2 bg-popover border-border" align="end">
+                                    <p className="text-xs text-muted-foreground mb-2 font-medium">
+                                      {locale === 'en' ? 'Relationship role:' : 'Role ve vztahu:'}
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-1">
+                                      {ROLE_TAGS.map(role => (
+                                        <button
+                                          key={role.value}
+                                          className={`text-xs px-2 py-1 rounded border text-left transition-all hover:opacity-80 ${
+                                            (chart as any).roleTag === role.value
+                                              ? role.color + " ring-1 ring-primary/50"
+                                              : "bg-background/50 border-border/50 text-muted-foreground hover:border-primary/30"
+                                          }`}
+                                          onClick={() => {
+                                            updateMutation.mutate({ id: chart.id, roleTag: role.value as RoleTagValue });
+                                            setRoleTagOpen(null);
+                                            toast.success(locale === 'en' ? `Role set: ${role.label}` : `Role nastavena: ${role.label}`);
+                                          }}
+                                        >
+                                          {role.label}
+                                        </button>
+                                      ))}
+                                      {(chart as any).roleTag && (
+                                        <button
+                                          className="col-span-2 text-xs px-2 py-1 rounded border border-border/50 text-muted-foreground hover:border-destructive/30 hover:text-destructive transition-all mt-1"
+                                          onClick={() => {
+                                            updateMutation.mutate({ id: chart.id, roleTag: null });
+                                            setRoleTagOpen(null);
+                                          }}
+                                        >
+                                          {locale === 'en' ? '✕ Remove role' : '✕ Odebrat roli'}
+                                        </button>
+                                      )}
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
+                              )}
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -316,6 +414,11 @@ export default function Dashboard() {
                                   {czType}
                                 </Badge>
                                 <Badge variant="outline" className="text-xs">{data.profile}</Badge>
+                                {currentRole && (
+                                  <span className={`px-1.5 py-0.5 rounded text-xs border ${currentRole.color}`}>
+                                    {currentRole.label}
+                                  </span>
+                                )}
                               </div>
                               <p className="text-xs text-muted-foreground">
                                 {chart.birthDate} {chart.birthTime} &middot; {chart.birthPlace?.split(",")[0]}
