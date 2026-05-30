@@ -75,6 +75,12 @@ export default function Footer() {
                   Katastr Online
                 </a>
               </li>
+              <li>
+                <a href="https://cajovny-praha.cz" target="_blank" rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors">
+                  Čajovny Praha
+                </a>
+              </li>
             </ul>
           </div>
         </div>
