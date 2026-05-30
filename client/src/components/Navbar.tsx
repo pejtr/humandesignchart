@@ -121,10 +121,10 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out navbar-mystical ${
         isScrolled
-          ? "navbar-mystical bg-background/90 backdrop-blur-xl"
-          : "bg-transparent border-b border-transparent"
+          ? "bg-background/95 backdrop-blur-xl shadow-sm shadow-black/5"
+          : "bg-background/85 backdrop-blur-md border-b border-border/20"
       }`}>
         <nav className="container flex items-center justify-between h-16 gap-2">
           {/* Logo — custom HD bodygraph symbol */}
