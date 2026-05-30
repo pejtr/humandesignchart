@@ -64,33 +64,15 @@ export default function Footer() {
             <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{locale === "cs" ? "Další projekty" : "Partner Sites"}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="https://cajovny-praha.cz" target="_blank" rel="noopener noreferrer"
+                <a href="https://bezmasajidla.cz" target="_blank" rel="noopener noreferrer"
                   className="hover:text-primary transition-colors">
-                  Čajovny Praha
+                  Bezmasá Jídla
                 </a>
               </li>
               <li>
                 <a href="https://katastr-online.cz" target="_blank" rel="noopener noreferrer"
                   className="hover:text-primary transition-colors">
                   Katastr Online
-                </a>
-              </li>
-              <li>
-                <a href="https://akcni-letenky.com" target="_blank" rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors">
-                  Akční Letenky
-                </a>
-              </li>
-              <li>
-                <a href="https://do-italie.cz" target="_blank" rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors">
-                  Do Itálie
-                </a>
-              </li>
-              <li>
-                <a href="https://bezmasajidla.cz" target="_blank" rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors">
-                  Bezmasá Jídla
                 </a>
               </li>
             </ul>

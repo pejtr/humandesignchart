@@ -124,6 +124,8 @@ export default function ChartResult() {
   const [copied, setCopied] = useState(false);
   const [aiReadingType, setAiReadingType] = useState<string | null>(null);
   const [showAiTypes, setShowAiTypes] = useState(false);
+  const [dailyTransitReading, setDailyTransitReading] = useState<string | null>(null);
+  const [dailyTransitLoading, setDailyTransitLoading] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [saveCategory, setSaveCategory] = useState<"self" | "family" | "friend" | "client" | "celebrity" | "other">("self");
@@ -159,6 +161,27 @@ export default function ChartResult() {
       chartData: chart,
       ownerName: chartMeta?.name,
     });
+  };
+
+  const personalizedTransitMutation = trpc.transit.personalizedByData.useMutation({
+    onSuccess: (data: { interpretation: string }) => {
+      setDailyTransitReading(data.interpretation);
+      setDailyTransitLoading(false);
+    },
+    onError: () => {
+      toast.error(locale === "cs" ? "Nepodařilo se vygenerovat denní výklad" : "Failed to generate daily reading");
+      setDailyTransitLoading(false);
+    },
+  });
+
+  const handleDailyTransitReading = () => {
+    if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+    if (!chart) return;
+    setDailyTransitLoading(true);
+    setAiReadingType("daily_transit");
+    setAiReading(null);
+    setDailyTransitReading(null);
+    personalizedTransitMutation.mutate({ chartData: chart, locale });
   };
 
   const transitQuery = trpc.transit.current.useQuery(undefined, {
@@ -605,6 +628,7 @@ export default function ChartResult() {
                               { key: "career", label: "💼 Kariéra", primary: false },
                               { key: "relationships", label: "❤️ Vztahy", primary: false },
                               { key: "channels", label: "⚡ Kanály", primary: false },
+                              { key: "daily_transit", label: "🌟 Denní výklad", primary: false },
                             ].map(item => (
                               <Button
                                 key={item.key}
@@ -614,10 +638,11 @@ export default function ChartResult() {
                                   ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90 font-semibold"
                                   : "text-xs h-8 bg-white/70 hover:bg-white border-border/60"}
                                 onClick={() => {
+                                  if (item.key === "daily_transit") { handleDailyTransitReading(); return; }
                                   setAiReadingType(item.key);
                                   handleAiReading(item.key);
                                 }}
-                                disabled={aiStreaming || aiMutation.isPending}
+                                disabled={aiStreaming || aiMutation.isPending || dailyTransitLoading}
                               >
                                 {item.label}
                               </Button>
@@ -648,7 +673,7 @@ export default function ChartResult() {
                       </div>
                     </CardContent>
                   </Card>
-                ) : aiReading ? (
+                ) : (aiReading || dailyTransitReading || dailyTransitLoading) ? (
                   <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background shadow-sm">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
@@ -660,7 +685,7 @@ export default function ChartResult() {
                           size="sm"
                           className="text-xs gap-1.5 h-8"
                           onClick={() => {
-                            const blob = new Blob([aiReading], { type: 'text/plain;charset=utf-8' });
+                            const blob = new Blob([aiReadingType === "daily_transit" ? (dailyTransitReading || "") : (aiReading || "")], { type: 'text/plain;charset=utf-8' });
                             const url = URL.createObjectURL(blob);
                             const a = document.createElement('a');
                             a.href = url;
@@ -683,6 +708,7 @@ export default function ChartResult() {
                           { key: "career", label: "💼 Kariéra" },
                           { key: "relationships", label: "❤️ Vztahy" },
                           { key: "channels", label: "⚡ Kanály" },
+                          { key: "daily_transit", label: "🌟 Denní výklad" },
                         ].map(item => (
                           <Button
                             key={item.key}
@@ -692,10 +718,11 @@ export default function ChartResult() {
                               ? "text-xs h-7 bg-primary text-primary-foreground font-semibold"
                               : "text-xs h-7 bg-white/70 hover:bg-white border-border/60"}
                             onClick={() => {
+                              if (item.key === "daily_transit") { handleDailyTransitReading(); return; }
                               setAiReadingType(item.key);
                               handleAiReading(item.key);
                             }}
-                            disabled={aiStreaming || aiMutation.isPending}
+                            disabled={aiStreaming || aiMutation.isPending || dailyTransitLoading}
                           >
                             {item.label}
                           </Button>
@@ -703,12 +730,21 @@ export default function ChartResult() {
                       </div>
                     </CardHeader>
                     <CardContent>
+                      {dailyTransitLoading && aiReadingType === "daily_transit" ? (
+                        <div className="flex flex-col items-center gap-3 py-8 text-center">
+                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                          </div>
+                          <p className="text-sm text-muted-foreground">{locale === "cs" ? "Generuji denní výklad tranzitů..." : "Generating daily transit reading..."}</p>
+                        </div>
+                      ) : (
                       <div className="prose prose-sm max-w-none p-4 rounded-lg bg-white/60 border border-border/30 relative">
-                        <Streamdown>{aiReading}</Streamdown>
-                        {aiStreaming && (
+                        <Streamdown>{aiReadingType === "daily_transit" ? (dailyTransitReading || "") : (aiReading || "")}</Streamdown>
+                        {aiStreaming && aiReadingType !== "daily_transit" && (
                           <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-middle rounded-sm" />
                         )}
                       </div>
+                      )}
                       {/* Thumbs up/down feedback + share reading */}
                       {!aiStreaming && (
                         <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border/20 flex-wrap">

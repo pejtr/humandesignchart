@@ -769,3 +769,13 @@
 - [x] Route /admin/crm přidána do App.tsx (admin-only, redirect pro non-admin)
 - [x] Vitest testy pro LeadOS webhook verifikaci (6 testů, všechny prošly)
 - [x] LeadOS API klíč nastaven přes webdev_request_secrets
+
+## AI Průvodce & Z-index opravy (2026-05-30)
+- [ ] Opravit mobilní layout AI průvodce — padding-bottom pro spodní nav (h-16 = 64px)
+- [ ] Přidat tlačítko minimalizace/šipky zpět do hlavičky AI průvodce
+- [ ] Přidat DB tabulku chatConversations + chatMessages pro persistentní paměť
+- [ ] Implementovat tRPC procedury: chat.getHistory, chat.saveMessage, chat.clearHistory
+- [ ] Integrovat persistentní historii do AiGuide.tsx (load při mount, save po každé zprávě)
+- [ ] Opravit z-index prokliků — hero sekce container z-10 vs dekorativní prvky z-1/2/3
+- [ ] Opravit AI průvodce — zdvojené pozdravy v systémovém promptu
+- [ ] Opravit AI průvodce — odpovědi max 2 odstavce
