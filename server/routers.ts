@@ -34,11 +34,43 @@ import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../shared/blogArticles";
 import { BLOG_ARTICLES_EN } from "../shared/blogArticlesEn";
 import { sendLeadOSEvent } from "./leados";
 
+// ─── Notifications Router ────────────────────────────────────────────────────
+const notificationsRouter = router({
+  getAll: protectedProcedure
+    .input(z.object({ limit: z.number().min(1).max(50).optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      const { getUserNotifications } = await import("./db.notifications");
+      return getUserNotifications(ctx.user.id, input?.limit ?? 30);
+    }),
+
+  getUnreadCount: protectedProcedure
+    .query(async ({ ctx }) => {
+      const { getUnreadCount } = await import("./db.notifications");
+      return { count: await getUnreadCount(ctx.user.id) };
+    }),
+
+  markRead: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { markNotificationRead } = await import("./db.notifications");
+      await markNotificationRead(input.id, ctx.user.id);
+      return { success: true };
+    }),
+
+  markAllRead: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      const { markAllNotificationsRead } = await import("./db.notifications");
+      await markAllNotificationsRead(ctx.user.id);
+      return { success: true };
+    }),
+});
+
 export const appRouter = router({
   system: systemRouter,
   social: socialRouter,
   leados: leadosRouter,
   chat: chatRouter,
+  notifications: notificationsRouter,
 
   // ─── Newsletter ─────────────────────────────────────────────────────
   newsletter: router({

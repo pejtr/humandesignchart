@@ -2,6 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "wouter";
+import { NotificationBell } from "@/components/NotificationBell";
 import {
   Menu, X, User, LogOut, LayoutDashboard, Star, Users,
   Sparkles, GitCompare, BookOpen, Bot, RotateCcw, ChevronDown,
@@ -259,6 +260,8 @@ export default function Navbar() {
             <LanguageSwitcher />
             {isAuthenticated ? (
               <>
+                {/* Notification Bell */}
+                {user?.id && <NotificationBell userId={user.id} />}
                 {/* Credits badge — links to Dashboard subscription tab */}
                 {creditsLabel !== null && (
                   <Link href={localePath("/dashboard")}>

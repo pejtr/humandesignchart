@@ -812,3 +812,19 @@
 - [x] server/mcp/leados-mcp-server.ts — MCP server s nástroji get_hdm_stats, get_hdm_leads, sync_lead_status
 - [x] package.json — přidat @modelcontextprotocol/sdk
 - [x] Vitest testy pro LeadOS integraci (13 test fileů, 162 testů, všechny prošly)
+
+## Real-time Vizuální Notifikace (2026-05-31)
+- [x] DB schema — tabulka user_notifications (id, userId, type, title, message, data JSON, isRead, createdAt)
+- [x] DB migrace — pnpm db:push (migrace 0012_amazing_infant_terrible.sql aplikována)
+- [x] server/db.notifications.ts — createNotification(), getUserNotifications(), markNotificationRead(), markAllNotificationsRead()
+- [x] server/routers.ts — tRPC procedury: notifications.getAll, notifications.markRead, notifications.markAllRead, notifications.getUnreadCount
+- [x] server/_core/index.ts — SSE endpoint GET /api/notifications/stream (per-user channel, heartbeat 30s)
+- [x] server/notificationBroadcast.ts — in-memory SSE broadcaster (Map<userId, Set<Response>>)
+- [x] server/leadosWebhook.ts — při lead_status_changed uložit notifikaci do DB + broadcast SSE
+- [x] server/leadosWebhook.ts — při new_campaign broadcast SSE pro všechny připojené uživatele
+- [x] client/src/hooks/useNotifications.ts — SSE hook (EventSource, reconnect po 5s, onMessage)
+- [x] client/src/components/NotificationBell.tsx — bell ikona s červeným badge, dropdown panel, wiggle animace
+- [x] Navbar.tsx — integrace NotificationBell (pouze pro přihlášené uživatele)
+- [x] Toast při příchodu nové notifikace přes SSE (sonner toast s ikonou, titulem, tlačítkem Zobrazit)
+- [x] Vizuální rozlišení typů notifikací (CRM status = fialová, kampaň = zelená, systém = modrá, kredit = jantárová, úspěch = růžová)
+- [x] Vitest testy pro notification DB helpers a SSE broadcaster (14 test fileů, 177 testů, všechny prošly)

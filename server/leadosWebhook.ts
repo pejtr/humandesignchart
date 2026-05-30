@@ -10,6 +10,8 @@ import { notifyOwner } from "./_core/notification";
 import { getDb } from "./db";
 import { users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { createNotification } from "./db.notifications";
+import { broadcastToUser, broadcastToAll, type NotificationPayload } from "./notificationBroadcast";
 
 export interface LeadOSWebhookPayload {
   event: "new_lead" | "lead_status_changed" | "new_order" | "quiz_completed" | "new_campaign";
@@ -125,6 +127,42 @@ async function handleLeadOSEvent(payload: LeadOSWebhookPayload): Promise<void> {
         }
       }
 
+      // Create in-app notification for the affected user
+      const targetUserId = userId ?? null;
+      if (targetUserId) {
+        try {
+          const statusLabels: Record<string, string> = {
+            new: "Nový lead",
+            contacted: "Kontaktován",
+            interested: "Má zájem",
+            converted: "Konvertován 🎉",
+            lost: "Ztracen",
+          };
+          const newLabel = statusLabels[newStatus as string] ?? newStatus ?? "Změna";
+          const oldLabel = statusLabels[oldStatus as string] ?? oldStatus ?? "";
+          const notif = await createNotification({
+            userId: targetUserId,
+            type: "crm_status",
+            title: `Váš CRM status byl aktualizován`,
+            message: `Status změněn${oldLabel ? ` z "${oldLabel}"` : ""} na "${newLabel}"${note ? `. Poznámka: ${note}` : ""}.`,
+            data: { oldStatus, newStatus, note },
+          });
+          if (notif) {
+            const payload: NotificationPayload = {
+              id: notif.id,
+              type: "crm_status",
+              title: notif.title,
+              message: notif.message,
+              data: notif.data,
+              createdAt: notif.createdAt.toISOString(),
+            };
+            broadcastToUser(targetUserId, payload);
+          }
+        } catch (err) {
+          console.error("[LeadOS] Failed to create/broadcast CRM status notification:", err);
+        }
+      }
+
       if (newStatus === "converted") {
         await notifyOwner({
           title: `💰 Lead konvertován v LeadOS!`,
@@ -138,9 +176,26 @@ async function handleLeadOSEvent(payload: LeadOSWebhookPayload): Promise<void> {
       const { campaignName, targetCount, email } = payload.data as { campaignName?: string; targetCount?: number; email?: string };
       console.log(`[LeadOS] New campaign launched: ${campaignName} (${targetCount} recipients)`);
       await notifyOwner({
-        title: `📧 LeadOS: Nová email kampaň spustěna`,
-        content: `Kampaň: **${campaignName || "Neznámá"}**\nPočet příjemců: ${targetCount ?? "neznámo"}${email ? `\nSpouštěcč: ${email}` : ""}`,
+        title: `📧 LeadOS: Nová email kampaň spuštěna`,
+        content: `Kampaň: **${campaignName || "Neznámá"}**\nPočet příjemce: ${targetCount ?? "neznámo"}${email ? `\nSpouštěcč: ${email}` : ""}`,
       }).catch(() => {});
+
+      // Broadcast campaign notification to ALL connected users
+      try {
+        // Create a system-level notification (userId=1 as placeholder for broadcast)
+        // We broadcast directly without saving per-user rows to avoid DB bloat
+        const campaignPayload: NotificationPayload = {
+          id: Date.now(), // ephemeral ID for broadcast-only notifications
+          type: "campaign",
+          title: `📧 Nová kampaň: ${campaignName || "Human Design Mapa"}`,
+          message: `Spustili jsme novou email kampaň pro ${targetCount ?? "všechny"} příjemce. Zkontrolujte svůj email.`,
+          data: { campaignName, targetCount },
+          createdAt: new Date().toISOString(),
+        };
+        broadcastToAll(campaignPayload);
+      } catch (err) {
+        console.error("[LeadOS] Failed to broadcast campaign notification:", err);
+      }
       break;
     }
 
