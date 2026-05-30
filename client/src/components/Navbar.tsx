@@ -24,10 +24,19 @@ import {
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [location] = useLocation();
   const { t, locale, localePath } = useLanguage();
   const { theme, preference, toggleTheme } = useTheme();
   const drawerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll-aware navbar transparency
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Close drawer on route change
   useEffect(() => {
@@ -112,7 +121,11 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 navbar-mystical bg-background/80 backdrop-blur-xl">
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
+        isScrolled
+          ? "navbar-mystical bg-background/90 backdrop-blur-xl"
+          : "bg-transparent border-b border-transparent"
+      }`}>
         <nav className="container flex items-center justify-between h-16 gap-2">
           {/* Logo — custom HD bodygraph symbol */}
           <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline shrink-0 group">
