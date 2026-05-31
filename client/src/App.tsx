@@ -43,6 +43,7 @@ const SocialScheduler = lazy(() => import("./pages/SocialScheduler"));
 const CompositeChart = lazy(() => import("./pages/CompositeChart"));
 const AdminCRM = lazy(() => import("./pages/AdminCRM"));
 const RoleCompatibility = lazy(() => import("./pages/RoleCompatibility"));
+const CrmDashboard = lazy(() => import("./pages/CrmDashboard"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -114,6 +115,7 @@ function LocaleRoutes() {
         <Route path="/:locale/composite" component={CompositeChart} />
         <Route path="/:locale/role-compatibility" component={RoleCompatibility} />
         <Route path="/:locale/admin/crm" component={AdminCRM} />
+        <Route path="/:locale/crm-dashboard" component={CrmDashboard} />
         <Route path="/:locale/pricing" component={Pricing} />
         <Route path="/:locale/payment/success" component={PaymentSuccess} />
         <Route path="/:locale/payment/cancel" component={PaymentCancel} />
@@ -160,6 +162,7 @@ function LocaleRoutes() {
         <Route path="/payment/success"><LegacyRedirect path="/payment/success" /></Route>
         <Route path="/payment/cancel"><LegacyRedirect path="/payment/cancel" /></Route>
         <Route path="/composite"><LegacyRedirect path="/composite" /></Route>
+        <Route path="/crm-dashboard"><LegacyRedirect path="/crm-dashboard" /></Route>
 
         {/* 404 */}
         <Route path="/404" component={NotFound} />

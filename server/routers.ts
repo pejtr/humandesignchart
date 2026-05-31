@@ -63,6 +63,39 @@ const notificationsRouter = router({
       await markAllNotificationsRead(ctx.user.id);
       return { success: true };
     }),
+
+  getPrefs: protectedProcedure
+    .query(async ({ ctx }) => {
+      const { parseNotifPrefs } = await import("../shared/notificationTypes");
+      const db = await getDb();
+      if (!db) return parseNotifPrefs(null);
+      const userRecord = await db.select({ notificationPrefs: users.notificationPrefs })
+        .from(users).where(eq(users.id, ctx.user.id)).limit(1);
+      return parseNotifPrefs(userRecord[0]?.notificationPrefs);
+    }),
+
+  updatePrefs: protectedProcedure
+    .input(z.object({
+      crm_status: z.boolean().optional(),
+      campaign: z.boolean().optional(),
+      system: z.boolean().optional(),
+      credit: z.boolean().optional(),
+      achievement: z.boolean().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { parseNotifPrefs } = await import("../shared/notificationTypes");
+      const db = await getDb();
+      if (!db) return { success: false };
+      // Merge with existing prefs
+      const userRecord = await db.select({ notificationPrefs: users.notificationPrefs })
+        .from(users).where(eq(users.id, ctx.user.id)).limit(1);
+      const current = parseNotifPrefs(userRecord[0]?.notificationPrefs);
+      const updated = { ...current, ...input };
+      await db.update(users)
+        .set({ notificationPrefs: updated })
+        .where(eq(users.id, ctx.user.id));
+      return { success: true, prefs: updated };
+    }),
 });
 
 export const appRouter = router({

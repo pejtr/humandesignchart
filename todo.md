@@ -828,3 +828,29 @@
 - [x] Toast při příchodu nové notifikace přes SSE (sonner toast s ikonou, titulem, tlačítkem Zobrazit)
 - [x] Vizuální rozlišení typů notifikací (CRM status = fialová, kampaň = zelená, systém = modrá, kredit = jantárová, úspěch = růžová)
 - [x] Vitest testy pro notification DB helpers a SSE broadcaster (14 test fileů, 177 testů, všechny prošly)
+
+## Notifikační Preference v Profilu (2026-05-31)
+- [ ] DB schema — přidat notificationPrefs JSON sloupec do users tabulky
+- [ ] DB migrace — pnpm db:push
+- [ ] shared/notificationTypes.ts — sdílené konstanty typů notifikací a výchozí preference
+- [ ] server/routers.ts — tRPC procedury: notifications.getPrefs, notifications.updatePrefs
+- [ ] server/leadosWebhook.ts — filtrovat createNotification a broadcastToUser dle uživatelských preferencí
+- [ ] server/leadosWebhook.ts — filtrovat broadcastToAll (new_campaign) dle preferencí příjemce
+- [ ] client/src/pages/Profile.tsx — sekce "Nastavení notifikací" s Switch přepínači pro každý typ
+- [ ] Okamžité uložení preference (optimistic update) bez nutnosti kliknout Save
+- [ ] Popis každého typu notifikace (co spouští, jak často)
+- [ ] Vitest testy pro getPrefs/updatePrefs a filtrování
+
+## CRM Dashboard /crm-dashboard (2026-05-31)
+
+- [x] server/routers/leados.ts — getEnrichedLeads (LeadOS + HDM DB join by email, charts, roleTag, hdType)
+- [x] server/routers/leados.ts — getCrmStats (analytics + sequences agregace)
+- [x] pnpm add d3 @types/d3 — D3.js force graph dependency
+- [x] client/src/pages/CrmDashboard.tsx — 3-panel layout (Top Lead Profiles | Relationship Map | SSE Stream)
+- [x] Top Lead Profiles — score ring, HD typ barva, CRM status badge, chart tags, status filter
+- [x] D3.js Relationship Map — force graph top 8 leadů, hrany dle HD typu/statusu, drag, click select
+- [x] Live SSE Stream panel — EventSource /api/notifications/stream, reconnect 5s, event feed
+- [x] Stats header — Total Leads, Active Sequences, Converted, SSE Live
+- [x] Admin guard — pouze role=admin, redirect pro nepřihlášené
+- [x] App.tsx — lazy import + route /:locale/crm-dashboard + legacy redirect
+- [x] TypeScript 0 chyb, 177 testů prošlo

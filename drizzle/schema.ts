@@ -31,6 +31,9 @@ export const users = mysqlTable("users", {
   crmStatus: varchar("crm_status", { length: 32 }),
   crmNote: text("crm_note"),
   crmUpdatedAt: bigint("crm_updated_at", { mode: "number" }),
+  // Notification preferences — JSON object with boolean flags per type
+  // Default: all enabled. Example: { crm_status: true, campaign: false, system: true, credit: true, achievement: true }
+  notificationPrefs: json("notification_prefs"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
