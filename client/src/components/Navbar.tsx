@@ -7,7 +7,7 @@ import {
   Menu, X, User, LogOut, LayoutDashboard, Star, Users,
   Sparkles, GitCompare, BookOpen, Bot, RotateCcw, ChevronDown,
   Hexagon, Sun, Moon, Monitor, Target, CreditCard, Zap, Share2,
-  Orbit, Flame, Eye, Layers, Crown, Gem,
+  Orbit, Flame, Eye, Layers, Crown, Gem, BarChart3,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -303,6 +303,14 @@ export default function Navbar() {
                       {t.common.dashboard}
                     </DropdownMenuItem>
                   </Link>
+                  {user?.role === "admin" && (
+                    <Link href={localePath("/crm-dashboard")}>
+                      <DropdownMenuItem className="text-violet-600 dark:text-violet-400 focus:text-violet-600 focus:dark:text-violet-400">
+                        <BarChart3 className="w-4 h-4 mr-2" />
+                        CRM Dashboard
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
                   {/* Credit pack quick-buy — only for non-premium */}
                   {!isPremium && (
                     <>
@@ -585,6 +593,17 @@ export default function Navbar() {
                   {t.common.dashboard}
                 </button>
               </Link>
+              {user?.role === "admin" && (
+                <Link href={localePath("/crm-dashboard")}>
+                  <button
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30 transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                    CRM Dashboard
+                  </button>
+                </Link>
+              )}
               <button
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
                 onClick={() => { logout(); setMobileOpen(false); }}
