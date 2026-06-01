@@ -845,6 +845,81 @@ Tyto hlubší vrstvy jsou součástí pokročilého studia (Proměnné, PHS, Rav
 
 Začněte prvními čtyřmi body a postupně se ponořujte hlouběji. Human Design je systém, který se studuje celý život. Více pojmů najdete v naší [encyklopedii Human Designu](/cs/encyclopedia).`,
   },
+  {
+    slug: "letni-slunovrat-2026-human-design",
+    title: "Letní slunovrat 2026 a Human Design: Nejsilnější tranzit roku",
+    metaTitle: "Letní slunovrat 2026 a Human Design — Brána 15 a 10 | HumanDesignMapa.cz",
+    metaDescription: "21. června 2026 nastane letní slunovrat. Zjistěte, co Brána 15 (Extrémy) a Brána 10 (Chování Já) znamenají pro váš Human Design a jak vědomě pracovat s touto silnou energií.",
+    excerpt: "Letní slunovrat je v Human Designu jedním z nejsilnějších tranzitních okamžiků roku. Slunce vstupuje do Brány 15 — Přirozených rytmů — a Země do Brány 10 — Autentického chování. Co to znamená pro každý typ?",
+    category: "zaklady",
+    categoryLabel: "Základy HD",
+    readingTime: 9,
+    publishedAt: "2026-06-01",
+    updatedAt: "2026-06-01",
+    coverColor: "bg-gradient-to-br from-amber-50 to-yellow-100",
+    coverIcon: "Sun",
+    tags: ["tranzity", "slunovrat", "brána 15", "brána 10", "sezónní cykly", "planetární program"],
+    content: `## Proč nás Slunce ovlivňuje víc, než si myslíme
+
+Abychom pochopili, co se děje při slunovratu, musíme začít u neutrin.
+
+Neutrina jsou subatomární částice, které vznikají převážně uvnitř hvězd při termonukleárních reakcích. Cestují napříč vesmírem téměř rychlostí světla a procházejí bez překážky vším — horninami, oceány, celou Zemí i naším tělem. Každým čtverečním centimetrem naší kůže jich za sekundu prolétne téměř **60 miliard**. Žijeme doslova v neviditelném oceánu informací.
+
+Klíčová vlastnost neutrin je, že mají hmotu — byť nepatrnou, přibližně jednu miliontinu váhy protonu. A právě hmota je podstatná pro uchování a přenos informace. Neutrina, která na své cestě k nám prolétnou Sluncem, Jupiterem nebo Saturnem, do nás vkládají informace a energetické vlivy těchto těles. Tento neustálý tok informací se v jazyce Human Designu nazývá **tranzit**.
+
+**Slunce je zdrojem přibližně 70 % všech neutrin, která na nás působí.** Jeho vliv je proto ze všech planet zdaleka nejsilnější. Každých přibližně šest dní vstupuje Slunce do nové brány v mandale Human Designu a mění tak hlavní téma planetárního programu — energii, která ovlivňuje všechny lidi na Zemi bez výjimky.
+
+## Mandala, brány a slunovrat
+
+Mandala Human Designu je kolo rozdělené na 64 sektorů, které odpovídají 64 hexagramům I-Ťingu a zároveň 64 kodonům lidské DNA. Každý sektor představuje jednu bránu — specifickou kvalitu vědomí, energie nebo způsobu bytí.
+
+Při letním slunovratu vstupuje Slunce do **Brány 15 — Brány Extrémů** (v I-Ťingu hexagram č. 15, nazývaný Pokora nebo Skromnost). Tato brána se nachází v G-centru, centru identity, lásky a směru. Je to brána, která pracuje s rytmem přírody, s přirozenými cykly a s přijetím toho, co je — bez snahy věci uměle urychlovat nebo zpomalovat.
+
+Zároveň se Země v tento okamžik nachází přesně naproti Slunci — v **Bráně 10 — Bráně Chování Já** (hexagram Kráčení, Chování). Tato brána je o autenticitě, o tom, jak se projevujeme ve světě, zda žijeme v souladu se svou pravou přirozeností nebo hrajeme role, které nám nepatří.
+
+Tato dvojice bran — **15 a 10** — tvoří jeden z nejdůležitějších kanálů v mapě Human Designu: **Kanál Průzkumníka (15-10)**, nazývaný také Kanál Lásky k Životu. Je to energie, která miluje rozmanitost, přirozené rytmy a autentické vyjádření.
+
+## Co slunovrat znamená pro každého z nás
+
+Letní slunovrat není jen astronomický bod. V Human Designu je to **přechod mezi dvěma energetickými fázemi roku**.
+
+Jaro (od 22. ledna do 21. června) je obdobím expanze, růstu a nových začátků. Slunce prochází branami, které aktivují iniciativu, tvoření a pohyb vpřed. Léto a druhá polovina roku je naopak obdobím integrace, zrání a sklizně — energie se obrací dovnitř, k hloubce a smyslu.
+
+Slunovrat je přesně tím přechodovým okamžikem. Je to chvíle, kdy má smysl zastavit se a zhodnotit, co jste od ledna do června vytvořili, začali, rozvinuli. Co z toho skutečně odpovídá vaší přirozenosti a co jste dělali jen proto, že jste "měli"?
+
+## Slunovrat a váš Human Design typ
+
+**Generátoři a Manifesting Generátoři** (přibližně 70 % populace) jsou v tuto dobu vyzváni k tomu, aby se zastavili a posoudili, zda jejich každodenní aktivity skutečně odpovídají jejich vnitřní odezvě — tomu hlubokému pocitu "ano, tohle chci". Energie slunovratu může odhalit, kde jste se nechali unést vnějšími očekáváními místo vlastního sacral centra.
+
+**Projektoré** (přibližně 20 % populace) jsou v tuto dobu přirozeně citlivější na energetické přetížení. Letní slunovrat přináší maximum světla a energie — a Projektoré, kteří nemají vlastní sacral centrum, mohou být snadno zahlceni. Klíčem je vědomé stahování, odpočinek a čekání na pozvání k aktivitě.
+
+**Manifestoři** (přibližně 9 % populace) mohou v tuto dobu cítit silný impuls k akci a iniciativě. Brána 15 jim připomíná, že i nejsilnější iniciativa potřebuje být v souladu s přirozeným rytmem — ne každý impuls je správný čas realizovat.
+
+**Reflektoři** (přibližně 1 % populace) jsou ze všech typů nejcitlivější na tranzity. Slunovrat pro ně představuje mimořádně silný energetický okamžik. Ideálním přístupem je pozorování — jak se cítím v tento den? Co mi tato energie ukazuje o světě kolem mě?
+
+## Slunovrat 2026 v datech
+
+| Datum a čas | 21. června 2026, 04:24 SELČ |
+|---|---|
+| Slunce v bráně | **15** — Extrémy / Přirozené rytmy |
+| Země v bráně | **10** — Chování Já / Autenticita |
+| Kanál | **15-10** — Kanál Průzkumníka (Láska k Životu) |
+| Centrum | G-centrum (identita, láska, směr) |
+| I-Ťing | Hexagram 15: Pokora / Skromnost |
+| Délka tranzitu | přibližně 6 dní (do 27. června) |
+
+## Závěr: Největší světlo jako pozvání k autenticitě
+
+Letní slunovrat je okamžikem největšího světla v roce. V Human Designu je to zároveň pozvání k největší autenticitě — k tomu, aby se ukázalo, co je skutečné a co je jen stín podmíněnosti.
+
+Energie Brány 15 nám připomíná, že příroda má svůj rytmus a my jsme jeho součástí — ať chceme nebo ne. Energie Brány 10 nás vyzývá, abychom v tomto světle ukázali své skutečné já, ne to, co od nás očekávají ostatní.
+
+Nejlepší způsob, jak pracovat s touto energií? Jednoduše: **žijte svůj design.**
+
+---
+
+*Chcete vědět, jak slunovrat ovlivňuje vaši konkrétní mapu? [Vypočítejte si svůj Human Design](/cs/calculate) a zjistěte, které brány a centra jsou u vás definované — a jak s nimi vědomě pracovat.*`,
+  },
 ];
 
 // Helper aliases and functions
