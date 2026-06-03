@@ -389,7 +389,7 @@ export default function AiGuide() {
 
   // --- Chat persistence & threads ---
   const [conversationId, setConversationId] = useState<number | null>(null);
-  const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [loadedConvId, setLoadedConvId] = useState<number | null>(null);
   const MAX_THREADS = 3;
 
   // Derived values for upgrade CTA
@@ -413,10 +413,10 @@ export default function AiGuide() {
   // Load history for current conversation
   const { data: historyData } = trpc.chat.getHistory.useQuery(
     { conversationId: conversationId ?? 0 },
-    { enabled: isAuthenticated && conversationId !== null && !historyLoaded }
+    { enabled: isAuthenticated && conversationId !== null && conversationId > 0 }
   );
 
-  // On mount: get or create conversation and load history
+  // On mount: get or create conversation
   useEffect(() => {
     if (!isAuthenticated) return;
     getOrCreateConv.mutateAsync({ locale: locale as "cs" | "en" }).then(conv => {
@@ -424,9 +424,11 @@ export default function AiGuide() {
     }).catch(() => {});
   }, [isAuthenticated, locale]);
 
-  // When history loads, populate messages
+  // When history loads for a new conversationId, populate messages
   useEffect(() => {
-    if (!historyData || historyLoaded) return;
+    if (!historyData || conversationId === null) return;
+    if (conversationId === loadedConvId) return; // already loaded this conv
+    setLoadedConvId(conversationId);
     if (historyData.length > 0) {
       const loaded: Message[] = historyData.map(m => ({
         id: String(m.id),
@@ -439,14 +441,13 @@ export default function AiGuide() {
         ...loaded,
       ]);
     }
-    setHistoryLoaded(true);
-  }, [historyData, historyLoaded, welcomeMessage]);
+  }, [historyData, conversationId, loadedConvId, welcomeMessage]);
 
   // Switch to a different thread
   const switchThread = useCallback(async (convId: number) => {
     if (convId === conversationId) return;
     setConversationId(convId);
-    setHistoryLoaded(false);
+    setLoadedConvId(null); // reset so history reloads for new conv
     setMessages([{ id: "welcome", role: "assistant", content: welcomeMessage, timestamp: new Date() }]);
     utils.chat.getHistory.invalidate({ conversationId: convId });
   }, [conversationId, welcomeMessage, utils]);
@@ -457,7 +458,7 @@ export default function AiGuide() {
     try {
       const conv = await createConvMutation.mutateAsync({ locale: locale as "cs" | "en" });
       setConversationId(conv.id);
-      setHistoryLoaded(true);
+      setLoadedConvId(conv.id); // new thread has no history, mark as loaded
       setMessages([{ id: "welcome", role: "assistant", content: welcomeMessage, timestamp: new Date() }]);
       refetchConversations();
     } catch {}

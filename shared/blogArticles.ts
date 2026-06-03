@@ -856,6 +856,7 @@ Začněte prvními čtyřmi body a postupně se ponořujte hlouběji. Human Desi
     readingTime: 9,
     publishedAt: "2026-06-01",
     updatedAt: "2026-06-01",
+    coverImage: "/manus-storage/blog-summer-solstice-2026_70623f1d.jpg",
     coverColor: "bg-gradient-to-br from-amber-50 to-yellow-100",
     coverIcon: "Sun",
     tags: ["tranzity", "slunovrat", "brána 15", "brána 10", "sezónní cykly", "planetární program"],
