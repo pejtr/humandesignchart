@@ -99,7 +99,7 @@ export default function Navbar() {
   // Primary nav links — keep short to avoid overflow
   const primaryLinks = [
     { href: "/calculate", label: locale === "cs" ? "Tvoje mapa" : "Your Chart", icon: Orbit },
-    { href: "/encyclopedia", label: locale === "cs" ? "Encyklopedie" : "Encyclopedia", icon: Layers },
+    { href: "/blog", label: "Blog", icon: BookOpen },
     { href: "/ai-guide", label: locale === "cs" ? "AI Průvodce" : "AI Guide", icon: Eye },
   ];
 
@@ -114,10 +114,10 @@ export default function Navbar() {
   ];
 
   const exploreLinks = [
+    { href: "/encyclopedia", label: locale === "cs" ? "Encyklopedie" : "Encyclopedia", icon: Layers, desc: locale === "cs" ? "Průvodce všemi HD pojmy" : "Guide to all HD concepts" },
     { href: "/celebrities", label: t.nav.celebrities, icon: Users, desc: locale === "cs" ? "Mapy známých osobností" : "Charts of famous people" },
     { href: "/iching", label: t.nav.iChing, icon: Hexagon, desc: locale === "cs" ? "I-Ťing orákulum" : "I Ching Oracle" },
     { href: "/incarnation-cross", label: locale === "cs" ? "Inkarnační kříž" : "Incarnation Cross", icon: Target, desc: locale === "cs" ? "Životní poslání a 4 brány kříže" : "Life purpose and 4 gates of the cross" },
-    { href: "/blog", label: "Blog", icon: BookOpen, desc: locale === "cs" ? "Články o Human Design" : "Human Design articles" },
   ];
 
   return (

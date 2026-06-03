@@ -37,6 +37,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   { href: "/dashboard",        labelCs: "Dashboard",          labelEn: "Dashboard",       icon: LayoutDashboard, group: "core" },
   { href: "/calculate",        labelCs: "Tvoje mapa",          labelEn: "Your Chart",      icon: Orbit,           group: "core" },
   { href: "/ai-guide",         labelCs: "HD Guru",             labelEn: "HD Guru",         icon: Eye,             group: "core",  badge: true },
+  { href: "/blog",             labelCs: "Blog",                labelEn: "Blog",            icon: BookOpen,        group: "core" },
   // Transits & Time
   { href: "/daily-transit",    labelCs: "Denní tranzit",       labelEn: "Daily Transit",   icon: Sun,             group: "time",  badge: true },
   { href: "/transits",         labelCs: "Tranzity",            labelEn: "Transits",        icon: Star,            group: "time" },
@@ -50,7 +51,6 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   { href: "/encyclopedia",     labelCs: "Encyklopedie",        labelEn: "Encyclopedia",    icon: Layers,          group: "explore" },
   { href: "/iching",           labelCs: "I-Ťing",              labelEn: "I Ching",         icon: Hexagon,         group: "explore" },
   { href: "/celebrities",      labelCs: "Celebrity",           labelEn: "Celebrities",     icon: Users,           group: "explore" },
-  { href: "/blog",             labelCs: "Blog",                labelEn: "Blog",            icon: BookOpen,        group: "explore" },
   // Tools
   { href: "/social-scheduler", labelCs: "Plánovač sítí",       labelEn: "Social Scheduler",icon: Share2,          group: "tools",  adminOnly: true },
 ];

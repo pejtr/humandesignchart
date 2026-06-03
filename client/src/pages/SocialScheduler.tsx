@@ -3,6 +3,7 @@
  * Tabs: Queue | Compose | AI Generator | Accounts
  */
 import { useState } from "react";
+import Navbar from "@/components/Navbar";
 import { useParams } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -739,7 +740,9 @@ export default function SocialScheduler() {
   const t = T[safeLocale];
 
   return (
-    <div className="container max-w-5xl py-8">
+    <div className="min-h-screen">
+      <Navbar />
+      <div className="container max-w-5xl py-8 pt-24">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
@@ -773,6 +776,7 @@ export default function SocialScheduler() {
         <TabsContent value="ai-gen"><AiGeneratorTab locale={safeLocale} t={t} /></TabsContent>
         <TabsContent value="accounts"><AccountsTab locale={safeLocale} t={t} /></TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }
