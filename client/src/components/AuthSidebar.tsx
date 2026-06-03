@@ -129,7 +129,7 @@ export function AuthSidebar() {
           const linkContent = (
             <Link
               href={localePath(item.href)}
-              className="relative flex items-center gap-2.5 w-full h-9 rounded-lg transition-all duration-150 no-underline group px-2"
+              className={`relative flex items-center gap-2.5 w-full h-9 rounded-lg transition-all duration-150 no-underline group ${expanded ? 'px-2' : 'justify-center px-0'}`}
               style={
                 active
                   ? { background: "var(--sidebar-accent)", color: "var(--sidebar-primary)" }
@@ -201,7 +201,7 @@ export function AuthSidebar() {
       <div className="px-1.5 pt-1 border-t" style={{ borderColor: "var(--sidebar-border)" }}>
         <button
           onClick={() => setExpanded(v => !v)}
-          className="flex items-center gap-2.5 w-full h-9 rounded-lg px-2 transition-all duration-150 hover:bg-sidebar-accent/60 group"
+          className={`flex items-center gap-2.5 w-full h-9 rounded-lg transition-all duration-150 hover:bg-sidebar-accent/60 group ${expanded ? 'px-2' : 'justify-center px-0'}`}
           style={{ color: "var(--sidebar-foreground)" }}
           title={expanded ? (locale === "cs" ? "Sbalit menu" : "Collapse menu") : (locale === "cs" ? "Rozbalit menu" : "Expand menu")}
         >
@@ -213,7 +213,7 @@ export function AuthSidebar() {
               </span>
             </>
           ) : (
-            <ChevronRight className="w-4 h-4 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity mx-auto" />
+            <ChevronRight className="w-4 h-4 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity" />
           )}
         </button>
       </div>
