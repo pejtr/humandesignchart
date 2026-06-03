@@ -168,6 +168,33 @@ export const chatRouter = router({
       return { success: true };
     }),
 
+  /** Create a new conversation (for new thread) */
+  createConversation: protectedProcedure
+    .input(z.object({ locale: z.enum(["cs", "en"]).default("cs") }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("DB unavailable");
+
+      const result = await db.insert(chatConversations).values({
+        userId: ctx.user.id,
+        locale: input.locale,
+        title: null,
+        messageCount: 0,
+        lastMessageAt: new Date(),
+        createdAt: new Date(),
+      });
+      const insertId = (result as any).insertId ?? (result as any)[0]?.insertId;
+      return {
+        id: Number(insertId),
+        userId: ctx.user.id,
+        locale: input.locale,
+        title: null,
+        messageCount: 0,
+        lastMessageAt: new Date(),
+        createdAt: new Date(),
+      };
+    }),
+
   /** List all conversations for the current user */
   listConversations: protectedProcedure
     .input(z.object({ locale: z.enum(["cs", "en"]).default("cs") }))

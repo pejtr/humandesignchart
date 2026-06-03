@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Sparkles, Send, User, Bot, LogIn, Loader2, ChevronDown,
   Zap, Star, Compass, Moon, Sun, Activity, Circle, Crown,
+  RotateCcw, MessageCirclePlus, MessageCircle, ChevronRight,
 } from "lucide-react";
 import { Streamdown } from "streamdown";
 import { Link } from "wouter";
@@ -351,6 +352,7 @@ export default function AiGuide() {
     "What is the Not-Self theme?",
   ] : [
     "Jaký je můj denní tranzit?",
+    "Co je to denní tranzit?",
     "Co je to Human Design a jak funguje?",
     "Jaký je rozdíl mezi Generátorem a Manifestorem?",
     "Co znamená mít otevřené Sakrální centrum?",
@@ -385,6 +387,11 @@ export default function AiGuide() {
   const [isLoading, setIsLoading] = useState(false);
   const [isChatMinimized, setIsChatMinimized] = useState(false);
 
+  // --- Chat persistence & threads ---
+  const [conversationId, setConversationId] = useState<number | null>(null);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
+  const MAX_THREADS = 3;
+
   // Derived values for upgrade CTA
   const totalMessages = messages.filter(m => m.role === "user").length;
   const showUpgradeBanner = !isPremium && totalMessages >= 3 && isAuthenticated;
@@ -392,6 +399,69 @@ export default function AiGuide() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const askMutation = trpc.ai.askGuide.useMutation();
+  const getOrCreateConv = trpc.chat.getOrCreateConversation.useMutation();
+  const createConvMutation = trpc.chat.createConversation.useMutation();
+  const saveMessagesMutation = trpc.chat.saveMessages.useMutation();
+  const utils = trpc.useUtils();
+
+  // List of conversations (threads)
+  const { data: conversations, refetch: refetchConversations } = trpc.chat.listConversations.useQuery(
+    { locale: locale as "cs" | "en" },
+    { enabled: isAuthenticated }
+  );
+
+  // Load history for current conversation
+  const { data: historyData } = trpc.chat.getHistory.useQuery(
+    { conversationId: conversationId ?? 0 },
+    { enabled: isAuthenticated && conversationId !== null && !historyLoaded }
+  );
+
+  // On mount: get or create conversation and load history
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    getOrCreateConv.mutateAsync({ locale: locale as "cs" | "en" }).then(conv => {
+      setConversationId(conv.id);
+    }).catch(() => {});
+  }, [isAuthenticated, locale]);
+
+  // When history loads, populate messages
+  useEffect(() => {
+    if (!historyData || historyLoaded) return;
+    if (historyData.length > 0) {
+      const loaded: Message[] = historyData.map(m => ({
+        id: String(m.id),
+        role: m.role as "user" | "assistant",
+        content: m.content,
+        timestamp: new Date(m.createdAt),
+      }));
+      setMessages([
+        { id: "welcome", role: "assistant", content: welcomeMessage, timestamp: new Date() },
+        ...loaded,
+      ]);
+    }
+    setHistoryLoaded(true);
+  }, [historyData, historyLoaded, welcomeMessage]);
+
+  // Switch to a different thread
+  const switchThread = useCallback(async (convId: number) => {
+    if (convId === conversationId) return;
+    setConversationId(convId);
+    setHistoryLoaded(false);
+    setMessages([{ id: "welcome", role: "assistant", content: welcomeMessage, timestamp: new Date() }]);
+    utils.chat.getHistory.invalidate({ conversationId: convId });
+  }, [conversationId, welcomeMessage, utils]);
+
+  // Start a new thread (max 3)
+  const startNewThread = useCallback(async () => {
+    if ((conversations?.length ?? 0) >= MAX_THREADS) return;
+    try {
+      const conv = await createConvMutation.mutateAsync({ locale: locale as "cs" | "en" });
+      setConversationId(conv.id);
+      setHistoryLoaded(true);
+      setMessages([{ id: "welcome", role: "assistant", content: welcomeMessage, timestamp: new Date() }]);
+      refetchConversations();
+    } catch {}
+  }, [conversations, locale, welcomeMessage, createConvMutation, refetchConversations]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -436,6 +506,17 @@ export default function AiGuide() {
       };
 
       setMessages(prev => [...prev, assistantMsg]);
+
+      // Persist to DB if authenticated
+      if (isAuthenticated && conversationId) {
+        saveMessagesMutation.mutate({
+          conversationId,
+          userMessage: question,
+          assistantMessage: result.content,
+          locale: locale as "cs" | "en",
+        });
+        refetchConversations();
+      }
     } catch {
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
@@ -532,31 +613,65 @@ export default function AiGuide() {
             {/* Right: Chat */}
             <div className="flex-1 flex flex-col min-w-0">
               {/* Header */}
-              <div className="flex items-center gap-3 py-3 border-b border-border/50 mb-4 bg-background/60 backdrop-blur-sm rounded-t-xl px-4">
-                <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                  <Bot className="w-4.5 h-4.5 text-primary" />
+              <div className="border-b border-border/50 mb-4 bg-background/60 backdrop-blur-sm rounded-t-xl">
+                <div className="flex items-center gap-3 py-3 px-4">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                    <Bot className="w-4.5 h-4.5 text-primary" />
+                  </div>
+                  <div>
+                    <h1 className="text-sm font-serif font-semibold">
+                      {isEn ? "AI Human Design Guide" : "AI průvodce Human Designem"}
+                    </h1>
+                    <p className="text-xs text-muted-foreground">
+                      {isEn ? "Ask anything about Human Design" : "Zeptejte se na cokoliv o Human Designu"}
+                    </p>
+                  </div>
+                  <Badge variant="outline" className="ml-auto text-xs border-primary/30 text-primary">
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    AI
+                  </Badge>
+                  {/* New thread button */}
+                  {isAuthenticated && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 ml-1"
+                      onClick={startNewThread}
+                      disabled={(conversations?.length ?? 0) >= MAX_THREADS}
+                      title={isEn ? `New thread (${conversations?.length ?? 0}/${MAX_THREADS})` : `Nové vlákno (${conversations?.length ?? 0}/${MAX_THREADS})`}
+                    >
+                      <MessageCirclePlus className="w-4 h-4" />
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0"
+                    onClick={() => setIsChatMinimized(v => !v)}
+                    title={isChatMinimized ? (isEn ? 'Expand chat' : 'Rozbalit chat') : (isEn ? 'Minimize chat' : 'Minimalizovat chat')}
+                  >
+                    {isChatMinimized ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
+                  </Button>
                 </div>
-                <div>
-                  <h1 className="text-sm font-serif font-semibold">
-                    {isEn ? "AI Human Design Guide" : "AI průvodce Human Designem"}
-                  </h1>
-                  <p className="text-xs text-muted-foreground">
-                    {isEn ? "Ask anything about Human Design" : "Zeptejte se na cokoliv o Human Designu"}
-                  </p>
-                </div>
-                <Badge variant="outline" className="ml-auto text-xs border-primary/30 text-primary">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  AI
-                </Badge>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 ml-1"
-                  onClick={() => setIsChatMinimized(v => !v)}
-                  title={isChatMinimized ? (isEn ? 'Expand chat' : 'Rozbalit chat') : (isEn ? 'Minimize chat' : 'Minimalizovat chat')}
-                >
-                  {isChatMinimized ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
-                </Button>
+                {/* Thread tabs — shown when more than 1 conversation */}
+                {isAuthenticated && conversations && conversations.length > 1 && (
+                  <div className="flex gap-1 px-4 pb-2 overflow-x-auto">
+                    {conversations.map((conv, idx) => (
+                      <button
+                        key={conv.id}
+                        onClick={() => switchThread(conv.id)}
+                        className={`text-[11px] px-3 py-1 rounded-full border transition-all whitespace-nowrap ${
+                          conv.id === conversationId
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'border-border/50 text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                        }`}
+                      >
+                        <MessageCircle className="w-3 h-3 inline mr-1" />
+                        {conv.title || (isEn ? `Thread ${idx + 1}` : `Vlákno ${idx + 1}`)}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Minimizable chat body */}
@@ -648,31 +763,22 @@ export default function AiGuide() {
                 </motion.div>
               )}
 
-              {/* Suggested questions */}
-              {messages.length <= 1 && (
-                <div className="mb-4">
-                  <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                    <ChevronDown className="w-3 h-3" />
-                    {isEn ? "Suggested questions" : "Navrhované otázky"}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {SUGGESTED_QUESTIONS.slice(0, 6).map((q, i) => (
-                      <Button
-                        key={i}
-                        variant="outline"
-                        size="sm"
-                        className="text-xs h-auto py-1.5 px-3 bg-background/60 backdrop-blur-sm border-border/50"
-                        onClick={() => handleSend(q)}
-                      >
-                        {q}
-                      </Button>
-                    ))}
-                  </div>
+              {/* Input + Quick prompts */}
+              <div className="border-t border-border/50 pt-3">
+                {/* Always-visible quick-prompt chips */}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {SUGGESTED_QUESTIONS.slice(0, 5).map((q, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => handleSend(q)}
+                      className="text-[11px] px-2.5 py-1 rounded-full border border-primary/25 bg-primary/5 text-primary/80 hover:bg-primary/15 hover:text-primary hover:border-primary/50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {q}
+                    </button>
+                  ))}
                 </div>
-              )}
-
-              {/* Input */}
-              <div className="border-t border-border/50 pt-4">
                 <form
                   onSubmit={e => {
                     e.preventDefault();
