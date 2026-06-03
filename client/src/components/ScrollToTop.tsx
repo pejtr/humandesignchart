@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { ArrowUp } from "lucide-react";
 
 export function ScrollToTop() {
   const [visible, setVisible] = useState(false);
+  const [location] = useLocation();
+  const isAiGuide = location.includes("/ai-guide");
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 400);
@@ -12,11 +15,14 @@ export function ScrollToTop() {
 
   const scrollUp = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
+  // On AI Guide mobile, hide to avoid overlapping the input in MobileBottomNav
+  if (isAiGuide) return null;
+
   return (
     <button
       onClick={scrollUp}
       aria-label="Scroll to top"
-      className={`fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-300 ${
+      className={`fixed bottom-[5.5rem] md:bottom-6 right-4 md:right-6 z-[55] w-10 h-10 md:w-12 md:h-12 rounded-full bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-300 ${
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
       }`}
     >

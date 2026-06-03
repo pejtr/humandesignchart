@@ -617,8 +617,8 @@ export default function Dashboard() {
                           <p className="font-semibold text-sm">{locale === 'en' ? 'Free Plan' : 'Bezplatný plán'}</p>
                           <p className="text-xs text-muted-foreground">
                             {locale === 'en'
-                              ? `${subQuery.data?.totalReadings ?? 0} / 1 free AI reading used`
-                              : `${subQuery.data?.totalReadings ?? 0} / 1 bezplatný AI výklad využit`}
+                              ? `${subQuery.data?.totalReadings ?? 0} / 5 free AI readings used`
+                              : `${subQuery.data?.totalReadings ?? 0} / 5 bezplatných AI výkladů využito`}
                           </p>
                         </div>
                       </div>

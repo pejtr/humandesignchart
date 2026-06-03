@@ -488,6 +488,17 @@ export default function AiGuide() {
     scrollToBottom();
   }, [messages]);
 
+  // Listen for messages sent from MobileBottomNav event bus
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const msg = (e as CustomEvent<{ message: string }>).detail.message;
+      if (msg) handleSend(msg);
+    };
+    window.addEventListener("ai-guide-send", handler);
+    return () => window.removeEventListener("ai-guide-send", handler);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, messages, conversationId]);
+
   const handleSend = async (text?: string) => {
     const question = text || input.trim();
     if (!question || isLoading) return;
@@ -502,6 +513,7 @@ export default function AiGuide() {
     setMessages(prev => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
+    window.dispatchEvent(new CustomEvent("ai-guide-loading", { detail: { loading: true } }));
 
     try {
       const history = messages
@@ -546,6 +558,7 @@ export default function AiGuide() {
       setMessages(prev => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
+      window.dispatchEvent(new CustomEvent("ai-guide-loading", { detail: { loading: false } }));
       inputRef.current?.focus();
     }
   };
@@ -695,8 +708,15 @@ export default function AiGuide() {
               {!isChatMinimized && <>
               {/* Messages */}
               <div
-                className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1"
-                style={{ maxHeight: "calc(100vh - 300px - env(safe-area-inset-bottom, 0px))" }}
+                className="flex-1 space-y-4 mb-4 pr-1 md:overflow-y-auto"
+                style={{ maxHeight: "var(--chat-max-h, none)" }}
+                ref={el => {
+                  // On desktop apply max-height for inner scroll; on mobile let page scroll
+                  if (el) {
+                    const isMd = window.innerWidth >= 768;
+                    el.style.setProperty('--chat-max-h', isMd ? 'calc(100vh - 300px - env(safe-area-inset-bottom, 0px))' : 'none');
+                  }
+                }}
               >
                 <AnimatePresence>
                   {messages.map(msg => (
@@ -817,49 +837,14 @@ export default function AiGuide() {
                 </form>
               </div>
 
-              {/* Mobile: spacer so messages don't hide behind fixed input */}
-              <div className="md:hidden h-28" />
+              {/* Mobile: spacer so messages don't hide behind MobileBottomNav (64px nav + ~56px input row) */}
+              <div className="md:hidden h-32" />
               </>}
             </div>
           </div>
         </div>
       </main>
 
-      {/* Mobile fixed input — sits directly above the bottom nav (bottom-16 = 64px) */}
-      <div className="md:hidden fixed bottom-16 left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-t border-border/50 px-3 py-2 safe-area-bottom"
-        style={{ boxShadow: "0 -4px 20px oklch(0.55 0.22 300 / 0.08)" }}>
-        {/* Quick chips — scrollable row */}
-        <div className="flex gap-1.5 mb-2 overflow-x-auto scrollbar-none pb-0.5">
-          {SUGGESTED_QUESTIONS.slice(0, 5).map((q, i) => (
-            <button
-              key={i}
-              type="button"
-              disabled={isLoading}
-              onClick={() => handleSend(q)}
-              className="text-[10px] px-2.5 py-1 rounded-full border border-primary/25 bg-primary/5 text-primary/80 hover:bg-primary/15 hover:text-primary hover:border-primary/50 transition-all disabled:opacity-40 whitespace-nowrap shrink-0"
-            >
-              {q}
-            </button>
-          ))}
-        </div>
-        {/* Input row */}
-        <form
-          onSubmit={e => { e.preventDefault(); handleSend(); }}
-          className="flex gap-2"
-        >
-          <Input
-            ref={inputRef}
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            placeholder={isEn ? "Ask anything about Human Design..." : "Zeptejte se na cokoliv o Human Designu..."}
-            disabled={isLoading}
-            className="flex-1 bg-background/60 backdrop-blur-sm border-border/50 h-9 text-sm"
-          />
-          <Button type="submit" disabled={!input.trim() || isLoading} size="icon" className="h-9 w-9 shrink-0">
-            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-          </Button>
-        </form>
-      </div>
     </div>
   );
 }

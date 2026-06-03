@@ -21,11 +21,11 @@ export default function PaymentCancel() {
   const reasons = isEn ? [
     { q: "Changed your mind?", a: "No problem — you can upgrade anytime from the Pricing page." },
     { q: "Had a technical issue?", a: "Try again with card 4242 4242 4242 4242 (test mode) or contact support." },
-    { q: "Not sure if it's worth it?", a: "You still have your 1 free AI reading — try it first, then decide." },
+    { q: "Not sure if it's worth it?", a: "You still have 5 free AI readings — try them first, then decide." },
   ] : [
     { q: "Rozmysleli jste si to?", a: "Žádný problém — můžete upgradovat kdykoli ze stránky Ceník." },
     { q: "Měli jste technický problém?", a: "Zkuste to znovu nebo nás kontaktujte na podpoře." },
-    { q: "Nejste si jisti hodnotou?", a: "Stále máte 1 bezplatný AI výklad — nejprve ho vyzkoušejte, pak se rozhodněte." },
+    { q: "Nejste si jisti hodnotou?", a: "Stále máte 5 bezplatných AI výkladů — nejprve je vyzkouejte, pak se rozhodněte." },
   ];
 
   return (

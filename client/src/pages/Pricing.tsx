@@ -136,12 +136,12 @@ export default function Pricing() {
   }, []);
 
   const freeFeatures = isCzech ? [
-    "1 bezplatný AI výklad",
+    "5 bezplatných AI výkladů",
     "Neomezené výpočty mapy",
     "Přístup do encyklopedie",
     "Základní bodygraph",
   ] : [
-    "1 free AI reading",
+    "5 free AI readings",
     "Unlimited chart calculations",
     "Encyclopedia access",
     "Basic bodygraph",
@@ -152,26 +152,28 @@ export default function Pricing() {
     "Stažení PDF reportu mapy",
     "Všechny nástroje (tranzity, návratové mapy, srovnání)",
     "I Ching věštírna",
-    "Databáze celebrit",
+    "Rozšířená databáze celebrit",
     "Prioritní podpora",
+    "Denní & týdenní tranzity na email (lze vypnout)",
   ] : [
     "Unlimited AI readings",
     "PDF chart report download",
     "All tools (transits, return charts, comparison)",
     "I Ching oracle",
-    "Celebrities database",
+    "Extended celebrities database",
     "Priority support",
+    "Daily & weekly transits by email (can be disabled)",
   ];
 
   const faqItems = isCzech ? [
     { q: "Mohu zrušit kdykoli?", a: "Ano, předplatné můžete zrušit kdykoli. Přístup si zachováte do konce fakturačního období." },
     { q: "Jaké platební metody jsou přijímány?", a: "Přijímáme všechny hlavní kreditní a debetní karty přes Stripe. Vaše platba je bezpečná a šifrovaná." },
-    { q: "Je k dispozici zkušební verze?", a: "Ano — každý nový uživatel dostane 1 bezplatný AI výklad, aby si mohl vyzkoušet kvalitu před upgradem." },
+    { q: "Je k dispozici zkušební verze?", a: "Ano — každý nový uživatel dostane 5 bezplatných AI výkladů, aby si mohl vyzkoušet kvalitu před upgradem." },
     { q: "Jak fungují dárkové poukazy?", a: "Po nákupu obdržíte unikátní kód poukazu e-mailem. Příjemce zadá kód na našem webu a aktivuje si Premium přístup." },
   ] : [
     { q: "Can I cancel anytime?", a: "Yes, you can cancel your subscription at any time. You will retain access until the end of the billing period." },
     { q: "What payment methods are accepted?", a: "We accept all major credit and debit cards via Stripe. Your payment is secure and encrypted." },
-    { q: "Is there a free trial?", a: "Yes — every new user gets 1 free AI reading to experience the quality before upgrading." },
+    { q: "Is there a free trial?", a: "Yes — every new user gets 5 free AI readings to experience the quality before upgrading." },
     { q: "How do gift vouchers work?", a: "After purchase, you receive a unique voucher code by email. The recipient enters the code on our site to activate their Premium access." },
   ];
 
