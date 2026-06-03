@@ -229,6 +229,21 @@ export default function Pricing() {
       </div>
 
       <div className="container max-w-5xl pb-20">
+        {/* Payment gateway integration notice */}
+        <div className="mb-8 flex items-center gap-3 rounded-xl border border-amber-400/40 bg-amber-50/80 dark:bg-amber-950/30 dark:border-amber-500/30 px-5 py-3.5 text-sm text-amber-800 dark:text-amber-300 shadow-sm">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-400/20 text-amber-600 dark:text-amber-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </span>
+          <span>
+            <strong className="font-semibold">
+              {isCzech ? "Probíhá integrace platební brány" : "Payment gateway integration in progress"}
+            </strong>
+            {" — "}
+            {isCzech
+              ? "Platby budou brzy plně aktivní. Děkujeme za trpělivost."
+              : "Payments will be fully active soon. Thank you for your patience."}
+          </span>
+        </div>
         <Tabs defaultValue="plans" className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-10 max-w-md mx-auto">
             <TabsTrigger value="plans">

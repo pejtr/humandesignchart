@@ -28,15 +28,16 @@ interface SidebarItem {
   labelEn: string;
   icon: React.ElementType;
   group?: string;
+  badge?: boolean; // show notification dot
 }
 
 const SIDEBAR_ITEMS: SidebarItem[] = [
   // Core
   { href: "/dashboard",        labelCs: "Dashboard",          labelEn: "Dashboard",       icon: LayoutDashboard, group: "core" },
   { href: "/calculate",        labelCs: "Tvoje mapa",          labelEn: "Your Chart",      icon: Orbit,           group: "core" },
-  { href: "/ai-guide",         labelCs: "HD Guru",             labelEn: "HD Guru",         icon: Eye,             group: "core" },
+  { href: "/ai-guide",         labelCs: "HD Guru",             labelEn: "HD Guru",         icon: Eye,             group: "core",  badge: true },
   // Transits & Time
-  { href: "/daily-transit",    labelCs: "Denní tranzit",       labelEn: "Daily Transit",   icon: Sun,             group: "time" },
+  { href: "/daily-transit",    labelCs: "Denní tranzit",       labelEn: "Daily Transit",   icon: Sun,             group: "time",  badge: true },
   { href: "/transits",         labelCs: "Tranzity",            labelEn: "Transits",        icon: Star,            group: "time" },
   { href: "/transit-calendar", labelCs: "Tranzitní kalendář",  labelEn: "Transit Calendar",icon: Calendar,        group: "time" },
   { href: "/return-chart",     labelCs: "Return charty",       labelEn: "Return Charts",   icon: RotateCcw,       group: "time" },
@@ -110,7 +111,7 @@ export function AuthSidebar() {
                 <TooltipTrigger asChild>
                   <Link
                     href={localePath(item.href)}
-                    className="flex items-center justify-center w-full h-9 rounded-lg transition-all duration-150 no-underline group"
+                    className="relative flex items-center justify-center w-full h-9 rounded-lg transition-all duration-150 no-underline group"
                     style={
                       active
                         ? {
@@ -122,22 +123,33 @@ export function AuthSidebar() {
                           }
                     }
                   >
-                    <Icon
-                      className="transition-transform duration-150 group-hover:scale-110"
-                      style={{
-                        width: "18px",
-                        height: "18px",
-                        opacity: active ? 1 : 0.65,
-                        color: active ? "var(--sidebar-primary)" : "inherit",
-                      }}
-                    />
-                    {/* Active indicator dot */}
-                    {active && (
-                      <span
-                        className="absolute left-0 w-0.5 h-5 rounded-r-full"
-                        style={{ background: "var(--sidebar-primary)" }}
-                      />
-                    )}
+              <Icon
+                  className="transition-transform duration-150 group-hover:scale-110"
+                  style={{
+                    width: "18px",
+                    height: "18px",
+                    opacity: active ? 1 : 0.65,
+                    color: active ? "var(--sidebar-primary)" : "inherit",
+                  }}
+                />
+                {/* Notification badge dot */}
+                {item.badge && (
+                  <span
+                    className="absolute top-1 right-1 w-2 h-2 rounded-full border-2"
+                    style={{
+                      background: "oklch(0.72 0.22 25)",
+                      borderColor: "var(--sidebar)",
+                      animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite",
+                    }}
+                  />
+                )}
+                {/* Active indicator dot */}
+                {active && (
+                  <span
+                    className="absolute left-0 w-0.5 h-5 rounded-r-full"
+                    style={{ background: "var(--sidebar-primary)" }}
+                  />
+                )}
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent side="right" sideOffset={8}>
