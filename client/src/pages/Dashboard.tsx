@@ -783,11 +783,11 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
                 </CardHeader>
                 <CardContent className="pt-0">
                   <div className="flex flex-wrap gap-1.5">
-                    {transit.reinforcedGates.map((g, i) => (
-                            <Badge variant="outline" className="font-mono text-xs border-amber-300 text-amber-700">
-                        {PLANET_SYMBOLS[g.planet]} {locale === 'en' ? 'Gate' : 'Brána'} {g.gate}
-                      </Badge>
-                    ))}
+                  {transit.reinforcedGates.map((g, i) => (
+                    <Badge key={i} variant="outline" className="font-mono text-xs border-amber-300 text-amber-700">
+                      {PLANET_SYMBOLS[g.planet]} {locale === 'en' ? 'Gate' : 'Brána'} {g.gate}
+                    </Badge>
+                  ))}
                   </div>
                 </CardContent>
               </Card>

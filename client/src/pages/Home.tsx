@@ -390,7 +390,6 @@ export default function Home() {
           backgroundImage: 'url(https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/WUcqCUXbXPPoyTKt.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
           backgroundColor: '#f5f0f8',
         }}
       >

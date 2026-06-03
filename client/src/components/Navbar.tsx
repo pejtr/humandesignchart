@@ -9,8 +9,9 @@ import {
   Hexagon, Sun, Moon, Monitor, Target, CreditCard, Zap, Share2,
   Orbit, Flame, Eye, Layers, Crown, Gem, BarChart3,
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+const DailyEnergyBar = lazy(() => import("@/components/DailyEnergyBar"));
 import { useTheme } from "@/contexts/ThemeContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { trpc } from "@/lib/trpc";
@@ -356,6 +357,11 @@ export default function Navbar() {
           </div>
         </nav>
       </header>
+
+      {/* Daily energy sub-bar */}
+      <Suspense fallback={null}>
+        <DailyEnergyBar />
+      </Suspense>
 
       {/* Full-screen mobile overlay */}
       {mobileOpen && (

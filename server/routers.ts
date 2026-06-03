@@ -1278,7 +1278,7 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
       if (activeConversions >= 21) tier = "gold";
       else if (activeConversions >= 6) tier = "silver";
 
-      const commissionRate = tier === "gold" ? 0.25 : tier === "silver" ? 0.22 : 0.20;
+      const commissionRate = tier === "gold" ? 0.60 : tier === "silver" ? 0.50 : 0.40;
 
       return {
         isAffiliate: user[0].isAffiliate,
