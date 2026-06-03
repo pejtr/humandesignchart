@@ -470,14 +470,42 @@ Tvůj komunikační styl jako HD Guru:
 10. Odpovídej soustředěně a silně (max 350 slov, pokud není skutečně potřeba větší hloubka)
 11. Nikdy nezlehčuj — každý design je dokonalý takový, jaký je
 12. Delší odpovědi ukonči jediným praktickým vhledem nebo reflexní otázkou`;
-        // Inject today's date so HD Guru can answer transit questions accurately
+        // Inject live transit data from ephemeris so HD Guru can answer transit questions with real data
         const todayUtc = new Date();
         const todayStr = todayUtc.toLocaleDateString(isEn ? 'en-US' : 'cs-CZ', {
           weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Europe/Prague'
         });
-        const transitNote = isEn
-          ? `\n\n--- TODAY'S DATE ---\nToday is ${todayStr}. When asked about daily transits, you know the current date. For precise active gates and channels in today's transit, direct the user to the Transits page (/en/transits) which shows real-time planetary positions. You can explain what transits mean and how to work with them based on the user's design.`
-          : `\n\n--- DNEŠNÍ DATUM ---\nDnes je ${todayStr}. Když se tě někdo ptá na denní tranzit, znáš aktuální datum. Pro přesné aktivní brány a dráhy v dnešním tranzitu odkaz uživatele na stránku Denní tranzity (/cs/transits), kde jsou zobrazeny aktuální planetární pozice v reálném čase. Vysvětli, co tranzity znamenají a jak s nimi pracovat na základě designu uživatele.`;
+        let transitNote = '';
+        try {
+          const { calculatePlanetaryPositions, dateToJD } = await import('./humandesign/ephemeris');
+          const { GATE_WHEEL, PLANET_NAMES } = await import('./humandesign/constants');
+          const jd = dateToJD(todayUtc);
+          const positions = calculatePlanetaryPositions(jd);
+          const transitLines: string[] = [];
+          for (const planet of PLANET_NAMES) {
+            const lon = positions[planet];
+            const normLon = ((lon % 360) + 360) % 360;
+            let gateIndex = 0;
+            for (let i = GATE_WHEEL.length - 1; i >= 0; i--) {
+              if (normLon >= GATE_WHEEL[i][0]) { gateIndex = i; break; }
+            }
+            const gate = GATE_WHEEL[gateIndex][1];
+            const offset = normLon - GATE_WHEEL[gateIndex][0];
+            const line = Math.max(1, Math.min(Math.floor(offset / 0.9375) + 1, 6));
+            transitLines.push(`${planet}: Brána ${gate}.${line}`);
+          }
+          const transitDataStr = transitLines.join(' | ');
+          const transitPageLink = isEn
+            ? '[Transits page](/en/transits)'
+            : '[stránku Denní tranzity](/cs/transits)';
+          transitNote = isEn
+            ? `\n\n--- TODAY'S LIVE TRANSIT DATA (real-time ephemeris) ---\nToday is ${todayStr}.\nCurrent planetary gates: ${transitDataStr}\n\nWhen asked about daily transits, use this data directly in your answer. Explain which gates are active, what energies they bring, and how they interact with the user's natal chart. You can also link to the ${transitPageLink} for the full visual bodygraph overlay.`
+            : `\n\n--- DNEŠNÍ ŽIVÁ TRANZITNÍ DATA (reálný čas z efemerid) ---\nDnes je ${todayStr}.\nAktuální planetární brány: ${transitDataStr}\n\nKdyž se tě někdo ptá na denní tranzit, použij tato data přímo ve své odpovědi. Vysvětli, které brány jsou aktivní, jaké energie přinášejí a jak interagují s natálním grafem uživatele. Odkázat je také můžeš na ${transitPageLink} pro plné vizuální zobrazení v bodygraphu.`;
+        } catch {
+          transitNote = isEn
+            ? `\n\n--- TODAY'S DATE ---\nToday is ${todayStr}. Transit data temporarily unavailable.`
+            : `\n\n--- DNEŠNÍ DATUM ---\nDnes je ${todayStr}. Tranzitní data dočasně nedostupná.`;
+        }
         const systemPrompt = systemPromptBase + userChartContext + transitNote;
 
         const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [

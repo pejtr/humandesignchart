@@ -98,7 +98,7 @@ export default function Navbar() {
 
   // Primary nav links — keep short to avoid overflow
   const primaryLinks = [
-    { href: "/calculate", label: locale === "cs" ? "Tvoje mapa" : "Your Chart", icon: Orbit },
+    { href: "/calculate", label: locale === "cs" ? "Generovat mapu" : "Generate Chart", icon: Orbit },
     { href: "/blog", label: "Blog", icon: BookOpen },
     { href: "/ai-guide", label: locale === "cs" ? "AI Průvodce" : "AI Guide", icon: Eye },
   ];

@@ -35,7 +35,7 @@ interface SidebarItem {
 const SIDEBAR_ITEMS: SidebarItem[] = [
   // Core
   { href: "/dashboard",        labelCs: "Dashboard",          labelEn: "Dashboard",       icon: LayoutDashboard, group: "core" },
-  { href: "/calculate",        labelCs: "Tvoje mapa",          labelEn: "Your Chart",      icon: Orbit,           group: "core" },
+  { href: "/calculate",        labelCs: "Generovat mapu",      labelEn: "Generate Chart", icon: Orbit,           group: "core" },
   { href: "/ai-guide",         labelCs: "HD Guru",             labelEn: "HD Guru",         icon: Eye,             group: "core",  badge: true },
   { href: "/blog",             labelCs: "Blog",                labelEn: "Blog",            icon: BookOpen,        group: "core" },
   // Transits & Time
