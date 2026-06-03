@@ -1,12 +1,14 @@
 import { Link } from "wouter";
 import { Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function Footer() {
   const { t, locale, localePath } = useLanguage();
+  const { isAuthenticated } = useAuth();
 
   return (
-    <footer className="footer-mystical bg-background/50 backdrop-blur-sm relative">
+    <footer className={`footer-mystical bg-background/50 backdrop-blur-sm relative${isAuthenticated ? " lg:pl-14" : ""}`}>
       {/* Mystical sacred geometry decoration */}
       <div className="absolute inset-0 bg-sacred-geometry pointer-events-none opacity-50" />
       <div className="container py-12 relative z-10">

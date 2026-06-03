@@ -413,7 +413,7 @@ export const appRouter = router({
           // Non-blocking — if chart load fails, continue without context
         }
 
-        const systemPrompt = (isEn
+        const systemPromptBase = isEn
           ? `You are HD Guru — a wise, warm, and deeply knowledgeable guide in the Human Design system. You embody the spirit of Ra Uru Hu's teachings: direct, precise, yet compassionate. You speak with quiet authority, like a mentor who has walked the path and now illuminates it for others.
 
 Your knowledge spans:
@@ -469,7 +469,8 @@ Tvůj komunikační styl jako HD Guru:
 9. Občas použij metafory z přírody, kosmu nebo posvátné geometrie — HD je živý systém
 10. Odpovídej soustředěně a silně (max 350 slov, pokud není skutečně potřeba větší hloubka)
 11. Nikdy nezlehčuj — každý design je dokonalý takový, jaký je
-12. Delší odpovědi ukonči jediným praktickým vhledem nebo reflexní otázkou`) + userChartContext;
+12. Delší odpovědi ukonči jediným praktickým vhledem nebo reflexní otázkou`;
+        const systemPrompt = systemPromptBase + userChartContext;
 
         const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
           { role: "system" as const, content: systemPrompt },

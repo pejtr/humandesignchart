@@ -882,3 +882,21 @@
 - [x] Skupinové oddělovače (core / time / analysis / explore / tools)
 - [x] Aktivní indikátor (levá linka + accent barva)
 - [x] HD Guru jako název AI průvodce v sidebaru
+
+## HD Guru — Přepínač profilu v chatu (2026-06-03)
+- [ ] Přidat dropdown selector profilu nad chat input v AiGuide — zobrazí všechny charty z Moje mapa
+- [ ] Předat vybrané chartId do askGuide mutace
+- [ ] Upravit askGuide na serveru — pokud je předáno chartId, načíst ten konkrétní chart místo primárního
+- [ ] Vizuálně zobrazit aktuálně vybraný profil (jméno + typ) v hlavičce chatu
+
+## HD Guru — Persistentní historie chatu (2026-06-03)
+- [ ] DB schema — tabulka chat_conversations (id, userId, chartId, locale, createdAt, updatedAt)
+- [ ] DB schema — tabulka chat_messages (id, conversationId, role, content, createdAt)
+- [ ] DB migrace — pnpm db:push
+- [ ] server/db.chat.ts — helpers: getOrCreateConversation, getChatMessages, saveChatMessage, clearConversation
+- [ ] server/routers.ts — tRPC procedury: chat.getHistory, chat.saveMessage, chat.clearHistory
+- [ ] AiGuide.tsx — načíst historii z DB při mount (useEffect)
+- [ ] AiGuide.tsx — uložit každou zprávu do DB po odeslání/přijetí
+- [ ] AiGuide.tsx — tlačítko "Vymazat historii" v hlavičce chatu
+- [ ] AiGuide.tsx — přepínač profilu (dropdown všech chartů z Moje mapa)
+- [ ] Vitest testy pro chat DB helpers

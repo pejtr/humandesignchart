@@ -29,6 +29,7 @@ interface SidebarItem {
   icon: React.ElementType;
   group?: string;
   badge?: boolean; // show notification dot
+  adminOnly?: boolean; // only visible to admins
 }
 
 const SIDEBAR_ITEMS: SidebarItem[] = [
@@ -51,7 +52,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   { href: "/celebrities",      labelCs: "Celebrity",           labelEn: "Celebrities",     icon: Users,           group: "explore" },
   { href: "/blog",             labelCs: "Blog",                labelEn: "Blog",            icon: BookOpen,        group: "explore" },
   // Tools
-  { href: "/social-scheduler", labelCs: "Plánovač sítí",       labelEn: "Social Scheduler",icon: Share2,          group: "tools" },
+  { href: "/social-scheduler", labelCs: "Plánovač sítí",       labelEn: "Social Scheduler",icon: Share2,          group: "tools",  adminOnly: true },
 ];
 
 const GROUP_DIVIDERS: Record<string, boolean> = {
@@ -62,11 +63,13 @@ const GROUP_DIVIDERS: Record<string, boolean> = {
 };
 
 export function AuthSidebar() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [location] = useLocation();
   const { locale } = useLanguage();
 
   if (!isAuthenticated) return null;
+
+  const isAdmin = (user as any)?.role === "admin";
 
   const localePath = (path: string) => `/${locale}${path}`;
 
@@ -89,7 +92,7 @@ export function AuthSidebar() {
       }}
     >
             <div className="flex flex-col items-center gap-0.5 w-full px-1.5 flex-1 overflow-y-auto scrollbar-none">
-        {SIDEBAR_ITEMS.map((item) => {
+        {SIDEBAR_ITEMS.filter(item => !item.adminOnly || isAdmin).map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
           const label = locale === "cs" ? item.labelCs : item.labelEn;
