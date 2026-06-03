@@ -128,7 +128,7 @@ export default function Navbar() {
           ? "bg-background/95 backdrop-blur-xl shadow-sm shadow-black/5"
           : "bg-background/85 backdrop-blur-md border-b border-border/20"
       }`}>
-        <nav className="container flex items-center justify-between h-16 gap-2">
+        <nav className="w-full flex items-center justify-between h-16 gap-2 px-4 lg:px-6">
           {/* Logo — custom HD bodygraph symbol */}
           <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline shrink-0 group">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
