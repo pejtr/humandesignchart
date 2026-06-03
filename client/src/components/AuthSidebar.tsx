@@ -79,22 +79,16 @@ export function AuthSidebar() {
 
   return (
     <aside
-      className="hidden lg:flex fixed left-0 top-0 h-full z-40 flex-col items-center py-3 gap-1"
+      className="hidden lg:flex fixed left-0 top-16 z-40 flex-col items-center py-3 gap-1"
       style={{
+        height: "calc(100vh - 4rem)",
         width: "56px",
         background: "var(--sidebar)",
         borderRight: "1px solid var(--sidebar-border)",
         boxShadow: "2px 0 12px 0 oklch(0.55 0.22 300 / 0.06)",
       }}
     >
-      {/* Logo dot */}
-      <Link href={localePath("/")} className="mb-2 mt-1 flex items-center justify-center w-9 h-9 rounded-xl no-underline"
-        style={{ background: "var(--primary)", boxShadow: "0 2px 8px oklch(0.55 0.22 300 / 0.35)" }}
-      >
-        <span className="text-white font-bold text-sm select-none">HD</span>
-      </Link>
-
-      <div className="flex flex-col items-center gap-0.5 w-full px-1.5 flex-1 overflow-y-auto scrollbar-none">
+            <div className="flex flex-col items-center gap-0.5 w-full px-1.5 flex-1 overflow-y-auto scrollbar-none">
         {SIDEBAR_ITEMS.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
