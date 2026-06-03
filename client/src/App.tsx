@@ -16,6 +16,8 @@ import PageTransition from "./components/PageTransition";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
 import { MobileBottomNav } from "./components/MobileBottomNav";
+import { AuthSidebar } from "./components/AuthSidebar";
+import { useAuth } from "./_core/hooks/useAuth";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
 const ChartResult = lazy(() => import("./pages/ChartResult"));
@@ -86,7 +88,9 @@ function LegacyRedirect({ path }: { path: string }) {
 
 /** All app routes, rendered inside a locale prefix */
 function LocaleRoutes() {
+  const { isAuthenticated } = useAuth();
   return (
+    <div className={isAuthenticated ? "lg:pl-14" : ""}>
     <PageTransition>
     <Suspense fallback={<PageLoader />}>
       <Switch>
@@ -170,6 +174,7 @@ function LocaleRoutes() {
       </Switch>
     </Suspense>
     </PageTransition>
+    </div>
   );
 }
 
@@ -192,6 +197,7 @@ function App() {
             <ExitIntentPopup />
             <ScrollToTop />
             <CookieConsent />
+            <AuthSidebar />
             <MobileBottomNav />
             <LocaleRoutes />
           </LanguageProvider>

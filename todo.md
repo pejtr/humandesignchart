@@ -874,3 +874,11 @@
 - [x] Opravit fire-and-forget test v leados.test.ts
 - [x] 25 nových testů pro promptSanitizer — všechny prošly
 - [x] Celkem 202 testů — všechny prošly
+
+## AuthSidebar — postranní navigace pro přihlášené
+- [x] Vytvořit AuthSidebar komponentu (56px, ikony + tooltip, zachovává stávající design)
+- [x] Integrovat do App.tsx — zobrazuje se pouze přihlášeným uživatelům na lg+ obrazovkách
+- [x] Přidat lg:pl-14 offset na obsah stránky pro přihlášené uživatele
+- [x] Skupinové oddělovače (core / time / analysis / explore / tools)
+- [x] Aktivní indikátor (levá linka + accent barva)
+- [x] HD Guru jako název AI průvodce v sidebaru
