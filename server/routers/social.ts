@@ -420,7 +420,7 @@ export const socialRouter = router({
   generateCaption: protectedProcedure
     .input(z.object({
       postType: z.enum(["hd_type", "quote", "infographic", "transit", "iching", "promo", "custom"]),
-      topic: z.string(),
+      topic: z.string().max(500),
       locale: z.enum(["cs", "en"]).default("cs"),
       tone: z.enum(["inspirational", "educational", "playful", "mystical"]).default("inspirational"),
     }))
@@ -442,7 +442,7 @@ export const socialRouter = router({
   generatePostImage: protectedProcedure
     .input(z.object({
       postType: z.enum(["hd_type", "quote", "infographic", "transit", "iching", "promo", "custom"]),
-      topic: z.string(),
+      topic: z.string().max(500),
       style: z.enum(["dark_cosmic", "light_minimal", "golden_mystical"]).default("dark_cosmic"),
       locale: z.enum(["cs", "en"]).default("cs"),
     }))

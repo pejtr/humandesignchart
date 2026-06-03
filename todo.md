@@ -857,3 +857,20 @@
 
 ## AiGuide — Navrhované otázky
 - [x] Přidat "Jaký je můj denní tranzit?" jako první navrhovanou otázku v sekci Navrhované otázky (CS + EN: "What is my daily transit today?")
+
+## Bezpečnost — Prompt Injection Prevention (2026-06-03)
+- [ ] Vytvořit server/security/promptSanitizer.ts — sanitizační helper (strip injection patterns, max length)
+- [ ] Vytvořit in-memory rate limiter (max 30 LLM volání / hodinu / uživatel)
+- [ ] Přidat max() limity na všechny LLM vstupy v routers.ts (question max 1000, topic max 500, history max 20 zpráv × 2000 znaků)
+- [ ] Přidat max() limity v social.ts (topic max 500, caption max 1000)
+- [ ] Napsat vitest testy pro sanitizační helper a rate limiter
+
+## Bezpečnost — Prompt Injection Prevention
+- [x] Vytvořit `server/security/promptSanitizer.ts` — sanitizační helper + rate limiter
+- [x] Přidat max() limity na Zod vstupy v `askGuide` (question max 1000, history msg max 2000, history max 20)
+- [x] Přidat rate limiting na `askGuide` (max 30 volání/hodinu/uživatel)
+- [x] Sanitizovat question a history před vložením do LLM promptu
+- [x] Přidat max(500) na topic v social.ts generateCaption a generatePostImage
+- [x] Opravit fire-and-forget test v leados.test.ts
+- [x] 25 nových testů pro promptSanitizer — všechny prošly
+- [x] Celkem 202 testů — všechny prošly

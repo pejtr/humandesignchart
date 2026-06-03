@@ -209,37 +209,47 @@ export interface LeadOSEventPayload {
 
 /**
  * Fire-and-forget event to LeadOS.
- * Sends a POST to /events endpoint — errors are logged but never thrown
- * so they cannot break the main request flow.
+ * NEVER awaited, NEVER throws — 3 s hard timeout so it cannot block any request.
+ * The main application flow is completely independent of LeadOS availability.
  */
-export async function sendLeadOSEvent(payload: LeadOSEventPayload): Promise<void> {
-  try {
-    const apiKey = getApiKey();
-    if (!apiKey) return;
+export function sendLeadOSEvent(payload: LeadOSEventPayload): void {
+  const apiKey = getApiKey();
+  if (!apiKey) return; // LeadOS not configured — silently skip
 
-    const url = `${LEADOS_BASE_URL}/events`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...payload,
-        timestamp: new Date().toISOString(),
-        source: "humandesignmapa.cz",
-      }),
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 3_000);
+
+  fetch(`${LEADOS_BASE_URL}/events`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ...payload,
+      timestamp: new Date().toISOString(),
+      source: "humandesignmapa.cz",
+    }),
+    signal: controller.signal,
+  })
+    .then(res => {
+      clearTimeout(timeout);
+      if (!res.ok) {
+        res.text().catch(() => "").then(text =>
+          console.warn(`[LeadOS] Event '${payload.event}' failed ${res.status}: ${text}`)
+        );
+      } else {
+        console.log(`[LeadOS] Event '${payload.event}' queued for userId=${payload.data.userId}`);
+      }
+    })
+    .catch(err => {
+      clearTimeout(timeout);
+      if (err?.name === "AbortError") {
+        console.warn(`[LeadOS] Event '${payload.event}' timed out after 3 s — skipped`);
+      } else {
+        console.warn(`[LeadOS] Event '${payload.event}' unreachable (non-blocking):`, err?.message ?? String(err));
+      }
     });
-
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      console.warn(`[LeadOS] Event '${payload.event}' failed ${res.status}: ${text}`);
-    } else {
-      console.log(`[LeadOS] Event '${payload.event}' sent for userId=${payload.data.userId}`);
-    }
-  } catch (err) {
-    console.error(`[LeadOS] sendLeadOSEvent error:`, err);
-  }
 }
 
 // ─── Sync user to LeadOS as lead ──────────────────────────────────────────────

@@ -118,12 +118,13 @@ describe("sendLeadOSEvent", () => {
 
     // Import dynamically to test with empty key
     const { sendLeadOSEvent } = await import("./leados");
-    await expect(
+    // sendLeadOSEvent is fire-and-forget (returns void synchronously), so just ensure no sync throw
+    expect(() =>
       sendLeadOSEvent({
         event: "new_user",
         data: { userId: 1, email: "test@test.com" },
       })
-    ).resolves.not.toThrow();
+    ).not.toThrow();
 
     process.env.LEADOS_API_KEY = originalKey;
   });

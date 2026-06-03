@@ -33,6 +33,13 @@ import { ENV } from "./_core/env";
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../shared/blogArticles";
 import { BLOG_ARTICLES_EN } from "../shared/blogArticlesEn";
 import { sendLeadOSEvent } from "./leados";
+import {
+  sanitizeInput,
+  sanitizeHistory,
+  checkRateLimit,
+  MAX_QUESTION_LENGTH,
+  MAX_TOPIC_LENGTH,
+} from "./security/promptSanitizer";
 
 // ─── Notifications Router ────────────────────────────────────────────────────
 const notificationsRouter = router({
@@ -363,14 +370,26 @@ export const appRouter = router({
     // AI Chat Guide - conversational HD assistant
      askGuide: protectedProcedure
       .input(z.object({
-        question: z.string().min(1),
+        question: z.string().min(1).max(MAX_QUESTION_LENGTH),
         history: z.array(z.object({
           role: z.enum(["user", "assistant"]),
-          content: z.string(),
-        })).optional(),
+          content: z.string().max(2_000),
+        })).max(20).optional(),
         locale: z.string().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
+        // Rate limiting — max 30 LLM calls per user per hour
+        const rateCheck = checkRateLimit(ctx.user.id);
+        if (!rateCheck.allowed) {
+          const minutes = Math.ceil((rateCheck.retryAfterMs ?? 3_600_000) / 60_000);
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `Příliš mnoho dotazů. Zkuste to za ${minutes} minut. / Too many requests. Try again in ${minutes} minutes.`,
+          });
+        }
+        // Sanitize inputs against prompt injection
+        const safeQuestion = sanitizeInput(input.question, MAX_QUESTION_LENGTH);
+        const safeHistory = sanitizeHistory(input.history);
         const isEn = input.locale === 'en';
         const systemPrompt = isEn
           ? `You are an expert guide in the Human Design system. You have deep knowledge of:
@@ -418,14 +437,12 @@ Pravidla:
           { role: "system" as const, content: systemPrompt },
         ];
 
-        // Add conversation history
-        if (input.history) {
-          for (const msg of input.history) {
-            messages.push({ role: msg.role as "user" | "assistant", content: msg.content });
-          }
+        // Add sanitized conversation history
+        for (const msg of safeHistory) {
+          messages.push({ role: msg.role as "user" | "assistant", content: msg.content });
         }
 
-        messages.push({ role: "user" as const, content: input.question });
+        messages.push({ role: "user" as const, content: safeQuestion });
 
         const response = await invokeLLM({ messages });
         const rawContent = response.choices?.[0]?.message?.content;
