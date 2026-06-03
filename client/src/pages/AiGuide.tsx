@@ -592,7 +592,7 @@ export default function AiGuide() {
       <AmbientOrbs />
       <Navbar />
 
-      <main className="flex-1 pt-20 pb-20 md:pb-4 flex flex-col relative z-10">
+      <main className="flex-1 pt-2 md:pt-6 pb-20 md:pb-4 flex flex-col relative z-10">
         <div className="container max-w-6xl flex-1 flex flex-col">
           {/* Layout: profile panel left + chat right */}
           <div className="flex-1 flex gap-6 py-4">
@@ -780,8 +780,8 @@ export default function AiGuide() {
                 </motion.div>
               )}
 
-              {/* Input + Quick prompts */}
-              <div className="border-t border-border/50 pt-3">
+              {/* Input + Quick prompts — desktop: inline, mobile: fixed above bottom nav */}
+              <div className="hidden md:block border-t border-border/50 pt-3">
                 {/* Always-visible quick-prompt chips */}
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {SUGGESTED_QUESTIONS.slice(0, 5).map((q, i) => (
@@ -816,11 +816,50 @@ export default function AiGuide() {
                   </Button>
                 </form>
               </div>
+
+              {/* Mobile: spacer so messages don't hide behind fixed input */}
+              <div className="md:hidden h-28" />
               </>}
             </div>
           </div>
         </div>
       </main>
+
+      {/* Mobile fixed input — sits directly above the bottom nav (bottom-16 = 64px) */}
+      <div className="md:hidden fixed bottom-16 left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-t border-border/50 px-3 py-2 safe-area-bottom"
+        style={{ boxShadow: "0 -4px 20px oklch(0.55 0.22 300 / 0.08)" }}>
+        {/* Quick chips — scrollable row */}
+        <div className="flex gap-1.5 mb-2 overflow-x-auto scrollbar-none pb-0.5">
+          {SUGGESTED_QUESTIONS.slice(0, 5).map((q, i) => (
+            <button
+              key={i}
+              type="button"
+              disabled={isLoading}
+              onClick={() => handleSend(q)}
+              className="text-[10px] px-2.5 py-1 rounded-full border border-primary/25 bg-primary/5 text-primary/80 hover:bg-primary/15 hover:text-primary hover:border-primary/50 transition-all disabled:opacity-40 whitespace-nowrap shrink-0"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+        {/* Input row */}
+        <form
+          onSubmit={e => { e.preventDefault(); handleSend(); }}
+          className="flex gap-2"
+        >
+          <Input
+            ref={inputRef}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            placeholder={isEn ? "Ask anything about Human Design..." : "Zeptejte se na cokoliv o Human Designu..."}
+            disabled={isLoading}
+            className="flex-1 bg-background/60 backdrop-blur-sm border-border/50 h-9 text-sm"
+          />
+          <Button type="submit" disabled={!input.trim() || isLoading} size="icon" className="h-9 w-9 shrink-0">
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
