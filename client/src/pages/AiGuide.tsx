@@ -224,6 +224,22 @@ function ProfilePanel({ locale }: { locale: string }) {
           {isEn ? "View full chart" : "Zobrazit celou mapu"}
         </Button>
       </Link>
+
+      {/* Transit quick links */}
+      <div className="grid grid-cols-2 gap-1.5 pt-1">
+        <Link href={`/${locale}/daily-transit`}>
+          <Button size="sm" variant="outline" className="w-full text-[11px] gap-1 border-amber-400/40 text-amber-600 hover:bg-amber-50/10 hover:border-amber-400/70 dark:text-amber-400">
+            <Sun className="w-3 h-3" />
+            {isEn ? "Daily" : "Denní"}
+          </Button>
+        </Link>
+        <Link href={`/${locale}/transit-calendar`}>
+          <Button size="sm" variant="outline" className="w-full text-[11px] gap-1 border-indigo-400/40 text-indigo-600 hover:bg-indigo-50/10 hover:border-indigo-400/70 dark:text-indigo-400">
+            <Moon className="w-3 h-3" />
+            {isEn ? "Weekly" : "Týdenní"}
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }
