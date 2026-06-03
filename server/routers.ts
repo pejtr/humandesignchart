@@ -394,15 +394,22 @@ export const appRouter = router({
 
         // Load user's primary chart from DB for personalized context
         let userChartContext = "";
+        let natalGateSet: Set<number> = new Set();
+        let natalChannelList: Array<{gate1: number; gate2: number}> = [];
+        let primaryChartData: any = null;
         try {
           const userCharts = await getUserCharts(ctx.user.id);
           // Prefer "self" category chart, otherwise use most recent
           const primaryChart = userCharts.find(c => c.category === "self") ?? userCharts[0];
           if (primaryChart?.chartData) {
             const cd = primaryChart.chartData as any;
+            primaryChartData = cd;
             const definedCenters = (cd.centers ?? []).filter((c: any) => c.defined).map((c: any) => c.name).join(", ");
-            const channels = (cd.channels ?? []).map((c: any) => `${c.gate1}-${c.gate2}`).join(", ");
-            const gates = (cd.activatedGates ?? []).join(", ");
+            natalChannelList = (cd.channels ?? []).map((c: any) => ({ gate1: Number(c.gate1), gate2: Number(c.gate2) }));
+            const channels = natalChannelList.map(c => `${c.gate1}-${c.gate2}`).join(", ");
+            const gateArray: number[] = (cd.activatedGates ?? []).map(Number);
+            natalGateSet = new Set(gateArray);
+            const gates = gateArray.join(", ");
             if (isEn) {
               userChartContext = `\n\n--- USER'S HUMAN DESIGN CHART ---\nName: ${primaryChart.name || ctx.user.name}\nType: ${cd.type}\nProfile: ${cd.profile}${cd.profileName ? ` (${cd.profileName})` : ""}\nAuthority: ${cd.authority}\nDefinition: ${cd.definition}\nStrategy: ${cd.strategy}\nIncarnation Cross: ${cd.incarnationCross?.name ?? "unknown"}\nDefined Centers: ${definedCenters || "none"}\nChannels: ${channels || "none"}\nActivated Gates: ${gates || "none"}\nBirth: ${primaryChart.birthDate} ${primaryChart.birthTime} — ${primaryChart.birthPlace}\n\nYou KNOW this person's design. ALWAYS use these details when answering. Never ask them for their birth data or design details — you already have them. Reference their specific type, profile, authority, and channels naturally in your responses.`;
             } else {
@@ -482,6 +489,9 @@ Tvůj komunikační styl jako HD Guru:
           const { GATE_WHEEL, PLANET_NAMES } = await import('./humandesign/constants');
           const jd = dateToJD(todayUtc);
           const positions = calculatePlanetaryPositions(jd);
+
+          // Build transit gate map: planet -> {gate, line}
+          const transitGateMap: Record<string, {gate: number; line: number}> = {};
           const transitLines: string[] = [];
           for (const planet of PLANET_NAMES) {
             const lon = positions[planet];
@@ -493,15 +503,79 @@ Tvůj komunikační styl jako HD Guru:
             const gate = GATE_WHEEL[gateIndex][1];
             const offset = normLon - GATE_WHEEL[gateIndex][0];
             const line = Math.max(1, Math.min(Math.floor(offset / 0.9375) + 1, 6));
+            transitGateMap[planet] = { gate, line };
             transitLines.push(`${planet}: Brána ${gate}.${line}`);
           }
           const transitDataStr = transitLines.join(' | ');
+
+          // Compute natal-transit cross-reference (server-side, precise)
+          let crossRefNote = '';
+          if (natalGateSet.size > 0) {
+            // 1. Which transit planets are activating user's natal gates?
+            const activatedNatalGates: string[] = [];
+            for (const planet of PLANET_NAMES) {
+              const tg = transitGateMap[planet];
+              if (tg && natalGateSet.has(tg.gate)) {
+                activatedNatalGates.push(isEn
+                  ? `${planet} in Gate ${tg.gate}.${tg.line} → activates your natal Gate ${tg.gate}`
+                  : `${planet} v Bráně ${tg.gate}.${tg.line} → aktivuje tvou natální Bránu ${tg.gate}`);
+              }
+            }
+
+            // 2. Which channels are completed by today's transits?
+            const transitGateNumbers = new Set(Object.values(transitGateMap).map(t => t.gate));
+            const completedChannels: string[] = [];
+            for (const ch of natalChannelList) {
+              // Channel is completed if one gate is natal and the other is in transit
+              const g1InNatal = natalGateSet.has(ch.gate1);
+              const g2InNatal = natalGateSet.has(ch.gate2);
+              const g1InTransit = transitGateNumbers.has(ch.gate1);
+              const g2InTransit = transitGateNumbers.has(ch.gate2);
+              if ((g1InNatal && g2InTransit) || (g2InNatal && g1InTransit)) {
+                completedChannels.push(isEn
+                  ? `Channel ${ch.gate1}-${ch.gate2} (transit completes your natal gate)`
+                  : `Dráha ${ch.gate1}-${ch.gate2} (tranzit doplňuje tvou natální bránu)`);
+              }
+            }
+
+            // 3. Which of user's natal gates are reinforced (natal gate also in transit)?
+            const reinforcedGates: string[] = [];
+            for (const planet of PLANET_NAMES) {
+              const tg = transitGateMap[planet];
+              if (tg && natalGateSet.has(tg.gate)) {
+                reinforcedGates.push(isEn
+                  ? `Gate ${tg.gate} (${planet})`
+                  : `Brána ${tg.gate} (${planet})`);
+              }
+            }
+
+            if (isEn) {
+              crossRefNote = `\n\n--- PERSONALIZED TRANSIT ANALYSIS (pre-computed) ---`;
+              crossRefNote += activatedNatalGates.length > 0
+                ? `\nTransit planets activating YOUR natal gates:\n${activatedNatalGates.map(s => `• ${s}`).join('\n')}`
+                : `\nNo transit planets are directly activating your natal gates today.`;
+              crossRefNote += completedChannels.length > 0
+                ? `\n\nChannels activated by today's transits (transit completes your natal gate to form a full channel):\n${completedChannels.map(s => `• ${s}`).join('\n')}`
+                : `\n\nNo channels are being completed by today's transits.`;
+              crossRefNote += `\n\nINSTRUCTION: When answering transit questions, ALWAYS use the above pre-computed cross-reference. Explain what each activated gate/channel means for this specific person (their type, profile, authority). Be concrete — name the gates, name the channels, explain the energy. Do NOT give generic transit descriptions.`;
+            } else {
+              crossRefNote = `\n\n--- PERSONALIZOVANÁ TRANZITNÍ ANALÝZA (předpočítáno) ---`;
+              crossRefNote += activatedNatalGates.length > 0
+                ? `\nPlanetární tranzity aktivující TVOJE natální brány:\n${activatedNatalGates.map(s => `• ${s}`).join('\n')}`
+                : `\nŽádné tranzitní planety dnes přímo neaktivují tvé natální brány.`;
+              crossRefNote += completedChannels.length > 0
+                ? `\n\nDráhy aktivované dnešními tranzity (tranzit doplňuje tvou natální bránu na kompletní dráhu):\n${completedChannels.map(s => `• ${s}`).join('\n')}`
+                : `\n\nŽádné dráhy nejsou dnes tranzitem dokončeny.`;
+              crossRefNote += `\n\nINSTRUKCE: Při odpovídání na otázky o tranzitu VŽDY použij výše předpočítanou cross-referenci. Vysvětli, co každá aktivovaná brána/dráha znamená pro tuto konkrétní osobu (její typ, profil, autoritu). Buď konkrétní — jmenuj brány, jmenuj dráhy, vysvětli energii. NEPOSKYTUJ obecné popisy tranzitů — vždy personalizuj na základě natálního grafu výše.`;
+            }
+          }
+
           const transitPageLink = isEn
             ? '[Transits page](/en/transits)'
             : '[stránku Denní tranzity](/cs/transits)';
           transitNote = isEn
-            ? `\n\n--- TODAY'S LIVE TRANSIT DATA (real-time ephemeris) ---\nToday is ${todayStr}.\nCurrent planetary gates: ${transitDataStr}\n\nWhen asked about daily transits, use this data directly in your answer. Explain which gates are active, what energies they bring, and how they interact with the user's natal chart. You can also link to the ${transitPageLink} for the full visual bodygraph overlay.`
-            : `\n\n--- DNEŠNÍ ŽIVÁ TRANZITNÍ DATA (reálný čas z efemerid) ---\nDnes je ${todayStr}.\nAktuální planetární brány: ${transitDataStr}\n\nKdyž se tě někdo ptá na denní tranzit, použij tato data přímo ve své odpovědi. Vysvětli, které brány jsou aktivní, jaké energie přinášejí a jak interagují s natálním grafem uživatele. Odkázat je také můžeš na ${transitPageLink} pro plné vizuální zobrazení v bodygraphu.`;
+            ? `\n\n--- TODAY'S LIVE TRANSIT DATA (real-time ephemeris) ---\nToday is ${todayStr}.\nCurrent planetary gates: ${transitDataStr}${crossRefNote}\n\nYou can also link to the ${transitPageLink} for the full visual bodygraph overlay.`
+            : `\n\n--- DNEŠNÍ ŽIVÁ TRANZITNÍ DATA (reálný čas z efemerid) ---\nDnes je ${todayStr}.\nAktuální planetární brány: ${transitDataStr}${crossRefNote}\n\nOdkázat je také můžeš na ${transitPageLink} pro plné vizuální zobrazení v bodygraphu.`;
         } catch {
           transitNote = isEn
             ? `\n\n--- TODAY'S DATE ---\nToday is ${todayStr}. Transit data temporarily unavailable.`
