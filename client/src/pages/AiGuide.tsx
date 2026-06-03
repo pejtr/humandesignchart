@@ -338,6 +338,7 @@ export default function AiGuide() {
   }, [isEn]);
 
   const SUGGESTED_QUESTIONS = isEn ? [
+    "What is my daily transit today?",
     "What is Human Design and how does it work?",
     "What's the difference between a Generator and a Manifestor?",
     "What does an open Sacral Center mean?",
@@ -349,6 +350,7 @@ export default function AiGuide() {
     "How do I find my correct diet according to HD?",
     "What is the Not-Self theme?",
   ] : [
+    "Jaký je můj denní tranzit?",
     "Co je to Human Design a jak funguje?",
     "Jaký je rozdíl mezi Generátorem a Manifestorem?",
     "Co znamená mít otevřené Sakrální centrum?",

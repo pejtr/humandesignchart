@@ -854,3 +854,6 @@
 - [x] Admin guard — pouze role=admin, redirect pro nepřihlášené
 - [x] App.tsx — lazy import + route /:locale/crm-dashboard + legacy redirect
 - [x] TypeScript 0 chyb, 177 testů prošlo
+
+## AiGuide — Navrhované otázky
+- [x] Přidat "Jaký je můj denní tranzit?" jako první navrhovanou otázku v sekci Navrhované otázky (CS + EN: "What is my daily transit today?")
