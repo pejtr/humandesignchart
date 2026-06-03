@@ -470,7 +470,15 @@ Tvůj komunikační styl jako HD Guru:
 10. Odpovídej soustředěně a silně (max 350 slov, pokud není skutečně potřeba větší hloubka)
 11. Nikdy nezlehčuj — každý design je dokonalý takový, jaký je
 12. Delší odpovědi ukonči jediným praktickým vhledem nebo reflexní otázkou`;
-        const systemPrompt = systemPromptBase + userChartContext;
+        // Inject today's date so HD Guru can answer transit questions accurately
+        const todayUtc = new Date();
+        const todayStr = todayUtc.toLocaleDateString(isEn ? 'en-US' : 'cs-CZ', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Europe/Prague'
+        });
+        const transitNote = isEn
+          ? `\n\n--- TODAY'S DATE ---\nToday is ${todayStr}. When asked about daily transits, you know the current date. For precise active gates and channels in today's transit, direct the user to the Transits page (/en/transits) which shows real-time planetary positions. You can explain what transits mean and how to work with them based on the user's design.`
+          : `\n\n--- DNEŠNÍ DATUM ---\nDnes je ${todayStr}. Když se tě někdo ptá na denní tranzit, znáš aktuální datum. Pro přesné aktivní brány a dráhy v dnešním tranzitu odkaz uživatele na stránku Denní tranzity (/cs/transits), kde jsou zobrazeny aktuální planetární pozice v reálném čase. Vysvětli, co tranzity znamenají a jak s nimi pracovat na základě designu uživatele.`;
+        const systemPrompt = systemPromptBase + userChartContext + transitNote;
 
         const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
           { role: "system" as const, content: systemPrompt },

@@ -136,9 +136,6 @@
   * {
     @apply border-border outline-ring/50;
   }
-  html {
-    overflow-x: hidden;
-  }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
