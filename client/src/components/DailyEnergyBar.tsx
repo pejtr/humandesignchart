@@ -3,7 +3,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "wouter";
 import { Sun, Moon } from "lucide-react";
 
-// Gate names in Czech
 const GATE_NAMES_CS: Record<number, string> = {
   1: "Sebevyjádření", 2: "Směr Já", 3: "Uspořádání", 4: "Formulace", 5: "Pevné vzorce",
   6: "Tření", 7: "Role Já", 8: "Přínos", 9: "Soustředění", 10: "Chování Já",
@@ -41,8 +40,8 @@ export default function DailyEnergyBar() {
   const isCs = locale === "cs";
 
   const { data, isLoading } = trpc.transit.current.useQuery(undefined, {
-    staleTime: 5 * 60 * 1000, // 5 min cache
-    refetchInterval: 10 * 60 * 1000, // refresh every 10 min
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 10 * 60 * 1000,
   });
 
   if (isLoading || !data) return null;
@@ -57,66 +56,118 @@ export default function DailyEnergyBar() {
   const gateNames = isCs ? GATE_NAMES_CS : GATE_NAMES_EN;
 
   const today = new Date().toLocaleDateString(isCs ? "cs-CZ" : "en-US", {
-    weekday: "long", day: "numeric", month: "long",
+    weekday: "short", day: "numeric", month: "short",
   });
 
   return (
-    <div className="sticky top-16 z-40 w-full border-b border-purple-500/15 bg-gradient-to-r from-purple-950/60 via-indigo-950/50 to-purple-950/60 backdrop-blur-md">
+    <div className="sticky top-16 z-40 w-full border-b border-purple-500/30"
+      style={{
+        background: "linear-gradient(135deg, #0d0520 0%, #130a2a 50%, #0d0520 100%)",
+        boxShadow: "0 2px 20px rgba(139,92,246,0.3), inset 0 1px 0 rgba(139,92,246,0.2)",
+      }}
+    >
       <Link href={localePath("/daily-transit")} className="block no-underline">
-        <div className="container flex items-center justify-between gap-3 h-9 text-xs overflow-hidden">
-          {/* Left: date */}
-          <span className="hidden sm:block text-purple-300/70 shrink-0 capitalize">{today}</span>
 
-          {/* Center: Sun + Earth + Moon */}
-          <div className="flex items-center gap-3 md:gap-5 flex-1 justify-center sm:justify-start">
-            {/* Sparkles icon */}
-            <span className="text-purple-400/80 shrink-0 hidden md:block">✦</span>
+        {/* ── DESKTOP (sm+): single row ─────────────────────────────── */}
+        <div className="hidden sm:flex container items-center justify-between gap-4 h-10 text-xs">
+          {/* Date */}
+          <span className="text-purple-300/80 shrink-0 capitalize font-medium tracking-wide">{today}</span>
 
+          {/* Planets row */}
+          <div className="flex items-center gap-4 flex-1 justify-center">
             {/* Sun */}
             <div className="flex items-center gap-1.5 shrink-0">
-              <Sun className="w-3 h-3 text-amber-400 shrink-0" />
-              <span className="text-amber-300/90 font-medium">
+              <Sun className="w-3.5 h-3.5 shrink-0" style={{ color: "#ffd700", filter: "drop-shadow(0 0 6px #ffd700)" }} />
+              <span className="font-black tracking-wider" style={{ color: "#ffe566", textShadow: "0 0 10px #ffd700, 0 0 20px #ffd70088" }}>
                 {isCs ? "Brána" : "Gate"} {sun.gate}.{sun.line}
               </span>
-              <span className="text-muted-foreground/60 hidden sm:inline">
-                — {gateNames[sun.gate] || ""}
-              </span>
+              <span className="text-purple-300/60 hidden md:inline">— {gateNames[sun.gate] || ""}</span>
             </div>
 
-            <span className="text-purple-500/40">·</span>
+            <span style={{ color: "rgba(139,92,246,0.5)" }}>✦</span>
 
             {/* Earth */}
             <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-emerald-400 text-[11px] shrink-0">⊕</span>
-              <span className="text-emerald-300/90 font-medium">
+              <span className="text-[14px] shrink-0" style={{ color: "#4ade80", filter: "drop-shadow(0 0 6px #4ade80)", lineHeight: 1 }}>⊕</span>
+              <span className="font-black tracking-wider" style={{ color: "#86efac", textShadow: "0 0 10px #4ade80, 0 0 20px #4ade8088" }}>
                 {isCs ? "Brána" : "Gate"} {earth.gate}.{earth.line}
               </span>
-              <span className="text-muted-foreground/60 hidden sm:inline">
-                — {gateNames[earth.gate] || ""}
-              </span>
+              <span className="text-purple-300/60 hidden md:inline">— {gateNames[earth.gate] || ""}</span>
             </div>
 
             {moon && (
               <>
-                <span className="text-purple-500/40 hidden md:inline">·</span>
-                <div className="hidden md:flex items-center gap-1.5 shrink-0">
-                  <Moon className="w-3 h-3 text-slate-400 shrink-0" />
-                  <span className="text-slate-300/80 font-medium">
+                <span style={{ color: "rgba(139,92,246,0.5)" }}>✦</span>
+                <div className="hidden lg:flex items-center gap-1.5 shrink-0">
+                  <Moon className="w-3.5 h-3.5 shrink-0" style={{ color: "#67e8f9", filter: "drop-shadow(0 0 6px #67e8f9)" }} />
+                  <span className="font-black tracking-wider" style={{ color: "#a5f3fc", textShadow: "0 0 10px #67e8f9, 0 0 20px #67e8f988" }}>
                     {isCs ? "Brána" : "Gate"} {moon.gate}.{moon.line}
                   </span>
-                  <span className="text-muted-foreground/60 hidden lg:inline">
-                    — {gateNames[moon.gate] || ""}
-                  </span>
+                  <span className="text-purple-300/60 hidden xl:inline">— {gateNames[moon.gate] || ""}</span>
                 </div>
               </>
             )}
           </div>
 
-          {/* Right: CTA */}
-          <span className="text-purple-400/70 shrink-0 hidden sm:block hover:text-purple-300 transition-colors">
+          {/* CTA */}
+          <span className="shrink-0 font-semibold tracking-wide transition-all" style={{ color: "#c084fc" }}>
             {isCs ? "Denní energie →" : "Daily energy →"}
           </span>
         </div>
+
+        {/* ── MOBILE: pill cards row ────────────────────────────────── */}
+        <div className="sm:hidden flex items-center justify-center gap-2 px-3 py-2">
+          {/* Sun pill */}
+          <div className="flex items-center gap-1.5 rounded-full px-3 py-1"
+            style={{
+              background: "rgba(251,191,36,0.12)",
+              border: "1px solid rgba(251,191,36,0.4)",
+              boxShadow: "0 0 10px rgba(251,191,36,0.2)",
+            }}
+          >
+            <Sun className="w-3.5 h-3.5 shrink-0" style={{ color: "#ffd700", filter: "drop-shadow(0 0 4px #ffd700)" }} />
+            <span className="text-[11px] font-black" style={{ color: "#ffe566", textShadow: "0 0 8px #ffd700" }}>
+              {sun.gate}.{sun.line}
+            </span>
+            <span className="text-[10px] font-medium" style={{ color: "rgba(255,229,102,0.7)" }}>
+              {gateNames[sun.gate]?.split(" ")[0] || ""}
+            </span>
+          </div>
+
+          {/* Earth pill */}
+          <div className="flex items-center gap-1.5 rounded-full px-3 py-1"
+            style={{
+              background: "rgba(74,222,128,0.12)",
+              border: "1px solid rgba(74,222,128,0.4)",
+              boxShadow: "0 0 10px rgba(74,222,128,0.2)",
+            }}
+          >
+            <span className="text-[13px] shrink-0" style={{ color: "#4ade80", filter: "drop-shadow(0 0 4px #4ade80)", lineHeight: 1 }}>⊕</span>
+            <span className="text-[11px] font-black" style={{ color: "#86efac", textShadow: "0 0 8px #4ade80" }}>
+              {earth.gate}.{earth.line}
+            </span>
+            <span className="text-[10px] font-medium" style={{ color: "rgba(134,239,172,0.7)" }}>
+              {gateNames[earth.gate]?.split(" ")[0] || ""}
+            </span>
+          </div>
+
+          {/* Moon pill (mobile) */}
+          {moon && (
+            <div className="flex items-center gap-1.5 rounded-full px-3 py-1"
+              style={{
+                background: "rgba(103,232,249,0.12)",
+                border: "1px solid rgba(103,232,249,0.4)",
+                boxShadow: "0 0 10px rgba(103,232,249,0.2)",
+              }}
+            >
+              <Moon className="w-3 h-3 shrink-0" style={{ color: "#67e8f9", filter: "drop-shadow(0 0 4px #67e8f9)" }} />
+              <span className="text-[11px] font-black" style={{ color: "#a5f3fc", textShadow: "0 0 8px #67e8f9" }}>
+                {moon.gate}.{moon.line}
+              </span>
+            </div>
+          )}
+        </div>
+
       </Link>
     </div>
   );
