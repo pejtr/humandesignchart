@@ -160,8 +160,8 @@ export default function Navbar() {
             />
           </div>
 
-          {/* Desktop nav — centered */}
-          <div className="hidden lg:flex items-center gap-0.5 flex-1 justify-center">
+          {/* Desktop nav — left-aligned */}
+          <div className="hidden lg:flex items-center gap-0.5 flex-1 justify-start">
             {primaryLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <Button
