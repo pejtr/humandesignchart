@@ -391,7 +391,29 @@ export const appRouter = router({
         const safeQuestion = sanitizeInput(input.question, MAX_QUESTION_LENGTH);
         const safeHistory = sanitizeHistory(input.history);
         const isEn = input.locale === 'en';
-        const systemPrompt = isEn
+
+        // Load user's primary chart from DB for personalized context
+        let userChartContext = "";
+        try {
+          const userCharts = await getUserCharts(ctx.user.id);
+          // Prefer "self" category chart, otherwise use most recent
+          const primaryChart = userCharts.find(c => c.category === "self") ?? userCharts[0];
+          if (primaryChart?.chartData) {
+            const cd = primaryChart.chartData as any;
+            const definedCenters = (cd.centers ?? []).filter((c: any) => c.defined).map((c: any) => c.name).join(", ");
+            const channels = (cd.channels ?? []).map((c: any) => `${c.gate1}-${c.gate2}`).join(", ");
+            const gates = (cd.activatedGates ?? []).join(", ");
+            if (isEn) {
+              userChartContext = `\n\n--- USER'S HUMAN DESIGN CHART ---\nName: ${primaryChart.name || ctx.user.name}\nType: ${cd.type}\nProfile: ${cd.profile}${cd.profileName ? ` (${cd.profileName})` : ""}\nAuthority: ${cd.authority}\nDefinition: ${cd.definition}\nStrategy: ${cd.strategy}\nIncarnation Cross: ${cd.incarnationCross?.name ?? "unknown"}\nDefined Centers: ${definedCenters || "none"}\nChannels: ${channels || "none"}\nActivated Gates: ${gates || "none"}\nBirth: ${primaryChart.birthDate} ${primaryChart.birthTime} — ${primaryChart.birthPlace}\n\nYou KNOW this person's design. ALWAYS use these details when answering. Never ask them for their birth data or design details — you already have them. Reference their specific type, profile, authority, and channels naturally in your responses.`;
+            } else {
+              userChartContext = `\n\n--- HUMAN DESIGN MAPA UŽIVATELE ---\nJméno: ${primaryChart.name || ctx.user.name}\nTyp: ${cd.type}\nProfil: ${cd.profile}${cd.profileName ? ` (${cd.profileName})` : ""}\nAutorita: ${cd.authority}\nDefinice: ${cd.definition}\nStrategie: ${cd.strategy}\nInkarnační kříž: ${cd.incarnationCross?.name ?? "neznámý"}\nDefinovaná centra: ${definedCenters || "žádná"}\nDráhy (kanály): ${channels || "žádné"}\nAktivované brány: ${gates || "žádné"}\nNarození: ${primaryChart.birthDate} ${primaryChart.birthTime} — ${primaryChart.birthPlace}\n\nZNÁŠ design tohoto člověka. VŽDY používej tyto detaily při odpovídání. Nikdy se neptej na datum narození ani detaily designu — už je máš. Přirozeně odkazuj na jejich konkrétní typ, profil, autoritu a dráhy ve svých odpovědích.`;
+            }
+          }
+        } catch (_e) {
+          // Non-blocking — if chart load fails, continue without context
+        }
+
+        const systemPrompt = (isEn
           ? `You are HD Guru — a wise, warm, and deeply knowledgeable guide in the Human Design system. You embody the spirit of Ra Uru Hu's teachings: direct, precise, yet compassionate. You speak with quiet authority, like a mentor who has walked the path and now illuminates it for others.
 
 Your knowledge spans:
@@ -447,7 +469,7 @@ Tvůj komunikační styl jako HD Guru:
 9. Občas použij metafory z přírody, kosmu nebo posvátné geometrie — HD je živý systém
 10. Odpovídej soustředěně a silně (max 350 slov, pokud není skutečně potřeba větší hloubka)
 11. Nikdy nezlehčuj — každý design je dokonalý takový, jaký je
-12. Delší odpovědi ukonči jediným praktickým vhledem nebo reflexní otázkou`;
+12. Delší odpovědi ukonči jediným praktickým vhledem nebo reflexní otázkou`) + userChartContext;
 
         const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
           { role: "system" as const, content: systemPrompt },
