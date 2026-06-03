@@ -139,7 +139,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
-    overflow-x: hidden;
+    overflow-x: clip; /* clip does not create a new scroll container, so sticky still works */
     /* Reserve space for mobile bottom nav (64px = h-16) */
     padding-bottom: 4rem;
   }

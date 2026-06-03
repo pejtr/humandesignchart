@@ -373,7 +373,7 @@ export const appRouter = router({
         question: z.string().min(1).max(MAX_QUESTION_LENGTH),
         history: z.array(z.object({
           role: z.enum(["user", "assistant"]),
-          content: z.string().max(2_000),
+          content: z.string().max(8_000),
         })).max(20).optional(),
         locale: z.string().optional(),
       }))

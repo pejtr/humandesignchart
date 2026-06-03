@@ -90,7 +90,7 @@ function LegacyRedirect({ path }: { path: string }) {
 function LocaleRoutes() {
   const { isAuthenticated } = useAuth();
   return (
-    <div className={isAuthenticated ? "lg:pl-14" : ""}>
+    <div className={isAuthenticated ? "lg:pl-[var(--sidebar-w,56px)]" : ""} style={{ transition: "padding-left 0.2s" }}>
     <PageTransition>
     <Suspense fallback={<PageLoader />}>
       <Switch>
