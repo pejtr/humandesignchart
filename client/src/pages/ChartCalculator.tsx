@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Compass, Loader2, MapPin, Calendar, Clock, Info } from "lucide-react";
+import { Compass, Loader2, MapPin, Calendar, Clock, Info, User, Heart, Users, Briefcase, Baby, Star, UserCheck, HelpCircle, Lock } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
@@ -41,12 +42,22 @@ export default function ChartCalculator() {
   const [timezone, setTimezone] = useState("");
   const [timezoneOffset, setTimezoneOffset] = useState(0);
   const [locationResolved, setLocationResolved] = useState(false);
+  const [category, setCategory] = useState<string>("self");
+
+  const RELATIONSHIP_OPTIONS = [
+    { value: "self",       labelCs: "Já",          labelEn: "Myself",     icon: User },
+    { value: "friend",     labelCs: "Partner",     labelEn: "Partner",    icon: Heart },
+    { value: "family",     labelCs: "Rodič",       labelEn: "Parent",     icon: Users },
+    { value: "client",     labelCs: "Šéf / práce", labelEn: "Boss / Work",icon: Briefcase },
+    { value: "other",      labelCs: "Potomek",     labelEn: "Child",      icon: Baby },
+    { value: "celebrity",  labelCs: "Kamarád",     labelEn: "Friend",     icon: Star },
+  ];
 
   const calculateMutation = trpc.chart.calculate.useMutation({
     onSuccess: (data) => {
       sessionStorage.setItem("chartResult", JSON.stringify(data));
       sessionStorage.setItem("chartMeta", JSON.stringify({
-        name, birthDate, birthTime, birthPlace, latitude, longitude, timezone,
+        name, birthDate, birthTime, birthPlace, latitude, longitude, timezone, category,
       }));
       navigate(localePath("/chart/new"));
     },
@@ -166,6 +177,51 @@ export default function ChartCalculator() {
                       onChange={(e) => setBirthTime(e.target.value)}
                       required
                     />
+                  </div>
+                </div>
+
+                {/* Relationship Category */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Label className="text-sm font-medium">
+                      {isEn ? "Who is this chart for?" : "Pro koho generuješ mapu?"}
+                    </Label>
+                    {!isAuthenticated && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground cursor-help">
+                            <Lock className="w-3 h-3" />
+                            {isEn ? "Login to save" : "Přihlaste se pro uložení"}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          <p className="text-xs">{isEn ? "Log in to save charts to your collection" : "Přihlaste se a ukládejte mapy do své sbírky"}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
+                  <div className={`grid grid-cols-3 gap-2 ${!isAuthenticated ? 'opacity-40 pointer-events-none select-none' : ''}`}>
+                    {RELATIONSHIP_OPTIONS.map((opt) => {
+                      const Icon = opt.icon;
+                      const label = isEn ? opt.labelEn : opt.labelCs;
+                      const active = category === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          disabled={!isAuthenticated}
+                          onClick={() => setCategory(opt.value)}
+                          className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-xs font-medium transition-all duration-150 ${
+                            active
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                          {label}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
