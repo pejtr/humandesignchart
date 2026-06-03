@@ -41,7 +41,7 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
           icon: <Gift className="w-8 h-8" />,
           color: "#7c3aed",
           title: "Vítejte v Human Design!",
-          description: "Získali jste 1 bezplatný AI výklad jako uvítací dárek. Použijte ho k prozkoumání svého designu.",
+          description: "Získali jste 5 bezplatných AI výkladů jako uvítací dárek. Použijte je k prozkoumání svého designu.",
           highlight: "Váš kredit je připraven — klikněte na AI průvodce nebo vygenerujte svou mapu.",
           cta: null,
         },

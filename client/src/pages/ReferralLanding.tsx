@@ -49,12 +49,12 @@ export default function ReferralLanding({ code }: Props) {
   const referrerName = validation?.referrerName || (isCzech ? "váš přítel" : "your friend");
 
   const benefits = isCzech ? [
-    "1 bezplatný AI výklad vašeho Human Design",
+    "5 bezplatných AI výkladů vašeho Human Design",
     "Neomezené výpočty mapy",
     "Přístup do encyklopedie Human Design",
     "Základní bodygraph zdarma",
   ] : [
-    "1 free AI reading of your Human Design",
+    "5 free AI readings of your Human Design",
     "Unlimited chart calculations",
     "Access to Human Design encyclopedia",
     "Basic bodygraph for free",
