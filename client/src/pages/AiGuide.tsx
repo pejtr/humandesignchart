@@ -261,7 +261,7 @@ export default function AiGuide() {
     const pageUrl = isEn
       ? 'https://humandesignchart.app/en/ai-guide'
       : 'https://humandesignmapa.cz/cs/ai-guide';
-    const ogImage = 'https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/og-ai-guide-GgLJHHtuBDfgRYPUBEeoLz.png';
+    const ogImage = '/manus-storage/og-ai-guide_b44c2f20.webp';
 
     document.title = title;
 

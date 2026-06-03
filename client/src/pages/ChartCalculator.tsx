@@ -210,47 +210,6 @@ export default function ChartCalculator() {
                   )}
                 </div>
 
-                {/* Manual coordinates */}
-                {!locationResolved && (
-                  <div className="rounded-lg border border-border/50 p-4 space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      {t.calculator.manualCoordinates}
-                    </p>
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="space-y-1">
-                        <Label className="text-xs">{t.calculator.latitude}</Label>
-                        <Input
-                          placeholder="50.08"
-                          value={latitude}
-                          onChange={(e) => setLatitude(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">{t.calculator.longitude}</Label>
-                        <Input
-                          placeholder="14.44"
-                          value={longitude}
-                          onChange={(e) => setLongitude(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">{t.calculator.utcOffset}</Label>
-                        <Input
-                          type="number"
-                          placeholder="1"
-                          value={timezoneOffset}
-                          onChange={(e) => {
-                            const v = parseInt(e.target.value) || 0;
-                            setTimezoneOffset(v);
-                            setTimezone(`UTC${v >= 0 ? "+" : ""}${v}`);
-                            if (latitude && longitude) setLocationResolved(true);
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 <Button
                   type="submit"
                   size="lg"

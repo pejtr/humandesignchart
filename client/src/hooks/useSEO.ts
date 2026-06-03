@@ -4,12 +4,12 @@
  */
 
 const OG_IMAGES = {
-  homepage: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/og-homepage-TnsCURzJFMQ4a9smwqmEMU.png",
-  calculator: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/og-calculator-kYGqbAtT73pWq25P7WHL4K.png",
-  blog: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/og-blog-v2-FsE5DvUfEaThgDsFSPS5to.png",
-  pricing: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/og-pricing-MLe62k7SvrxRkiBUdeX9DN.png",
-  aiGuide: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/og-ai-guide-GgLJHHtuBDfgRYPUBEeoLz.png",
-  default: "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/og-homepage-TnsCURzJFMQ4a9smwqmEMU.png",
+  homepage: "/manus-storage/og-homepage_dffd5da3.webp",
+  calculator: "/manus-storage/og-calculator_f6d92b32.webp",
+  blog: "/manus-storage/og-blog-v2_0a6cb0ba.webp",
+  pricing: "/manus-storage/og-pricing_041c6b96.webp",
+  aiGuide: "/manus-storage/og-ai-guide_b44c2f20.webp",
+  default: "/manus-storage/og-homepage_dffd5da3.webp",
 };
 
 export { OG_IMAGES };
