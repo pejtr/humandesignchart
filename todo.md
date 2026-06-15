@@ -900,3 +900,28 @@
 - [ ] AiGuide.tsx — tlačítko "Vymazat historii" v hlavičce chatu
 - [ ] AiGuide.tsx — přepínač profilu (dropdown všech chartů z Moje mapa)
 - [ ] Vitest testy pro chat DB helpers
+
+
+## Claude Code Tasks — June 2026
+
+### Smooth Animations on Chart Result Loading
+- [ ] Implementovat plynulé animace (fade-in, slide-up) při načítání výsledků na ChartResult stránce
+- [ ] Přidat skeleton loadery pro všechny sekce (bodygraph, type info, gates table, AI section)
+- [ ] Animace by měly být smooth a bez trhání (60fps)
+- [ ] Testovat na mobilních zařízeních (iPhone, Android)
+
+### Social Sharing Buttons — README & Implementation
+- [ ] Doplnit README.md sekcí "Social Sharing" s detailem jak funguje sdílení výsledků
+- [ ] Implementovat sdílení výsledků na: Facebook, WhatsApp, Telegram, X (Twitter), LinkedIn
+- [ ] Přidat share button do ChartResult stránky (vedle "Stáhnout PDF")
+- [ ] Generovat OG meta tagy pro sdílené linky (og:title, og:description, og:image s bodygraph)
+- [ ] Bilingual UI (CS/EN)
+- [ ] Testy pro share procedury
+
+### Mobile UX Review & Fixes
+- [ ] Zkontrolovat všechny stránky na mobilních zařízeních (iPhone SE, Pixel 4, iPad)
+- [ ] Opravit vizuální nedostatky (padding, font size, button size, spacing)
+- [ ] Zajistit že všechny formuláře jsou mobilní-friendly (input fields, dropdowns, date pickers)
+- [ ] Testovat landscape orientaci
+- [ ] Přidat do todo.md konkrétní problémy které byly nalezeny
+- [ ] Pushni všechny opravy na GitHub
