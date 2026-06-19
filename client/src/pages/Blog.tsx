@@ -36,7 +36,7 @@ export default function Blog() {
   const { localePath, locale } = useLanguage();
   const isEn = locale === 'en';
   const [activeCategory, setActiveCategory] = useState<string | undefined>(undefined);
-  const { data, isLoading } = trpc.blog.list.useQuery(
+  const { data, isLoading } = trpc.content.blogList.useQuery(
     activeCategory ? { category: activeCategory, locale } : { locale }
   );
 

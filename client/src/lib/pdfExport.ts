@@ -1,8 +1,4 @@
 import type { HumanDesignChartData } from "@shared/types";
-import {
-  GATE_DESCRIPTIONS, CHANNEL_DESCRIPTIONS, CENTER_DESCRIPTIONS,
-  TYPE_DESCRIPTIONS, AUTHORITY_DESCRIPTIONS, PROFILE_DESCRIPTIONS,
-} from "@shared/hdContent";
 import { cs } from "@shared/i18n/cs";
 
 const t = cs;
@@ -22,7 +18,7 @@ function translateCrossName(name: string): string {
   return result;
 }
 
-export function generateChartPDF(chart: HumanDesignChartData, name: string): void {
+export function generateChartPDF(chart: HumanDesignChartData, name: string, hdData: any): void {
   const czType = (t.types as Record<string, string>)[chart.type] || chart.type;
   const czStrategy = (t.hd.strategies as Record<string, string>)[chart.strategy] || chart.strategy;
   const czSignature = (t.hd.signatures as Record<string, string>)[chart.signature] || chart.signature;
@@ -31,14 +27,14 @@ export function generateChartPDF(chart: HumanDesignChartData, name: string): voi
   const czCrossName = translateCrossName(chart.incarnationCross?.name || "—");
   const czCrossType = CROSS_TYPE_CS[chart.incarnationCross?.type || ""] || chart.incarnationCross?.type || "";
 
-  const typeDesc = TYPE_DESCRIPTIONS[chart.type];
-  const profileDesc = PROFILE_DESCRIPTIONS[chart.profile];
-  const authDesc = AUTHORITY_DESCRIPTIONS[chart.authority];
+  const typeDesc = hdData?.types[chart.type];
+  const profileDesc = hdData?.profiles[chart.profile];
+  const authDesc = hdData?.authorities[chart.authority];
 
   const centersHtml = (chart.centers || []).map(center => {
     const czName = (t.hd.centerNames as Record<string, string>)[center.name] || center.name;
     const status = center.defined ? "Definováno" : "Otevřeno";
-    const desc = CENTER_DESCRIPTIONS[center.name];
+    const desc = hdData?.centers[center.name];
     const statusColor = center.defined ? "#7c3aed" : "#6b7280";
     return `<tr>
       <td style="padding:5px 8px;font-weight:600;color:#374151;width:120px">${czName}</td>
@@ -48,8 +44,9 @@ export function generateChartPDF(chart: HumanDesignChartData, name: string): voi
   }).join("");
 
   const channelsHtml = (chart.channels || []).map(ch => {
-    const key = CHANNEL_DESCRIPTIONS[`${ch.gate1}-${ch.gate2}`] ? `${ch.gate1}-${ch.gate2}` : `${ch.gate2}-${ch.gate1}`;
-    const desc = CHANNEL_DESCRIPTIONS[key];
+    if (!hdData) return "";
+    const key = hdData.channels[`${ch.gate1}-${ch.gate2}`] ? `${ch.gate1}-${ch.gate2}` : `${ch.gate2}-${ch.gate1}`;
+    const desc = hdData.channels[key];
     const czCenA = (t.hd.centerNames as Record<string, string>)[ch.centerA] || ch.centerA;
     const czCenB = (t.hd.centerNames as Record<string, string>)[ch.centerB] || ch.centerB;
     return `<tr>
@@ -65,19 +62,19 @@ export function generateChartPDF(chart: HumanDesignChartData, name: string): voi
       <h4 style="font-size:11px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0">${label}</h4>
       <table style="width:100%;border-collapse:collapse">
         ${(activations || []).map(a => {
-          const czPlanet = (t.hd.planets as Record<string, string>)[a.planet] || a.planet;
-          const gateDesc = GATE_DESCRIPTIONS[a.gate];
-          return `<tr>
+      const czPlanet = (t.hd.planets as Record<string, string>)[a.planet] || a.planet;
+      const gateDesc = hdData?.gates[a.gate];
+      return `<tr>
             <td style="padding:3px 8px;color:#6b7280;width:90px;font-size:10px">${czPlanet}</td>
             <td style="padding:3px 8px;font-weight:600;color:#374151;font-size:10px">Brána ${a.gate}.${a.line}</td>
             <td style="padding:3px 8px;color:#6b7280;font-size:10px">${gateDesc?.name || ""}</td>
           </tr>`;
-        }).join("")}
+    }).join("")}
       </table>
     </div>`;
 
   const gatesHtml = (chart.activatedGates || []).sort((a, b) => a - b).map(gate => {
-    const desc = GATE_DESCRIPTIONS[gate];
+    const desc = hdData?.gates[gate];
     return `<span style="display:inline-block;background:#f3f0ff;color:#7c3aed;border-radius:4px;padding:2px 7px;margin:2px;font-size:10px;font-weight:600">${gate}${desc ? ` · ${desc.name}` : ""}</span>`;
   }).join("");
 
@@ -205,14 +202,14 @@ export function generateChartPDF(chart: HumanDesignChartData, name: string): voi
       <div style="font-size:11px;color:#7c3aed;margin-bottom:10px">${czCrossType}</div>
       <div class="cross-gates">
         ${(chart.incarnationCross?.gates || []).map((g, i) => {
-          const gd = GATE_DESCRIPTIONS[g];
-          const labels = ["Osobnost ☉", "Osobnost ⊕", "Design ☉", "Design ⊕"];
-          return `<div class="cross-gate">
+    const gd = hdData?.gates[g];
+    const labels = ["Osobnost ☉", "Osobnost ⊕", "Design ☉", "Design ⊕"];
+    return `<div class="cross-gate">
             <div class="cross-gate-label">${labels[i] || ""}</div>
             <div class="cross-gate-num">${g}</div>
             <div class="cross-gate-name">${gd?.name || ""}</div>
           </div>`;
-        }).join("")}
+  }).join("")}
       </div>
     </div>
 

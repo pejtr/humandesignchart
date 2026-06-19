@@ -26,10 +26,6 @@ import {
 } from "lucide-react";
 import { generateChartPDF } from "@/lib/pdfExport";
 import type { HumanDesignChartData } from "@shared/types";
-import {
-  GATE_DESCRIPTIONS, CHANNEL_DESCRIPTIONS, CENTER_DESCRIPTIONS,
-  TYPE_DESCRIPTIONS, AUTHORITY_DESCRIPTIONS, PROFILE_DESCRIPTIONS,
-} from "@shared/hdContent";
 import OnboardingModal, { useOnboarding } from "@/components/OnboardingModal";
 import PremiumPaywall from "@/components/PremiumPaywall";
 
@@ -51,11 +47,10 @@ function ShareReadingButton({ readingId }: { readingId: number }) {
     <button
       onClick={() => !copied && shareMut.mutate({ readingId })}
       disabled={shareMut.isPending}
-      className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
-        copied
-          ? "bg-primary/10 text-primary border-primary/30"
-          : "bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary border-border/40"
-      }`}
+      className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${copied
+        ? "bg-primary/10 text-primary border-primary/30"
+        : "bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary border-border/40"
+        }`}
     >
       {shareMut.isPending ? (
         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -133,6 +128,10 @@ export default function ChartResult() {
   const streamAbortRef = useRef<AbortController | null>(null);
   const { shouldShow: showOnboarding, triggerOnboarding, markSeen: markOnboardingSeen } = useOnboarding();
   const { data: subStatus } = trpc.subscription.status.useQuery(undefined, { enabled: isAuthenticated });
+
+  // Fetch HD static content via tRPC
+  const hdContentQuery = trpc.content.getHdContent.useQuery();
+  const hdData = hdContentQuery.data;
 
   const shareMutation = trpc.share.createLink.useMutation({
     onSuccess: (data) => {
@@ -359,9 +358,9 @@ export default function ChartResult() {
     }
   };
 
-  const typeDesc = useMemo(() => chart ? TYPE_DESCRIPTIONS[chart.type] : null, [chart]);
-  const profileDesc = useMemo(() => chart ? PROFILE_DESCRIPTIONS[chart.profile] : null, [chart]);
-  const authorityDesc = useMemo(() => chart ? AUTHORITY_DESCRIPTIONS[chart.authority] : null, [chart]);
+  const typeDesc = useMemo(() => (chart && hdData) ? hdData.types[chart.type] : null, [chart, hdData]);
+  const profileDesc = useMemo(() => (chart && hdData) ? hdData.profiles[chart.profile] : null, [chart, hdData]);
+  const authorityDesc = useMemo(() => (chart && hdData) ? hdData.authorities[chart.authority] : null, [chart, hdData]);
 
   // Czech type name
   const czType = chart ? (t.types as any)[chart.type] || chart.type : "";
@@ -510,7 +509,7 @@ export default function ChartResult() {
                 setGeneratingPdf(true);
                 setTimeout(() => {
                   try {
-                    generateChartPDF(chart, chartMeta?.name || "Chart");
+                    generateChartPDF(chart, chartMeta?.name || "Chart", hdData);
                   } catch (e) {
                     toast.error("PDF generování selhalo");
                   }
@@ -541,7 +540,8 @@ export default function ChartResult() {
                     onGateClick={(gate) => setDetailModal({ type: "gate", id: gate })}
                     onCenterClick={(center) => setDetailModal({ type: "center", id: center })}
                     onChannelClick={(g1, g2) => {
-                      const key = CHANNEL_DESCRIPTIONS[`${g1}-${g2}`] ? `${g1}-${g2}` : `${g2}-${g1}`;
+                      if (!hdData) return;
+                      const key = hdData.channels[`${g1}-${g2}`] ? `${g1}-${g2}` : `${g2}-${g1}`;
                       setDetailModal({ type: "channel", id: key });
                     }}
                   />
@@ -738,12 +738,12 @@ export default function ChartResult() {
                           <p className="text-sm text-muted-foreground">{locale === "cs" ? "Generuji denní výklad tranzitů..." : "Generating daily transit reading..."}</p>
                         </div>
                       ) : (
-                      <div className="prose prose-sm max-w-none p-4 rounded-lg bg-white/60 border border-border/30 relative">
-                        <Streamdown>{aiReadingType === "daily_transit" ? (dailyTransitReading || "") : (aiReading || "")}</Streamdown>
-                        {aiStreaming && aiReadingType !== "daily_transit" && (
-                          <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-middle rounded-sm" />
-                        )}
-                      </div>
+                        <div className="prose prose-sm max-w-none p-4 rounded-lg bg-white/60 border border-border/30 relative">
+                          <Streamdown>{aiReadingType === "daily_transit" ? (dailyTransitReading || "") : (aiReading || "")}</Streamdown>
+                          {aiStreaming && aiReadingType !== "daily_transit" && (
+                            <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-middle rounded-sm" />
+                          )}
+                        </div>
                       )}
                       {/* Thumbs up/down feedback + share reading */}
                       {!aiStreaming && (
@@ -751,21 +751,19 @@ export default function ChartResult() {
                           <span className="text-xs text-muted-foreground mr-1">Byl tento výklad užitečný?</span>
                           <button
                             onClick={() => handleRating("up")}
-                            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                              aiRating === "up"
-                                ? "bg-green-100 text-green-700 border border-green-300"
-                                : "bg-muted/30 text-muted-foreground hover:bg-green-50 hover:text-green-600 border border-border/40"
-                            }`}
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${aiRating === "up"
+                              ? "bg-green-100 text-green-700 border border-green-300"
+                              : "bg-muted/30 text-muted-foreground hover:bg-green-50 hover:text-green-600 border border-border/40"
+                              }`}
                           >
                             👍 {aiRating === "up" ? "Děkujeme!" : "Ano"}
                           </button>
                           <button
                             onClick={() => handleRating("down")}
-                            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                              aiRating === "down"
-                                ? "bg-red-100 text-red-700 border border-red-300"
-                                : "bg-muted/30 text-muted-foreground hover:bg-red-50 hover:text-red-600 border border-border/40"
-                            }`}
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${aiRating === "down"
+                              ? "bg-red-100 text-red-700 border border-red-300"
+                              : "bg-muted/30 text-muted-foreground hover:bg-red-50 hover:text-red-600 border border-border/40"
+                              }`}
                           >
                             👎 {aiRating === "down" ? "Děkujeme" : "Ne"}
                           </button>
@@ -888,7 +886,7 @@ export default function ChartResult() {
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {chart.incarnationCross.gates.map((g, i) => {
-                      const gateDesc = GATE_DESCRIPTIONS[g];
+                      const gateDesc = hdData?.gates[g];
                       return (
                         <button key={i} onClick={() => setDetailModal({ type: "gate", id: g })}
                           className="p-3 rounded-lg text-left transition-colors hover:bg-primary/10 border border-border/30 bg-muted/20">
@@ -1018,15 +1016,14 @@ export default function ChartResult() {
                 <TabsContent value="centers" className="mt-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {(chart.centers || []).map(center => {
-                      const desc = CENTER_DESCRIPTIONS[center.name];
+                      const desc = hdData?.centers[center.name];
                       const czCenterName = (t.hd.centerNames as any)[center.name] || center.name;
                       return (
                         <button key={center.name} onClick={() => setDetailModal({ type: "center", id: center.name })}
-                          className={`text-left p-4 rounded-lg border transition-all hover:scale-[1.02] ${
-                            center.defined
-                              ? "border-primary/40 bg-primary/5 hover:bg-primary/10"
-                              : "border-border/30 bg-muted/10 hover:bg-muted/20"
-                          }`}>
+                          className={`text-left p-4 rounded-lg border transition-all hover:scale-[1.02] ${center.defined
+                            ? "border-primary/40 bg-primary/5 hover:bg-primary/10"
+                            : "border-border/30 bg-muted/10 hover:bg-muted/20"
+                            }`}>
                           <div className="flex items-center justify-between mb-2">
                             <p className="font-serif font-medium text-sm">{czCenterName}</p>
                             <Badge variant={center.defined ? "default" : "outline"} className="text-[10px]">
@@ -1036,11 +1033,10 @@ export default function ChartResult() {
                           {desc && <p className="text-[10px] text-muted-foreground mb-2">{desc.theme}</p>}
                           <div className="flex flex-wrap gap-1">
                             {center.gates.map(g => (
-                              <span key={g} className={`text-[10px] px-1.5 py-0.5 rounded ${
-                                center.activatedGates.includes(g)
-                                  ? "bg-primary/20 text-primary font-medium"
-                                  : "bg-muted/30 text-muted-foreground"
-                              }`}>{g}</span>
+                              <span key={g} className={`text-[10px] px-1.5 py-0.5 rounded ${center.activatedGates.includes(g)
+                                ? "bg-primary/20 text-primary font-medium"
+                                : "bg-muted/30 text-muted-foreground"
+                                }`}>{g}</span>
                             ))}
                           </div>
                         </button>
@@ -1100,7 +1096,7 @@ export default function ChartResult() {
                     <CardContent className="pt-6">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {(chart.activatedGates || []).sort((a, b) => a - b).map(gate => {
-                          const desc = GATE_DESCRIPTIONS[gate];
+                          const desc = hdData?.gates[gate];
                           const isPers = (chart.personalityActivations || []).some(a => a.gate === gate);
                           const isDes = (chart.designActivations || []).some(a => a.gate === gate);
                           return (
@@ -1144,7 +1140,7 @@ export default function ChartResult() {
           <ScrollArea className="max-h-[75vh]">
             <DialogHeader>
               {detailModal.type === "gate" && detailModal.id !== null && (() => {
-                const g = GATE_DESCRIPTIONS[detailModal.id as number];
+                const g = hdData?.gates[detailModal.id as number];
                 return g ? (
                   <>
                     <DialogTitle className="font-serif text-xl">
@@ -1180,7 +1176,7 @@ export default function ChartResult() {
               })()}
 
               {detailModal.type === "channel" && detailModal.id !== null && (() => {
-                const ch = CHANNEL_DESCRIPTIONS[detailModal.id as string];
+                const ch = hdData?.channels[detailModal.id as string];
                 return ch ? (
                   <>
                     <DialogTitle className="font-serif text-xl">{ch.name}</DialogTitle>
@@ -1204,7 +1200,7 @@ export default function ChartResult() {
               })()}
 
               {detailModal.type === "center" && detailModal.id !== null && (() => {
-                const c = CENTER_DESCRIPTIONS[detailModal.id as string];
+                const c = hdData?.centers[detailModal.id as string];
                 const centerData = (chart.centers || []).find(ct => ct.name === detailModal.id);
                 return c ? (
                   <>
@@ -1238,7 +1234,7 @@ export default function ChartResult() {
               })()}
 
               {detailModal.type === "type" && detailModal.id !== null && (() => {
-                const tp = TYPE_DESCRIPTIONS[detailModal.id as string];
+                const tp = hdData?.types[detailModal.id as string];
                 return tp ? (
                   <>
                     <DialogTitle className="font-serif text-xl">{(t.types as any)[detailModal.id] || tp.name}</DialogTitle>

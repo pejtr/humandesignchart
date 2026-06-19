@@ -189,7 +189,7 @@ describe("AI Reading Prompt Coverage", () => {
   it("should have prompts for all 8 reading types", async () => {
     const fs = await import("fs");
     const indexContent = fs.readFileSync(
-      "./server/_core/index.ts",
+      "./server/ai/prompts.ts",
       "utf-8"
     );
     for (const type of EXPECTED_TYPES) {
@@ -200,7 +200,7 @@ describe("AI Reading Prompt Coverage", () => {
   it("should have Czech system prompt", async () => {
     const fs = await import("fs");
     const indexContent = fs.readFileSync(
-      "./server/_core/index.ts",
+      "./server/ai/prompts.ts",
       "utf-8"
     );
     expect(indexContent).toContain("Jsi expert na systém Human Design");

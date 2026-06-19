@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Star, RefreshCw, Globe, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { GATE_DESCRIPTIONS } from "@shared/hdContent";
 import { motion } from "framer-motion";
 import type { HumanDesignChartData } from "@shared/types";
 
@@ -47,12 +46,15 @@ export default function Transits() {
     }
   }, [locale]);
 
-    const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [selectedChartId, setSelectedChartId] = useState<string>("none");
 
   const transitQuery = trpc.transit.current.useQuery(undefined, {
     refetchInterval: 60000,
   });
+
+  const hdContentQuery = trpc.content.getHdContent.useQuery();
+  const hdData = hdContentQuery.data;
 
   const chartsQuery = trpc.chart.list.useQuery(undefined, {
     enabled: isAuthenticated,
@@ -171,7 +173,7 @@ export default function Transits() {
                 <div className="space-y-3">
                   {transitQuery.data.transitGates.map((tr, i) => {
                     const czPlanet = (t.hd.planets as any)[tr.planet] || tr.planet;
-                    const gateDesc = GATE_DESCRIPTIONS[tr.gate];
+                    const gateDesc = hdData?.gates[tr.gate];
                     return (
                       <motion.div key={i} initial="hidden" animate="visible" custom={i + 3} variants={fadeUp}>
                         <Card className="bg-card border-border/50 hover:border-cyan-500/30 transition-all hover:shadow-lg hover:shadow-cyan-500/5 group">

@@ -15,9 +15,6 @@ import {
   Sun, Moon, Star, Brain, Hexagon, CircleDot, Globe,
 } from "lucide-react";
 import type { HumanDesignChartData } from "@shared/types";
-import {
-  TYPE_DESCRIPTIONS, AUTHORITY_DESCRIPTIONS, PROFILE_DESCRIPTIONS,
-} from "@shared/hdContent";
 
 const TYPE_COLORS: Record<string, string> = {
   Manifestor: "bg-emerald-50 text-emerald-700 border-emerald-200",

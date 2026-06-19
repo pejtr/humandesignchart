@@ -9,8 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, BookOpen, Zap, Circle, ArrowRight, Sparkles } from "lucide-react";
-import { GATE_DESCRIPTIONS, CHANNEL_DESCRIPTIONS, CENTER_DESCRIPTIONS } from "../../../shared/hdContent";
+import { Search, BookOpen, Zap, Circle, ArrowRight, Sparkles, Loader2 } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 // Czech gate names
 const GATE_NAMES_CS: Record<number, string> = {
@@ -53,13 +53,16 @@ const CIRCUIT_COLORS: Record<string, string> = {
   Tribal: "bg-amber-100 text-amber-700 border-amber-200",
 };
 
-type GateDetail = { gateNum: number; data: typeof GATE_DESCRIPTIONS[number] } | null;
-type ChannelDetail = { key: string; data: typeof CHANNEL_DESCRIPTIONS[string] } | null;
+type GateDetail = { gateNum: number; data: any } | null;
+type ChannelDetail = { key: string; data: any } | null;
 
 export default function Encyclopedia() {
   const { locale, localePath } = useLanguage();
   const isEN = locale === "en";
   const centerNames = isEN ? CENTER_NAMES_EN : CENTER_NAMES_CS;
+
+  const hdContentQuery = trpc.content.getHdContent.useQuery();
+  const hdData = hdContentQuery.data;
 
   useEffect(() => {
     if (isEN) {
@@ -86,18 +89,20 @@ export default function Encyclopedia() {
   const [selectedChannel, setSelectedChannel] = useState<ChannelDetail>(null);
 
   const gatesArray = useMemo(() => {
-    return Object.entries(GATE_DESCRIPTIONS).map(([num, data]) => ({
+    if (!hdData) return [];
+    return Object.entries(hdData.gates).map(([num, data]) => ({
       num: parseInt(num),
-      data,
+      data: data as any,
     }));
-  }, []);
+  }, [hdData]);
 
   const channelsArray = useMemo(() => {
-    return Object.entries(CHANNEL_DESCRIPTIONS).map(([key, data]) => ({
+    if (!hdData) return [];
+    return Object.entries(hdData.channels).map(([key, data]) => ({
       key,
-      data,
+      data: data as any,
     }));
-  }, []);
+  }, [hdData]);
 
   const filteredGates = useMemo(() => {
     return gatesArray.filter(g => {
@@ -328,53 +333,59 @@ export default function Encyclopedia() {
 
             {/* ─── Centers Tab ─── */}
             <TabsContent value="centers">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Object.entries(CENTER_DESCRIPTIONS).map(([key, data], i) => (
-                  <motion.div
-                    key={key}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                  >
-                    <Card className="h-full">
-                      <CardHeader>
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                            <Circle className="w-6 h-6 text-primary" />
+              {!hdData ? (
+                <div className="flex justify-center py-20">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {Object.entries(hdData.centers).map(([key, data]: [string, any], i) => (
+                    <motion.div
+                      key={key}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                    >
+                      <Card className="h-full">
+                        <CardHeader>
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                              <Circle className="w-6 h-6 text-primary" />
+                            </div>
+                            <div>
+                              <CardTitle className="text-base">{centerNames[key] || data.name}</CardTitle>
+                              <p className="text-xs text-muted-foreground">{data.biologicalCorrelation}</p>
+                            </div>
                           </div>
-                          <div>
-                            <CardTitle className="text-base">{centerNames[key] || data.name}</CardTitle>
-                            <p className="text-xs text-muted-foreground">{data.biologicalCorrelation}</p>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm font-medium text-primary mb-3">{data.theme}</p>
+                          <div className="space-y-3">
+                            <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
+                              <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-1">
+                                ✦ {isEN ? "Defined center" : "Definované centrum"}
+                              </p>
+                              <p className="text-xs text-green-800 dark:text-green-300">{data.definedMeaning}</p>
+                            </div>
+                            <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700">
+                              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                                ○ {isEN ? "Open center" : "Otevřené centrum"}
+                              </p>
+                              <p className="text-xs text-gray-800 dark:text-gray-200">{data.openMeaning}</p>
+                            </div>
+                            <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                              <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">
+                                ? {isEN ? "Not-Self question" : "Otázka Ne-Já"}
+                              </p>
+                              <p className="text-xs text-amber-800 dark:text-amber-300 italic">{data.notSelfQuestion}</p>
+                            </div>
                           </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm font-medium text-primary mb-3">{data.theme}</p>
-                        <div className="space-y-3">
-                          <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
-                            <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-1">
-                              ✦ {isEN ? "Defined center" : "Definované centrum"}
-                            </p>
-                            <p className="text-xs text-green-800 dark:text-green-300">{data.definedMeaning}</p>
-                          </div>
-                          <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700">
-                            <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                              ○ {isEN ? "Open center" : "Otevřené centrum"}
-                            </p>
-                            <p className="text-xs text-gray-800 dark:text-gray-200">{data.openMeaning}</p>
-                          </div>
-                          <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
-                            <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">
-                              ? {isEN ? "Not-Self question" : "Otázka Ne-Já"}
-                            </p>
-                            <p className="text-xs text-amber-800 dark:text-amber-300 italic">{data.notSelfQuestion}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
@@ -471,7 +482,7 @@ export default function Encyclopedia() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {selectedChannel.data.gates.map(gateNum => {
-                    const gateData = GATE_DESCRIPTIONS[gateNum];
+                    const gateData = hdData?.gates[gateNum];
                     return gateData ? (
                       <div key={gateNum} className="p-3 rounded-lg bg-muted/50 border">
                         <p className="text-xs font-semibold text-muted-foreground mb-0.5">

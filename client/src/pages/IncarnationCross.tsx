@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import type { HumanDesignChartData } from "@shared/types";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { GATE_DESCRIPTIONS } from "@shared/hdContent";
+import { trpc } from "@/lib/trpc";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 
 const CROSS_TYPE_CS: Record<string, string> = {
@@ -123,10 +123,11 @@ function GateDetailCard({
   color: string;
   icon: React.ReactNode;
   locale: string;
+  hdData: any;
 }) {
   const [expanded, setExpanded] = useState(false);
   if (!gateNumber) return null;
-  const gateDesc = GATE_DESCRIPTIONS[gateNumber];
+  const gateDesc = hdData?.gates[gateNumber];
   if (!gateDesc) return null;
   const isCs = locale === "cs";
   const name = isCs ? gateDesc.name : gateDesc.nameEn;
@@ -292,6 +293,10 @@ export default function IncarnationCross() {
   const { isAuthenticated } = useAuth();
   const { t, locale, localePath } = useLanguage();
   const tp = t.incarnationCrossPage;
+
+  const hdContentQuery = trpc.content.getHdContent.useQuery();
+  const hdData = hdContentQuery.data;
+
   const [chart, setChart] = useState<HumanDesignChartData | null>(null);
   const [chartMeta, setChartMeta] = useState<any>(null);
   const [aiContent, setAiContent] = useState<string>("");
@@ -420,8 +425,8 @@ export default function IncarnationCross() {
   const crossColor = crossType === "Right Angle Cross"
     ? "#7c3aed"
     : crossType === "Left Angle Cross"
-    ? "#2a9d8f"
-    : "#d4af37";
+      ? "#2a9d8f"
+      : "#d4af37";
 
   const sunGate = chart.personalityActivations?.find(p => p.planet === "Sun")?.gate;
   const earthGate = chart.personalityActivations?.find(p => p.planet === "Earth")?.gate;
@@ -613,6 +618,7 @@ export default function IncarnationCross() {
                       color={g.color}
                       icon={g.icon}
                       locale={locale}
+                      hdData={hdData}
                     />
                   ))}
                   {gateCardData.every(g => !g.gate) && (

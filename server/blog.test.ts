@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { blogArticles, getBlogArticleBySlug, getBlogArticlesByCategory } from "../shared/blogArticles";
+import { blogArticles, getBlogArticleBySlug, getBlogArticlesByCategory } from "./data/blogArticles";
 
 describe("Blog Articles", () => {
   it("should have at least 10 articles", () => {
