@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, ChevronLeft, ChevronRight, Sun, Moon, Sparkles, ArrowRight } from "lucide-react";
-import { GATE_DESCRIPTIONS } from "../../../shared/hdContent";
+
 
 const PLANET_NAMES_CS: Record<string, string> = {
   Sun: "Slunce", Earth: "Země", NorthNode: "Severní uzel", SouthNode: "Jižní uzel",
@@ -48,6 +48,9 @@ export default function TransitCalendar() {
   const { locale } = useLanguage();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMonth, setViewMonth] = useState(new Date());
+
+  const { data: hdData, isLoading: isLoadingContent } = trpc.content.hdData.useQuery();
+  const GATE_DESCRIPTIONS = hdData?.gates || {};
 
   useEffect(() => {
     if (locale === "en") {
@@ -326,10 +329,10 @@ export default function TransitCalendar() {
                     {personalPlanets.length > 0 ? (
                       <>
                         Dnes je Slunce v bráně <strong>{personalPlanets[0]?.gate}</strong> ({GATE_NAMES_CS[personalPlanets[0]?.gate]}) —
-                        {" "}{GATE_DESCRIPTIONS[personalPlanets[0]?.gate]?.theme || ""}. 
+                        {" "}{GATE_DESCRIPTIONS[personalPlanets[0]?.gate]?.theme || ""}.
                         {personalPlanets[1] && (
-                          <> Země je v bráně <strong>{personalPlanets[1]?.gate}</strong> ({GATE_NAMES_CS[personalPlanets[1]?.gate]}), 
-                          což přináší uzemňující energii {GATE_DESCRIPTIONS[personalPlanets[1]?.gate]?.theme?.toLowerCase() || ""}.</>
+                          <> Země je v bráně <strong>{personalPlanets[1]?.gate}</strong> ({GATE_NAMES_CS[personalPlanets[1]?.gate]}),
+                            což přináší uzemňující energii {GATE_DESCRIPTIONS[personalPlanets[1]?.gate]?.theme?.toLowerCase() || ""}.</>
                         )}
                       </>
                     ) : (
