@@ -1,15 +1,18 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 
-let _db: ReturnType<typeof drizzle> | null = null;
+let _db: any = null;
+let _pool: mysql.Pool | null = null;
 
 export async function getDb() {
-    console.log("[Database] getDb called, DATABASE_URL length:", process.env.DATABASE_URL?.length || 0);
     if (!_db && process.env.DATABASE_URL) {
         try {
-            _db = drizzle(process.env.DATABASE_URL);
+            console.log("[Database] Initializing connection pool...");
+            _pool = mysql.createPool(process.env.DATABASE_URL);
+            _db = drizzle(_pool);
         } catch (error) {
-            console.warn("[Database] Failed to connect:", error);
+            console.error("[Database] Failed to initialize pool:", error);
             _db = null;
         }
     }
