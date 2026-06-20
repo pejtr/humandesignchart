@@ -80,8 +80,8 @@ export default function Navbar() {
   const creditsLabel = isPremium
     ? "∞"
     : totalAvailable !== null
-    ? String(totalAvailable)
-    : null;
+      ? String(totalAvailable)
+      : null;
 
   // Pulse animation when credits increase
   const prevCreditsRef = useRef<number | null>(null);
@@ -123,238 +123,231 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out navbar-mystical ${
-        isScrolled
+      <header className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out navbar-mystical ${isScrolled
           ? "bg-background/95 backdrop-blur-xl shadow-sm shadow-black/5"
           : "bg-background/85 backdrop-blur-md border-b border-border/20"
-      }`}>
-        <nav className="w-full flex items-center justify-between h-16 gap-2 px-4 lg:px-6">
-          {/* Logo — custom HD bodygraph symbol */}
-          <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline shrink-0 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <circle cx="12" cy="4" r="2" />
-                <circle cx="12" cy="12" r="2.5" />
-                <circle cx="12" cy="20" r="2" />
-                <circle cx="6" cy="8" r="1.5" />
-                <circle cx="18" cy="8" r="1.5" />
-                <line x1="12" y1="6" x2="12" y2="9.5" />
-                <line x1="12" y1="14.5" x2="12" y2="18" />
-                <line x1="7.2" y1="7" x2="10" y2="10.5" />
-                <line x1="16.8" y1="7" x2="14" y2="10.5" />
-              </svg>
-            </div>
-            <span className="font-serif text-xl font-bold tracking-tight text-foreground hidden sm:block">
-              Human Design
-            </span>
-          </Link>
+        }`}>
+        <nav className="w-full grid grid-cols-3 items-center h-16 px-4 lg:px-6 relative">
+          {/* Left spacer for grid balance */}
+          <div className="flex lg:hidden" />
 
-          {/* Golden Halo — floating sacred ellipse, visible on mobile in the empty space */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none lg:hidden">
-            <div
-              className="w-16 h-8 rounded-[50%] border-2 border-amber-400/60 dark:border-amber-300/50"
-              style={{
-                boxShadow: '0 0 12px rgba(212,175,55,0.3), inset 0 0 8px rgba(212,175,55,0.15)',
-                animation: 'haloFloat 4s ease-in-out infinite',
-              }}
-            />
-          </div>
+          {/* Centered Section (Logo + Links) */}
+          <div className="flex items-center justify-center gap-6 col-start-1 col-end-4 lg:col-start-2 lg:col-end-3">
+            {/* Logo */}
+            <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline shrink-0 group">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
+                <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <circle cx="12" cy="4" r="2" />
+                  <circle cx="12" cy="12" r="2.5" />
+                  <circle cx="12" cy="20" r="2" />
+                  <circle cx="6" cy="8" r="1.5" />
+                  <circle cx="18" cy="8" r="1.5" />
+                  <line x1="12" y1="6" x2="12" y2="9.5" />
+                  <line x1="12" y1="14.5" x2="12" y2="18" />
+                  <line x1="7.2" y1="7" x2="10" y2="10.5" />
+                  <line x1="16.8" y1="7" x2="14" y2="10.5" />
+                </svg>
+              </div>
+              <span className="font-serif text-xl font-bold tracking-tight text-foreground hidden md:block">
+                Human Design
+              </span>
+            </Link>
 
-          {/* Desktop nav — left-aligned */}
-          <div className="hidden lg:flex items-center gap-0.5 flex-1 justify-start">
-            {primaryLinks.map(link => (
-              <Link key={link.href} href={localePath(link.href)}>
+            {/* Desktop nav links */}
+            <div className="hidden lg:flex items-center gap-0.5">
+              {primaryLinks.map(link => (
+                <Link key={link.href} href={localePath(link.href)}>
+                  <Button
+                    variant={isActive(link.href) ? "secondary" : "ghost"}
+                    size="sm"
+                    className="text-sm"
+                  >
+                    <link.icon className="w-4 h-4 mr-1.5" />
+                    {link.label}
+                  </Button>
+                </Link>
+              ))}
+
+              {/* Tools dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-sm gap-1">
+                    <Flame className="w-4 h-4" />
+                    {locale === "cs" ? "Nástroje" : "Tools"}
+                    <ChevronDown className="w-3 h-3 opacity-60" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="w-64 bg-popover text-popover-foreground">
+                  {toolsLinks.map(link => (
+                    <Link key={link.href} href={localePath(link.href)}>
+                      <DropdownMenuItem className="cursor-pointer py-2.5">
+                        <link.icon className="w-4 h-4 mr-2.5 text-primary shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium">{link.label}</p>
+                          <p className="text-xs text-muted-foreground">{link.desc}</p>
+                        </div>
+                      </DropdownMenuItem>
+                    </Link>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Explore dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-sm gap-1">
+                    <Sparkles className="w-4 h-4" />
+                    {locale === "cs" ? "Prozkoumat" : "Explore"}
+                    <ChevronDown className="w-3 h-3 opacity-60" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="w-64 bg-popover text-popover-foreground">
+                  {exploreLinks.map(link => (
+                    <Link key={link.href} href={localePath(link.href)}>
+                      <DropdownMenuItem className="cursor-pointer py-2.5">
+                        <link.icon className="w-4 h-4 mr-2.5 text-primary shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium">{link.label}</p>
+                          <p className="text-xs text-muted-foreground">{link.desc}</p>
+                        </div>
+                      </DropdownMenuItem>
+                    </Link>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Pricing link */}
+              <Link href={localePath("/pricing")}>
                 <Button
-                  variant={isActive(link.href) ? "secondary" : "ghost"}
+                  variant={isActive("/pricing") ? "secondary" : "ghost"}
                   size="sm"
                   className="text-sm"
                 >
-                  <link.icon className="w-4 h-4 mr-1.5" />
-                  {link.label}
+                  <Crown className="w-4 h-4 mr-1.5" />
+                  {locale === "cs" ? "Premium" : "Premium"}
                 </Button>
               </Link>
-            ))}
+            </div>
 
-            {/* Tools dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-sm gap-1">
-                  <Flame className="w-4 h-4" />
-                  {locale === "cs" ? "Nástroje" : "Tools"}
-                  <ChevronDown className="w-3 h-3 opacity-60" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-64 bg-popover text-popover-foreground">
-                {toolsLinks.map(link => (
-                  <Link key={link.href} href={localePath(link.href)}>
-                    <DropdownMenuItem className="cursor-pointer py-2.5">
-                      <link.icon className="w-4 h-4 mr-2.5 text-primary shrink-0" />
-                      <div>
-                        <p className="text-sm font-medium">{link.label}</p>
-                        <p className="text-xs text-muted-foreground">{link.desc}</p>
-                      </div>
-                    </DropdownMenuItem>
-                  </Link>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Explore dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-sm gap-1">
-                  <Sparkles className="w-4 h-4" />
-                  {locale === "cs" ? "Prozkoumat" : "Explore"}
-                  <ChevronDown className="w-3 h-3 opacity-60" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-64 bg-popover text-popover-foreground">
-                {exploreLinks.map(link => (
-                  <Link key={link.href} href={localePath(link.href)}>
-                    <DropdownMenuItem className="cursor-pointer py-2.5">
-                      <link.icon className="w-4 h-4 mr-2.5 text-primary shrink-0" />
-                      <div>
-                        <p className="text-sm font-medium">{link.label}</p>
-                        <p className="text-xs text-muted-foreground">{link.desc}</p>
-                      </div>
-                    </DropdownMenuItem>
-                  </Link>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Pricing link */}
-            <Link href={localePath("/pricing")}>
+            {/* Desktop right section: theme toggle + language + user */}
+            <div className="hidden lg:flex items-center gap-1.5 shrink-0">
+              {/* Theme toggle */}
               <Button
-                variant={isActive("/pricing") ? "secondary" : "ghost"}
-                size="sm"
-                className="text-sm"
+                variant="ghost"
+                size="icon"
+                className="w-8 h-8 rounded-full"
+                onClick={toggleTheme}
+                title={
+                  preference === "light" ? (locale === "cs" ? "Světlý → Tmavý" : "Light → Dark") :
+                    preference === "dark" ? (locale === "cs" ? "Tmavý → Systém" : "Dark → System") :
+                      (locale === "cs" ? "Systém → Světlý" : "System → Light")
+                }
               >
-                <Crown className="w-4 h-4 mr-1.5" />
-                {locale === "cs" ? "Premium" : "Premium"}
+                {preference === "dark" ? (
+                  <Moon className="w-4 h-4 text-indigo-400 transition-transform hover:-rotate-12" />
+                ) : preference === "system" ? (
+                  <Monitor className="w-4 h-4 text-emerald-500 transition-transform hover:scale-110" />
+                ) : (
+                  <Sun className="w-4 h-4 text-amber-500 transition-transform hover:rotate-45" />
+                )}
               </Button>
-            </Link>
-          </div>
-
-          {/* Desktop right section: theme toggle + language + user */}
-          <div className="hidden lg:flex items-center gap-1.5 shrink-0">
-            {/* Theme toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-8 h-8 rounded-full"
-              onClick={toggleTheme}
-              title={
-                preference === "light" ? (locale === "cs" ? "Světlý → Tmavý" : "Light → Dark") :
-                preference === "dark" ? (locale === "cs" ? "Tmavý → Systém" : "Dark → System") :
-                (locale === "cs" ? "Systém → Světlý" : "System → Light")
-              }
-            >
-              {preference === "dark" ? (
-                <Moon className="w-4 h-4 text-indigo-400 transition-transform hover:-rotate-12" />
-              ) : preference === "system" ? (
-                <Monitor className="w-4 h-4 text-emerald-500 transition-transform hover:scale-110" />
-              ) : (
-                <Sun className="w-4 h-4 text-amber-500 transition-transform hover:rotate-45" />
-              )}
-            </Button>
-            <LanguageSwitcher />
-            {isAuthenticated ? (
-              <>
-                {/* Notification Bell */}
-                {user?.id && <NotificationBell userId={user.id} />}
-                {/* Credits badge — links to Dashboard subscription tab */}
-                {creditsLabel !== null && (
-                  <Link href={localePath("/dashboard")}>
-                    <button
-                      title={locale === "cs" ? `${creditsLabel === "∞" ? "Neomezené" : creditsLabel} AI výkladů k dispozici` : `${creditsLabel === "∞" ? "Unlimited" : creditsLabel} AI readings available`}
-                      className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold transition-all
+              <LanguageSwitcher />
+              {isAuthenticated ? (
+                <>
+                  {/* Notification Bell */}
+                  {user?.id && <NotificationBell userId={user.id} />}
+                  {/* Credits badge — links to Dashboard subscription tab */}
+                  {creditsLabel !== null && (
+                    <Link href={localePath("/dashboard")}>
+                      <button
+                        title={locale === "cs" ? `${creditsLabel === "∞" ? "Neomezené" : creditsLabel} AI výkladů k dispozici` : `${creditsLabel === "∞" ? "Unlimited" : creditsLabel} AI readings available`}
+                        className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold transition-all
                         bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20
                         hover:bg-purple-500/20 hover:border-purple-500/40
                         ${creditsPulse ? 'ring-2 ring-purple-400 ring-offset-1 scale-110 bg-purple-500/20' : ''}`}
-                    >
-                      <Sparkles className={`w-3 h-3 ${creditsPulse ? 'animate-spin' : ''}`} />
-                      {creditsLabel}
-                    </button>
-                  </Link>
-                )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full" title={user?.name || t.common.account}>
-                    <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center">
-                      <User className="w-4 h-4 text-primary" />
-                    </div>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52 bg-popover text-popover-foreground">
-                  {/* User name + plan badge */}
-                  <div className="px-3 py-2 border-b border-border/50">
-                    <p className="text-sm font-semibold truncate">{user?.name || t.common.account}</p>
-                    {isPremium ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500 mt-0.5">
-                        👑 Premium
-                      </span>
-                    ) : (
-                      <span className="text-[11px] text-muted-foreground">{locale === "cs" ? "Free plán" : "Free plan"}</span>
-                    )}
-                  </div>
-                  <Link href={localePath("/dashboard")}>
-                    <DropdownMenuItem>
-                      <LayoutDashboard className="w-4 h-4 mr-2" />
-                      {t.common.dashboard}
-                    </DropdownMenuItem>
-                  </Link>
-                  {user?.role === "admin" && (
-                    <Link href={localePath("/crm-dashboard")}>
-                      <DropdownMenuItem className="text-violet-600 dark:text-violet-400 focus:text-violet-600 focus:dark:text-violet-400">
-                        <BarChart3 className="w-4 h-4 mr-2" />
-                        CRM Dashboard
-                      </DropdownMenuItem>
+                      >
+                        <Sparkles className={`w-3 h-3 ${creditsPulse ? 'animate-spin' : ''}`} />
+                        {creditsLabel}
+                      </button>
                     </Link>
                   )}
-                  {/* Credit pack quick-buy — only for non-premium */}
-                  {!isPremium && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <Link href={localePath("/pricing")}>
-                        <DropdownMenuItem className="text-primary focus:text-primary">
-                          <Zap className="w-4 h-4 mr-2" />
-                          {locale === "cs" ? "5 výkladů za 49 Kč" : "5 readings – €1.99"}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full" title={user?.name || t.common.account}>
+                        <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center">
+                          <User className="w-4 h-4 text-primary" />
+                        </div>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-52 bg-popover text-popover-foreground">
+                      {/* User name + plan badge */}
+                      <div className="px-3 py-2 border-b border-border/50">
+                        <p className="text-sm font-semibold truncate">{user?.name || t.common.account}</p>
+                        {isPremium ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500 mt-0.5">
+                            👑 Premium
+                          </span>
+                        ) : (
+                          <span className="text-[11px] text-muted-foreground">{locale === "cs" ? "Free plán" : "Free plan"}</span>
+                        )}
+                      </div>
+                      <Link href={localePath("/dashboard")}>
+                        <DropdownMenuItem>
+                          <LayoutDashboard className="w-4 h-4 mr-2" />
+                          {t.common.dashboard}
                         </DropdownMenuItem>
                       </Link>
-                    </>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => logout()}>
-                    <LogOut className="w-4 h-4 mr-2" />
-                    {t.common.signOut}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              </>
-            ) : (
-              <a href={getLoginUrl()}>
-                <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                  {t.common.signIn}
-                </Button>
-              </a>
-            )}
-          </div>
+                      {user?.role === "admin" && (
+                        <Link href={localePath("/crm-dashboard")}>
+                          <DropdownMenuItem className="text-violet-600 dark:text-violet-400 focus:text-violet-600 focus:dark:text-violet-400">
+                            <BarChart3 className="w-4 h-4 mr-2" />
+                            CRM Dashboard
+                          </DropdownMenuItem>
+                        </Link>
+                      )}
+                      {/* Credit pack quick-buy — only for non-premium */}
+                      {!isPremium && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <Link href={localePath("/pricing")}>
+                            <DropdownMenuItem className="text-primary focus:text-primary">
+                              <Zap className="w-4 h-4 mr-2" />
+                              {locale === "cs" ? "5 výkladů za 49 Kč" : "5 readings – €1.99"}
+                            </DropdownMenuItem>
+                          </Link>
+                        </>
+                      )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => logout()}>
+                        <LogOut className="w-4 h-4 mr-2" />
+                        {t.common.signOut}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              ) : (
+                <a href={getLoginUrl()}>
+                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                    {t.common.signIn}
+                  </Button>
+                </a>
+              )}
+            </div>
 
-          {/* Mobile: hamburger only */}
-          <div className="flex lg:hidden items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="p-2"
-              onClick={() => setMobileOpen(true)}
-              aria-label={locale === "cs" ? "Otevřít menu" : "Open menu"}
-              aria-expanded={mobileOpen}
-              aria-controls="mobile-menu"
-            >
-              <Menu className="w-5 h-5" />
-            </Button>
-          </div>
+            {/* Mobile: hamburger only */}
+            <div className="flex lg:hidden items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-2"
+                onClick={() => setMobileOpen(true)}
+                aria-label={locale === "cs" ? "Otevřít menu" : "Open menu"}
+                aria-expanded={mobileOpen}
+                aria-controls="mobile-menu"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+            </div>
         </nav>
       </header>
 
@@ -420,8 +413,8 @@ export default function Navbar() {
               onClick={toggleTheme}
               title={
                 preference === "light" ? (locale === "cs" ? "Světlý" : "Light") :
-                preference === "dark" ? (locale === "cs" ? "Tmavý" : "Dark") :
-                (locale === "cs" ? "Systém" : "System")
+                  preference === "dark" ? (locale === "cs" ? "Tmavý" : "Dark") :
+                    (locale === "cs" ? "Systém" : "System")
               }
             >
               {preference === "dark" ? (
@@ -455,11 +448,10 @@ export default function Navbar() {
             {primaryLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <button
-                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-colors mb-1 ${
-                    isActive(link.href)
+                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-colors mb-1 ${isActive(link.href)
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
-                  }`}
+                    }`}
                   onClick={() => setMobileOpen(false)}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive(link.href) ? "bg-primary/20" : "bg-muted"}`}>
@@ -472,11 +464,10 @@ export default function Navbar() {
             {/* Pricing in main section */}
             <Link href={localePath("/pricing")}>
               <button
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-colors mb-1 ${
-                  isActive("/pricing")
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-colors mb-1 ${isActive("/pricing")
                     ? "bg-primary/10 text-primary"
                     : "text-foreground hover:bg-muted"
-                }`}
+                  }`}
                 onClick={() => setMobileOpen(false)}
               >
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive("/pricing") ? "bg-primary/20" : "bg-muted"}`}>
@@ -498,11 +489,10 @@ export default function Navbar() {
             {toolsLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <button
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-0.5 ${
-                    isActive(link.href)
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-0.5 ${isActive(link.href)
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
-                  }`}
+                    }`}
                   onClick={() => setMobileOpen(false)}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive(link.href) ? "bg-primary/20" : "bg-muted"}`}>
@@ -528,11 +518,10 @@ export default function Navbar() {
             {exploreLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <button
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-0.5 ${
-                    isActive(link.href)
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-0.5 ${isActive(link.href)
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
-                  }`}
+                    }`}
                   onClick={() => setMobileOpen(false)}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive(link.href) ? "bg-primary/20" : "bg-muted"}`}>
