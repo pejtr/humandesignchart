@@ -14,7 +14,7 @@ export const BLOG_ARTICLES_EN: BlogArticle[] = [
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-amber-50 to-orange-50",
     coverIcon: "Compass",
-    coverImage: "/manus-storage/blog-cover-what-is-hd-9eTivLzbjfpYqb3AY3wvyb_23db6d10.webp",
+    coverImage: "/images/blog-cover-what-is-hd-9eTivLzbjfpYqb3AY3wvyb_23db6d10.webp",
     tags: ["human design", "what is human design", "human design system", "beginner's guide", "self-discovery", "spirituality"],
     content: `# What is Human Design? A Complete Beginner's Guide
 
@@ -102,7 +102,7 @@ Ready to go deeper? Explore [how to read your Bodygraph](/en/blog/how-to-read-bo
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-violet-50 to-purple-50",
     coverIcon: "Users",
-    coverImage: "/manus-storage/blog-cover-5-types-YY6JuStBBaYytjF8swFTEz_b4d53166.webp",
+    coverImage: "/images/blog-cover-5-types-YY6JuStBBaYytjF8swFTEz_b4d53166.webp",
     tags: ["human design types", "manifestor", "generator", "projector", "reflector", "human design type test"],
     content: `# 5 Human Design Types: Which One Are You?
 
@@ -187,7 +187,7 @@ Once you know your type, explore your [Strategy](/en/blog/human-design-strategy)
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-emerald-50 to-green-50",
     coverIcon: "Compass",
-    coverImage: "/manus-storage/blog-cover-strategy-QJVhQQszbuzrXhxog29apU_be3f4330.webp",
+    coverImage: "/images/blog-cover-strategy-QJVhQQszbuzrXhxog29apU_be3f4330.webp",
     tags: ["human design strategy", "wait to respond", "wait for invitation", "to inform", "human design types", "manifestor", "generator", "projector", "reflector", "initiator"],
     content: `Human Design offers a profound system for understanding our unique energetic blueprint, guiding us toward a life of greater ease and authenticity. At its core lies the concept of **Human Design Strategy**, a personalized approach to decision-making and interaction that aligns you with your natural flow. When you operate according to your specific strategy, you minimize resistance, attract the right opportunities, and experience a deeper sense of purpose and fulfillment.
 
@@ -247,7 +247,7 @@ Next steps: learn about your [inner Authority](/en/blog/human-design-authority),
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-blue-50 to-indigo-50",
     coverIcon: "Brain",
-    coverImage: "/manus-storage/blog-cover-authority-QGccsjASgJwE2xu6AUbTAN_71a6ea8d.webp",
+    coverImage: "/images/blog-cover-authority-QGccsjASgJwE2xu6AUbTAN_71a6ea8d.webp",
     tags: ["human design authority", "emotional authority", "sacral authority", "splenic authority", "decision making"],
     content: `# Human Design Authority: Your Inner Decision-Making Compass
 
@@ -321,7 +321,7 @@ Once you know your authority, explore your [Profile](/en/blog/human-design-profi
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-orange-50 to-amber-50",
     coverIcon: "Circle",
-    coverImage: "/manus-storage/blog-cover-profiles-SYULYkCAeC979gZ6rELWp7_b84a6420.webp",
+    coverImage: "/images/blog-cover-profiles-SYULYkCAeC979gZ6rELWp7_b84a6420.webp",
     tags: ["human design centers", "defined centers", "undefined centers", "bodygraph centers", "human design", "centers"],
     content: `# 9 Centers in Human Design: Defined vs Undefined
 
@@ -402,7 +402,7 @@ Related reading: [Open vs. Defined Centers: How Your Environment Conditions You]
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-emerald-50 to-green-50",
     coverIcon: "Zap",
-    coverImage: "/manus-storage/blog-cover-strategy-QJVhQQszbuzrXhxog29apU_be3f4330.webp",
+    coverImage: "/images/blog-cover-strategy-QJVhQQszbuzrXhxog29apU_be3f4330.webp",
     tags: ["generator human design", "sacral response", "wait to respond generator", "generator strategy"],
     content: `# Generator Human Design: The Art of Responding to Life
 
@@ -469,7 +469,7 @@ Related reading: [Sacral Authority in Human Design](/en/blog/sacral-authority-hu
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-pink-50 to-rose-50",
     coverIcon: "Heart",
-    coverImage: "/manus-storage/blog-cover-relationships-6e7CiBwXEvELkByKScTSMr_2ef818c7.webp",
+    coverImage: "/images/blog-cover-relationships-6e7CiBwXEvELkByKScTSMr_2ef818c7.webp",
     tags: ["human design relationships", "human design compatibility", "electromagnetic connection", "composite chart"],
     content: `# Human Design and Relationships: Understanding Partnership Dynamics
 
@@ -532,7 +532,7 @@ Related reading: [Electromagnetic Connections in Human Design](/en/blog/electrom
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-teal-50 to-cyan-50",
     coverIcon: "Star",
-    coverImage: "/manus-storage/blog-cover-what-is-hd-9eTivLzbjfpYqb3AY3wvyb_23db6d10.webp",
+    coverImage: "/images/blog-cover-what-is-hd-9eTivLzbjfpYqb3AY3wvyb_23db6d10.webp",
     tags: ["incarnation cross", "human design", "life purpose", "right angle cross", "left angle cross"],
     content: `# Incarnation Cross: Your Life Purpose in Human Design
 
@@ -603,7 +603,7 @@ Related reading: [Electromagnetic Connections in Human Design](/en/blog/electrom
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-orange-50 to-red-50",
     coverIcon: "Zap",
-    coverImage: "/manus-storage/blog-cover-5-types-YY6JuStBBaYytjF8swFTEz_b4d53166.webp",
+    coverImage: "/images/blog-cover-5-types-YY6JuStBBaYytjF8swFTEz_b4d53166.webp",
     tags: ["manifesting generator", "human design", "MG strategy", "frustration anger", "energy type"],
     content: `# Manifesting Generator: The Hybrid Powerhouse of Human Design
 
@@ -660,7 +660,7 @@ Related reading: [Generator Human Design: The Art of Responding](/en/blog/genera
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-red-50 to-orange-50",
     coverIcon: "Flame",
-    coverImage: "/manus-storage/blog-cover-authority-QGccsjASgJwE2xu6AUbTAN_71a6ea8d.webp",
+    coverImage: "/images/blog-cover-authority-QGccsjASgJwE2xu6AUbTAN_71a6ea8d.webp",
     tags: ["manifestor human design", "manifestor strategy to inform", "manifestor anger", "manifestor aura"],
     content: `# Manifestor Human Design: The Initiator's Complete Guide
 
@@ -728,7 +728,7 @@ Related reading: [5 Human Design Types](/en/blog/5-types-human-design), [Human D
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-cyan-50 to-blue-50",
     coverIcon: "Moon",
-    coverImage: "/manus-storage/blog-cover-profiles-SYULYkCAeC979gZ6rELWp7_b84a6420.webp",
+    coverImage: "/images/blog-cover-profiles-SYULYkCAeC979gZ6rELWp7_b84a6420.webp",
     tags: ["reflector human design", "reflector lunar cycle", "reflector strategy", "reflector disappointment", "human design types", "open centers"],
     content: `# Reflector Human Design: The Rarest and Most Mystical Type
 
@@ -784,7 +784,7 @@ Understanding your Human Design type is the first step towards living a life tha
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-blue-50 to-purple-50",
     coverIcon: "Waves",
-    coverImage: "/manus-storage/blog-cover-authority-QGccsjASgJwE2xu6AUbTAN_71a6ea8d.webp",
+    coverImage: "/images/blog-cover-authority-QGccsjASgJwE2xu6AUbTAN_71a6ea8d.webp",
     tags: ["emotional authority human design", "emotional wave", "solar plexus authority", "wait for clarity", "human design", "authority"],
     content: `# Emotional Authority in Human Design: Riding the Wave
 
@@ -851,7 +851,7 @@ Related reading: [5 Human Design Types](/en/blog/5-types-human-design), [Human D
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-orange-50 to-yellow-50",
     coverIcon: "Zap",
-    coverImage: "/manus-storage/blog-cover-strategy-QJVhQQszbuzrXhxog29apU_be3f4330.webp",
+    coverImage: "/images/blog-cover-strategy-QJVhQQszbuzrXhxog29apU_be3f4330.webp",
     tags: ["sacral authority human design", "sacral response", "gut feeling human design", "uh-huh response", "human design authority", "generators", "manifesting generators"],
     content: `# Sacral Authority: How to Hear Your Gut Response
 
@@ -928,7 +928,7 @@ Related reading: [Generator Human Design](/en/blog/generator-strategy-respond), 
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-indigo-50 to-blue-50",
     coverIcon: "Briefcase",
-    coverImage: "/manus-storage/blog-cover-relationships-6e7CiBwXEvELkByKScTSMr_2ef818c7.webp",
+    coverImage: "/images/blog-cover-relationships-6e7CiBwXEvELkByKScTSMr_2ef818c7.webp",
     tags: ["human design career", "human design work", "career human design type", "human design job", "human design", "career", "work", "job"],
     content: `. Manifesting Generators, while also needing to respond, have a faster, more efficient energy and can move quickly between tasks, often juggling multiple projects at once. Their strategy is to respond and then inform.
 
@@ -1015,7 +1015,7 @@ Related reading: [5 Human Design Types](/en/blog/5-types-human-design), [Human D
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-green-50 to-teal-50",
     coverIcon: "Leaf",
-    coverImage: "/manus-storage/blog-cover-profiles-SYULYkCAeC979gZ6rELWp7_b84a6420.webp",
+    coverImage: "/images/blog-cover-profiles-SYULYkCAeC979gZ6rELWp7_b84a6420.webp",
     tags: ["human design deconditioning", "not-self human design", "conditioning human design", "7 year deconditioning", "human design basics", "self-discovery"],
     content: `# Human Design Deconditioning: The 7-Year Journey to Yourself
 
@@ -1064,7 +1064,7 @@ Related reading: [Not-Self Themes in Human Design](/en/blog/human-design-not-sel
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-purple-50 to-violet-50",
     coverIcon: "Circle",
-    coverImage: "/manus-storage/blog-cover-what-is-hd-9eTivLzbjfpYqb3AY3wvyb_23db6d10.webp",
+    coverImage: "/images/blog-cover-what-is-hd-9eTivLzbjfpYqb3AY3wvyb_23db6d10.webp",
     tags: ["open centers human design", "defined centers human design", "conditioning centers", "not-self theme", "human design centers", "deconditioning"],
     content: `The Human Design system offers a profound map of our unique energetic blueprint, revealing how we are designed to interact with the world. At its core are the nine centers, energetic hubs that process life force, emotions, thoughts, and actions. Understanding whether these centers are **open (white)** or **defined (colored)** is fundamental to unlocking self-awareness and navigating the powerful forces of conditioning.
 
@@ -1127,7 +1127,7 @@ Related reading: [9 Centers in Human Design](/en/blog/9-centers-human-design), [
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-navy-50 to-indigo-50",
     coverIcon: "Moon",
-    coverImage: "/manus-storage/blog-cover-5-types-YY6JuStBBaYytjF8swFTEz_b4d53166.webp",
+    coverImage: "/images/blog-cover-5-types-YY6JuStBBaYytjF8swFTEz_b4d53166.webp",
     tags: ["human design sleep", "generator sleep", "projector rest", "human design bed time", "manifestor sleep", "reflector sleep", "sleep tips", "recharge"],
     content: `# Human Design Sleep: How Each Type Should Rest and Recharge
 
@@ -1200,7 +1200,7 @@ Related reading: [Human Design PHS: Optimize Your Health](/en/blog/human-design-
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-slate-50 to-gray-50",
     coverIcon: "AlertCircle",
-    coverImage: "/manus-storage/blog-cover-strategy-QJVhQQszbuzrXhxog29apU_be3f4330.webp",
+    coverImage: "/images/blog-cover-strategy-QJVhQQszbuzrXhxog29apU_be3f4330.webp",
     tags: ["not-self theme human design", "frustration human design", "bitterness human design", "anger human design", "disappointment human design", "human design strategy", "inner authority"],
     content: `The journey of self-discovery through Human Design is profoundly empowering, offering a unique map to your authentic self. Yet, even with this map, we often find ourselves veering off course, entangled in patterns that don't serve our highest good. These are the moments when your **Not-Self Themes** emerge—powerful signals indicating you're operating out of alignment with your unique energetic blueprint. Recognizing these themes is not about self-criticism, but about gaining clarity and redirecting your energy back to your true path.
 
@@ -1275,7 +1275,7 @@ Related reading: [Human Design Deconditioning](/en/blog/human-design-decondition
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-amber-50 to-yellow-50",
     coverIcon: "GitBranch",
-    coverImage: "/manus-storage/blog-cover-relationships-6e7CiBwXEvELkByKScTSMr_2ef818c7.webp",
+    coverImage: "/images/blog-cover-relationships-6e7CiBwXEvELkByKScTSMr_2ef818c7.webp",
     tags: ["human design channels", "defined channels", "channel 20-57", "channel 36-35", "human design gifts", "human design centers", "human design talents", "human design chart"],
     content: `# Human Design Channels: Your Consistent Gifts and Talents
 
@@ -1330,7 +1330,7 @@ Your Human Design channels are not just lines on a chart; they are the energetic
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-amber-50 to-gold-50",
     coverIcon: "Hash",
-    coverImage: "/manus-storage/blog-cover-profiles-SYULYkCAeC979gZ6rELWp7_b84a6420.webp",
+    coverImage: "/images/blog-cover-profiles-SYULYkCAeC979gZ6rELWp7_b84a6420.webp",
     tags: ["human design gates", "64 gates human design", "I Ching human design", "gate meanings", "human experience", "archetypes"],
     content: `## Understanding the Human Design Gates: Your Energetic Blueprint
 
@@ -1403,7 +1403,7 @@ Related reading: [9 Centers in Human Design](/en/blog/9-centers-human-design), [
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-green-50 to-lime-50",
     coverIcon: "Leaf",
-    coverImage: "/manus-storage/blog-cover-authority-QGccsjASgJwE2xu6AUbTAN_71a6ea8d.webp",
+    coverImage: "/images/blog-cover-authority-QGccsjASgJwE2xu6AUbTAN_71a6ea8d.webp",
     tags: ["human design PHS", "human design digestion", "primary health system", "human design diet", "variables human design"],
     content: `# Human Design PHS: Optimize Your Health Through Your Design
 
@@ -1461,7 +1461,7 @@ Related reading: [Human Design Sleep Strategies](/en/blog/human-design-sleep-res
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-purple-50 to-blue-50",
     coverIcon: "Stars",
-    coverImage: "/manus-storage/blog-cover-what-is-hd-9eTivLzbjfpYqb3AY3wvyb_23db6d10.webp",
+    coverImage: "/images/blog-cover-what-is-hd-9eTivLzbjfpYqb3AY3wvyb_23db6d10.webp",
     tags: ["human design vs astrology", "human design astrology comparison", "is human design astrology", "human design birth chart", "astrology", "human design", "self-discovery", "energetic blueprint"],
     content: `# Human Design vs Astrology: What's the Difference?
 
@@ -1534,7 +1534,7 @@ Related reading: [What is Human Design?](/en/blog/what-is-human-design), [Human 
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-pink-50 to-magenta-50",
     coverIcon: "Zap",
-    coverImage: "/manus-storage/blog-cover-5-types-YY6JuStBBaYytjF8swFTEz_b4d53166.webp",
+    coverImage: "/images/blog-cover-5-types-YY6JuStBBaYytjF8swFTEz_b4d53166.webp",
     tags: ["electromagnetic connection human design", "human design compatibility", "composite chart", "channel completion", "relationships"],
     content: `# Electromagnetic Connections in Human Design: When Two Charts Complete Each Other
 
@@ -1593,7 +1593,7 @@ Related reading: [Human Design and Relationships](/en/blog/human-design-relation
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-indigo-50 to-purple-50",
     coverIcon: "Globe",
-    coverImage: "/manus-storage/blog-cover-strategy-QJVhQQszbuzrXhxog29apU_be3f4330.webp",
+    coverImage: "/images/blog-cover-strategy-QJVhQQszbuzrXhxog29apU_be3f4330.webp",
     tags: ["human design transits", "daily transits human design", "planetary transits human design", "transit gates", "human design", "transits", "astrology"],
     content: `# Human Design Transits: How Planetary Movements Affect You Daily
 
@@ -1670,7 +1670,7 @@ Related reading: [Human Design vs Astrology](/en/blog/human-design-vs-astrology)
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-teal-50 to-blue-50",
     coverIcon: "Map",
-    coverImage: "/manus-storage/blog-cover-relationships-6e7CiBwXEvELkByKScTSMr_2ef818c7.webp",
+    coverImage: "/images/blog-cover-relationships-6e7CiBwXEvELkByKScTSMr_2ef818c7.webp",
     tags: ["how to read human design chart", "bodygraph explained", "human design chart reading", "bodygraph beginner guide", "Human Design", "Bodygraph"],
     content: `# How to Read a Human Design Bodygraph: Step-by-Step Guide
 
@@ -1771,7 +1771,7 @@ Related reading: [9 Centers in Human Design](/en/blog/9-centers-human-design), [
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-violet-50 to-pink-50",
     coverIcon: "FlaskConical",
-    coverImage: "/manus-storage/blog-cover-profiles-SYULYkCAeC979gZ6rELWp7_b84a6420.webp",
+    coverImage: "/images/blog-cover-profiles-SYULYkCAeC979gZ6rELWp7_b84a6420.webp",
     tags: ["human design experiment", "living by design", "human design practice", "how to start human design"],
     content: `
 # The Human Design Experiment: Your 30-Day Guide to Living by Design
@@ -1862,7 +1862,7 @@ Related reading: [Human Design Strategy](/en/blog/human-design-strategy), [Human
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-rose-50 to-pink-50",
     coverIcon: "Star",
-    coverImage: "/manus-storage/blog-cover-authority-QGccsjASgJwE2xu6AUbTAN_71a6ea8d.webp",
+    coverImage: "/images/blog-cover-authority-QGccsjASgJwE2xu6AUbTAN_71a6ea8d.webp",
     tags: ["profiles", "life role", "lines", "human design profile", "1/3 profile"],
     content: `## What Is a Human Design Profile?
 
@@ -1949,7 +1949,7 @@ Related reading: [Human Design Authority](/en/blog/human-design-authority), [Hum
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-violet-50 to-indigo-50",
     coverIcon: "Eye",
-    coverImage: "/manus-storage/blog-cover-what-is-hd-9eTivLzbjfpYqb3AY3wvyb_23db6d10.webp",
+    coverImage: "/images/blog-cover-what-is-hd-9eTivLzbjfpYqb3AY3wvyb_23db6d10.webp",
     tags: ["projector", "wait for invitation", "projector strategy", "recognition", "bitterness"],
     content: `## The Projector: A New Kind of Leader
 
@@ -2043,7 +2043,7 @@ Related reading: [5 Human Design Types](/en/blog/5-types-human-design), [Human D
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-yellow-50 to-amber-50",
     coverIcon: "Heart",
-    coverImage: "/manus-storage/blog-cover-5-types-YY6JuStBBaYytjF8swFTEz_b4d53166.webp",
+    coverImage: "/images/blog-cover-5-types-YY6JuStBBaYytjF8swFTEz_b4d53166.webp",
     tags: ["human design children", "parenting", "child human design", "raising kids", "human design family"],
     content: `## Why Human Design Changes Everything for Parents
 
@@ -2139,7 +2139,7 @@ Related reading: [Human Design and Relationships](/en/blog/human-design-relation
     updatedAt: "2026-03-07",
     coverColor: "bg-gradient-to-br from-teal-50 to-green-50",
     coverIcon: "Shield",
-    coverImage: "/manus-storage/blog-cover-strategy-QJVhQQszbuzrXhxog29apU_be3f4330.webp",
+    coverImage: "/images/blog-cover-strategy-QJVhQQszbuzrXhxog29apU_be3f4330.webp",
     tags: ["splenic authority", "spleen authority", "instinct human design", "splenic center", "decision making"],
     content: `## What Is Splenic Authority?
 

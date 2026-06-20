@@ -54,9 +54,9 @@ export default function Footer() {
             <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{t.footer.learn}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link href={localePath("/iching")} className="hover:text-primary transition-colors">{t.footer.iChingOracle}</Link></li>
-              <li><Link href={localePath("/calculate")} className="hover:text-primary transition-colors">{t.footer.typesStrategy}</Link></li>
-              <li><Link href={localePath("/calculate")} className="hover:text-primary transition-colors">{t.footer.authorityLabel}</Link></li>
-              <li><Link href={localePath("/calculate")} className="hover:text-primary transition-colors">{t.footer.gatesChannels}</Link></li>
+              <li><Link href={localePath("/blog")} className="hover:text-primary transition-colors">{t.footer.typesStrategy}</Link></li>
+              <li><Link href={localePath("/blog")} className="hover:text-primary transition-colors">{t.footer.authorityLabel}</Link></li>
+              <li><Link href={localePath("/blog")} className="hover:text-primary transition-colors">{t.footer.gatesChannels}</Link></li>
               <li><Link href={localePath("/blog")} className="hover:text-primary transition-colors">Blog</Link></li>
             </ul>
           </div>

@@ -40,7 +40,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-amber-50 to-orange-50",
     coverIcon: "Compass",
-    coverImage: "/manus-storage/blog-what-is-hd_71817bfc.webp",
+    coverImage: "/images/blog-what-is-hd_71817bfc.webp",
     tags: ["human design", "základy", "sebepoznání", "začátečníci"],
     content: `## Co je Human Design?
 
@@ -102,7 +102,7 @@ Human Design není víra ani dogma — je to experiment. Ra Uru Hu vždy říkal
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-violet-50 to-purple-50",
     coverIcon: "Users",
-    coverImage: "/manus-storage/blog-5-types_bb130b58.webp",
+    coverImage: "/images/blog-5-types_bb130b58.webp",
     tags: ["typy", "generátor", "projektor", "manifestor", "reflektor"],
     content: `## Pět typů v Human Designu
 
@@ -185,7 +185,7 @@ K zjištění svého typu potřebujete přesné datum, čas a místo narození. 
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-emerald-50 to-teal-50",
     coverIcon: "Target",
-    coverImage: "/manus-storage/blog-strategy_4749d297.webp",
+    coverImage: "/images/blog-strategy_4749d297.webp",
     tags: ["strategie", "rozhodování", "reagovat", "informovat", "pozvání"],
     content: `## Co je strategie v Human Designu?
 
@@ -245,7 +245,7 @@ Chcete zjistit svou strategii? **[Vypočítejte si svůj Human Design chart](/cs
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-blue-50 to-indigo-50",
     coverIcon: "Brain",
-    coverImage: "/manus-storage/blog-authority_0b2a2a02.webp",
+    coverImage: "/images/blog-authority_0b2a2a02.webp",
     tags: ["autorita", "rozhodování", "sakrální", "emocionální", "slezinová"],
     content: `## Co je autorita v Human Designu?
 
@@ -324,7 +324,7 @@ Pamatujte: autorita vždy pracuje společně se [strategií](/cs/blog/strategie-
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-rose-50 to-pink-50",
     coverIcon: "Star",
-    coverImage: "/manus-storage/blog-profiles_fe6f9a4d.webp",
+    coverImage: "/images/blog-profiles_fe6f9a4d.webp",
     tags: ["profil", "životní role", "linie", "1/3", "2/4", "5/1", "6/2"],
     content: `## Co je profil v Human Designu?
 
@@ -400,7 +400,7 @@ Profil úzce souvisí s vaším [inkarnačním křížem](/cs/blog/inkarnacni-kr
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-orange-50 to-amber-50",
     coverIcon: "Circle",
-    coverImage: "/manus-storage/blog-authority_0b2a2a02.webp",
+    coverImage: "/images/blog-authority_0b2a2a02.webp",
     tags: ["centra", "definovaná centra", "otevřená centra", "kondicionování", "bodygraph"],
     content: `## Co jsou centra v Human Designu?
 
@@ -486,7 +486,7 @@ Vaše definovaná a otevřená centra jsou viditelná v bodygraphu. **[Vypočít
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-yellow-50 to-amber-50",
     coverIcon: "Zap",
-    coverImage: "/manus-storage/blog-strategy_4749d297.webp",
+    coverImage: "/images/blog-strategy_4749d297.webp",
     tags: ["generátor", "reagovat", "sakrální centrum", "strategie"],
     content: `## Generátor a umění reagování
 
@@ -562,7 +562,7 @@ Chcete zjistit, zda jste Generátor? **[Vypočítejte si svůj Human Design char
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-violet-50 to-indigo-50",
     coverIcon: "Eye",
-    coverImage: "/manus-storage/blog-5-types_bb130b58.webp",
+    coverImage: "/images/blog-5-types_bb130b58.webp",
     tags: ["projektor", "pozvání", "uznání", "strategie", "průvodce"],
     content: `## Projektor — průvodce nové éry
 
@@ -641,7 +641,7 @@ Chcete zjistit, zda jste Projektor? **[Vypočítejte si svůj Human Design chart
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-pink-50 to-rose-50",
     coverIcon: "Heart",
-    coverImage: "/manus-storage/blog-relationships_a6ba04d7.webp",
+    coverImage: "/images/blog-relationships_a6ba04d7.webp",
     tags: ["vztahy", "kompatibilita", "elektromagnetické spojení", "partnerské charty"],
     content: `## Human Design a vztahy
 
@@ -708,7 +708,7 @@ Reflektor zrcadlí partnera. Je důležité, aby Reflektor měl prostor pro svou
     updatedAt: "2026-03-03",
     coverColor: "bg-gradient-to-br from-teal-50 to-cyan-50",
     coverIcon: "Star",
-    coverImage: "/manus-storage/how-purpose_d49470f1.webp",
+    coverImage: "/images/how-purpose_d49470f1.webp",
     tags: ["inkarnační kříž", "životní účel", "brány", "poslání", "slunce"],
     content: `## Co je inkarnační kříž?
 
@@ -766,7 +766,7 @@ Váš inkarnační kříž je součástí vašeho Human Design chartu. **[Vypoč
     updatedAt: "2026-03-01",
     coverColor: "bg-gradient-to-br from-slate-50 to-gray-100",
     coverIcon: "FileText",
-    coverImage: "/manus-storage/blog-profiles_fe6f9a4d.webp",
+    coverImage: "/images/blog-profiles_fe6f9a4d.webp",
     tags: ["bodygraph", "jak číst", "začátečníci", "brány", "kanály"],
     content: `## Co je bodygraph?
 
@@ -856,7 +856,7 @@ Začněte prvními čtyřmi body a postupně se ponořujte hlouběji. Human Desi
     readingTime: 9,
     publishedAt: "2026-06-01",
     updatedAt: "2026-06-01",
-    coverImage: "/manus-storage/blog-summer-solstice-2026_70623f1d.jpg",
+    coverImage: "/images/blog-summer-solstice-2026_70623f1d.jpg",
     coverColor: "bg-gradient-to-br from-amber-50 to-yellow-100",
     coverIcon: "Sun",
     tags: ["tranzity", "slunovrat", "brána 15", "brána 10", "sezónní cykly", "planetární program"],
