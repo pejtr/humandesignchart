@@ -337,45 +337,45 @@ export default function Home() {
 
   const steps = isCs
     ? [
-        { step: "1", title: "Vygenerujte si mapu", desc: "Zadejte datum, čas a místo narození. Vaše mapa se vygeneruje během několika sekund.", cta: "Získat mapu zdarma" },
-        { step: "2", title: "Prozkoumejte svůj design", desc: "Prozkoumejte svůj typ, profil, autoritu, centra, brány a dráhy. Každý detail má svůj význam.", cta: "Začít prozkoumávat" },
-        { step: "3", title: "Získejte AI rozbor", desc: "Nechte si vygenerovat personalizovaný rozbor poháněný umělou inteligencí přímo o vás.", cta: "Vyzkoušet AI rozbor" },
-      ]
+      { step: "1", title: "Vygenerujte si mapu", desc: "Zadejte datum, čas a místo narození. Vaše mapa se vygeneruje během několika sekund.", cta: "Získat mapu zdarma" },
+      { step: "2", title: "Prozkoumejte svůj design", desc: "Prozkoumejte svůj typ, profil, autoritu, centra, brány a dráhy. Každý detail má svůj význam.", cta: "Začít prozkoumávat" },
+      { step: "3", title: "Získejte AI rozbor", desc: "Nechte si vygenerovat personalizovaný rozbor poháněný umělou inteligencí přímo o vás.", cta: "Vyzkoušet AI rozbor" },
+    ]
     : [
-        { step: "1", title: "Generate your chart", desc: "Enter your date, time, and place of birth. Your chart will be generated in seconds.", cta: "Get your free chart" },
-        { step: "2", title: "Explore your design", desc: "Explore your type, profile, authority, centers, gates, and channels. Every detail has meaning.", cta: "Start exploring" },
-        { step: "3", title: "Get an AI reading", desc: "Get a personalized AI-powered reading based on your unique design.", cta: "Try AI reading" },
-      ];
+      { step: "1", title: "Generate your chart", desc: "Enter your date, time, and place of birth. Your chart will be generated in seconds.", cta: "Get your free chart" },
+      { step: "2", title: "Explore your design", desc: "Explore your type, profile, authority, centers, gates, and channels. Every detail has meaning.", cta: "Start exploring" },
+      { step: "3", title: "Get an AI reading", desc: "Get a personalized AI-powered reading based on your unique design.", cta: "Try AI reading" },
+    ];
 
   const howItWorks = isCs
     ? [
-        { image: "/manus-storage/how-gifts_113b1faa.webp", title: "1. Pochopte své dary", desc: "Zjistěte svůj typ, profil a autoritu. Poznejte, jak přirozeně fungujete a co vás skutečně naplňuje." },
-        { image: "/manus-storage/how-relationships_b2b2867e.webp", title: "2. Zlepšete své vztahy", desc: "Porovnejte mapy s blízkými. Pochopte dynamiku vašich vztahů a jak spolu lépe fungovat." },
-        { image: "/manus-storage/how-purpose_d49470f1.webp", title: "3. Najděte svůj účel", desc: "Prozkoumejte svůj inkarnační kříž a brány. Objevte své životní poslání a směr." },
-      ]
+      { image: "/manus-storage/how-gifts.png", title: "1. Pochopte své dary", desc: "Zjistěte svůj typ, profil a autoritu. Poznejte, jak přirozeně fungujete a co vás skutečně naplňuje." },
+      { image: "/manus-storage/how-relationships.png", title: "2. Zlepšete své vztahy", desc: "Porovnejte mapy s blízkými. Pochopte dynamiku vašich vztahů a jak spolu lépe fungovat." },
+      { image: "/manus-storage/how-purpose.png", title: "3. Najděte svůj účel", desc: "Prozkoumejte svůj inkarnační kříž a brány. Objevte své životní poslání a směr." },
+    ]
     : [
-        { image: "/manus-storage/how-gifts_113b1faa.webp", title: "1. Understand your gifts", desc: "Discover your type, profile, and authority. Learn how you naturally operate and what truly fulfills you." },
-        { image: "/manus-storage/how-relationships_b2b2867e.webp", title: "2. Improve your relationships", desc: "Compare charts with loved ones. Understand the dynamics of your relationships and how to work better together." },
-        { image: "/manus-storage/how-purpose_d49470f1.webp", title: "3. Find your purpose", desc: "Explore your incarnation cross and gates. Discover your life mission and direction." },
-      ];
+      { image: "/manus-storage/how-gifts.png", title: "1. Understand your gifts", desc: "Discover your type, profile, and authority. Learn how you naturally operate and what truly fulfills you." },
+      { image: "/manus-storage/how-relationships.png", title: "2. Improve your relationships", desc: "Compare charts with loved ones. Understand the dynamics of your relationships and how to work better together." },
+      { image: "/manus-storage/how-purpose.png", title: "3. Find your purpose", desc: "Explore your incarnation cross and gates. Discover your life mission and direction." },
+    ];
 
   const blogPosts = isCs
     ? [
-        { slug: "co-je-human-design", title: "Co je Human Design?", excerpt: "Kompletní průvodce pro začátečníky — zjistěte, jak systém funguje a jak vám může pomoci.", cat: "Základy HD", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/manus-storage/blog-what-is-hd_71817bfc.webp", featured: true },
-        { slug: "5-typu-human-design", title: "5 typů v Human Designu", excerpt: "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.", cat: "Typy", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/manus-storage/blog-5-types_bb130b58.webp", featured: false },
-        { slug: "strategie-v-human-design", title: "Strategie: Klíč ke správným rozhodnutím", excerpt: "Reagovat, informovat, čekat na pozvání — naučte se svou strategii.", cat: "Strategie", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/manus-storage/blog-strategy_4749d297.webp", featured: false },
-        { slug: "autorita-v-human-design", title: "Autorita: Jak dělat správná rozhodnutí", excerpt: "Emocionální, sakrální, slezinná — každý typ má svůj vnitřní kompas rozhodování.", cat: "Autorita", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/manus-storage/blog-authority_0b2a2a02.webp", featured: false },
-        { slug: "profily-v-human-design", title: "12 profilů v Human Designu", excerpt: "Váš profil odhaluje vaši životní roli a způsob, jakým se učíte a rostete.", cat: "Profily", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/manus-storage/blog-profiles_fe6f9a4d.webp", featured: false },
-        { slug: "human-design-a-vztahy", title: "Human Design a vztahy", excerpt: "Jak porozumět partnerské dynamice a zlepšit komunikaci s blízkými.", cat: "Vztahy", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/manus-storage/blog-relationships_a6ba04d7.webp", featured: false },
-      ]
+      { slug: "co-je-human-design", title: "Co je Human Design?", excerpt: "Kompletní průvodce pro začátečníky — zjistěte, jak systém funguje a jak vám může pomoci.", cat: "Základy HD", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/manus-storage/blog-fallback.png", featured: true },
+      { slug: "5-typu-human-design", title: "5 typů v Human Designu", excerpt: "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.", cat: "Typy", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/manus-storage/blog-fallback.png", featured: false },
+      { slug: "strategie-v-human-design", title: "Strategie: Klíč ke správným rozhodnutím", excerpt: "Reagovat, informovat, čekat na pozvání — naučte se svou strategii.", cat: "Strategie", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/manus-storage/blog-fallback.png", featured: false },
+      { slug: "autorita-v-human-design", title: "Autorita: Jak dělat správná rozhodnutí", excerpt: "Emocionální, sakrální, slezinná — každý typ má svůj vnitřní kompas rozhodování.", cat: "Autorita", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/manus-storage/blog-fallback.png", featured: false },
+      { slug: "profily-v-human-design", title: "12 profilů v Human Designu", excerpt: "Váš profil odhaluje vaši životní roli a způsob, jakým se učíte a rostete.", cat: "Profily", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/manus-storage/blog-fallback.png", featured: false },
+      { slug: "human-design-a-vztahy", title: "Human Design a vztahy", excerpt: "Jak porozumět partnerské dynamice a zlepšit komunikaci s blízkými.", cat: "Vztahy", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/manus-storage/blog-fallback.png", featured: false },
+    ]
     : [
-        { slug: "what-is-human-design", title: "What is Human Design?", excerpt: "A complete beginner's guide — learn how the system works and how it can help you.", cat: "HD Basics", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/manus-storage/blog-what-is-hd_71817bfc.webp", featured: true },
-        { slug: "5-types-human-design", title: "5 Human Design Types", excerpt: "Discover all 5 types — Generator, Projector, Manifestor, MG, and Reflector.", cat: "Types", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/manus-storage/blog-5-types_bb130b58.webp", featured: false },
-        { slug: "human-design-strategy", title: "Strategy: The Key to Right Decisions", excerpt: "Respond, inform, wait for the invitation — learn your unique strategy.", cat: "Strategy", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/manus-storage/blog-strategy_4749d297.webp", featured: false },
-        { slug: "human-design-authority", title: "Inner Authority Explained", excerpt: "Emotional, sacral, splenic — every type has its own inner compass for decisions.", cat: "Authority", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/manus-storage/blog-authority_0b2a2a02.webp", featured: false },
-        { slug: "human-design-profiles", title: "12 Human Design Profiles", excerpt: "Your profile reveals your life role and the way you learn, grow, and connect.", cat: "Profiles", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/manus-storage/blog-profiles_fe6f9a4d.webp", featured: false },
-        { slug: "human-design-relationships", title: "Human Design & Relationships", excerpt: "Understand partnership dynamics and improve communication with loved ones.", cat: "Relationships", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/manus-storage/blog-relationships_a6ba04d7.webp", featured: false },
-      ];
+      { slug: "what-is-human-design", title: "What is Human Design?", excerpt: "A complete beginner's guide — learn how the system works and how it can help you.", cat: "HD Basics", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/manus-storage/blog-fallback.png", featured: true },
+      { slug: "5-types-human-design", title: "5 Human Design Types", excerpt: "Discover all 5 types — Generator, Projector, Manifestor, MG, and Reflector.", cat: "Types", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/manus-storage/blog-fallback.png", featured: false },
+      { slug: "human-design-strategy", title: "Strategy: The Key to Right Decisions", excerpt: "Respond, inform, wait for the invitation — learn your unique strategy.", cat: "Strategy", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/manus-storage/blog-fallback.png", featured: false },
+      { slug: "human-design-authority", title: "Inner Authority Explained", excerpt: "Emotional, sacral, splenic — every type has its own inner compass for decisions.", cat: "Authority", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/manus-storage/blog-authority_0b2a2a02.webp", featured: false },
+      { slug: "human-design-profiles", title: "12 Human Design Profiles", excerpt: "Your profile reveals your life role and the way you learn, grow, and connect.", cat: "Profiles", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/manus-storage/blog-fallback.png", featured: false },
+      { slug: "human-design-relationships", title: "Human Design & Relationships", excerpt: "Understand partnership dynamics and improve communication with loved ones.", cat: "Relationships", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/manus-storage/blog-fallback.png", featured: false },
+    ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -486,30 +486,30 @@ export default function Home() {
                 transition={{ delay: i * 0.1, duration: 0.45 }}
               >
                 <TiltCard className={`rounded-2xl border overflow-hidden flex flex-col ${tp.color} shadow-sm hover:shadow-md transition-shadow h-full`}>
-                {/* Image */}
-                <div className="w-full bg-white/60 dark:bg-card/60" style={{ height: '260px' }}>
-                  <ProgressiveImage
-                    src={tp.imgUrl}
-                    alt={tp.displayName}
-                    className="w-full h-full"
-                    imgClassName="object-contain object-top drop-shadow-sm"
-                  />
-                </div>
-                {/* Info */}
-                <div className="p-4 text-center flex flex-col gap-1">
-                  <p className="text-[10px] md:text-xs font-bold tracking-widest whitespace-pre-line leading-tight" style={{ color: '#555' }}>
-                    {tp.displayName}
-                  </p>
-                  <p className={`text-2xl font-bold leading-none ${tp.pctColor}`}>{tp.pct}</p>
-                  <p className="text-[10px] text-muted-foreground">{tp.label}</p>
-                  <p className="text-xs text-muted-foreground leading-snug mt-1">{tp.role}</p>
-                  <p className="text-[11px] text-muted-foreground leading-snug italic">{tp.strategy}</p>
-                  <Link href={localePath("/calculate")} className="mt-2 block">
-                    <span className="inline-flex items-center justify-center gap-1 text-[10px] font-semibold text-primary hover:underline">
-                      {isCs ? "Zjistit svůj typ" : "Find your type"} <ArrowRight className="w-3 h-3" />
-                    </span>
-                  </Link>
-                </div>
+                  {/* Image */}
+                  <div className="w-full bg-white/60 dark:bg-card/60" style={{ height: '260px' }}>
+                    <ProgressiveImage
+                      src={tp.imgUrl}
+                      alt={tp.displayName}
+                      className="w-full h-full"
+                      imgClassName="object-contain object-top drop-shadow-sm"
+                    />
+                  </div>
+                  {/* Info */}
+                  <div className="p-4 text-center flex flex-col gap-1">
+                    <p className="text-[10px] md:text-xs font-bold tracking-widest whitespace-pre-line leading-tight" style={{ color: '#555' }}>
+                      {tp.displayName}
+                    </p>
+                    <p className={`text-2xl font-bold leading-none ${tp.pctColor}`}>{tp.pct}</p>
+                    <p className="text-[10px] text-muted-foreground">{tp.label}</p>
+                    <p className="text-xs text-muted-foreground leading-snug mt-1">{tp.role}</p>
+                    <p className="text-[11px] text-muted-foreground leading-snug italic">{tp.strategy}</p>
+                    <Link href={localePath("/calculate")} className="mt-2 block">
+                      <span className="inline-flex items-center justify-center gap-1 text-[10px] font-semibold text-primary hover:underline">
+                        {isCs ? "Zjistit svůj typ" : "Find your type"} <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </Link>
+                  </div>
                 </TiltCard>
               </motion.div>
             ))}
@@ -517,7 +517,7 @@ export default function Home() {
         </div>
       </section>
 
-       <div className="mystical-divider" />
+      <div className="mystical-divider" />
 
       {/* ── How to start — 3 steps ─────────────────────────────────────── */}
       <section className="py-20 overflow-hidden">
@@ -721,7 +721,7 @@ export default function Home() {
 
       <div className="mystical-divider" />
 
-        {/* ── Social Proof Section ──────────────────────────────────── */}
+      {/* ── Social Proof Section ──────────────────────────────────── */}
       <SocialProof />
 
       {/* ── CTA Section ────────────────────────────────────────────── */}

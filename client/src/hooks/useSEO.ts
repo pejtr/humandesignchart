@@ -4,12 +4,12 @@
  */
 
 const OG_IMAGES = {
-  homepage: "/manus-storage/og-homepage_dffd5da3.webp",
-  calculator: "/manus-storage/og-calculator_f6d92b32.webp",
-  blog: "/manus-storage/og-blog-v2_0a6cb0ba.webp",
-  pricing: "/manus-storage/og-pricing_041c6b96.webp",
-  aiGuide: "/manus-storage/og-ai-guide_b44c2f20.webp",
-  default: "/manus-storage/og-homepage_dffd5da3.webp",
+  homepage: "/manus-storage/og-homepage.png",
+  calculator: "/manus-storage/og-homepage.png",
+  blog: "/manus-storage/og-homepage.png",
+  pricing: "/manus-storage/og-homepage.png",
+  aiGuide: "/manus-storage/og-homepage.png",
+  default: "/manus-storage/og-homepage.png",
 };
 
 export { OG_IMAGES };
