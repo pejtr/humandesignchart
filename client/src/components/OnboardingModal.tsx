@@ -64,9 +64,9 @@ export default function OnboardingModal({
     },
     {
       icon: <Sparkles className="w-8 h-8" />,
-      title: "Získejte AI výklad",
-      description: `Váš profil ${chartProfile} a inkarnační kříž odhalují vaše životní poslání. AI výklad vám vše vysvětlí srozumitelně v češtině.`,
-      highlight: `Klikněte na "AI výklad vaší mapy" v pravém sloupci — je to první věc nahoře.`,
+      title: "Získejte Hloubkový výklad",
+      description: `Váš profil ${chartProfile} a inkarnační kříž odhalují vaše životní poslání. Hloubkový výklad vám vše vysvětlí srozumitelně v češtině.`,
+      highlight: `Klikněte na "Hloubkový výklad vaší mapy" v pravém sloupci — je to první věc nahoře.`,
       color: "#d4af37",
     },
   ];
@@ -176,7 +176,7 @@ export default function OnboardingModal({
             style={{ background: currentStep.color, border: "none" }}
           >
             {isLast ? (
-              <><Sparkles className="w-4 h-4 mr-1.5" /> Spustit AI výklad</>
+              <><Sparkles className="w-4 h-4 mr-1.5" /> Spustit Hloubkový výklad</>
             ) : (
               <>Další <ChevronRight className="w-4 h-4 ml-1" /></>
             )}

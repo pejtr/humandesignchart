@@ -1,3 +1,4 @@
+import html2canvas from 'html2canvas';
 import type { HumanDesignChartData } from "@shared/types";
 import { cs } from "@shared/i18n/cs";
 
@@ -18,7 +19,7 @@ function translateCrossName(name: string): string {
   return result;
 }
 
-export function generateChartPDF(chart: HumanDesignChartData, name: string, hdData: any): void {
+export async function generateChartPDF(chart: HumanDesignChartData, name: string, hdData: any, bodygraphRef?: React.RefObject<HTMLDivElement | null>): Promise<void> {
   const czType = (t.types as Record<string, string>)[chart.type] || chart.type;
   const czStrategy = (t.hd.strategies as Record<string, string>)[chart.strategy] || chart.strategy;
   const czSignature = (t.hd.signatures as Record<string, string>)[chart.signature] || chart.signature;
@@ -90,6 +91,21 @@ export function generateChartPDF(chart: HumanDesignChartData, name: string, hdDa
     </tr>`;
   }).join("") : "";
 
+  let bodygraphImg = "";
+  if (bodygraphRef?.current) {
+    try {
+      const canvas = await html2canvas(bodygraphRef.current, {
+        scale: 2,
+        backgroundColor: null,
+        logging: false,
+        useCORS: true
+      });
+      bodygraphImg = canvas.toDataURL("image/png");
+    } catch (e) {
+      console.error("Failed to capture bodygraph for PDF", e);
+    }
+  }
+
   const html = `<!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -110,28 +126,33 @@ export function generateChartPDF(chart: HumanDesignChartData, name: string, hdDa
     
     .content { padding: 20px 30px; }
     
-    .section { margin-bottom: 20px; break-inside: avoid; }
-    .section-title { background: #f3f0ff; border-left: 3px solid #7c3aed; padding: 6px 10px; font-size: 11px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+    .main-grid { display: flex; gap: 20px; }
+    .bodygraph-side { width: 280px; flex-shrink: 0; text-align: center; }
+    .info-side { flex: 1; }
+    
+    .section { margin-bottom: 18px; break-inside: avoid; }
+    .section-title { background: #f3f0ff; border-left: 3px solid #7c3aed; padding: 5px 10px; font-size: 10px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
     
     table { width: 100%; border-collapse: collapse; }
     td { vertical-align: top; }
     tr:nth-child(even) td { background: #fafafa; }
     
-    .kv-label { font-size: 10px; color: #9ca3af; width: 130px; padding: 4px 8px; }
-    .kv-value { font-size: 11px; font-weight: 600; color: #1e1e32; padding: 4px 8px; }
+    .kv-label { font-size: 9px; color: #9ca3af; width: 100px; padding: 3px 6px; }
+    .kv-value { font-size: 10px; font-weight: 600; color: #1e1e32; padding: 3px 6px; }
     
-    .desc-box { background: #fafafa; border: 1px solid #e9e5ff; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; font-size: 10px; color: #4b5563; line-height: 1.6; }
-    .desc-label { font-size: 9px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-    .conscious-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; padding: 6px 10px; margin-top: 6px; font-size: 10px; color: #166534; }
-    .unconscious-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 6px 10px; margin-top: 4px; font-size: 10px; color: #991b1b; }
+    .bodygraph-img { max-width: 100%; height: auto; margin-top: 10px; border: 1px solid #f3f0ff; border-radius: 8px; padding: 10px; }
     
-    .cross-gates { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
-    .cross-gate { background: #f3f0ff; border: 1px solid #ddd6fe; border-radius: 6px; padding: 8px; text-align: center; }
-    .cross-gate-label { font-size: 9px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; }
-    .cross-gate-num { font-size: 16px; font-weight: 700; color: #7c3aed; }
-    .cross-gate-name { font-size: 9px; color: #6b7280; margin-top: 2px; }
+    .desc-box { background: #fafafa; border: 1px solid #e9e5ff; border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; font-size: 9px; color: #4b5563; line-height: 1.5; }
+    .desc-label { font-size: 8px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+    .conscious-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; padding: 4px 8px; margin-top: 4px; font-size: 9px; color: #166534; }
+    .unconscious-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 4px 8px; margin-top: 4px; font-size: 9px; color: #991b1b; }
     
-    .footer { border-top: 1px solid #e5e7eb; padding: 10px 30px; text-align: center; font-size: 9px; color: #9ca3af; margin-top: 20px; }
+    .cross-gates { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
+    .cross-gate { background: #f3f0ff; border: 1px solid #ddd6fe; border-radius: 4px; padding: 6px; text-align: center; }
+    .cross-gate-label { font-size: 8px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; }
+    .cross-gate-num { font-size: 14px; font-weight: 700; color: #7c3aed; }
+    
+    .footer { border-top: 1px solid #e5e7eb; padding: 10px 30px; text-align: center; font-size: 9px; color: #9ca3af; margin-top: 15px; }
     
     @media print {
       body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -154,97 +175,109 @@ export function generateChartPDF(chart: HumanDesignChartData, name: string, hdDa
   <div class="accent-bar"></div>
 
   <div class="content">
-
-    <!-- Overview -->
-    <div class="section">
-      <div class="section-title">Přehled mapy</div>
-      <table>
-        <tr><td class="kv-label">Typ:</td><td class="kv-value">${czType}</td><td class="kv-label">Strategie:</td><td class="kv-value">${czStrategy}</td></tr>
-        <tr><td class="kv-label">Profil:</td><td class="kv-value">${chart.profile} ${chart.profileName}</td><td class="kv-label">Autorita:</td><td class="kv-value">${chart.authority}</td></tr>
-        <tr><td class="kv-label">Definice:</td><td class="kv-value">${czDefinition}</td><td class="kv-label">Signatura:</td><td class="kv-value">${czSignature}</td></tr>
-        <tr><td class="kv-label">Ne-Já:</td><td class="kv-value">${czNotSelf}</td><td class="kv-label">Aura:</td><td class="kv-value">${chart.aura}</td></tr>
-        <tr><td class="kv-label">Inkarnační kříž:</td><td class="kv-value" colspan="3">${czCrossName}</td></tr>
-        <tr><td class="kv-label">Typ kříže:</td><td class="kv-value" colspan="3">${czCrossType}</td></tr>
-      </table>
-    </div>
-
-    ${typeDesc ? `
-    <!-- Type -->
-    <div class="section">
-      <div class="section-title">Typ: ${czType}</div>
-      <div class="desc-box">${typeDesc.description}</div>
-      <div style="font-size:10px;color:#7c3aed;padding:0 4px">Strategie: ${czStrategy} · Signatura: ${czSignature} · Ne-Já: ${czNotSelf}</div>
-    </div>` : ""}
-
-    ${profileDesc ? `
-    <!-- Profile -->
-    <div class="section">
-      <div class="section-title">Profil: ${chart.profile} ${chart.profileName}</div>
-      <div class="desc-box">${profileDesc.description}</div>
-      <div class="conscious-box"><strong>Vědomé:</strong> ${profileDesc.conscious}</div>
-      <div class="unconscious-box"><strong>Nevědomé:</strong> ${profileDesc.unconscious}</div>
-    </div>` : ""}
-
-    ${authDesc ? `
-    <!-- Authority -->
-    <div class="section">
-      <div class="section-title">Autorita: ${chart.authority}</div>
-      <div class="desc-box">${authDesc.description}</div>
-      <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:4px;padding:6px 10px;margin-top:6px;font-size:10px;color:#6b21a8">
-        <strong>Jak používat:</strong> ${authDesc.howToUse}
+    <div class="main-grid">
+      <!-- Left side: Bodygraph -->
+      <div class="bodygraph-side">
+        <div class="section-title">Váš energetický Bodygraph</div>
+        ${bodygraphImg ? `<img src="${bodygraphImg}" class="bodygraph-img" alt="Bodygraph" />` : `<div style="padding:40px; border:1px dashed #ccc; color:#999">Vizualizace mapy</div>`}
+        
+        <div style="margin-top: 20px; text-align: left">
+          <div class="section-title" style="margin-top:20px">Aktivované brány (${(chart.activatedGates || []).length})</div>
+          <div style="padding:4px">${gatesHtml}</div>
+        </div>
       </div>
-    </div>` : ""}
 
-    <!-- Incarnation Cross -->
-    <div class="section">
-      <div class="section-title">Inkarnační kříž</div>
-      <div style="font-size:14px;font-weight:700;color:#1e1e32;margin-bottom:4px">${czCrossName}</div>
-      <div style="font-size:11px;color:#7c3aed;margin-bottom:10px">${czCrossType}</div>
-      <div class="cross-gates">
-        ${(chart.incarnationCross?.gates || []).map((g, i) => {
+      <!-- Right side: Information -->
+      <div class="info-side">
+        <!-- Overview -->
+        <div class="section">
+          <div class="section-title">Přehled mapy</div>
+          <table>
+            <tr><td class="kv-label">Typ:</td><td class="kv-value">${czType}</td><td class="kv-label">Strategie:</td><td class="kv-value">${czStrategy}</td></tr>
+            <tr><td class="kv-label">Profil:</td><td class="kv-value">${chart.profile} ${chart.profileName}</td><td class="kv-label">Autorita:</td><td class="kv-value">${chart.authority}</td></tr>
+            <tr><td class="kv-label">Definice:</td><td class="kv-value">${czDefinition}</td><td class="kv-label">Signatura:</td><td class="kv-value">${czSignature}</td></tr>
+            <tr><td class="kv-label">Inkarnační kříž:</td><td class="kv-value" colspan="3">${czCrossName}</td></tr>
+          </table>
+        </div>
+
+
+        ${typeDesc ? `
+        <!-- Type -->
+        <div class="section">
+          <div class="section-title">Typ: ${czType}</div>
+          <div class="desc-box">${typeDesc.description}</div>
+          <div style="font-size:9px;color:#7c3aed;padding:0 4px">Strategie: ${czStrategy} · Signatura: ${czSignature} · Ne-Já: ${czNotSelf}</div>
+        </div>` : ""}
+
+        ${profileDesc ? `
+        <!-- Profile -->
+        <div class="section">
+          <div class="section-title">Profil: ${chart.profile} ${chart.profileName}</div>
+          <div class="desc-box">${profileDesc.description}</div>
+          <div class="conscious-box"><strong>Vědomé:</strong> ${profileDesc.conscious}</div>
+          <div class="unconscious-box"><strong>Nevědomé:</strong> ${profileDesc.unconscious}</div>
+        </div>` : ""}
+
+        ${authDesc ? `
+        <!-- Authority -->
+        <div class="section">
+          <div class="section-title">Autorita: ${chart.authority}</div>
+          <div class="desc-box">${authDesc.description}</div>
+          <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:4px;padding:5px 8px;margin-top:4px;font-size:9px;color:#6b21a8">
+            <strong>Jak používat:</strong> ${authDesc.howToUse}
+          </div>
+        </div>` : ""}
+
+        <!-- Incarnation Cross -->
+        <div class="section">
+          <div class="section-title">Inkarnační kříž</div>
+          <div style="font-size:12px;font-weight:700;color:#1e1e32;margin-bottom:2px">${czCrossName} ${czCrossType ? `· ${czCrossType}` : ""}</div>
+          <div class="cross-gates">
+            ${(chart.incarnationCross?.gates || []).map((g, i) => {
     const gd = hdData?.gates[g];
     const labels = ["Osobnost ☉", "Osobnost ⊕", "Design ☉", "Design ⊕"];
     return `<div class="cross-gate">
-            <div class="cross-gate-label">${labels[i] || ""}</div>
-            <div class="cross-gate-num">${g}</div>
-            <div class="cross-gate-name">${gd?.name || ""}</div>
-          </div>`;
+                <div class="cross-gate-label">${labels[i] || ""}</div>
+                <div class="cross-gate-num">${g}</div>
+              </div>`;
   }).join("")}
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Centers -->
-    <div class="section">
-      <div class="section-title">Centra</div>
-      <table>${centersHtml}</table>
+    <!-- Full Width Sections below grid -->
+    <div style="margin-top:20px">
+      <!-- Centers -->
+      <div class="section">
+        <div class="section-title">Centra</div>
+        <table>${centersHtml}</table>
+      </div>
+
+      ${(chart.channels || []).length > 0 ? `
+      <!-- Channels -->
+      <div class="section">
+        <div class="section-title">Kanály (${chart.channels.length})</div>
+        <table>${channelsHtml}</table>
+      </div>` : ""}
+
+      <!-- Activations -->
+      <div class="section">
+        <div class="section-title">Planetární aktivace</div>
+        <div style="display:flex; gap:20px">
+          <div style="flex:1">${activationsHtml(chart.personalityActivations, "Osobnost (Vědomé)", "#166534")}</div>
+          <div style="flex:1">${activationsHtml(chart.designActivations, "Design (Nevědomé)", "#991b1b")}</div>
+        </div>
+      </div>
+
+      ${chart.variables ? `
+      <!-- Variables -->
+      <div class="section">
+        <div class="section-title">Proměnné (PHS)</div>
+        <table>${variablesHtml}</table>
+      </div>` : ""}
     </div>
-
-    ${(chart.channels || []).length > 0 ? `
-    <!-- Channels -->
-    <div class="section">
-      <div class="section-title">Kanály (${chart.channels.length})</div>
-      <table>${channelsHtml}</table>
-    </div>` : ""}
-
-    <!-- Activations -->
-    <div class="section">
-      <div class="section-title">Planetární aktivace</div>
-      ${activationsHtml(chart.personalityActivations, "Osobnost (Vědomé)", "#166534")}
-      ${activationsHtml(chart.designActivations, "Design (Nevědomé)", "#991b1b")}
-    </div>
-
-    ${chart.variables ? `
-    <!-- Variables -->
-    <div class="section">
-      <div class="section-title">Proměnné (PHS)</div>
-      <table>${variablesHtml}</table>
-    </div>` : ""}
-
-    <!-- All Gates -->
-    <div class="section">
-      <div class="section-title">Aktivované brány (${(chart.activatedGates || []).length})</div>
-      <div style="padding:4px">${gatesHtml}</div>
-    </div>
+  </div>
 
   </div>
 

@@ -15,12 +15,22 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href={localePath("/")} className="flex items-center gap-2 no-underline mb-4">
-              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-primary" />
+            <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline mb-4 group">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-sm group-hover:shadow-purple-500/20 transition-shadow">
+                <svg viewBox="0 0 24 24" className="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <circle cx="12" cy="4" r="2" />
+                  <circle cx="12" cy="12" r="2.5" />
+                  <circle cx="12" cy="20" r="2" />
+                  <circle cx="6" cy="8" r="1.5" />
+                  <circle cx="18" cy="8" r="1.5" />
+                  <line x1="12" y1="6" x2="12" y2="9.5" />
+                  <line x1="12" y1="14.5" x2="12" y2="18" />
+                  <line x1="7.2" y1="7" x2="10" y2="10.5" />
+                  <line x1="16.8" y1="7" x2="14" y2="10.5" />
+                </svg>
               </div>
-              <span className="font-serif text-lg font-semibold text-foreground">
-                {t.common.appName}
+              <span className="font-serif text-lg font-bold tracking-tight text-foreground">
+                Human Design
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">

@@ -59,7 +59,7 @@ export default function NewsletterPopup() {
         {/* Cosmic header graphic with AI-generated art */}
         <div className="relative h-36 sm:h-44 overflow-hidden">
           <img
-            src="/manus-storage/newsletter-cosmic-art.png"
+            src="/images/newsletter-cosmic-art.png"
             alt=""
             className="w-full h-full object-cover"
           />

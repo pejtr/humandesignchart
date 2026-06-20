@@ -10,6 +10,7 @@ export * from "./db/readings";
 export * from "./db/referrals";
 export * from "./db/gamification";
 export * from "./db/affiliates";
+export * from "./db/chat";
 
 // Re-export specific logic that might be used elsewhere
 export { calculateUserLevel } from "./db/gamification";

@@ -131,8 +131,8 @@ export default function Navbar() {
           {/* Col 1: Empty on desktop, but ensures the center is really centered */}
           <div className="flex-1 lg:block hidden" />
 
-          {/* Col 2: Centered Section (Logo + Links) */}
-          <div className="flex items-center justify-center gap-6">
+          {/* Center: Logo + Desktop nav links */}
+          <div className="flex flex-shrink-0 items-center justify-center gap-6">
             {/* Logo */}
             <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline shrink-0 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
@@ -228,7 +228,10 @@ export default function Navbar() {
                 </Button>
               </Link>
             </div>
+          </div>
 
+          {/* Right: Controls (Desktop + Mobile) */}
+          <div className="flex-1 flex items-center justify-end gap-1.5 shrink-0">
             {/* Desktop right section: theme toggle + language + user */}
             <div className="hidden lg:flex items-center gap-1.5 shrink-0">
               {/* Theme toggle */}
@@ -348,6 +351,7 @@ export default function Navbar() {
                 <Menu className="w-5 h-5" />
               </Button>
             </div>
+          </div>
         </nav>
       </header>
 

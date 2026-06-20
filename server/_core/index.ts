@@ -1,5 +1,7 @@
 import "dotenv/config";
 import express from "express";
+import { BLOG_ARTICLES } from "../data/blogArticles";
+import { BLOG_ARTICLES_EN } from "../data/blogArticlesEn";
 import { GATE_DESCRIPTIONS } from "../data/hdContent";
 import { getSystemPrompt, getReadingPrompt } from "../ai/prompts";
 import { createServer } from "http";
@@ -35,6 +37,17 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+
+  // ─── SEO: Redirect www to root domains ──────────────────────────────
+  app.use((req, res, next) => {
+    if (req.hostname === "www.humandesignmapa.cz") {
+      return res.redirect(301, `https://humandesignmapa.cz${req.originalUrl}`);
+    }
+    if (req.hostname === "www.humandesignchart.app") {
+      return res.redirect(301, `https://humandesignchart.app${req.originalUrl}`);
+    }
+    next();
+  });
   // ⚠️ Stripe webhook MUST be registered BEFORE express.json() to allow raw body for signature verification
   registerStripeWebhook(app);
   // ⚠️ LeadOS webhook also needs raw body for HMAC-SHA256 signature verification
@@ -49,9 +62,11 @@ async function startServer() {
 
   // ─── SEO: Sitemap.xml (bilingual with hreflang) ─────────────────────
   app.get("/sitemap.xml", (_req, res) => {
-    const baseUrl = "https://humandesignmapa.cz";
+    const csBase = "https://humandesignmapa.cz";
+    const enBase = "https://humandesignchart.app";
     const now = new Date().toISOString().split("T")[0];
-    const pages = [
+
+    const staticPages = [
       { loc: "/", priority: "1.0", changefreq: "weekly" },
       { loc: "/calculate", priority: "0.9", changefreq: "monthly" },
       { loc: "/encyclopedia", priority: "0.8", changefreq: "monthly" },
@@ -60,6 +75,8 @@ async function startServer() {
       { loc: "/transit-calendar", priority: "0.6", changefreq: "daily" },
       { loc: "/celebrities", priority: "0.7", changefreq: "monthly" },
       { loc: "/comparison", priority: "0.6", changefreq: "monthly" },
+      { loc: "/composite", priority: "0.6", changefreq: "monthly" },
+      { loc: "/role-compatibility", priority: "0.6", changefreq: "monthly" },
       { loc: "/return-chart", priority: "0.6", changefreq: "monthly" },
       { loc: "/variables", priority: "0.6", changefreq: "monthly" },
       { loc: "/iching", priority: "0.6", changefreq: "monthly" },
@@ -69,27 +86,55 @@ async function startServer() {
       { loc: "/types/manifestor", priority: "0.8", changefreq: "monthly" },
       { loc: "/types/reflector", priority: "0.8", changefreq: "monthly" },
       { loc: "/blog", priority: "0.8", changefreq: "weekly" },
-      { loc: "/blog/co-je-human-design", priority: "0.7", changefreq: "monthly" },
-      { loc: "/blog/5-typu-human-design", priority: "0.7", changefreq: "monthly" },
-      { loc: "/blog/strategie-v-human-design", priority: "0.7", changefreq: "monthly" },
-      { loc: "/blog/autorita-v-human-design", priority: "0.7", changefreq: "monthly" },
-      { loc: "/blog/profily-v-human-design", priority: "0.7", changefreq: "monthly" },
-      { loc: "/blog/9-center-v-human-design", priority: "0.7", changefreq: "monthly" },
-      { loc: "/blog/generator-strategie-reagovat", priority: "0.7", changefreq: "monthly" },
-      { loc: "/blog/projektor-cekat-na-pozvani", priority: "0.7", changefreq: "monthly" },
-      { loc: "/blog/human-design-a-vztahy", priority: "0.7", changefreq: "monthly" },
-      { loc: "/blog/inkarnacni-kriz-zivotni-ucel", priority: "0.7", changefreq: "monthly" },
-      { loc: "/blog/jak-cist-bodygraph", priority: "0.7", changefreq: "monthly" },
       { loc: "/daily-transit", priority: "0.6", changefreq: "daily" },
       { loc: "/incarnation-cross", priority: "0.6", changefreq: "monthly" },
     ];
+
     const locales = ["cs", "en"];
-    const urls = pages.flatMap(p => locales.map(lang => {
-      const loc = `${baseUrl}/${lang}${p.loc}`;
-      const alternates = locales.map(l => `    <xhtml:link rel="alternate" hreflang="${l}" href="${baseUrl}/${l}${p.loc}" />`).join("\n");
+    const standardUrls = staticPages.flatMap(p => locales.map(lang => {
+      const baseUrl = lang === "en" ? enBase : csBase;
+
+      const csUrl = csBase + (p.loc === "/" ? "/cs/" : "/cs" + p.loc);
+      const enUrl = enBase + (p.loc === "/" ? "/en/" : "/en" + p.loc);
+
+      const loc = lang === "en" ? enUrl : csUrl;
+      const alternates = [
+        `    <xhtml:link rel="alternate" hreflang="cs" href="${csUrl}" />`,
+        `    <xhtml:link rel="alternate" hreflang="en" href="${enUrl}" />`,
+        `    <xhtml:link rel="alternate" hreflang="x-default" href="${enUrl}" />`
+      ].join("\n");
+
       return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n${alternates}\n  </url>`;
-    })).join("\n");
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>`;
+    }));
+
+    const csBlogUrls = BLOG_ARTICLES.map((a, i) => {
+      const isPerfectMatch = BLOG_ARTICLES.length === BLOG_ARTICLES_EN.length;
+      const csUrl = `${csBase}/cs/blog/${a.slug}`;
+      const alternates = isPerfectMatch && BLOG_ARTICLES_EN[i] ? [
+        `    <xhtml:link rel="alternate" hreflang="cs" href="${csUrl}" />`,
+        `    <xhtml:link rel="alternate" hreflang="en" href="${enBase}/en/blog/${BLOG_ARTICLES_EN[i].slug}" />`,
+        `    <xhtml:link rel="alternate" hreflang="x-default" href="${enBase}/en/blog/${BLOG_ARTICLES_EN[i].slug}" />`
+      ].join("\n") : `    <xhtml:link rel="alternate" hreflang="cs" href="${csUrl}" />`;
+
+      return `  <url>\n    <loc>${csUrl}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n${alternates}\n  </url>`;
+    });
+
+    const enBlogUrls = BLOG_ARTICLES_EN.map((a, i) => {
+      const isPerfectMatch = BLOG_ARTICLES.length === BLOG_ARTICLES_EN.length;
+      const enUrl = `${enBase}/en/blog/${a.slug}`;
+      const alternates = isPerfectMatch && BLOG_ARTICLES[i] ? [
+        `    <xhtml:link rel="alternate" hreflang="cs" href="${csBase}/cs/blog/${BLOG_ARTICLES[i].slug}" />`,
+        `    <xhtml:link rel="alternate" hreflang="en" href="${enUrl}" />`,
+        `    <xhtml:link rel="alternate" hreflang="x-default" href="${enUrl}" />`
+      ].join("\n") : [
+        `    <xhtml:link rel="alternate" hreflang="en" href="${enUrl}" />`,
+        `    <xhtml:link rel="alternate" hreflang="x-default" href="${enUrl}" />`
+      ].join("\n");
+
+      return `  <url>\n    <loc>${enUrl}</loc>\n    <lastmod>${now}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n${alternates}\n  </url>`;
+    });
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${[...standardUrls, ...csBlogUrls, ...enBlogUrls].join("\n")}\n</urlset>`;
     res.set("Content-Type", "application/xml");
     res.send(xml);
   });
@@ -98,6 +143,29 @@ async function startServer() {
     res.type("text/plain");
     res.send("User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: https://humandesignmapa.cz/sitemap.xml");
   });
+
+  // ─── OG Image Generator ────────────────────────────────────────────────
+  app.get("/api/og/shared/:token", async (req, res) => {
+    try {
+      const { token } = req.params;
+      const { getSharedChart } = await import("../db");
+      const shared = await getSharedChart(token);
+      if (!shared) {
+        res.status(404).send("Not found");
+        return;
+      }
+      const { generateOGImage } = await import("../ogGenerator");
+      const pngBuffer = await generateOGImage(shared.chartData as any, shared.ownerName);
+
+      res.set("Content-Type", "image/png");
+      res.set("Cache-Control", "public, max-age=86400, s-maxage=86400"); // cache 1 day
+      res.send(pngBuffer);
+    } catch (err) {
+      console.error("[OG Generator] Error:", err);
+      res.status(500).send("Internal Server Error");
+    }
+  });
+
   // ─── AI Streaming SSE Endpoint ────────────────────────────────────────
   app.get("/api/ai/stream", async (req, res) => {
     const { chartData, readingType, chartId, locale } = req.query as Record<string, string>;
@@ -119,11 +187,11 @@ async function startServer() {
 
     // ─── Freemium limit check ─────────────────────────────────────────────
     try {
-      const { getUserById, countAiReadingsByUser } = await import("../db");
+      const { getUserById, countAiReadingsByUserToday } = await import("../db");
       const { canGenerateAiReading } = await import("../stripeProducts");
       const user = await getUserById(userId);
       if (user) {
-        const totalReadings = await countAiReadingsByUser(userId);
+        const totalReadings = await countAiReadingsByUserToday(userId);
         const check = canGenerateAiReading(user, totalReadings);
         if (!check.allowed) {
           res.status(402).json({ error: "free_limit_reached", reason: check.reason });

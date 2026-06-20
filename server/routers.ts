@@ -28,12 +28,14 @@ import { contentRouter } from "./routers/content";
 import { socialRouter } from "./routers/social";
 import { leadosRouter } from "./routers/leados";
 import { chatRouter } from "./routers/chat";
+import { userRouter } from "./routers/user";
 
 export const appRouter = router({
   system: systemRouter,
   social: socialRouter,
   leados: leadosRouter,
   chat: chatRouter,
+  user: userRouter,
   notifications: notificationsRouter,
   newsletter: newsletterRouter,
   auth: authRouter,

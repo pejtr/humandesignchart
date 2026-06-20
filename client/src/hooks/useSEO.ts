@@ -4,12 +4,12 @@
  */
 
 const OG_IMAGES = {
-  homepage: "/manus-storage/og-homepage.png",
-  calculator: "/manus-storage/og-homepage.png",
-  blog: "/manus-storage/og-homepage.png",
-  pricing: "/manus-storage/og-homepage.png",
-  aiGuide: "/manus-storage/og-homepage.png",
-  default: "/manus-storage/og-homepage.png",
+  homepage: "/images/og-homepage.png",
+  calculator: "/images/og-homepage.png",
+  blog: "/images/og-homepage.png",
+  pricing: "/images/og-homepage.png",
+  aiGuide: "/images/og-homepage.png",
+  default: "/images/og-homepage.png",
 };
 
 export { OG_IMAGES };
@@ -40,6 +40,16 @@ function setMeta(selector: string, attr: string, value: string) {
     document.head.appendChild(el);
   }
   el.setAttribute(attr, value);
+}
+
+function setCanonical(href: string) {
+  let el = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (!el) {
+    el = document.createElement("link");
+    el.setAttribute("rel", "canonical");
+    document.head.appendChild(el);
+  }
+  el.setAttribute("href", href);
 }
 
 export function useSEO(options: SEOOptions) {
@@ -87,4 +97,8 @@ export function useSEO(options: SEOOptions) {
   setMeta('meta[name="twitter:description"]', "content", description);
   setMeta('meta[name="twitter:image"]', "content", ogImage);
   setMeta('meta[name="twitter:site"]', "content", "@humandesignmapa");
+
+  // Canonical URL - strip query params from the URL
+  const canonicalUrl = ogUrl.split('?')[0];
+  setCanonical(canonicalUrl);
 }

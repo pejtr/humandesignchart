@@ -21,7 +21,7 @@ const PLANET_SYMBOLS: Record<string, string> = {
     "North Node": "☊", "South Node": "☋",
 };
 
-async function calculateTransitGates() {
+export async function calculateTransitGates() {
     const { calculatePlanetaryPositions, dateToJD } = await import("../humandesign/ephemeris");
     const { GATE_WHEEL, PLANET_NAMES } = await import("../humandesign/constants");
     const now = new Date();

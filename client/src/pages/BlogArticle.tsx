@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import HDLoader from "@/components/HDLoader";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { ProgressiveImage } from "@/components/ProgressiveImage";
 
 const CATEGORY_STYLES: Record<string, string> = {
   zaklady: "bg-amber-100 text-amber-800 border-amber-200",
@@ -86,8 +87,8 @@ function ShareButtons({ article, isEn, locale }: { article: { slug: string; titl
             <button
               onClick={handleCopy}
               className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-200 ${copied
-                  ? 'bg-green-50 text-green-600 border-green-200'
-                  : 'border-border/50 text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border'
+                ? 'bg-green-50 text-green-600 border-green-200'
+                : 'border-border/50 text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border'
                 }`}
               title={isEn ? 'Copy link' : 'Kopírovat odkaz'}
             >
@@ -304,10 +305,11 @@ export default function BlogArticle() {
 
       {article.coverImage && (
         <div className="w-full h-64 md:h-80 overflow-hidden mt-16">
-          <img
+          <ProgressiveImage
             src={article.coverImage}
             alt={article.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full"
+            imgClassName="object-cover"
           />
         </div>
       )}
@@ -385,11 +387,11 @@ export default function BlogArticle() {
                             {/* Thumbnail */}
                             <div className="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden bg-muted">
                               {ra.coverImage ? (
-                                <img
+                                <ProgressiveImage
                                   src={ra.coverImage}
                                   alt={ra.title}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                  loading="lazy"
+                                  className="w-full h-full"
+                                  imgClassName="object-cover group-hover:scale-105 transition-transform duration-300"
                                 />
                               ) : (
                                 <div className={`w-full h-full flex items-center justify-center text-2xl ${ra.coverColor ?? 'bg-primary/10'}`}>
@@ -423,11 +425,11 @@ export default function BlogArticle() {
                     <p className="text-xs text-muted-foreground mb-3">
                       {isEn ? "Calculate your free chart" : "Vypočítejte si mapu zdarma"}
                     </p>
-                    <Link href={localePath("/calculate")}>
-                      <Button size="sm" className="w-full bg-primary text-primary-foreground">
+                    <Button size="sm" className="w-full bg-primary text-primary-foreground" asChild>
+              <Link href={localePath("/calculate")}>
                         {isEn ? "Free chart" : "Mapa zdarma"}
-                      </Button>
-                    </Link>
+                      </Link>
+            </Button>
                   </CardContent>
                 </Card>
               </div>
@@ -473,11 +475,11 @@ export default function BlogArticle() {
                       {/* Thumbnail with gradient overlay */}
                       <div className="w-full h-28 overflow-hidden bg-muted flex-shrink-0 relative">
                         {ra.coverImage ? (
-                          <img
+                          <ProgressiveImage
                             src={ra.coverImage}
                             alt={ra.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            loading="lazy"
+                            className="w-full h-full"
+                            imgClassName="object-cover group-hover:scale-110 transition-transform duration-500"
                           />
                         ) : (
                           <div className={`w-full h-full flex items-center justify-center ${ra.coverColor ?? 'bg-gradient-to-br from-primary/10 to-primary/5'}`}>
@@ -576,17 +578,17 @@ export default function BlogArticle() {
                       key={sa.slug}
                       href={localePath(`/blog/${sa.slug}`)}
                       className={`no-underline flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors text-sm ${sa.slug === article.slug
-                          ? 'bg-primary/10 text-primary font-medium'
-                          : idx <= currentSeriesIdx
-                            ? 'text-foreground/70 hover:bg-muted/50'
-                            : 'text-muted-foreground hover:bg-muted/50'
+                        ? 'bg-primary/10 text-primary font-medium'
+                        : idx <= currentSeriesIdx
+                          ? 'text-foreground/70 hover:bg-muted/50'
+                          : 'text-muted-foreground hover:bg-muted/50'
                         }`}
                     >
                       <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${sa.slug === article.slug
-                          ? 'bg-primary text-primary-foreground'
-                          : idx < currentSeriesIdx
-                            ? 'bg-primary/20 text-primary'
-                            : 'bg-muted text-muted-foreground'
+                        ? 'bg-primary text-primary-foreground'
+                        : idx < currentSeriesIdx
+                          ? 'bg-primary/20 text-primary'
+                          : 'bg-muted text-muted-foreground'
                         }`}>
                         {idx < currentSeriesIdx ? '✓' : idx + 1}
                       </span>
@@ -651,17 +653,17 @@ export default function BlogArticle() {
               : "Vypočítejte si svou energetickou mapu zdarma a získejte personalizovaný AI rozbor."}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href={localePath("/calculate")}>
-              <Button size="lg" className="bg-primary text-primary-foreground">
+            <Button size="lg" className="bg-primary text-primary-foreground" asChild>
+              <Link href={localePath("/calculate")}>
                 <Compass className="w-5 h-5 mr-2" />
                 {isEn ? "Create My Free Chart" : "Vytvořit moji mapu zdarma"}
-              </Button>
-            </Link>
-            <Link href={localePath("/dashboard?tab=subscription")}>
-              <Button size="lg" variant="outline" className="border-primary/40 text-primary hover:bg-primary/5">
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" className="border-primary/40 text-primary hover:bg-primary/5" asChild>
+              <Link href={localePath("/dashboard?tab=subscription")}>
                 {isEn ? "Invite a friend → free reading" : "Pozvat příteľe → výklad zdarma"}
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

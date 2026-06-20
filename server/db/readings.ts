@@ -1,4 +1,4 @@
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, gte } from "drizzle-orm";
 import { aiReadings, InsertAiReading, charts } from "../../drizzle/schema";
 import { getDb } from "./index";
 
@@ -58,5 +58,23 @@ export async function countAiReadingsByUser(userId: number) {
     const db = await getDb();
     if (!db) throw new Error("Database not available");
     const result = await db.select().from(aiReadings).where(eq(aiReadings.userId, userId));
+    return result.length;
+}
+
+export async function countAiReadingsByUserToday(userId: number) {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const result = await db.select()
+        .from(aiReadings)
+        .where(
+            and(
+                eq(aiReadings.userId, userId),
+                gte(aiReadings.createdAt, startOfToday)
+            )
+        );
     return result.length;
 }

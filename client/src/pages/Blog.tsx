@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ProgressiveImage } from "@/components/ProgressiveImage";
 import { trpc } from "@/lib/trpc";
 import {
   Compass, Users, Target, Brain, Fingerprint, CircleDot,
@@ -147,11 +148,12 @@ export default function Blog() {
                     <div className="grid grid-cols-1 md:grid-cols-2">
                       <div className="relative overflow-hidden min-h-[200px]">
                         {featured.coverImage ? (
-                          <img
+                          <ProgressiveImage
                             src={featured.coverImage}
                             alt={featured.title}
-                            className="w-full h-full object-cover absolute inset-0"
+                            className="w-full h-full absolute inset-0"
                             style={{ minHeight: 200 }}
+                            imgClassName="object-cover"
                           />
                         ) : (
                           <div className={`${featured.coverColor} p-8 md:p-12 flex items-center justify-center h-full`}>
@@ -194,10 +196,11 @@ export default function Blog() {
                       <Card className="border-border/50 overflow-hidden hover:shadow-lg transition-all group h-full">
                         <div className="relative overflow-hidden h-44">
                           {article.coverImage ? (
-                            <img
+                            <ProgressiveImage
                               src={article.coverImage}
                               alt={article.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              className="w-full h-full"
+                              imgClassName="object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                           ) : (
                             <div className={`${article.coverColor} p-6 flex items-center justify-center h-full`}>
@@ -250,12 +253,12 @@ export default function Blog() {
               ? "Calculate your free energy map and get a personalized AI reading."
               : "Vypočítejte si svou energetickou mapu zdarma a získejte personalizovaný AI rozbor."}
           </p>
-          <Link href={localePath("/calculate")}>
-            <Button size="lg" className="bg-primary text-primary-foreground">
+          <Button size="lg" className="bg-primary text-primary-foreground" asChild>
+              <Link href={localePath("/calculate")}>
               <Compass className="w-5 h-5 mr-2" />
               {isEn ? "Create My Free Chart" : "Vytvořit moji mapu zdarma"}
+            </Link>
             </Button>
-          </Link>
         </div>
       </section>
 

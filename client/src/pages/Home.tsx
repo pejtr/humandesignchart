@@ -339,42 +339,42 @@ export default function Home() {
     ? [
       { step: "1", title: "Vygenerujte si mapu", desc: "Zadejte datum, čas a místo narození. Vaše mapa se vygeneruje během několika sekund.", cta: "Získat mapu zdarma" },
       { step: "2", title: "Prozkoumejte svůj design", desc: "Prozkoumejte svůj typ, profil, autoritu, centra, brány a dráhy. Každý detail má svůj význam.", cta: "Začít prozkoumávat" },
-      { step: "3", title: "Získejte AI rozbor", desc: "Nechte si vygenerovat personalizovaný rozbor poháněný umělou inteligencí přímo o vás.", cta: "Vyzkoušet AI rozbor" },
+      { step: "3", title: "Získejte Hloubkový rozbor", desc: "Nechte si vygenerovat personalizovaný rozbor, využívající přesné algoritmické výpočty přímo o vás.", cta: "Vyzkoušet Hloubkový rozbor" },
     ]
     : [
       { step: "1", title: "Generate your chart", desc: "Enter your date, time, and place of birth. Your chart will be generated in seconds.", cta: "Get your free chart" },
       { step: "2", title: "Explore your design", desc: "Explore your type, profile, authority, centers, gates, and channels. Every detail has meaning.", cta: "Start exploring" },
-      { step: "3", title: "Get an AI reading", desc: "Get a personalized AI-powered reading based on your unique design.", cta: "Try AI reading" },
+      { step: "3", title: "Get a comprehensive reading", desc: "Get a personalized reading based on your unique design using advanced algorithms.", cta: "Try comprehensive reading" },
     ];
 
   const howItWorks = isCs
     ? [
-      { image: "/manus-storage/how-gifts.png", title: "1. Pochopte své dary", desc: "Zjistěte svůj typ, profil a autoritu. Poznejte, jak přirozeně fungujete a co vás skutečně naplňuje." },
-      { image: "/manus-storage/how-relationships.png", title: "2. Zlepšete své vztahy", desc: "Porovnejte mapy s blízkými. Pochopte dynamiku vašich vztahů a jak spolu lépe fungovat." },
-      { image: "/manus-storage/how-purpose.png", title: "3. Najděte svůj účel", desc: "Prozkoumejte svůj inkarnační kříž a brány. Objevte své životní poslání a směr." },
+      { image: "/images/how-gifts.png", title: "1. Pochopte své dary", desc: "Zjistěte svůj typ, profil a autoritu. Poznejte, jak přirozeně fungujete a co vás skutečně naplňuje." },
+      { image: "/images/how-relationships.png", title: "2. Zlepšete své vztahy", desc: "Porovnejte mapy s blízkými. Pochopte dynamiku vašich vztahů a jak spolu lépe fungovat." },
+      { image: "/images/how-purpose.png", title: "3. Najděte svůj účel", desc: "Prozkoumejte svůj inkarnační kříž a brány. Objevte své životní poslání a směr." },
     ]
     : [
-      { image: "/manus-storage/how-gifts.png", title: "1. Understand your gifts", desc: "Discover your type, profile, and authority. Learn how you naturally operate and what truly fulfills you." },
-      { image: "/manus-storage/how-relationships.png", title: "2. Improve your relationships", desc: "Compare charts with loved ones. Understand the dynamics of your relationships and how to work better together." },
-      { image: "/manus-storage/how-purpose.png", title: "3. Find your purpose", desc: "Explore your incarnation cross and gates. Discover your life mission and direction." },
+      { image: "/images/how-gifts.png", title: "1. Understand your gifts", desc: "Discover your type, profile, and authority. Learn how you naturally operate and what truly fulfills you." },
+      { image: "/images/how-relationships.png", title: "2. Improve your relationships", desc: "Compare charts with loved ones. Understand the dynamics of your relationships and how to work better together." },
+      { image: "/images/how-purpose.png", title: "3. Find your purpose", desc: "Explore your incarnation cross and gates. Discover your life mission and direction." },
     ];
 
   const blogPosts = isCs
     ? [
-      { slug: "co-je-human-design", title: "Co je Human Design?", excerpt: "Kompletní průvodce pro začátečníky — zjistěte, jak systém funguje a jak vám může pomoci.", cat: "Základy HD", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/manus-storage/blog-fallback.png", featured: true },
-      { slug: "5-typu-human-design", title: "5 typů v Human Designu", excerpt: "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.", cat: "Typy", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/manus-storage/blog-fallback.png", featured: false },
-      { slug: "strategie-v-human-design", title: "Strategie: Klíč ke správným rozhodnutím", excerpt: "Reagovat, informovat, čekat na pozvání — naučte se svou strategii.", cat: "Strategie", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/manus-storage/blog-fallback.png", featured: false },
-      { slug: "autorita-v-human-design", title: "Autorita: Jak dělat správná rozhodnutí", excerpt: "Emocionální, sakrální, slezinná — každý typ má svůj vnitřní kompas rozhodování.", cat: "Autorita", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/manus-storage/blog-fallback.png", featured: false },
-      { slug: "profily-v-human-design", title: "12 profilů v Human Designu", excerpt: "Váš profil odhaluje vaši životní roli a způsob, jakým se učíte a rostete.", cat: "Profily", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/manus-storage/blog-fallback.png", featured: false },
-      { slug: "human-design-a-vztahy", title: "Human Design a vztahy", excerpt: "Jak porozumět partnerské dynamice a zlepšit komunikaci s blízkými.", cat: "Vztahy", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/manus-storage/blog-fallback.png", featured: false },
+      { slug: "co-je-human-design", title: "Co je Human Design?", excerpt: "Kompletní průvodce pro začátečníky — zjistěte, jak systém funguje a jak vám může pomoci.", cat: "Základy HD", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/images/blog-fallback.png", featured: true },
+      { slug: "5-typu-human-design", title: "5 typů v Human Designu", excerpt: "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.", cat: "Typy", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/images/blog-fallback.png", featured: false },
+      { slug: "strategie-v-human-design", title: "Strategie: Klíč ke správným rozhodnutím", excerpt: "Reagovat, informovat, čekat na pozvání — naučte se svou strategii.", cat: "Strategie", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/images/blog-fallback.png", featured: false },
+      { slug: "autorita-v-human-design", title: "Autorita: Jak dělat správná rozhodnutí", excerpt: "Emocionální, sakrální, slezinná — každý typ má svůj vnitřní kompas rozhodování.", cat: "Autorita", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/images/blog-fallback.png", featured: false },
+      { slug: "profily-v-human-design", title: "12 profilů v Human Designu", excerpt: "Váš profil odhaluje vaši životní roli a způsob, jakým se učíte a rostete.", cat: "Profily", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/images/blog-fallback.png", featured: false },
+      { slug: "human-design-a-vztahy", title: "Human Design a vztahy", excerpt: "Jak porozumět partnerské dynamice a zlepšit komunikaci s blízkými.", cat: "Vztahy", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/images/blog-fallback.png", featured: false },
     ]
     : [
-      { slug: "what-is-human-design", title: "What is Human Design?", excerpt: "A complete beginner's guide — learn how the system works and how it can help you.", cat: "HD Basics", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/manus-storage/blog-fallback.png", featured: true },
-      { slug: "5-types-human-design", title: "5 Human Design Types", excerpt: "Discover all 5 types — Generator, Projector, Manifestor, MG, and Reflector.", cat: "Types", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/manus-storage/blog-fallback.png", featured: false },
-      { slug: "human-design-strategy", title: "Strategy: The Key to Right Decisions", excerpt: "Respond, inform, wait for the invitation — learn your unique strategy.", cat: "Strategy", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/manus-storage/blog-fallback.png", featured: false },
-      { slug: "human-design-authority", title: "Inner Authority Explained", excerpt: "Emotional, sacral, splenic — every type has its own inner compass for decisions.", cat: "Authority", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/manus-storage/blog-authority_0b2a2a02.webp", featured: false },
-      { slug: "human-design-profiles", title: "12 Human Design Profiles", excerpt: "Your profile reveals your life role and the way you learn, grow, and connect.", cat: "Profiles", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/manus-storage/blog-fallback.png", featured: false },
-      { slug: "human-design-relationships", title: "Human Design & Relationships", excerpt: "Understand partnership dynamics and improve communication with loved ones.", cat: "Relationships", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/manus-storage/blog-fallback.png", featured: false },
+      { slug: "what-is-human-design", title: "What is Human Design?", excerpt: "A complete beginner's guide — learn how the system works and how it can help you.", cat: "HD Basics", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/images/blog-fallback.png", featured: true },
+      { slug: "5-types-human-design", title: "5 Human Design Types", excerpt: "Discover all 5 types — Generator, Projector, Manifestor, MG, and Reflector.", cat: "Types", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/images/blog-fallback.png", featured: false },
+      { slug: "human-design-strategy", title: "Strategy: The Key to Right Decisions", excerpt: "Respond, inform, wait for the invitation — learn your unique strategy.", cat: "Strategy", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/images/blog-fallback.png", featured: false },
+      { slug: "human-design-authority", title: "Inner Authority Explained", excerpt: "Emotional, sacral, splenic — every type has its own inner compass for decisions.", cat: "Authority", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/images/blog-fallback.png", featured: false },
+      { slug: "human-design-profiles", title: "12 Human Design Profiles", excerpt: "Your profile reveals your life role and the way you learn, grow, and connect.", cat: "Profiles", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/images/blog-fallback.png", featured: false },
+      { slug: "human-design-relationships", title: "Human Design & Relationships", excerpt: "Understand partnership dynamics and improve communication with loved ones.", cat: "Relationships", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/images/blog-fallback.png", featured: false },
     ];
 
   return (
@@ -439,15 +439,15 @@ export default function Home() {
               initial="hidden" animate="visible" custom={2} variants={fadeUp}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
             >
-              <Link href={localePath("/calculate")}>
-                <Button
+              <Button
                   size="lg"
                   className="text-white text-base px-8 py-6 shadow-lg transition-all hover:scale-105 rounded-lg"
                   style={{ background: '#2a9d8f', border: 'none' }}
-                >
+                 asChild>
+              <Link href={localePath("/calculate")}>
                   {isCs ? "Vytvořit moji mapu zdarma" : "Get my free chart"}
-                </Button>
-              </Link>
+                </Link>
+            </Button>
 
               <ChartCounter isCs={isCs} />
             </motion.div>
@@ -557,12 +557,12 @@ export default function Home() {
                   </div>
                   <h3 className="font-serif text-xl font-semibold mb-3 text-foreground">{s.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed mb-5">{s.desc}</p>
-                  <Link href={localePath("/calculate")}>
-                    <Button variant="outline" size="sm" className={`border-2 font-medium transition-all ${btnStyles[i]}`}>
+                  <Button variant="outline" size="sm" className={`border-2 font-medium transition-all ${btnStyles[i]}`} asChild>
+              <Link href={localePath("/calculate")}>
                       {s.cta}
                       <ArrowRight className="w-4 h-4 ml-1.5" />
-                    </Button>
-                  </Link>
+                    </Link>
+            </Button>
                 </motion.div>
               );
             })}
@@ -617,7 +617,7 @@ export default function Home() {
                 className="flex flex-col items-center text-center gap-5 group"
               >
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300 ring-2 ring-purple-200/50 dark:ring-purple-500/30">
-                  <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                  <ProgressiveImage src={image} alt={title} className="w-full h-full" imgClassName="object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <h3 className="font-semibold text-lg text-foreground">{title}</h3>
                 <p className="text-sm leading-relaxed text-muted-foreground max-w-[260px]">{desc}</p>
@@ -644,12 +644,12 @@ export default function Home() {
                 {isCs ? "Prozkoumejte svět Human Designu s našimi články a průvodci." : "Explore the world of Human Design with our articles and guides."}
               </p>
             </div>
-            <Link href={localePath("/blog")} className="hidden md:flex">
-              <Button variant="outline" className="rounded-full">
+            <Button variant="outline" className="rounded-full" asChild>
+              <Link href={localePath("/blog")} className="hidden md:flex">
                 {isCs ? "Všechny články" : "All articles"}
                 <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
@@ -658,11 +658,11 @@ export default function Home() {
               <motion.div key={post.slug} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={scaleIn} className="lg:col-span-7">
                 <Link href={localePath(`/blog/${post.slug}`)} className="no-underline">
                   <div className="group relative rounded-2xl overflow-hidden hover:shadow-xl transition-all h-full min-h-[320px] md:min-h-[400px] bg-card border border-border/40">
-                    <img
+                    <ProgressiveImage
                       src={post.cover}
                       alt={post.title}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      loading="lazy"
+                      className="absolute inset-0 w-full h-full"
+                      imgClassName="object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)' }} />
                     <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
@@ -683,13 +683,13 @@ export default function Home() {
               {blogPosts.filter(p => !p.featured).slice(0, 5).map((post, i) => (
                 <motion.div key={post.slug} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i + 1} variants={scaleIn}>
                   <Link href={localePath(`/blog/${post.slug}`)} className="no-underline">
-                    <TiltCard className="group flex gap-3.5 p-3 rounded-xl border border-border/40 bg-card hover:shadow-md hover:border-primary/20 transition-all h-full" maxTilt={5} scale={1.01} hermeticGlow={true}>
+                    <TiltCard className="group flex gap-3.5 p-3 rounded-xl border border-border/40 bg-card hover:shadow-md hover:border-primary/20 transition-all h-full">
                       <div className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-muted">
-                        <img
+                        <ProgressiveImage
                           src={post.cover}
                           alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          loading="lazy"
+                          className="w-full h-full"
+                          imgClassName="object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                       </div>
                       <div className="flex flex-col justify-center gap-1 min-w-0">
@@ -709,12 +709,12 @@ export default function Home() {
 
           {/* Mobile-only "All articles" button */}
           <div className="text-center md:hidden">
-            <Link href={localePath("/blog")}>
-              <Button variant="outline" className="rounded-full">
+            <Button variant="outline" className="rounded-full" asChild>
+              <Link href={localePath("/blog")}>
                 {isCs ? "Všechny články" : "All articles"}
                 <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -735,12 +735,12 @@ export default function Home() {
             </div>
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">{t.home.ctaTitle}</h2>
             <p className="text-muted-foreground mb-8">{t.home.ctaDescription}</p>
-            <Link href={localePath("/calculate")}>
-              <Button size="lg" className="btn-mystical bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg shadow-primary/20 transition-all hover:scale-105 rounded-full">
+            <Button size="lg" className="btn-mystical bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg shadow-primary/20 transition-all hover:scale-105 rounded-full" asChild>
+              <Link href={localePath("/calculate")}>
                 {t.home.ctaButton}
                 <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </motion.div>
         </div>
       </section>

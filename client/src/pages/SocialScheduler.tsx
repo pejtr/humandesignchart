@@ -55,6 +55,7 @@ const T = {
       postTypes: {
         hd_type: "Typ HD", quote: "Citát", infographic: "Infografika",
         transit: "Tranzit", iching: "I-Ťing", promo: "Promo", custom: "Vlastní",
+        tiktok_script: "TikTok Scénář",
       },
     },
     aiGen: {
@@ -69,6 +70,7 @@ const T = {
       generating: "Generuji...",
       useImage: "Kopírovat URL",
       download: "Otevřít",
+      aspectRatio: "Poměr stran",
     },
     accounts: {
       title: "Připojené účty",
@@ -115,6 +117,7 @@ const T = {
       postTypes: {
         hd_type: "HD Type", quote: "Quote", infographic: "Infographic",
         transit: "Transit", iching: "I-Ching", promo: "Promo", custom: "Custom",
+        tiktok_script: "TikTok Script",
       },
     },
     aiGen: {
@@ -129,6 +132,7 @@ const T = {
       generating: "Generating...",
       useImage: "Copy URL",
       download: "Open",
+      aspectRatio: "Aspect Ratio",
     },
     accounts: {
       title: "Connected Accounts",
@@ -151,6 +155,7 @@ const PLATFORM_ICONS: Record<string, React.ComponentType<{ className?: string }>
   facebook: Facebook,
   instagram: Instagram,
   linkedin: Linkedin,
+  tiktok: Share2, // Lucide doesn't have a direct TikTok icon, using Share2 or we could use a custom SVG
 };
 
 const PLATFORM_COLORS: Record<string, string> = {
@@ -158,6 +163,7 @@ const PLATFORM_COLORS: Record<string, string> = {
   instagram: "bg-gradient-to-br from-purple-600 to-pink-500",
   linkedin: "bg-blue-700",
   pinterest: "bg-red-600",
+  tiktok: "bg-black",
 };
 
 // ─── Queue Tab ────────────────────────────────────────────────────────────────
@@ -300,7 +306,7 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
   const [title, setTitle] = useState("");
   const [hashtags, setHashtags] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [postType, setPostType] = useState<"hd_type" | "quote" | "infographic" | "transit" | "iching" | "promo" | "custom">("custom");
+  const [postType, setPostType] = useState<"hd_type" | "quote" | "infographic" | "transit" | "iching" | "promo" | "custom" | "tiktok_script">("custom");
   const [postLocale, setPostLocale] = useState<"cs" | "en">(locale);
   const [scheduledAt, setScheduledAt] = useState("");
   const [selectedAccounts, setSelectedAccounts] = useState<number[]>([]);
@@ -471,7 +477,8 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
 function AiGeneratorTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
   const [topic, setTopic] = useState("");
   const [style, setStyle] = useState<"dark_cosmic" | "light_minimal" | "golden_mystical">("dark_cosmic");
-  const [postType, setPostType] = useState<"hd_type" | "quote" | "infographic" | "transit" | "iching" | "promo" | "custom">("hd_type");
+  const [postType, setPostType] = useState<"hd_type" | "quote" | "infographic" | "transit" | "iching" | "promo" | "custom" | "tiktok_script">("hd_type");
+  const [aspectRatio, setAspectRatio] = useState<"1:1" | "4:5" | "9:16">("1:1");
   const [generatedImages, setGeneratedImages] = useState<{ imageUrl: string; prompt: string }[]>([]);
 
   const generateImage = trpc.social.generatePostImage.useMutation({
@@ -521,6 +528,17 @@ function AiGeneratorTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-1.5">
+              <Label>{t.aiGen.aspectRatio}</Label>
+              <Select value={aspectRatio} onValueChange={v => setAspectRatio(v as typeof aspectRatio)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1:1">1:1 (Square)</SelectItem>
+                  <SelectItem value="4:5">4:5 (Portrait)</SelectItem>
+                  <SelectItem value="9:16">9:16 (Story/TikTok)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label>{t.aiGen.topic}</Label>
@@ -528,7 +546,7 @@ function AiGeneratorTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
           </div>
           <Button
             className="w-full"
-            onClick={() => generateImage.mutate({ postType, topic: topic || "Human Design", style, locale })}
+            onClick={() => generateImage.mutate({ postType, topic: topic || "Human Design", style, locale, aspectRatio })}
             disabled={generateImage.isPending}
           >
             {generateImage.isPending ? (
@@ -544,7 +562,7 @@ function AiGeneratorTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
         <div className="grid grid-cols-2 gap-4">
           {generatedImages.map((img, i) => (
             <Card key={i} className="overflow-hidden group">
-              <div className="relative aspect-square">
+              <div className={`relative ${aspectRatio === "9:16" ? "aspect-[9/16]" : aspectRatio === "4:5" ? "aspect-[4/5]" : "aspect-square"}`}>
                 <img src={img.imageUrl} alt="" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                   <Button size="sm" variant="secondary" onClick={() => copyUrl(img.imageUrl)}>
@@ -574,7 +592,7 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
   const utils = trpc.useUtils();
 
   const [showForm, setShowForm] = useState(false);
-  const [platform, setPlatform] = useState<"facebook" | "instagram" | "linkedin" | "pinterest">("instagram");
+  const [platform, setPlatform] = useState<"facebook" | "instagram" | "linkedin" | "pinterest" | "tiktok">("instagram");
   const [accountName, setAccountName] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [accountId, setAccountId] = useState("");
@@ -614,6 +632,9 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
     pinterest: locale === "cs"
       ? "Pinterest API je momentálně v beta verzi. Získejte token z Pinterest Developer Portal."
       : "Pinterest API is currently in beta. Get your token from the Pinterest Developer Portal.",
+    tiktok: locale === "cs"
+      ? "Pro TikTok použijte Access Token z TikTok For Developers portálu."
+      : "For TikTok, use the Access Token from TikTok For Developers portal.",
   };
 
   return (
@@ -643,6 +664,7 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
                   <SelectItem value="instagram">Instagram</SelectItem>
                   <SelectItem value="linkedin">LinkedIn</SelectItem>
                   <SelectItem value="pinterest">Pinterest</SelectItem>
+                  <SelectItem value="tiktok">TikTok</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">{PLATFORM_INSTRUCTIONS[platform]}</p>
@@ -743,39 +765,39 @@ export default function SocialScheduler() {
     <div className="min-h-screen">
       <Navbar />
       <div className="container max-w-5xl py-8 pt-24">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-            <Share2 className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">{t.title}</h1>
-            <p className="text-sm text-muted-foreground">{t.subtitle}</p>
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <Share2 className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">{t.title}</h1>
+              <p className="text-sm text-muted-foreground">{t.subtitle}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <Tabs defaultValue="queue">
-        <TabsList className="mb-6">
-          <TabsTrigger value="queue" className="gap-2">
-            <Calendar className="w-4 h-4" />{t.tabs.queue}
-          </TabsTrigger>
-          <TabsTrigger value="compose" className="gap-2">
-            <Plus className="w-4 h-4" />{t.tabs.compose}
-          </TabsTrigger>
-          <TabsTrigger value="ai-gen" className="gap-2">
-            <Wand2 className="w-4 h-4" />{t.tabs.aiGen}
-          </TabsTrigger>
-          <TabsTrigger value="accounts" className="gap-2">
-            <Settings className="w-4 h-4" />{t.tabs.accounts}
-          </TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="queue">
+          <TabsList className="mb-6">
+            <TabsTrigger value="queue" className="gap-2">
+              <Calendar className="w-4 h-4" />{t.tabs.queue}
+            </TabsTrigger>
+            <TabsTrigger value="compose" className="gap-2">
+              <Plus className="w-4 h-4" />{t.tabs.compose}
+            </TabsTrigger>
+            <TabsTrigger value="ai-gen" className="gap-2">
+              <Wand2 className="w-4 h-4" />{t.tabs.aiGen}
+            </TabsTrigger>
+            <TabsTrigger value="accounts" className="gap-2">
+              <Settings className="w-4 h-4" />{t.tabs.accounts}
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="queue"><QueueTab locale={safeLocale} t={t} /></TabsContent>
-        <TabsContent value="compose"><ComposeTab locale={safeLocale} t={t} /></TabsContent>
-        <TabsContent value="ai-gen"><AiGeneratorTab locale={safeLocale} t={t} /></TabsContent>
-        <TabsContent value="accounts"><AccountsTab locale={safeLocale} t={t} /></TabsContent>
-      </Tabs>
+          <TabsContent value="queue"><QueueTab locale={safeLocale} t={t} /></TabsContent>
+          <TabsContent value="compose"><ComposeTab locale={safeLocale} t={t} /></TabsContent>
+          <TabsContent value="ai-gen"><AiGeneratorTab locale={safeLocale} t={t} /></TabsContent>
+          <TabsContent value="accounts"><AccountsTab locale={safeLocale} t={t} /></TabsContent>
+        </Tabs>
       </div>
     </div>
   );

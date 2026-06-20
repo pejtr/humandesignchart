@@ -19,6 +19,18 @@ export const aiRouter = router({
             readingType: z.enum(["overview", "type_strategy", "profile", "authority", "incarnation_cross", "channels", "gates", "variables", "relationships", "career"]),
         }))
         .mutation(async ({ ctx, input }) => {
+            const { countAiReadingsByUserToday } = await import("../db");
+            const { canGenerateAiReading } = await import("../stripeProducts");
+            const totalReadings = await countAiReadingsByUserToday(ctx.user.id);
+            const userForCheck = {
+                ...ctx.user,
+                subscriptionCurrentPeriodEnd: ctx.user.subscriptionCurrentPeriodEnd ? new Date(ctx.user.subscriptionCurrentPeriodEnd) : null,
+            };
+            const check = canGenerateAiReading(userForCheck, totalReadings);
+            if (!check.allowed) {
+                throw new TRPCError({ code: "PAYMENT_REQUIRED", message: "Free limit reached" });
+            }
+
             const chart = input.chartData;
 
             const isEn = false; // standard readings are in Czech as before (or detect via chart data if needed)
@@ -76,7 +88,7 @@ export const aiRouter = router({
                 token,
                 chartData: { readingContent: reading.content, readingType: reading.readingType, readingId: reading.id } as any,
                 ownerName: ctx.user.name || undefined,
-                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
             });
             return { token };
         }),
@@ -85,6 +97,7 @@ export const aiRouter = router({
     askGuide: protectedProcedure
         .input(z.object({
             question: z.string().min(1).max(MAX_QUESTION_LENGTH),
+            chartId: z.number().optional(),
             history: z.array(z.object({
                 role: z.enum(["user", "assistant"]),
                 content: z.string().max(8_000),
@@ -112,7 +125,7 @@ export const aiRouter = router({
             let primaryChartData: any = null;
             try {
                 const userCharts = await getUserCharts(ctx.user.id);
-                const primaryChart = userCharts.find(c => c.category === "self") ?? userCharts[0];
+                const primaryChart = userCharts.find((c: any) => c.category === "self") ?? userCharts[0];
                 if (primaryChart?.chartData) {
                     const cd = primaryChart.chartData as any;
                     primaryChartData = cd;
@@ -293,7 +306,17 @@ Tvůj komunikační styl jako HD Guru:
                 { role: "system" as const, content: systemPrompt },
             ];
 
-            for (const msg of safeHistory) {
+            // Use DB history if input history is not provided
+            const { getOrCreateConversation, getChatMessages, saveChatMessage, clearChatHistory } = await import("../db");
+            const conversation = await getOrCreateConversation(ctx.user.id, input.chartId ?? null, input.locale ?? 'cs');
+
+            let finalHistory = safeHistory;
+            if (!input.history || input.history.length === 0) {
+                const dbMessages = await getChatMessages(conversation.id);
+                finalHistory = dbMessages.map((m: any) => ({ role: m.role, content: m.content }));
+            }
+
+            for (const msg of finalHistory) {
                 messages.push({ role: msg.role as "user" | "assistant", content: msg.content });
             }
 
@@ -302,6 +325,10 @@ Tvůj komunikační styl jako HD Guru:
             const response = await invokeLLM({ messages });
             const rawContent = response.choices?.[0]?.message?.content;
             const content = typeof rawContent === "string" ? rawContent : "Omlouvám se, nepodařilo se vygenerovat odpověď.";
+
+            // Persist messages
+            await saveChatMessage(conversation.id, ctx.user.id, "user", safeQuestion);
+            await saveChatMessage(conversation.id, ctx.user.id, "assistant", content);
 
             return { content };
         }),

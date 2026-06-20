@@ -34,6 +34,24 @@ export async function setupVite(app: Express, server: Server) {
 
       // always reload the index.html file from disk incase it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
+
+      if (url.startsWith("/shared/") || url.startsWith("/en/shared/") || url.startsWith("/cs/shared/")) {
+        const parts = url.split("/");
+        const token = parts[parts.length - 1]; // last part is token
+        if (token && token.length > 5) {
+          const baseUrl = `${req.protocol}://${req.get("host")}`;
+          const ogHtml = `
+            <meta property="og:image" content="${baseUrl}/api/og/shared/${token}" />
+            <meta property="og:title" content="Human Design Rozbor" />
+            <meta property="og:description" content="Podívejte se na moji detailní Human Design mapu." />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content="Human Design Rozbor" />
+            <meta name="twitter:image" content="${baseUrl}/api/og/shared/${token}" />
+          `;
+          template = template.replace(/<head>/i, `<head>\n${ogHtml}`);
+        }
+      }
+
       template = template.replace(
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`
@@ -61,7 +79,32 @@ export function serveStatic(app: Express) {
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+  app.use("*", async (req, res) => {
+    try {
+      let template = await fs.promises.readFile(path.resolve(distPath, "index.html"), "utf-8");
+
+      const url = req.originalUrl;
+      if (url.startsWith("/shared/") || url.startsWith("/en/shared/") || url.startsWith("/cs/shared/")) {
+        const parts = url.split("/");
+        const token = parts[parts.length - 1];
+        if (token && token.length > 5) {
+          const baseUrl = `${req.protocol}://${req.get("host")}`;
+          const ogHtml = `
+            <meta property="og:image" content="${baseUrl}/api/og/shared/${token}" />
+            <meta property="og:title" content="Human Design Rozbor" />
+            <meta property="og:description" content="Podívejte se na moji detailní Human Design mapu." />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content="Human Design Rozbor" />
+            <meta name="twitter:image" content="${baseUrl}/api/og/shared/${token}" />
+          `;
+          template = template.replace(/<head>/i, `<head>\n${ogHtml}`);
+        }
+      }
+
+      res.status(200).set({ "Content-Type": "text/html" }).end(template);
+    } catch (e) {
+      console.error("Error serving index.html:", e);
+      res.status(500).send("Internal Server Error");
+    }
   });
 }

@@ -46,11 +46,11 @@ export async function upsertUser(user: InsertUser): Promise<void> {
         }
 
         if (!values.lastSignedIn) {
-            values.lastSignedIn = new Date();
+            values.lastSignedIn = new Date().toISOString();
         }
 
         if (Object.keys(updateSet).length === 0) {
-            updateSet.lastSignedIn = new Date();
+            updateSet.lastSignedIn = new Date().toISOString();
         }
 
         await db.insert(users).values(values).onDuplicateKeyUpdate({
@@ -106,4 +106,9 @@ export async function consumeAiReadingCredit(userId: number) {
         return true;
     }
     return false;
+}
+export async function updateUserPreferences(userId: number, preferences: any) {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    await db.update(users).set({ notificationPreferences: preferences }).where(eq(users.id, userId));
 }

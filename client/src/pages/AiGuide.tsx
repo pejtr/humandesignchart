@@ -125,11 +125,11 @@ function ProfilePanel({ locale }: { locale: string }) {
         <p className="text-sm text-muted-foreground mb-4">
           {isEn ? "No chart yet" : "Zatím žádná mapa"}
         </p>
-        <Link href={`/${locale}/calculate`}>
-          <Button size="sm" variant="outline" className="w-full text-xs">
+        <Button size="sm" variant="outline" className="w-full text-xs" asChild>
+              <Link href={`/${locale}/calculate`}>
             {isEn ? "Calculate my chart" : "Vypočítat mou mapu"}
-          </Button>
-        </Link>
+          </Link>
+            </Button>
       </div>
     );
   }
@@ -219,26 +219,26 @@ function ProfilePanel({ locale }: { locale: string }) {
       )}
 
       {/* Link to full chart */}
-      <Link href={`/${locale}/chart/${primaryChart.id}`}>
-        <Button size="sm" variant="outline" className="w-full text-xs mt-1">
+      <Button size="sm" variant="outline" className="w-full text-xs mt-1" asChild>
+              <Link href={`/${locale}/chart/${primaryChart.id}`}>
           {isEn ? "View full chart" : "Zobrazit celou mapu"}
-        </Button>
-      </Link>
+        </Link>
+            </Button>
 
       {/* Transit quick links */}
       <div className="grid grid-cols-2 gap-1.5 pt-1">
-        <Link href={`/${locale}/daily-transit`}>
-          <Button size="sm" variant="outline" className="w-full text-[11px] gap-1 border-amber-400/40 text-amber-600 hover:bg-amber-50/10 hover:border-amber-400/70 dark:text-amber-400">
+        <Button size="sm" variant="outline" className="w-full text-[11px] gap-1 border-amber-400/40 text-amber-600 hover:bg-amber-50/10 hover:border-amber-400/70 dark:text-amber-400" asChild>
+              <Link href={`/${locale}/daily-transit`}>
             <Sun className="w-3 h-3" />
             {isEn ? "Daily" : "Denní"}
-          </Button>
-        </Link>
-        <Link href={`/${locale}/transit-calendar`}>
-          <Button size="sm" variant="outline" className="w-full text-[11px] gap-1 border-indigo-400/40 text-indigo-600 hover:bg-indigo-50/10 hover:border-indigo-400/70 dark:text-indigo-400">
+          </Link>
+            </Button>
+        <Button size="sm" variant="outline" className="w-full text-[11px] gap-1 border-indigo-400/40 text-indigo-600 hover:bg-indigo-50/10 hover:border-indigo-400/70 dark:text-indigo-400" asChild>
+              <Link href={`/${locale}/transit-calendar`}>
             <Moon className="w-3 h-3" />
             {isEn ? "Weekly" : "Týdenní"}
-          </Button>
-        </Link>
+          </Link>
+            </Button>
       </div>
     </div>
   );
@@ -278,7 +278,7 @@ export default function AiGuide() {
     const pageUrl = isEn
       ? 'https://humandesignchart.app/en/ai-guide'
       : 'https://humandesignmapa.cz/cs/ai-guide';
-    const ogImage = '/manus-storage/og-ai-guide_b44c2f20.webp';
+    const ogImage = '/images/og-ai-guide_b44c2f20.webp';
 
     document.title = title;
 
@@ -404,9 +404,10 @@ export default function AiGuide() {
   const [isChatMinimized, setIsChatMinimized] = useState(false);
 
   // --- Chat persistence & threads ---
+  const [selectedChartId, setSelectedChartId] = useState<number | null>(null);
   const [conversationId, setConversationId] = useState<number | null>(null);
   const [loadedConvId, setLoadedConvId] = useState<number | null>(null);
-  const MAX_THREADS = 3;
+  const MAX_THREADS = 5;
 
   // Derived values for upgrade CTA
   const totalMessages = messages.filter(m => m.role === "user").length;
@@ -420,9 +421,19 @@ export default function AiGuide() {
   const saveMessagesMutation = trpc.chat.saveMessages.useMutation();
   const utils = trpc.useUtils();
 
-  // List of conversations (threads)
+  // Get all user charts for the switcher
+  const { data: charts } = trpc.chart.list.useQuery(undefined, { enabled: isAuthenticated });
+
+  // Set initial selected chart if not set
+  useEffect(() => {
+    if (charts?.length && selectedChartId === null) {
+      setSelectedChartId(charts[0].id);
+    }
+  }, [charts, selectedChartId]);
+
+  // List of conversations (threads) for the SELECTED chart
   const { data: conversations, refetch: refetchConversations } = trpc.chat.listConversations.useQuery(
-    { locale: locale as "cs" | "en" },
+    { locale: locale as "cs" | "en", chartId: selectedChartId },
     { enabled: isAuthenticated }
   );
 
@@ -432,13 +443,13 @@ export default function AiGuide() {
     { enabled: isAuthenticated && conversationId !== null && conversationId > 0 }
   );
 
-  // On mount: get or create conversation
+  // When selectedChartId or locale changes: get or create conversation
   useEffect(() => {
     if (!isAuthenticated) return;
-    getOrCreateConv.mutateAsync({ locale: locale as "cs" | "en" }).then(conv => {
+    getOrCreateConv.mutateAsync({ locale: locale as "cs" | "en", chartId: selectedChartId }).then(conv => {
       setConversationId(conv.id);
-    }).catch(() => {});
-  }, [isAuthenticated, locale]);
+    }).catch(() => { });
+  }, [isAuthenticated, locale, selectedChartId]);
 
   // When history loads for a new conversationId, populate messages
   useEffect(() => {
@@ -446,7 +457,7 @@ export default function AiGuide() {
     if (conversationId === loadedConvId) return; // already loaded this conv
     setLoadedConvId(conversationId);
     if (historyData.length > 0) {
-      const loaded: Message[] = historyData.map(m => ({
+      const loaded: Message[] = historyData.map((m: any) => ({
         id: String(m.id),
         role: m.role as "user" | "assistant",
         content: m.content,
@@ -456,6 +467,9 @@ export default function AiGuide() {
         { id: "welcome", role: "assistant", content: welcomeMessage, timestamp: new Date() },
         ...loaded,
       ]);
+    } else {
+      // Clear messages if new empty thread
+      setMessages([{ id: "welcome", role: "assistant", content: welcomeMessage, timestamp: new Date() }]);
     }
   }, [historyData, conversationId, loadedConvId, welcomeMessage]);
 
@@ -468,17 +482,17 @@ export default function AiGuide() {
     utils.chat.getHistory.invalidate({ conversationId: convId });
   }, [conversationId, welcomeMessage, utils]);
 
-  // Start a new thread (max 3)
+  // Start a new thread (max 5)
   const startNewThread = useCallback(async () => {
     if ((conversations?.length ?? 0) >= MAX_THREADS) return;
     try {
-      const conv = await createConvMutation.mutateAsync({ locale: locale as "cs" | "en" });
+      const conv = await createConvMutation.mutateAsync({ locale: locale as "cs" | "en", chartId: selectedChartId });
       setConversationId(conv.id);
       setLoadedConvId(conv.id); // new thread has no history, mark as loaded
       setMessages([{ id: "welcome", role: "assistant", content: welcomeMessage, timestamp: new Date() }]);
       refetchConversations();
-    } catch {}
-  }, [conversations, locale, welcomeMessage, createConvMutation, refetchConversations]);
+    } catch { }
+  }, [conversations, locale, welcomeMessage, createConvMutation, refetchConversations, selectedChartId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -496,7 +510,7 @@ export default function AiGuide() {
     };
     window.addEventListener("ai-guide-send", handler);
     return () => window.removeEventListener("ai-guide-send", handler);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, messages, conversationId]);
 
   const handleSend = async (text?: string) => {
@@ -525,6 +539,7 @@ export default function AiGuide() {
         question,
         history,
         locale,
+        chartId: selectedChartId ?? undefined,
       });
 
       const assistantMsg: Message = {
@@ -605,7 +620,7 @@ export default function AiGuide() {
       <AmbientOrbs />
       <Navbar />
 
-      <main className="flex-1 pt-2 md:pt-6 pb-20 md:pb-4 flex flex-col relative z-10">
+      <main className="flex-1 pt-2 md:pt-6 pb-20 md:pb-16 flex flex-col relative z-10">
         <div className="container max-w-6xl flex-1 flex flex-col">
           {/* Layout: profile panel left + chat right */}
           <div className="flex-1 flex gap-6 py-4">
@@ -683,18 +698,42 @@ export default function AiGuide() {
                     {isChatMinimized ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
                   </Button>
                 </div>
+
+                {/* Profile Switcher — shown when more than 1 chart */}
+                {isAuthenticated && charts && charts.length > 1 && (
+                  <div className="px-4 pb-3 flex gap-1.5 overflow-x-auto scrollbar-hide border-b border-border/30 mb-2">
+                    {charts.map((chart: any) => (
+                      <button
+                        key={chart.id}
+                        onClick={() => {
+                          setSelectedChartId(chart.id);
+                          setConversationId(null);
+                          setLoadedConvId(null);
+                          setMessages([{ id: "welcome", role: "assistant", content: welcomeMessage, timestamp: new Date() }]);
+                        }}
+                        className={`text-[10px] h-7 px-3 rounded-full flex items-center gap-1.5 transition-all whitespace-nowrap border ${chart.id === selectedChartId
+                            ? 'bg-primary/10 border-primary text-primary font-medium'
+                            : 'bg-muted/50 border-transparent text-muted-foreground hover:bg-muted dark:hover:bg-muted/80'
+                          }`}
+                      >
+                        <User className="w-3 h-3" />
+                        {chart.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {/* Thread tabs — shown when more than 1 conversation */}
                 {isAuthenticated && conversations && conversations.length > 1 && (
-                  <div className="flex gap-1 px-4 pb-2 overflow-x-auto">
-                    {conversations.map((conv, idx) => (
+                  <div className="flex gap-1 px-4 pb-2 overflow-x-auto scrollbar-hide">
+                    {conversations.map((conv: any, idx: number) => (
                       <button
                         key={conv.id}
                         onClick={() => switchThread(conv.id)}
-                        className={`text-[11px] px-3 py-1 rounded-full border transition-all whitespace-nowrap ${
-                          conv.id === conversationId
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'border-border/50 text-muted-foreground hover:border-primary/40 hover:text-foreground'
-                        }`}
+                        className={`text-[11px] px-3 py-1 rounded-full border transition-all whitespace-nowrap ${conv.id === conversationId
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'border-border/50 text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                          }`}
                       >
                         <MessageCircle className="w-3 h-3 inline mr-1" />
                         {conv.title || (isEn ? `Thread ${idx + 1}` : `Vlákno ${idx + 1}`)}
@@ -703,148 +742,146 @@ export default function AiGuide() {
                   </div>
                 )}
               </div>
-
               {/* Minimizable chat body */}
               {!isChatMinimized && <>
-              {/* Messages */}
-              <div
-                className="flex-1 space-y-4 mb-4 pr-1 md:overflow-y-auto"
-                style={{ maxHeight: "var(--chat-max-h, none)" }}
-                ref={el => {
-                  // On desktop apply max-height for inner scroll; on mobile let page scroll
-                  if (el) {
-                    const isMd = window.innerWidth >= 768;
-                    el.style.setProperty('--chat-max-h', isMd ? 'calc(100vh - 300px - env(safe-area-inset-bottom, 0px))' : 'none');
-                  }
-                }}
-              >
-                <AnimatePresence>
-                  {messages.map(msg => (
-                    <motion.div
-                      key={msg.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
-                    >
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                        msg.role === "user"
+                {/* Messages */}
+                <div
+                  className="flex-1 space-y-4 mb-4 pr-1 md:overflow-y-auto"
+                  style={{ maxHeight: "var(--chat-max-h, none)" }}
+                  ref={el => {
+                    // On desktop apply max-height for inner scroll; on mobile let page scroll
+                    if (el) {
+                      const isMd = window.innerWidth >= 768;
+                      el.style.setProperty('--chat-max-h', isMd ? 'calc(100vh - 300px - env(safe-area-inset-bottom, 0px))' : 'none');
+                    }
+                  }}
+                >
+                  <AnimatePresence>
+                    {messages.map(msg => (
+                      <motion.div
+                        key={msg.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
+                      >
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${msg.role === "user"
                           ? "bg-primary text-primary-foreground"
                           : "bg-primary/10 text-primary border border-primary/20"
-                      }`}>
-                        {msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-                      </div>
-                      <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                        msg.role === "user"
+                          }`}>
+                          {msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                        </div>
+                        <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${msg.role === "user"
                           ? "bg-primary text-primary-foreground"
                           : "bg-background/80 backdrop-blur-sm border border-border/50 text-foreground shadow-sm"
-                      }`}>
-                        {msg.role === "assistant" ? (
-                          <div className="text-sm prose prose-sm max-w-none [&_p]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mb-1 [&_ul]:mb-2 [&_li]:mb-0.5">
-                            <Streamdown>{msg.content}</Streamdown>
-                          </div>
-                        ) : (
-                          <p className="text-sm">{msg.content}</p>
-                        )}
+                          }`}>
+                          {msg.role === "assistant" ? (
+                            <div className="text-sm prose prose-sm max-w-none [&_p]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mb-1 [&_ul]:mb-2 [&_li]:mb-0.5">
+                              <Streamdown>{msg.content}</Streamdown>
+                            </div>
+                          ) : (
+                            <p className="text-sm">{msg.content}</p>
+                          )}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+
+                  {isLoading && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex gap-3"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+                        <Bot className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl px-4 py-3 shadow-sm">
+                        <div className="flex gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "0ms" }} />
+                          <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "150ms" }} />
+                          <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "300ms" }} />
+                        </div>
                       </div>
                     </motion.div>
-                  ))}
-                </AnimatePresence>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
 
-                {isLoading && (
+                {/* Upgrade CTA banner — shown after 3 messages for free users */}
+                {showUpgradeBanner && (
                   <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex gap-3"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="my-3 rounded-xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 to-violet-950/40 p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-                      <Bot className="w-4 h-4 text-primary" />
+                    <div className="w-9 h-9 rounded-lg bg-purple-500/20 flex items-center justify-center shrink-0">
+                      <Crown className="w-4.5 h-4.5 text-purple-400" />
                     </div>
-                    <div className="bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl px-4 py-3 shadow-sm">
-                      <div className="flex gap-1.5">
-                        <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "300ms" }} />
-                      </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-purple-200">
+                        {isEn ? "Enjoying the AI Guide? ✨" : "Líbí se vám AI průvodce? ✨"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {isEn
+                          ? `You've sent ${totalMessages} messages. Upgrade to Premium for unlimited conversations, AI chart readings, and PDF reports.`
+                          : `Odeslali jste ${totalMessages} zpráv. Upgradujte na Premium pro neomezené konverzace, AI výklady map a PDF reporty.`}
+                      </p>
                     </div>
+                    <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white shrink-0 gap-1.5" asChild>
+              <Link href={localePath("/pricing")}>
+                        <Zap className="w-3.5 h-3.5" />
+                        {isEn ? "Upgrade" : "Upgradovat"}
+                      </Link>
+            </Button>
                   </motion.div>
                 )}
-                <div ref={messagesEndRef} />
-              </div>
 
-              {/* Upgrade CTA banner — shown after 3 messages for free users */}
-              {showUpgradeBanner && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="my-3 rounded-xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 to-violet-950/40 p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-purple-500/20 flex items-center justify-center shrink-0">
-                    <Crown className="w-4.5 h-4.5 text-purple-400" />
+                {/* Input + Quick prompts — desktop: inline, mobile: fixed above bottom nav */}
+                <div className="hidden md:block border-t border-border/50 pt-3">
+                  {/* Always-visible quick-prompt chips */}
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {SUGGESTED_QUESTIONS.slice(0, 5).map((q, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        disabled={isLoading}
+                        onClick={() => handleSend(q)}
+                        className="text-[11px] px-2.5 py-1 rounded-full border border-primary/25 bg-primary/5 text-primary/80 hover:bg-primary/15 hover:text-primary hover:border-primary/50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        {q}
+                      </button>
+                    ))}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-purple-200">
-                      {isEn ? "Enjoying the AI Guide? ✨" : "Líbí se vám AI průvodce? ✨"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {isEn
-                        ? `You've sent ${totalMessages} messages. Upgrade to Premium for unlimited conversations, AI chart readings, and PDF reports.`
-                        : `Odeslali jste ${totalMessages} zpráv. Upgradujte na Premium pro neomezené konverzace, AI výklady map a PDF reporty.`}
-                    </p>
-                  </div>
-                  <Link href={localePath("/pricing")}>
-                    <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white shrink-0 gap-1.5">
-                      <Zap className="w-3.5 h-3.5" />
-                      {isEn ? "Upgrade" : "Upgradovat"}
-                    </Button>
-                  </Link>
-                </motion.div>
-              )}
-
-              {/* Input + Quick prompts — desktop: inline, mobile: fixed above bottom nav */}
-              <div className="hidden md:block border-t border-border/50 pt-3">
-                {/* Always-visible quick-prompt chips */}
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {SUGGESTED_QUESTIONS.slice(0, 5).map((q, i) => (
-                    <button
-                      key={i}
-                      type="button"
+                  <form
+                    onSubmit={e => {
+                      e.preventDefault();
+                      handleSend();
+                    }}
+                    className="flex gap-2"
+                  >
+                    <Input
+                      ref={inputRef}
+                      value={input}
+                      onChange={e => setInput(e.target.value)}
+                      placeholder={isEn ? "Ask anything about Human Design..." : "Zeptejte se na cokoliv o Human Designu..."}
                       disabled={isLoading}
-                      onClick={() => handleSend(q)}
-                      className="text-[11px] px-2.5 py-1 rounded-full border border-primary/25 bg-primary/5 text-primary/80 hover:bg-primary/15 hover:text-primary hover:border-primary/50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      {q}
-                    </button>
-                  ))}
+                      className="flex-1 bg-background/60 backdrop-blur-sm border-border/50"
+                    />
+                    <Button type="submit" disabled={!input.trim() || isLoading} size="icon">
+                      {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    </Button>
+                  </form>
                 </div>
-                <form
-                  onSubmit={e => {
-                    e.preventDefault();
-                    handleSend();
-                  }}
-                  className="flex gap-2"
-                >
-                  <Input
-                    ref={inputRef}
-                    value={input}
-                    onChange={e => setInput(e.target.value)}
-                    placeholder={isEn ? "Ask anything about Human Design..." : "Zeptejte se na cokoliv o Human Designu..."}
-                    disabled={isLoading}
-                    className="flex-1 bg-background/60 backdrop-blur-sm border-border/50"
-                  />
-                  <Button type="submit" disabled={!input.trim() || isLoading} size="icon">
-                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  </Button>
-                </form>
-              </div>
 
-              {/* Mobile: spacer so messages don't hide behind MobileBottomNav (64px nav + ~56px input row) */}
-              <div className="md:hidden h-32" />
+                {/* Mobile: spacer so messages don't hide behind MobileBottomNav (64px nav + ~56px input row) */}
+                <div className="md:hidden h-32" />
               </>}
             </div>
           </div>
         </div>
       </main>
 
+      <Footer />
     </div>
   );
 }

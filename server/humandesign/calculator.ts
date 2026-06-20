@@ -47,7 +47,7 @@ export interface HumanDesignChart {
   birthTime: string;
   birthPlace: string;
   timezone: string;
-  
+
   // Core chart elements
   type: string;
   profile: string;
@@ -58,14 +58,14 @@ export interface HumanDesignChart {
   notSelf: string;
   aura: string;
   definition: string;
-  
+
   // Incarnation Cross
   incarnationCross: {
     name: string;
     type: string; // Right Angle, Juxtaposition, Left Angle
     gates: [number, number, number, number]; // Personality Sun, Earth, Design Sun, Earth
   };
-  
+
   // Variables
   variables: {
     digestion: { type: string; color: number; tone: number; arrow: string };
@@ -73,22 +73,35 @@ export interface HumanDesignChart {
     perspective: { type: string; color: number; tone: number; arrow: string };
     awareness: { type: string; color: number; tone: number; arrow: string };
   };
-  
+
+  // Dream Rave
+  dreamRave: {
+    type: string;
+    activatedGates: number[];
+    centers: CenterStatus[];
+    channels: ChannelActivation[];
+    activeRealms: {
+      lightField: number[];
+      earthPlane: number[];
+      demonRealm: number[];
+    };
+  };
+
   // Planetary activations
   personalityActivations: GateActivation[];
   designActivations: GateActivation[];
-  
+
   // Channels and Centers
   channels: ChannelActivation[];
   centers: CenterStatus[];
-  
+
   // All activated gates (unique)
   activatedGates: number[];
-  
+
   // Planetary positions (degrees)
   personalityPositions: PlanetaryPositions;
   designPositions: PlanetaryPositions;
-  
+
   // Design date
   designDate: string;
 }
@@ -97,7 +110,7 @@ export interface HumanDesignChart {
 
 function longitudeToGate(longitude: number): { gate: number; line: number; color: number; tone: number; base: number } {
   const normLon = ((longitude % 360) + 360) % 360;
-  
+
   // Find which gate this longitude falls into
   // The wheel starts at 3.875°, so longitudes 0-3.875° wrap to the last gate (Gate 25 at 358.25°)
   let gateIndex = GATE_WHEEL.length - 1; // Default to last gate (25) for wrap-around
@@ -107,29 +120,29 @@ function longitudeToGate(longitude: number): { gate: number; line: number; color
       break;
     }
   }
-  
+
   const gate = GATE_WHEEL[gateIndex][1];
   const gateStart = GATE_WHEEL[gateIndex][0];
   let offset = normLon - gateStart;
   // Handle wrap-around for Gate 25 (358.25° to 3.875°)
   if (offset < 0) offset += 360;
-  
+
   // Each gate = 5.625°, each line = 0.9375°
   const lineFloat = offset / 0.9375;
   const line = Math.min(Math.floor(lineFloat) + 1, 6);
-  
+
   // Color (6 per line) = 0.15625° each
   const lineOffset = offset - (line - 1) * 0.9375;
   const color = Math.min(Math.floor(lineOffset / 0.15625) + 1, 6);
-  
+
   // Tone (6 per color) = 0.026041667° each
   const colorOffset = lineOffset - (color - 1) * 0.15625;
   const tone = Math.min(Math.floor(colorOffset / 0.026041667) + 1, 6);
-  
+
   // Base (5 per tone)
   const toneOffset = colorOffset - (tone - 1) * 0.026041667;
   const base = Math.min(Math.floor(toneOffset / 0.005208333) + 1, 5);
-  
+
   return { gate, line, color, tone, base };
 }
 
@@ -139,16 +152,16 @@ function isMotorConnectedToThroat(definedChannels: ChannelActivation[], definedC
   // BFS from each motor center to Throat
   for (const motor of MOTOR_CENTERS) {
     if (!definedCenters.has(motor)) continue;
-    
+
     const visited = new Set<string>();
     const queue = [motor];
-    
+
     while (queue.length > 0) {
       const current = queue.shift()!;
       if (current === "Throat") return true;
       if (visited.has(current)) continue;
       visited.add(current);
-      
+
       // Find connected centers through defined channels
       for (const ch of definedChannels) {
         if (ch.centerA === current && definedCenters.has(ch.centerB) && !visited.has(ch.centerB)) {
@@ -166,7 +179,7 @@ function isMotorConnectedToThroat(definedChannels: ChannelActivation[], definedC
 function determineType(definedCenters: Set<string>, definedChannels: ChannelActivation[]): string {
   const sacralDefined = definedCenters.has("Sacral");
   const motorToThroat = isMotorConnectedToThroat(definedChannels, definedCenters);
-  
+
   if (definedCenters.size === 0) return "Reflector";
   if (sacralDefined && motorToThroat) return "Manifesting Generator";
   if (sacralDefined) return "Generator";
@@ -180,21 +193,21 @@ function determineAuthority(definedCenters: Set<string>, definedChannels: Channe
   if (definedCenters.has("SolarPlexus")) return "Emotional (Solar Plexus)";
   if (definedCenters.has("Sacral")) return "Sacral";
   if (definedCenters.has("Spleen")) return "Splenic";
-  
+
   // Ego Manifested: Heart connected to Throat
   if (definedCenters.has("Heart")) {
     const heartToThroat = definedChannels.some(
       ch => (ch.centerA === "Heart" && ch.centerB === "Throat") || (ch.centerA === "Throat" && ch.centerB === "Heart")
     );
     if (heartToThroat) return "Ego Manifested";
-    
+
     // Ego Projected: Heart connected to G
     const heartToG = definedChannels.some(
       ch => (ch.centerA === "Heart" && ch.centerB === "G") || (ch.centerA === "G" && ch.centerB === "Heart")
     );
     if (heartToG) return "Ego Projected";
   }
-  
+
   // Self-Projected: G connected to Throat
   if (definedCenters.has("G")) {
     const gToThroat = definedChannels.some(
@@ -202,12 +215,12 @@ function determineAuthority(definedCenters: Set<string>, definedChannels: Channe
     );
     if (gToThroat) return "Self-Projected";
   }
-  
+
   // Mental/Outer Authority
   if (definedCenters.has("Ajna") || definedCenters.has("Head")) {
     return "Mental (Outer Authority)";
   }
-  
+
   return "Lunar (No Inner Authority)";
 }
 
@@ -215,23 +228,23 @@ function determineAuthority(definedCenters: Set<string>, definedChannels: Channe
 
 function determineDefinition(definedCenters: Set<string>, definedChannels: ChannelActivation[]): string {
   if (definedCenters.size === 0) return "None";
-  
+
   // Find connected groups using BFS
   const visited = new Set<string>();
   const groups: string[][] = [];
-  
+
   for (const center of Array.from(definedCenters)) {
     if (visited.has(center)) continue;
-    
+
     const group: string[] = [];
     const queue = [center];
-    
+
     while (queue.length > 0) {
       const current = queue.shift()!;
       if (visited.has(current)) continue;
       visited.add(current);
       group.push(current);
-      
+
       for (const ch of definedChannels) {
         if (ch.centerA === current && definedCenters.has(ch.centerB) && !visited.has(ch.centerB)) {
           queue.push(ch.centerB);
@@ -241,10 +254,10 @@ function determineDefinition(definedCenters: Set<string>, definedChannels: Chann
         }
       }
     }
-    
+
     if (group.length > 0) groups.push(group);
   }
-  
+
   switch (groups.length) {
     case 1: return "Single Definition";
     case 2: return "Split Definition";
@@ -343,11 +356,11 @@ function determineIncarnationCross(
     crossType = "Left Angle Cross";
     angleKey = "left";
   }
-  
+
   const crossNameData = CROSS_NAMES[personalitySunGate];
   const crossTheme = crossNameData ? crossNameData[angleKey] : getGateKeyword(personalitySunGate);
   const name = `${crossType} of ${crossTheme} (${personalitySunGate}/${personalityEarthGate} | ${designSunGate}/${designEarthGate})`;
-  
+
   return {
     name,
     type: crossType,
@@ -366,17 +379,17 @@ function determineVariables(
   // Design Earth Color → Environment
   // Personality Sun Color → Perspective
   // Personality Earth Color → Awareness
-  
+
   const designSun = designActivations.find(a => a.planet === "Sun");
   const designEarth = designActivations.find(a => a.planet === "Earth");
   const personalitySun = personalityActivations.find(a => a.planet === "Sun");
   const personalityEarth = personalityActivations.find(a => a.planet === "Earth");
-  
+
   const DIGESTION = ["Consecutive", "Alternating", "Open", "Closed", "Hot", "Cold"];
   const ENVIRONMENT = ["Caves", "Markets", "Kitchens", "Mountains", "Valleys", "Shores"];
   const PERSPECTIVE = ["Survival", "Possibility", "Power", "Wanting", "Probability", "Personal"];
   const AWARENESS = ["Communalist", "Theist", "Separatist", "Materialist", "Leader", "Follower"];
-  
+
   return {
     digestion: {
       type: DIGESTION[(designSun?.color || 1) - 1] || "Consecutive",
@@ -429,6 +442,73 @@ function getGateKeyword(gate: number): string {
   return keywords[gate] || `Gate ${gate}`;
 }
 
+// ─── Dream Rave ──────────────────────────────────────────────────────────────
+
+const DREAM_RAVE_GATES = [1, 5, 8, 12, 15, 19, 20, 27, 28, 38, 42, 50, 53, 57, 62];
+const DREAM_RAVE_REALMS = {
+  lightField: [62, 20, 57, 8, 1],
+  demonRealm: [19, 53, 42, 38, 28],
+  earthPlane: [5, 12, 15, 27, 50]
+};
+
+function determineDreamRave(allActivations: GateActivation[]) {
+  const drActivatedGates = new Set(
+    allActivations.map(a => a.gate).filter(g => DREAM_RAVE_GATES.includes(g))
+  );
+
+  const drChannels: ChannelActivation[] = [];
+  for (const [g1, g2, cA, cB] of CHANNELS) {
+    if (drActivatedGates.has(g1) && drActivatedGates.has(g2)) {
+      const g1Sources = allActivations.filter(a => a.gate === g1).map(a => ({ planet: a.planet, type: a.type }));
+      const g2Sources = allActivations.filter(a => a.gate === g2).map(a => ({ planet: a.planet, type: a.type }));
+      drChannels.push({
+        gate1: g1,
+        gate2: g2,
+        centerA: cA,
+        centerB: cB,
+        activatedBy: { gate1Sources: g1Sources, gate2Sources: g2Sources },
+      });
+    }
+  }
+
+  const drDefinedCenterSet = new Set<string>();
+  for (const ch of drChannels) {
+    drDefinedCenterSet.add(ch.centerA);
+    drDefinedCenterSet.add(ch.centerB);
+  }
+
+  const hasSacral = drDefinedCenterSet.has("Sacral");
+  const motorToThroat = isMotorConnectedToThroat(drChannels, drDefinedCenterSet);
+
+  let type = "Reflector";
+  if (drDefinedCenterSet.size > 0) {
+    if (hasSacral && motorToThroat) type = "Manifesting Generator";
+    else if (hasSacral) type = "Generator";
+    else if (motorToThroat) type = "Manifestor";
+    else type = "Projector";
+  }
+
+  const drCenterNames = ["Throat", "G", "Sacral", "Spleen", "Root"];
+  const centers: CenterStatus[] = drCenterNames.map(name => ({
+    name,
+    defined: drDefinedCenterSet.has(name),
+    gates: (CENTER_GATES[name as keyof typeof CENTER_GATES] || []).filter(g => DREAM_RAVE_GATES.includes(g)),
+    activatedGates: (CENTER_GATES[name as keyof typeof CENTER_GATES] || []).filter(g => drActivatedGates.has(g)),
+  }));
+
+  return {
+    type,
+    activatedGates: Array.from(drActivatedGates).sort((a, b) => a - b),
+    centers,
+    channels: drChannels,
+    activeRealms: {
+      lightField: Array.from(drActivatedGates).filter(g => DREAM_RAVE_REALMS.lightField.includes(g)),
+      earthPlane: Array.from(drActivatedGates).filter(g => DREAM_RAVE_REALMS.earthPlane.includes(g)),
+      demonRealm: Array.from(drActivatedGates).filter(g => DREAM_RAVE_REALMS.demonRealm.includes(g)),
+    }
+  };
+}
+
 // ─── Main Calculator ─────────────────────────────────────────────────────────
 
 export function calculateChart(
@@ -443,31 +523,31 @@ export function calculateChart(
   // Parse birth date and time
   const [year, month, day] = birthDateStr.split("-").map(Number);
   const [hours, minutes] = birthTimeStr.split(":").map(Number);
-  
+
   // Convert to UTC
   const utcHours = hours - timezoneOffsetHours;
   const birthDate = new Date(Date.UTC(year, month - 1, day, utcHours, minutes));
   const birthJD = dateToJD(birthDate);
-  
+
   // Calculate Personality (birth) positions
   const personalityPositions = calculatePlanetaryPositions(birthJD);
-  
+
   // Calculate Design date and positions
   const designJD = findDesignDate(birthJD);
   const designPositions = calculatePlanetaryPositions(designJD);
-  
+
   // Convert Design JD back to date string
   const designDateObj = jdToCalendar(designJD);
   const designDate = `${Math.floor(designDateObj.year)}-${String(Math.floor(designDateObj.month)).padStart(2, "0")}-${String(Math.floor(designDateObj.day)).padStart(2, "0")}`;
-  
+
   // Calculate gate activations for all planets
   const personalityActivations: GateActivation[] = [];
   const designActivations: GateActivation[] = [];
-  
+
   for (const planetName of PLANET_NAMES) {
     const pLon = personalityPositions[planetName];
     const dLon = designPositions[planetName];
-    
+
     const pGate = longitudeToGate(pLon);
     personalityActivations.push({
       ...pGate,
@@ -475,7 +555,7 @@ export function calculateChart(
       type: "personality",
       longitude: pLon,
     });
-    
+
     const dGate = longitudeToGate(dLon);
     designActivations.push({
       ...dGate,
@@ -484,12 +564,12 @@ export function calculateChart(
       longitude: dLon,
     });
   }
-  
+
   // Collect all activated gates
   const allActivations = [...personalityActivations, ...designActivations];
   const activatedGateSet = new Set(allActivations.map(a => a.gate));
   const activatedGates = Array.from(activatedGateSet).sort((a, b) => a - b);
-  
+
   // Determine defined channels
   const definedChannels: ChannelActivation[] = [];
   for (const [g1, g2, cA, cB] of CHANNELS) {
@@ -500,7 +580,7 @@ export function calculateChart(
       const g2Sources = allActivations
         .filter(a => a.gate === g2)
         .map(a => ({ planet: a.planet, type: a.type }));
-      
+
       definedChannels.push({
         gate1: g1,
         gate2: g2,
@@ -510,14 +590,14 @@ export function calculateChart(
       });
     }
   }
-  
+
   // Determine defined centers
   const definedCenterSet = new Set<string>();
   for (const ch of definedChannels) {
     definedCenterSet.add(ch.centerA);
     definedCenterSet.add(ch.centerB);
   }
-  
+
   // Build center status
   const centerNames = ["Head", "Ajna", "Throat", "G", "Heart", "Sacral", "SolarPlexus", "Spleen", "Root"];
   const centers: CenterStatus[] = centerNames.map(name => ({
@@ -526,33 +606,36 @@ export function calculateChart(
     gates: CENTER_GATES[name] || [],
     activatedGates: (CENTER_GATES[name] || []).filter(g => activatedGateSet.has(g)),
   }));
-  
+
   // Determine type
   const type = determineType(definedCenterSet, definedChannels);
   const typeInfo = TYPES[type as keyof typeof TYPES] || TYPES.Projector;
-  
+
   // Determine authority
   const authority = determineAuthority(definedCenterSet, definedChannels);
-  
+
   // Determine profile
   const personalitySunLine = personalityActivations.find(a => a.planet === "Sun")!.line;
   const designSunLine = designActivations.find(a => a.planet === "Sun")!.line;
   const profileKey = `${personalitySunLine}/${designSunLine}`;
   const profileName = PROFILES[profileKey] || "Unknown Profile";
-  
+
   // Determine definition
   const definition = determineDefinition(definedCenterSet, definedChannels);
-  
+
   // Determine incarnation cross
   const pSunGate = personalityActivations.find(a => a.planet === "Sun")!.gate;
   const pEarthGate = personalityActivations.find(a => a.planet === "Earth")!.gate;
   const dSunGate = designActivations.find(a => a.planet === "Sun")!.gate;
   const dEarthGate = designActivations.find(a => a.planet === "Earth")!.gate;
   const incarnationCross = determineIncarnationCross(pSunGate, pEarthGate, dSunGate, dEarthGate, personalitySunLine);
-  
+
   // Determine variables
   const variables = determineVariables(personalityActivations, designActivations);
-  
+
+  // Determine Dream Rave
+  const dreamRave = determineDreamRave(allActivations);
+
   return {
     birthDate: birthDateStr,
     birthTime: birthTimeStr,
@@ -569,6 +652,7 @@ export function calculateChart(
     definition,
     incarnationCross,
     variables,
+    dreamRave,
     personalityActivations,
     designActivations,
     channels: definedChannels,

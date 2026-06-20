@@ -87,11 +87,13 @@ export const charts = mysqlTable("charts", {
 export const chatConversations = mysqlTable("chatConversations", {
 	id: int().autoincrement().notNull(),
 	userId: int().notNull(),
+	chartId: int(),
 	locale: varchar({ length: 5 }).default('cs').notNull(),
 	title: varchar({ length: 255 }),
 	messageCount: int().default(0).notNull(),
 	lastMessageAt: timestamp({ mode: 'string' }).default(sql`(now())`).notNull(),
 	createdAt: timestamp({ mode: 'string' }).default(sql`(now())`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).default(sql`(now())`).onUpdateNow().notNull(),
 },
 	(table) => [
 		primaryKey({ columns: [table.id], name: "chatConversations_id" }),
@@ -188,7 +190,7 @@ export const sharedCharts = mysqlTable("sharedCharts", {
 export const socialAccounts = mysqlTable("socialAccounts", {
 	id: int().autoincrement().notNull(),
 	userId: int().notNull(),
-	platform: mysqlEnum(['facebook', 'instagram', 'linkedin', 'pinterest']).notNull(),
+	platform: mysqlEnum(['facebook', 'instagram', 'linkedin', 'pinterest', 'tiktok']).notNull(),
 	accountId: varchar({ length: 128 }).notNull(),
 	accountName: varchar({ length: 255 }).notNull(),
 	accountHandle: varchar({ length: 128 }),
@@ -226,7 +228,7 @@ export const socialPosts = mysqlTable("socialPosts", {
 	caption: text().notNull(),
 	imageUrl: text(),
 	imagePrompt: text(),
-	postType: mysqlEnum(['hd_type', 'quote', 'infographic', 'transit', 'iching', 'promo', 'custom']).default('custom').notNull(),
+	postType: mysqlEnum(['hd_type', 'quote', 'infographic', 'transit', 'iching', 'promo', 'custom', 'tiktok_script']).default('custom').notNull(),
 	locale: mysqlEnum(['cs', 'en']).default('cs').notNull(),
 	hashtags: text(),
 	scheduledAt: timestamp({ mode: 'string' }),
@@ -276,14 +278,15 @@ export const users = mysqlTable("users", {
 	currentStreak: int().default(0).notNull(),
 	longestStreak: int().default(0).notNull(),
 	lastLoginDate: varchar({ length: 10 }),
+	notificationPreferences: json().default(sql`('{"dailyTransit": true, "system": true, "credits": true, "campaigns": true}')`).notNull(),
 	lastDailyRewardAt: timestamp({ mode: 'string' }),
 	level: mysqlEnum(['searcher', 'awakened', 'initiated', 'guide', 'master']).default('searcher').notNull(),
 	totalCreditsEarned: int().default(0).notNull(),
 	isAffiliate: tinyint().default(0).notNull(),
 	affiliateCode: varchar({ length: 16 }),
 	affiliateTier: mysqlEnum(['bronze', 'silver', 'gold']).default('bronze').notNull(),
-	affiliateTotalEarned: float().notNull(),
-	affiliatePendingPayout: float().notNull(),
+	affiliateTotalEarned: float().default(0).notNull(),
+	affiliatePendingPayout: float().default(0).notNull(),
 	crmStatus: varchar("crm_status", { length: 32 }),
 	crmNote: text("crm_note"),
 	crmUpdatedAt: bigint("crm_updated_at", { mode: "number" }),
@@ -295,3 +298,36 @@ export const users = mysqlTable("users", {
 		unique("users_referralCode_unique").on(table.referralCode),
 		unique("users_affiliateCode_unique").on(table.affiliateCode),
 	]);
+
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+export type Chart = typeof charts.$inferSelect;
+export type InsertChart = typeof charts.$inferInsert;
+export type AiReading = typeof aiReadings.$inferSelect;
+export type InsertAiReading = typeof aiReadings.$inferInsert;
+export type ChatConversation = typeof chatConversations.$inferSelect;
+export type InsertChatConversation = typeof chatConversations.$inferInsert;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = typeof chatMessages.$inferInsert;
+export type AffiliateConversion = typeof affiliateConversions.$inferSelect;
+export type InsertAffiliateConversion = typeof affiliateConversions.$inferInsert;
+export type AffiliatePayout = typeof affiliatePayouts.$inferSelect;
+export type InsertAffiliatePayout = typeof affiliatePayouts.$inferInsert;
+export type UserNotification = typeof userNotifications.$inferSelect;
+export type InsertUserNotification = typeof userNotifications.$inferInsert;
+export type SocialAccount = typeof socialAccounts.$inferSelect;
+export type InsertSocialAccount = typeof socialAccounts.$inferInsert;
+export type SocialPost = typeof socialPosts.$inferSelect;
+export type InsertSocialPost = typeof socialPosts.$inferInsert;
+export type SocialPostAccount = typeof socialPostAccounts.$inferSelect;
+export type InsertSocialPostAccount = typeof socialPostAccounts.$inferInsert;
+export type CreditTransaction = typeof creditTransactions.$inferSelect;
+export type InsertCreditTransaction = typeof creditTransactions.$inferInsert;
+export type GiftVoucher = typeof giftVouchers.$inferSelect;
+export type InsertGiftVoucher = typeof giftVouchers.$inferInsert;
+export type Referral = typeof referrals.$inferSelect;
+export type InsertReferral = typeof referrals.$inferInsert;
+export type SharedChart = typeof sharedCharts.$inferSelect;
+export type InsertSharedChart = typeof sharedCharts.$inferInsert;
+export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
+export type InsertNewsletterSubscriber = typeof newsletterSubscribers.$inferInsert;

@@ -10,7 +10,7 @@ function createPublicContext(): TrpcContext {
       headers: {},
     } as TrpcContext["req"],
     res: {
-      clearCookie: () => {},
+      clearCookie: () => { },
     } as TrpcContext["res"],
   };
 }
@@ -115,17 +115,16 @@ describe("Sitemap and SEO", () => {
     expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>');
     expect(xml).toContain("<urlset");
     expect(xml).toContain("https://humandesignmapa.cz/");
-    // Bilingual URLs with /cs/ and /en/ prefixes
+    // Bilingual URLs with /cs/ and /en/ prefixes across distinct domains
     expect(xml).toContain("https://humandesignmapa.cz/cs/calculate");
-    expect(xml).toContain("https://humandesignmapa.cz/en/calculate");
+    expect(xml).toContain("https://humandesignchart.app/en/calculate");
     expect(xml).toContain("https://humandesignmapa.cz/cs/types/generator");
-    expect(xml).toContain("https://humandesignmapa.cz/en/types/generator");
-    expect(xml).toContain("https://humandesignmapa.cz/cs/types/manifesting-generator");
-    expect(xml).toContain("https://humandesignmapa.cz/en/types/reflector");
+    expect(xml).toContain("https://humandesignchart.app/en/types/generator");
     expect(xml).toContain("https://humandesignmapa.cz/cs/encyclopedia");
     // hreflang alternates
     expect(xml).toContain('xhtml:link rel="alternate" hreflang="cs"');
     expect(xml).toContain('xhtml:link rel="alternate" hreflang="en"');
+    expect(xml).toContain('xhtml:link rel="alternate" hreflang="x-default"');
   });
 
   it("robots.txt is accessible and contains sitemap reference", async () => {

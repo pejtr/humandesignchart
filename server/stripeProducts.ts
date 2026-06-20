@@ -50,7 +50,7 @@ export type StripePlanKey = keyof typeof STRIPE_PRODUCTS;
 
 /** Free tier limits */
 export const FREE_TIER = {
-  AI_READINGS_LIMIT: 5,  // 5 free AI readings per user (lifetime)
+  AI_READINGS_LIMIT: 3,  // 3 free AI readings per user (daily)
   SAVED_CHARTS_LIMIT: 3, // 3 saved charts for free users
 } as const;
 

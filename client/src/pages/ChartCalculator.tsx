@@ -45,12 +45,12 @@ export default function ChartCalculator() {
   const [category, setCategory] = useState<string>("self");
 
   const RELATIONSHIP_OPTIONS = [
-    { value: "self",       labelCs: "Já",          labelEn: "Myself",     icon: User },
-    { value: "friend",     labelCs: "Partner",     labelEn: "Partner",    icon: Heart },
-    { value: "family",     labelCs: "Rodič",       labelEn: "Parent",     icon: Users },
-    { value: "client",     labelCs: "Šéf / práce", labelEn: "Boss / Work",icon: Briefcase },
-    { value: "other",      labelCs: "Potomek",     labelEn: "Child",      icon: Baby },
-    { value: "celebrity",  labelCs: "Kamarád",     labelEn: "Friend",     icon: Star },
+    { value: "self", labelCs: "Já", labelEn: "Myself", icon: User },
+    { value: "friend", labelCs: "Partner", labelEn: "Partner", icon: Heart },
+    { value: "family", labelCs: "Rodič", labelEn: "Parent", icon: Users },
+    { value: "client", labelCs: "Šéf / práce", labelEn: "Boss / Work", icon: Briefcase },
+    { value: "other", labelCs: "Potomek", labelEn: "Child", icon: Baby },
+    { value: "celebrity", labelCs: "Kamarád", labelEn: "Friend", icon: Star },
   ];
 
   const calculateMutation = trpc.chart.calculate.useMutation({
@@ -111,7 +111,28 @@ export default function ChartCalculator() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-hidden">
+      {/* Mystical Background Decorations */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        {/* Large faint logo icon in the background */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] dark:opacity-[0.05] animate-slow-spin">
+          <svg viewBox="0 0 24 24" className="w-[800px] h-[800px] text-primary" fill="none" stroke="currentColor" strokeWidth="0.5">
+            <circle cx="12" cy="4" r="2" />
+            <circle cx="12" cy="12" r="2.5" />
+            <circle cx="12" cy="20" r="2" />
+            <circle cx="6" cy="8" r="1.5" />
+            <circle cx="18" cy="8" r="1.5" />
+            <line x1="12" y1="6" x2="12" y2="9.5" />
+            <line x1="12" y1="14.5" x2="12" y2="18" />
+            <line x1="7.2" y1="7" x2="10" y2="10.5" />
+            <line x1="16.8" y1="7" x2="14" y2="10.5" />
+          </svg>
+        </div>
+        {/* Floating glow spots */}
+        <div className="absolute top-[20%] left-[10%] w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute bottom-[20%] right-[10%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
+
       <Navbar />
 
       <main className="flex-1 pt-24 pb-16">
@@ -211,11 +232,10 @@ export default function ChartCalculator() {
                           type="button"
                           disabled={!isAuthenticated}
                           onClick={() => setCategory(opt.value)}
-                          className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-xs font-medium transition-all duration-150 ${
-                            active
+                          className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-xs font-medium transition-all duration-150 ${active
                               ? 'border-primary bg-primary/10 text-primary'
                               : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
-                          }`}
+                            }`}
                         >
                           <Icon className="w-4 h-4" />
                           {label}

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
-import { countAiReadingsByUser, updateUserSubscription, getUserById } from "../db";
+import { countAiReadingsByUserToday, updateUserSubscription, getUserById } from "../db";
 import { getStripe } from "../stripeWebhook";
 import { isPremiumUser, canGenerateAiReading, FREE_TIER } from "../stripeProducts";
 import { ENV } from "../_core/env";
@@ -8,7 +8,7 @@ import { ENV } from "../_core/env";
 export const subscriptionRouter = router({
     status: protectedProcedure.query(async ({ ctx }) => {
         const user = ctx.user;
-        const totalReadings = await countAiReadingsByUser(user.id);
+        const totalReadings = await countAiReadingsByUserToday(user.id);
         const premium = isPremiumUser(user);
         const isOwner = !!ENV.ownerOpenId && user.openId === ENV.ownerOpenId;
         return {
