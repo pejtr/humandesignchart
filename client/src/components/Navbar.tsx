@@ -124,15 +124,15 @@ export default function Navbar() {
   return (
     <>
       <header className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out navbar-mystical ${isScrolled
-          ? "bg-background/95 backdrop-blur-xl shadow-sm shadow-black/5"
-          : "bg-background/85 backdrop-blur-md border-b border-border/20"
+        ? "bg-background/95 backdrop-blur-xl shadow-sm shadow-black/5"
+        : "bg-background/85 backdrop-blur-md border-b border-border/20"
         }`}>
-        <nav className="w-full grid grid-cols-3 items-center h-16 px-4 lg:px-6 relative">
-          {/* Left spacer for grid balance */}
-          <div className="flex lg:hidden" />
+        <nav className="w-full grid grid-cols-[1fr_auto_1fr] items-center h-16 px-4 lg:px-6 relative gap-4">
+          {/* Col 1: Empty on desktop, but ensures the center is really centered */}
+          <div className="flex-1 lg:block hidden" />
 
-          {/* Centered Section (Logo + Links) */}
-          <div className="flex items-center justify-center gap-6 col-start-1 col-end-4 lg:col-start-2 lg:col-end-3">
+          {/* Col 2: Centered Section (Logo + Links) */}
+          <div className="flex items-center justify-center gap-6">
             {/* Logo */}
             <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline shrink-0 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
@@ -449,8 +449,8 @@ export default function Navbar() {
               <Link key={link.href} href={localePath(link.href)}>
                 <button
                   className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-colors mb-1 ${isActive(link.href)
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-muted"
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground hover:bg-muted"
                     }`}
                   onClick={() => setMobileOpen(false)}
                 >
@@ -465,8 +465,8 @@ export default function Navbar() {
             <Link href={localePath("/pricing")}>
               <button
                 className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-colors mb-1 ${isActive("/pricing")
-                    ? "bg-primary/10 text-primary"
-                    : "text-foreground hover:bg-muted"
+                  ? "bg-primary/10 text-primary"
+                  : "text-foreground hover:bg-muted"
                   }`}
                 onClick={() => setMobileOpen(false)}
               >
@@ -490,8 +490,8 @@ export default function Navbar() {
               <Link key={link.href} href={localePath(link.href)}>
                 <button
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-0.5 ${isActive(link.href)
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-muted"
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground hover:bg-muted"
                     }`}
                   onClick={() => setMobileOpen(false)}
                 >
@@ -519,8 +519,8 @@ export default function Navbar() {
               <Link key={link.href} href={localePath(link.href)}>
                 <button
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-0.5 ${isActive(link.href)
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-muted"
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground hover:bg-muted"
                     }`}
                   onClick={() => setMobileOpen(false)}
                 >
