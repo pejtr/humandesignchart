@@ -29,6 +29,7 @@ import { socialRouter } from "./routers/social";
 import { leadosRouter } from "./routers/leados";
 import { chatRouter } from "./routers/chat";
 import { userRouter } from "./routers/user";
+import { adsRouter } from "./routers/ads";
 
 export const appRouter = router({
   system: systemRouter,
@@ -52,6 +53,7 @@ export const appRouter = router({
   affiliate: affiliateRouter,
   composite: compositeRouter,
   content: contentRouter,
+  ads: adsRouter,
 });
 
 export type AppRouter = typeof appRouter;

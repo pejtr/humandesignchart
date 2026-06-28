@@ -9,6 +9,14 @@ export const ENV = {
   // ─── Google OAuth (sign-in) ──────────────────────────────────────────
   googleClientId: process.env.GOOGLE_CLIENT_ID ?? "",
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+  // ─── Google Ads API (read-only reporting; admin-only) ────────────────
+  googleAdsDeveloperToken: process.env.GOOGLE_ADS_DEVELOPER_TOKEN ?? "",
+  googleAdsClientId: process.env.GOOGLE_ADS_CLIENT_ID ?? "",
+  googleAdsClientSecret: process.env.GOOGLE_ADS_CLIENT_SECRET ?? "",
+  googleAdsRefreshToken: process.env.GOOGLE_ADS_REFRESH_TOKEN ?? "",
+  googleAdsCustomerId: process.env.GOOGLE_ADS_CUSTOMER_ID ?? "",
+  googleAdsLoginCustomerId: process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID ?? "",
+  googleAdsApiVersion: process.env.GOOGLE_ADS_API_VERSION ?? "v18",
   // ─── LLM: Google Gemini via OpenAI-compatible endpoint ───────────────
   // Set GEMINI_API_KEY in the deploy environment. Override base URL/model
   // with LLM_BASE_URL / LLM_MODEL to use any other OpenAI-compatible provider.
