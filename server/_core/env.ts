@@ -1,10 +1,14 @@
 export const ENV = {
-  appId: process.env.VITE_APP_ID ?? "",
+  // Stable identifier embedded in session tokens. Must be non-empty so that
+  // verifySession accepts the cookie; the exact value is not security-sensitive.
+  appId: process.env.APP_ID ?? process.env.VITE_APP_ID ?? "humandesignmapa",
   cookieSecret: process.env.JWT_SECRET ?? "",
   databaseUrl: process.env.DATABASE_URL ?? "",
-  oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
   ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
   isProduction: process.env.NODE_ENV === "production",
+  // ─── Google OAuth (sign-in) ──────────────────────────────────────────
+  googleClientId: process.env.GOOGLE_CLIENT_ID ?? "",
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
   // ─── LLM: Google Gemini via OpenAI-compatible endpoint ───────────────
   // Set GEMINI_API_KEY in the deploy environment. Override base URL/model
   // with LLM_BASE_URL / LLM_MODEL to use any other OpenAI-compatible provider.
