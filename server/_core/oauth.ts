@@ -1,6 +1,5 @@
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
-import { parse as parseCookieHeader } from "cookie";
-import { randomBytes } from "node:crypto";
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
@@ -9,22 +8,52 @@ import { ENV } from "./env";
 import { buildGoogleAuthUrl, exchangeGoogleCode } from "./googleAuth";
 import { syncUserAsLead, sendLeadOSEvent } from "../leados";
 
-const STATE_COOKIE = "oauth_state";
-const STATE_TTL_MS = 10 * 60 * 1000;
+const STATE_MAX_AGE_MS = 10 * 60 * 1000;
 
 function getQueryParam(req: Request, key: string): string | undefined {
   const value = req.query[key];
   return typeof value === "string" ? value : undefined;
 }
 
-/** Build the OAuth redirect URI from the incoming request (honours the proxy). */
+// ─── Stateless CSRF state ──────────────────────────────────────────────
+// The state is a signed token instead of a cookie, so it survives regardless
+// of which host (www vs apex) the callback lands on and is immune to SameSite
+// cookie quirks. Signature uses the app's JWT secret.
+function signState(): string {
+  const payload = `${Date.now()}.${randomBytes(8).toString("hex")}`;
+  const sig = createHmac("sha256", ENV.cookieSecret).update(payload).digest("base64url");
+  return `${payload}.${sig}`;
+}
+
+function verifyState(state: string | undefined): boolean {
+  if (!state) return false;
+  const idx = state.lastIndexOf(".");
+  if (idx <= 0) return false;
+  const payload = state.slice(0, idx);
+  const sig = state.slice(idx + 1);
+  const expected = createHmac("sha256", ENV.cookieSecret).update(payload).digest("base64url");
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return false;
+  const ts = Number(payload.split(".")[0]);
+  const age = Date.now() - ts;
+  return Number.isFinite(age) && age >= 0 && age <= STATE_MAX_AGE_MS;
+}
+
+/**
+ * Build the OAuth redirect URI. For the production domain we always return the
+ * canonical `www` host (the one registered in the Google OAuth client), so the
+ * flow never bounces between apex and www and the token-exchange redirect_uri
+ * always matches the authorization request.
+ */
 function getRedirectUri(req: Request): string {
-  const forwardedProto = (
-    req.headers["x-forwarded-proto"] as string | undefined
-  )
+  const host = (req.get("host") ?? "").toLowerCase();
+  if (host === "humandesignmapa.cz" || host === "www.humandesignmapa.cz") {
+    return "https://www.humandesignmapa.cz/api/oauth/callback";
+  }
+  const forwardedProto = (req.headers["x-forwarded-proto"] as string | undefined)
     ?.split(",")[0]
     ?.trim();
-  const host = req.get("host") ?? "";
   const isLocal = host.startsWith("localhost") || host.startsWith("127.0.0.1");
   const proto = forwardedProto || (isLocal ? "http" : "https");
   return `${proto}://${host}/api/oauth/callback`;
@@ -40,16 +69,12 @@ export function registerOAuthRoutes(app: Express) {
       return;
     }
 
-    const state = randomBytes(16).toString("hex");
-    const cookieOptions = getSessionCookieOptions(req);
-    res.cookie(STATE_COOKIE, state, { ...cookieOptions, maxAge: STATE_TTL_MS });
-
     res.redirect(
       302,
       buildGoogleAuthUrl({
         clientId: ENV.googleClientId,
         redirectUri: getRedirectUri(req),
-        state,
+        state: signState(),
       })
     );
   });
@@ -67,14 +92,10 @@ export function registerOAuthRoutes(app: Express) {
       res.status(400).json({ error: "code and state are required" });
       return;
     }
-
-    // CSRF: the returned state must match the value set before the redirect.
-    const cookies = parseCookieHeader(req.headers.cookie ?? "");
-    if (!cookies[STATE_COOKIE] || cookies[STATE_COOKIE] !== state) {
+    if (!verifyState(state)) {
       res.status(400).json({ error: "Invalid OAuth state" });
       return;
     }
-    res.clearCookie(STATE_COOKIE, getSessionCookieOptions(req)); // one-time use
 
     try {
       const profile = await exchangeGoogleCode({
