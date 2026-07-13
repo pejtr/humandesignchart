@@ -122,7 +122,7 @@ export function registerOAuthRoutes(app: Express) {
         name: profile.name ?? null,
         email: profile.email ?? null,
         loginMethod: "google",
-        lastSignedIn: new Date().toISOString(),
+        lastSignedIn: new Date().toISOString().slice(0, 19).replace('T', ' '),
       });
 
       // Sync brand-new users to LeadOS CRM (best-effort, non-blocking).

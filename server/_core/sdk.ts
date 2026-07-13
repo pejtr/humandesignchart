@@ -131,7 +131,7 @@ class SDKServer {
 
     await db.upsertUser({
       openId: user.openId,
-      lastSignedIn: new Date().toISOString(),
+      lastSignedIn: new Date().toISOString().slice(0, 19).replace('T', ' '),
     });
 
     return user;

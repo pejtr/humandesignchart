@@ -45,12 +45,14 @@ export async function upsertUser(user: InsertUser): Promise<void> {
             updateSet.role = 'admin';
         }
 
+        const formatMysqlDate = () => new Date().toISOString().slice(0, 19).replace('T', ' ');
+
         if (!values.lastSignedIn) {
-            values.lastSignedIn = new Date().toISOString();
+            values.lastSignedIn = formatMysqlDate();
         }
 
         if (Object.keys(updateSet).length === 0) {
-            updateSet.lastSignedIn = new Date().toISOString();
+            updateSet.lastSignedIn = formatMysqlDate();
         }
 
         await db.insert(users).values(values).onDuplicateKeyUpdate({
