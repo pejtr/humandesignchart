@@ -44,6 +44,8 @@ const PaymentCancel = lazy(() => import("./pages/PaymentCancel"));
 const ReferralLanding = lazy(() => import("./pages/ReferralLanding"));
 const SocialScheduler = lazy(() => import("./pages/SocialScheduler"));
 const CompositeChart = lazy(() => import("./pages/CompositeChart"));
+const AndelskaCisla = lazy(() => import("./pages/AndelskaCisla"));
+const AndelskaCislaDetail = lazy(() => import("./pages/AndelskaCislaDetail"));
 const AdminCRM = lazy(() => import("./pages/AdminCRM"));
 const RoleCompatibility = lazy(() => import("./pages/RoleCompatibility"));
 const CrmDashboard = lazy(() => import("./pages/CrmDashboard"));
@@ -128,6 +130,8 @@ function LocaleRoutes() {
             <Route path="/:locale/blog" component={Blog} />
             <Route path="/:locale/blog/:slug" component={BlogArticle} />
             <Route path="/:locale/incarnation-cross" component={IncarnationCross} />
+            <Route path="/:locale/andelska-cisla" component={AndelskaCisla} />
+            <Route path="/:locale/andelska-cisla/:slug" component={AndelskaCislaDetail} />
             <Route path="/:locale/daily-transit" component={DailyTransit} />
             <Route path="/:locale/social-scheduler" component={SocialScheduler} />
             <Route path="/:locale/composite" component={CompositeChart} />

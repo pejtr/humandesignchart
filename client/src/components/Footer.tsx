@@ -75,7 +75,7 @@ export default function Footer() {
             <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{locale === "cs" ? "Další projekty" : "Partner Sites"}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="relative group/tip">
-                <a href="https://bezmasajidla.cz" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.bezmasajidla.cz" target="_blank" rel="noopener noreferrer"
                   className="hover:text-primary transition-colors">
                   Bezmasá Jídla
                 </a>
@@ -84,7 +84,7 @@ export default function Footer() {
                 </span>
               </li>
               <li className="relative group/tip">
-                <a href="https://katastr-online.cz" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.katastr-online.cz" target="_blank" rel="noopener noreferrer"
                   className="hover:text-primary transition-colors">
                   Katastr Online
                 </a>
@@ -93,7 +93,7 @@ export default function Footer() {
                 </span>
               </li>
               <li className="relative group/tip">
-                <a href="https://cajovny-praha.cz" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.cajovny-praha.cz" target="_blank" rel="noopener noreferrer"
                   className="hover:text-primary transition-colors">
                   Čajovny Praha
                 </a>
