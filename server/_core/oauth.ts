@@ -155,7 +155,10 @@ export function registerOAuthRoutes(app: Express) {
       res.redirect(302, "/");
     } catch (error) {
       console.error("[OAuth] Google callback failed", error);
-      res.status(500).json({ error: "Sign-in failed" });
+      res.status(500).json({
+        error: "Sign-in failed",
+        detail: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 }
