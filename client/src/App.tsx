@@ -17,6 +17,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { AuthSidebar } from "./components/AuthSidebar";
+import { FloatingChatGuide } from "./components/FloatingChatGuide";
 import { useAuth } from "./_core/hooks/useAuth";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
@@ -46,6 +47,7 @@ const CompositeChart = lazy(() => import("./pages/CompositeChart"));
 const AdminCRM = lazy(() => import("./pages/AdminCRM"));
 const RoleCompatibility = lazy(() => import("./pages/RoleCompatibility"));
 const CrmDashboard = lazy(() => import("./pages/CrmDashboard"));
+const HumanDesignTest = lazy(() => import("./pages/HumanDesignTest"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -91,89 +93,103 @@ function LocaleRoutes() {
   const { isAuthenticated } = useAuth();
   return (
     <div className={isAuthenticated ? "lg:pl-[var(--sidebar-w,56px)]" : ""} style={{ transition: "padding-left 0.2s" }}>
-    <PageTransition>
-    <Suspense fallback={<PageLoader />}>
-      <Switch>
-        {/* Locale root = home */}
-        <Route path="/:locale" component={Home} />
+      <PageTransition>
+        <Suspense fallback={<PageLoader />}>
+          <Switch>
+            {/* Locale root = home */}
+            <Route path="/:locale" component={Home} />
 
-        {/* Core pages */}
-        <Route path="/:locale/calculate" component={ChartCalculator} />
-        <Route path="/:locale/chart/:id" component={ChartResult} />
-        <Route path="/:locale/dashboard" component={Dashboard} />
-        <Route path="/:locale/compare" component={ChartComparison} />
-        <Route path="/:locale/transits" component={Transits} />
-        <Route path="/:locale/iching" component={IChing} />
-        <Route path="/:locale/celebrities" component={Celebrities} />
-        <Route path="/:locale/encyclopedia" component={Encyclopedia} />
-        <Route path="/:locale/ai-guide" component={AiGuide} />
-        <Route path="/:locale/return-chart" component={ReturnChart} />
-        <Route path="/:locale/transit-calendar" component={TransitCalendar} />
-        <Route path="/:locale/variables" component={VariablesAnalysis} />
-        <Route path="/:locale/types/:type" component={TypeDetail} />
-        <Route path="/:locale/blog" component={Blog} />
-        <Route path="/:locale/blog/:slug" component={BlogArticle} />
-        <Route path="/:locale/incarnation-cross" component={IncarnationCross} />
-        <Route path="/:locale/daily-transit" component={DailyTransit} />
-        <Route path="/:locale/social-scheduler" component={SocialScheduler} />
-        <Route path="/:locale/composite" component={CompositeChart} />
-        <Route path="/:locale/role-compatibility" component={RoleCompatibility} />
-        <Route path="/:locale/admin/crm" component={AdminCRM} />
-        <Route path="/:locale/crm-dashboard" component={CrmDashboard} />
-        <Route path="/:locale/pricing" component={Pricing} />
-        <Route path="/:locale/payment/success" component={PaymentSuccess} />
-        <Route path="/:locale/payment/cancel" component={PaymentCancel} />
+            {/* Core pages */}
+            <Route path="/:locale/calculate">
+              {() => <ChartCalculator />}
+            </Route>
+            <Route path="/:locale/human-design-kalkulacka">
+              {() => <ChartCalculator seoType="kalkulacka" />}
+            </Route>
+            <Route path="/:locale/human-design-test">
+              {() => <HumanDesignTest />}
+            </Route>
+            <Route path="/:locale/human-design-typy">
+              {() => <ChartCalculator seoType="typy" />}
+            </Route>
+            <Route path="/:locale/chart/:id" component={ChartResult} />
+            <Route path="/:locale/dashboard" component={Dashboard} />
+            <Route path="/:locale/compare" component={ChartComparison} />
+            <Route path="/:locale/transits" component={Transits} />
+            <Route path="/:locale/iching" component={IChing} />
+            <Route path="/:locale/celebrities" component={Celebrities} />
+            <Route path="/:locale/encyclopedia" component={Encyclopedia} />
+            <Route path="/:locale/ai-guide" component={AiGuide} />
+            <Route path="/:locale/return-chart" component={ReturnChart} />
+            <Route path="/:locale/transit-calendar" component={TransitCalendar} />
+            <Route path="/:locale/variables" component={VariablesAnalysis} />
+            <Route path="/:locale/types/:type" component={TypeDetail} />
+            <Route path="/:locale/blog" component={Blog} />
+            <Route path="/:locale/blog/:slug" component={BlogArticle} />
+            <Route path="/:locale/incarnation-cross" component={IncarnationCross} />
+            <Route path="/:locale/daily-transit" component={DailyTransit} />
+            <Route path="/:locale/social-scheduler" component={SocialScheduler} />
+            <Route path="/:locale/composite" component={CompositeChart} />
+            <Route path="/:locale/role-compatibility" component={RoleCompatibility} />
+            <Route path="/:locale/admin/crm" component={AdminCRM} />
+            <Route path="/:locale/crm-dashboard" component={CrmDashboard} />
+            <Route path="/:locale/pricing" component={Pricing} />
+            <Route path="/:locale/payment/success" component={PaymentSuccess} />
+            <Route path="/:locale/payment/cancel" component={PaymentCancel} />
 
-        {/* Referral landing pages */}
-        <Route path="/:locale/refer/:code">
-          {(params: any) => <ReferralLanding code={params.code} />}
-        </Route>
+            {/* Referral landing pages */}
+            <Route path="/:locale/refer/:code">
+              {(params: any) => <ReferralLanding code={params.code} />}
+            </Route>
 
-        {/* Shared charts (no locale prefix — public links) */}
-        <Route path="/shared/:token" component={SharedChart} />
-        {/* Referral without locale prefix */}
-        <Route path="/refer/:code">
-          {(params: any) => {
-            const locale = detectPreferredLocale();
-            return <Redirect to={`/${locale}/refer/${params.code}`} />;
-          }}
-        </Route>
+            {/* Shared charts (no locale prefix — public links) */}
+            <Route path="/shared/:token" component={SharedChart} />
+            {/* Referral without locale prefix */}
+            <Route path="/refer/:code">
+              {(params: any) => {
+                const locale = detectPreferredLocale();
+                return <Redirect to={`/${locale}/refer/${params.code}`} />;
+              }}
+            </Route>
 
-        {/* Root redirect */}
-        <Route path="/">
-          <RootRedirect />
-        </Route>
+            {/* Root redirect */}
+            <Route path="/">
+              <RootRedirect />
+            </Route>
 
-        {/* Legacy routes without locale prefix → redirect */}
-        <Route path="/calculate"><LegacyRedirect path="/calculate" /></Route>
-        <Route path="/chart/:id">{(params: any) => <LegacyRedirect path={`/chart/${params.id}`} />}</Route>
-        <Route path="/dashboard"><LegacyRedirect path="/dashboard" /></Route>
-        <Route path="/compare"><LegacyRedirect path="/compare" /></Route>
-        <Route path="/transits"><LegacyRedirect path="/transits" /></Route>
-        <Route path="/iching"><LegacyRedirect path="/iching" /></Route>
-        <Route path="/celebrities"><LegacyRedirect path="/celebrities" /></Route>
-        <Route path="/encyclopedia"><LegacyRedirect path="/encyclopedia" /></Route>
-        <Route path="/ai-guide"><LegacyRedirect path="/ai-guide" /></Route>
-        <Route path="/return-chart"><LegacyRedirect path="/return-chart" /></Route>
-        <Route path="/transit-calendar"><LegacyRedirect path="/transit-calendar" /></Route>
-        <Route path="/variables"><LegacyRedirect path="/variables" /></Route>
-        <Route path="/types/:type">{(params: any) => <LegacyRedirect path={`/types/${params.type}`} />}</Route>
-        <Route path="/blog"><LegacyRedirect path="/blog" /></Route>
-        <Route path="/blog/:slug">{(params: any) => <LegacyRedirect path={`/blog/${params.slug}`} />}</Route>
-        <Route path="/incarnation-cross"><LegacyRedirect path="/incarnation-cross" /></Route>
-        <Route path="/daily-transit"><LegacyRedirect path="/daily-transit" /></Route>
-        <Route path="/pricing"><LegacyRedirect path="/pricing" /></Route>
-        <Route path="/payment/success"><LegacyRedirect path="/payment/success" /></Route>
-        <Route path="/payment/cancel"><LegacyRedirect path="/payment/cancel" /></Route>
-        <Route path="/composite"><LegacyRedirect path="/composite" /></Route>
-        <Route path="/crm-dashboard"><LegacyRedirect path="/crm-dashboard" /></Route>
+            {/* Legacy routes without locale prefix → redirect */}
+            <Route path="/calculate"><LegacyRedirect path="/calculate" /></Route>
+            <Route path="/human-design-kalkulacka"><LegacyRedirect path="/human-design-kalkulacka" /></Route>
+            <Route path="/human-design-test"><LegacyRedirect path="/human-design-test" /></Route>
+            <Route path="/human-design-typy"><LegacyRedirect path="/human-design-typy" /></Route>
+            <Route path="/chart/:id">{(params: any) => <LegacyRedirect path={`/chart/${params.id}`} />}</Route>
+            <Route path="/dashboard"><LegacyRedirect path="/dashboard" /></Route>
+            <Route path="/compare"><LegacyRedirect path="/compare" /></Route>
+            <Route path="/transits"><LegacyRedirect path="/transits" /></Route>
+            <Route path="/iching"><LegacyRedirect path="/iching" /></Route>
+            <Route path="/celebrities"><LegacyRedirect path="/celebrities" /></Route>
+            <Route path="/encyclopedia"><LegacyRedirect path="/encyclopedia" /></Route>
+            <Route path="/ai-guide"><LegacyRedirect path="/ai-guide" /></Route>
+            <Route path="/return-chart"><LegacyRedirect path="/return-chart" /></Route>
+            <Route path="/transit-calendar"><LegacyRedirect path="/transit-calendar" /></Route>
+            <Route path="/variables"><LegacyRedirect path="/variables" /></Route>
+            <Route path="/types/:type">{(params: any) => <LegacyRedirect path={`/types/${params.type}`} />}</Route>
+            <Route path="/blog"><LegacyRedirect path="/blog" /></Route>
+            <Route path="/blog/:slug">{(params: any) => <LegacyRedirect path={`/blog/${params.slug}`} />}</Route>
+            <Route path="/incarnation-cross"><LegacyRedirect path="/incarnation-cross" /></Route>
+            <Route path="/daily-transit"><LegacyRedirect path="/daily-transit" /></Route>
+            <Route path="/pricing"><LegacyRedirect path="/pricing" /></Route>
+            <Route path="/payment/success"><LegacyRedirect path="/payment/success" /></Route>
+            <Route path="/payment/cancel"><LegacyRedirect path="/payment/cancel" /></Route>
+            <Route path="/composite"><LegacyRedirect path="/composite" /></Route>
+            <Route path="/crm-dashboard"><LegacyRedirect path="/crm-dashboard" /></Route>
 
-        {/* 404 */}
-        <Route path="/404" component={NotFound} />
-        <Route component={NotFound} />
-      </Switch>
-    </Suspense>
-    </PageTransition>
+            {/* 404 */}
+            <Route path="/404" component={NotFound} />
+            <Route component={NotFound} />
+          </Switch>
+        </Suspense>
+      </PageTransition>
     </div>
   );
 }
@@ -199,6 +215,7 @@ function App() {
             <CookieConsent />
             <AuthSidebar />
             <MobileBottomNav />
+            <FloatingChatGuide />
             <LocaleRoutes />
           </LanguageProvider>
         </TooltipProvider>

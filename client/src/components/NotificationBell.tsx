@@ -212,17 +212,16 @@ export function NotificationBell({ userId }: NotificationBellProps) {
           ) : (
             <div className="divide-y divide-border/30">
               {allNotifs.map((notif) => {
-                const cfg = TYPE_CONFIG[notif.type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.system;
-                const isUnread = !("isRead" in notif) || !(notif as { isRead: boolean }).isRead;
+                const cfg = TYPE_CONFIG[(notif as any).type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.system;
+                const isUnread = !("isRead" in notif) || !(notif as any).isRead;
                 return (
                   <div
                     key={notif.id}
-                    className={`flex gap-3 px-4 py-3 hover:bg-accent/30 transition-colors cursor-pointer group ${
-                      isUnread ? "bg-primary/5" : ""
-                    }`}
+                    className={`flex gap-3 px-4 py-3 hover:bg-accent/30 transition-colors cursor-pointer group ${isUnread ? "bg-primary/5" : ""
+                      }`}
                     onClick={() => {
                       if (isUnread && "isRead" in notif) {
-                        handleMarkRead(notif.id);
+                        handleMarkRead((notif as any).id);
                       }
                     }}
                     role="button"

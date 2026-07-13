@@ -32,6 +32,11 @@ const CELEBRITIES = [
   { name: "Frida Kahlo", birthDate: "1907-07-06", birthTime: "08:30", birthPlace: "Coyoacán, Mexico", lat: 19.3500, lon: -99.1621, tz: -6, photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Frida_Kahlo%2C_by_Guillermo_Kahlo.jpg/250px-Frida_Kahlo%2C_by_Guillermo_Kahlo.jpg" },
   { name: "Michael Jackson", birthDate: "1958-08-29", birthTime: "19:33", birthPlace: "Gary, Indiana, USA", lat: 41.5934, lon: -87.3465, tz: -6, photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Michael_Jackson_1983_%283x4_cropped%29_%28contrast%29.jpg/250px-Michael_Jackson_1983_%283x4_cropped%29_%28contrast%29.jpg" },
   { name: "Queen Elizabeth II", birthDate: "1926-04-21", birthTime: "02:40", birthPlace: "London, UK", lat: 51.5074, lon: -0.1278, tz: 0, photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Queen_Elizabeth_II_official_portrait_for_1959_tour_%28retouched%29_%28cropped%29_%283-to-4_aspect_ratio%29.jpg/250px-Queen_Elizabeth_II_official_portrait_for_1959_tour_%28retouched%29_%28cropped%29_%283-to-4_aspect_ratio%29.jpg" },
+  { name: "Keanu Reeves", birthDate: "1964-09-02", birthTime: "05:41", birthPlace: "Beirut, Lebanon", lat: 33.8938, lon: 35.5018, tz: 2, photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Reeves_at_the_2014_Toronto_International_Film_Festival.jpg/250px-Reeves_at_the_2014_Toronto_International_Film_Festival.jpg" },
+  { name: "Marilyn Monroe", birthDate: "1926-06-01", birthTime: "09:30", birthPlace: "Los Angeles, CA", lat: 34.0522, lon: -118.2437, tz: -8, photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Marilyn_Monroe_in_1952.jpg/250px-Marilyn_Monroe_in_1952.jpg" },
+  { name: "Elvis Presley", birthDate: "1935-01-08", birthTime: "04:35", birthPlace: "Tupelo, MS", lat: 34.2576, lon: -88.7034, tz: -6, photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Welcome_Home_Elvis_1960.jpg/250px-Welcome_Home_Elvis_1960.jpg" },
+  { name: "Ryan Gosling", birthDate: "1980-11-12", birthTime: "14:34", birthPlace: "London, Canada", lat: 42.9849, lon: -81.2453, tz: -5, photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Ryan_Gosling_in_2018.jpg/250px-Ryan_Gosling_in_2018.jpg" },
+  { name: "Meryl Streep", birthDate: "1949-06-22", birthTime: "08:05", birthPlace: "Summit, NJ", lat: 40.7182, lon: -74.3615, tz: -5, photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Meryl_Streep_December_2018.jpg/250px-Meryl_Streep_December_2018.jpg" },
 ];
 
 export default function Celebrities() {
@@ -77,7 +82,7 @@ export default function Celebrities() {
   };
 
   const filtered = useMemo(() => {
-    return CELEBRITIES.filter(c =>
+    return CELEBRITIES.filter((c: any) =>
       c.name.toLowerCase().includes(search.toLowerCase())
     );
   }, [search]);
@@ -113,32 +118,37 @@ export default function Celebrities() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Celebrity list */}
-            <div className="lg:col-span-1 space-y-2 max-h-[700px] overflow-y-auto pr-2 scrollbar-thin">
-              {filtered.map(celeb => (
-                <button
-                  key={celeb.name}
-                  onClick={() => handleSelectCeleb(celeb)}
-                  className={`w-full text-left p-3 rounded-xl border transition-all flex items-center gap-3 ${
-                    selectedCeleb?.name === celeb.name
-                      ? "border-primary bg-primary/5 shadow-sm"
-                      : "border-border/30 bg-white hover:border-primary/30 hover:shadow-sm"
-                  }`}
-                >
-                  <img
-                    src={celeb.photo}
-                    alt={celeb.name}
-                    className="w-11 h-11 rounded-full object-cover bg-muted flex-shrink-0"
-                    loading="lazy"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                  <div className="min-w-0">
-                    <p className="font-medium text-sm truncate">{celeb.name}</p>
-                    <p className="text-xs text-muted-foreground">{celeb.birthDate} · {celeb.birthPlace.split(",")[0]}</p>
-                  </div>
-                </button>
-              ))}
+            <div className="lg:col-span-1 max-h-[700px] overflow-y-auto pr-2 scrollbar-thin">
+              <div className="grid grid-cols-2 gap-3">
+                {filtered.map(celeb => (
+                  <button
+                    key={celeb.name}
+                    onClick={() => handleSelectCeleb(celeb)}
+                    className={`w-full text-left p-3 rounded-2xl border transition-all flex flex-col items-center gap-3 text-center ${selectedCeleb?.name === celeb.name
+                        ? "border-primary bg-primary/5 shadow-md scale-[1.02]"
+                        : "border-border/30 bg-white hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5"
+                      }`}
+                  >
+                    <div className="relative w-20 h-20 shadow-sm rounded-full p-1 bg-white border border-border/40">
+                      <img
+                        src={celeb.photo}
+                        alt={celeb.name}
+                        className="w-full h-full rounded-full object-cover bg-muted"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    </div>
+                    <div className="min-w-0 w-full">
+                      <p className="font-serif font-bold text-[15px] truncate text-foreground">{celeb.name}</p>
+                      <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold mt-1">
+                        {celeb.birthDate.split("-")[0]}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Celebrity chart detail */}
@@ -174,11 +184,13 @@ export default function Celebrities() {
                 <Card className="bg-white border-border/30 shadow-sm">
                   <CardHeader className="pb-4">
                     <div className="flex items-center gap-4">
-                      <img
-                        src={selectedCeleb.photo}
-                        alt={selectedCeleb.name}
-                        className="w-16 h-16 rounded-full object-cover bg-muted shadow-sm"
-                      />
+                      <div className="p-1 rounded-full bg-white border border-primary/20 shadow-sm shrink-0">
+                        <img
+                          src={selectedCeleb.photo}
+                          alt={selectedCeleb.name}
+                          className="w-20 h-20 rounded-full object-cover bg-muted"
+                        />
+                      </div>
                       <div>
                         <CardTitle className="font-serif text-2xl">{selectedCeleb.name}</CardTitle>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -226,7 +238,7 @@ export default function Celebrities() {
                     <div className="border-t border-border/30 pt-4">
                       <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">{t.chart.centers}</p>
                       <div className="flex flex-wrap gap-1.5">
-                        {(chartData.centers || []).map(c => (
+                        {(chartData.centers || []).map((c: any) => (
                           <Badge
                             key={c.name}
                             variant={c.defined ? "default" : "outline"}

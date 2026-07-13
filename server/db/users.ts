@@ -80,8 +80,8 @@ export async function updateUserSubscription(userId: number, data: Partial<{
     stripeCustomerId: string;
     stripeSubscriptionId: string | null;
     subscriptionStatus: "active" | "canceled" | "past_due" | "trialing" | "none";
-    subscriptionPlan: "monthly" | "annual" | "none";
-    subscriptionCurrentPeriodEnd: Date | null;
+    subscriptionPlan: "monthly" | "annual" | "lifetime" | "none";
+    subscriptionCurrentPeriodEnd: Date | string | null;
 }>) {
     const db = await getDb();
     if (!db) throw new Error("Database not available");

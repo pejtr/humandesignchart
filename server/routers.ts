@@ -23,6 +23,7 @@ import { gamificationRouter } from "./routers/gamification";
 import { affiliateRouter } from "./routers/affiliate";
 import { compositeRouter } from "./routers/composite";
 import { contentRouter } from "./routers/content";
+import { angelNumbersRouter } from "./routers/angelNumbers";
 
 // Pre-existing routers (already extracted before this refactoring)
 import { socialRouter } from "./routers/social";
@@ -52,6 +53,7 @@ export const appRouter = router({
   affiliate: affiliateRouter,
   composite: compositeRouter,
   content: contentRouter,
+  angelNumbers: angelNumbersRouter,
 });
 
 export type AppRouter = typeof appRouter;

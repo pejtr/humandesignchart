@@ -99,9 +99,11 @@ export default function Navbar() {
 
   // Primary nav links — keep short to avoid overflow
   const primaryLinks = [
-    { href: "/calculate", label: locale === "cs" ? "Generovat mapu" : "Generate Chart", icon: Orbit },
+    { href: "/calculate", label: locale === "cs" ? "Nová mapa" : "New Chart", icon: Orbit },
+    { href: "/daily-transit", label: locale === "cs" ? "Denní tranzit" : "Daily Transit", icon: Sun },
+    { href: "/compare", label: t.nav.compare, icon: GitCompare },
+    { href: "/encyclopedia", label: locale === "cs" ? "Encyklopedie" : "Encyclopedia", icon: Layers },
     { href: "/blog", label: "Blog", icon: BookOpen },
-    { href: "/ai-guide", label: locale === "cs" ? "AI Průvodce" : "AI Guide", icon: Eye },
   ];
 
   const toolsLinks = [
@@ -123,17 +125,13 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out navbar-mystical ${isScrolled
-        ? "bg-background/95 backdrop-blur-xl shadow-sm shadow-black/5"
-        : "bg-background/85 backdrop-blur-md border-b border-border/20"
+      <header className={`sticky top-0 left-0 right-0 z-[100] transition-colors duration-300 ease-in-out navbar-mystical ${isScrolled
+        ? "bg-background/95 backdrop-blur-xl shadow-sm border-b border-border/20"
+        : "bg-background/70 backdrop-blur-md border-b border-border/10"
         }`}>
-        <nav className="w-full grid grid-cols-[1fr_auto_1fr] items-center h-16 px-4 lg:px-6 relative gap-4">
-          {/* Col 1: Empty on desktop, but ensures the center is really centered */}
-          <div className="flex-1 lg:block hidden" />
-
-          {/* Center: Logo + Desktop nav links */}
-          <div className="flex flex-shrink-0 items-center justify-center gap-6">
-            {/* Logo */}
+        <nav className="w-full flex items-center justify-between h-16 px-4 lg:px-8 relative gap-4 max-w-screen-2xl mx-auto">
+          {/* Left: Logo */}
+          <div className="flex shrink-0 items-center justify-start lg:w-48">
             <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline shrink-0 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
                 <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -149,89 +147,90 @@ export default function Navbar() {
                 </svg>
               </div>
               <span className="font-serif text-xl font-bold tracking-tight text-foreground hidden md:block">
-                Human Design
+                Human Design Mapa
               </span>
             </Link>
+          </div>
 
-            {/* Desktop nav links */}
-            <div className="hidden lg:flex items-center gap-0.5">
-              {primaryLinks.map(link => (
-                <Link key={link.href} href={localePath(link.href)}>
-                  <Button
-                    variant={isActive(link.href) ? "secondary" : "ghost"}
-                    size="sm"
-                    className="text-sm"
-                  >
-                    <link.icon className="w-4 h-4 mr-1.5" />
-                    {link.label}
-                  </Button>
-                </Link>
-              ))}
-
-              {/* Tools dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-sm gap-1">
-                    <Flame className="w-4 h-4" />
-                    {locale === "cs" ? "Nástroje" : "Tools"}
-                    <ChevronDown className="w-3 h-3 opacity-60" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-64 bg-popover text-popover-foreground">
-                  {toolsLinks.map(link => (
-                    <Link key={link.href} href={localePath(link.href)}>
-                      <DropdownMenuItem className="cursor-pointer py-2.5">
-                        <link.icon className="w-4 h-4 mr-2.5 text-primary shrink-0" />
-                        <div>
-                          <p className="text-sm font-medium">{link.label}</p>
-                          <p className="text-xs text-muted-foreground">{link.desc}</p>
-                        </div>
-                      </DropdownMenuItem>
-                    </Link>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Explore dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-sm gap-1">
-                    <Sparkles className="w-4 h-4" />
-                    {locale === "cs" ? "Prozkoumat" : "Explore"}
-                    <ChevronDown className="w-3 h-3 opacity-60" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-64 bg-popover text-popover-foreground">
-                  {exploreLinks.map(link => (
-                    <Link key={link.href} href={localePath(link.href)}>
-                      <DropdownMenuItem className="cursor-pointer py-2.5">
-                        <link.icon className="w-4 h-4 mr-2.5 text-primary shrink-0" />
-                        <div>
-                          <p className="text-sm font-medium">{link.label}</p>
-                          <p className="text-xs text-muted-foreground">{link.desc}</p>
-                        </div>
-                      </DropdownMenuItem>
-                    </Link>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Pricing link */}
-              <Link href={localePath("/pricing")}>
+          {/* Center: Desktop nav links */}
+          <div className="hidden lg:flex flex-1 items-center justify-center gap-1 xl:gap-2">
+            {primaryLinks.map(link => (
+              <Link key={link.href} href={localePath(link.href)}>
                 <Button
-                  variant={isActive("/pricing") ? "secondary" : "ghost"}
+                  variant={isActive(link.href) ? "secondary" : "ghost"}
                   size="sm"
-                  className="text-sm"
+                  className="text-sm px-2.5 font-medium"
                 >
-                  <Crown className="w-4 h-4 mr-1.5" />
-                  {locale === "cs" ? "Premium" : "Premium"}
+                  <link.icon className="w-4 h-4 mr-1.5 opacity-80" />
+                  {link.label}
                 </Button>
               </Link>
-            </div>
+            ))}
+
+            {/* Tools dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-sm px-2 gap-1">
+                  <Flame className="w-4 h-4" />
+                  <span className="hidden xl:inline">{locale === "cs" ? "Nástroje" : "Tools"}</span>
+                  <span className="xl:hidden">Tools</span>
+                  <ChevronDown className="w-3 h-3 opacity-60" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-64 bg-popover text-popover-foreground">
+                {toolsLinks.map(link => (
+                  <Link key={link.href} href={localePath(link.href)}>
+                    <DropdownMenuItem className="cursor-pointer py-2.5">
+                      <link.icon className="w-4 h-4 mr-2.5 text-primary shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium">{link.label}</p>
+                        <p className="text-xs text-muted-foreground">{link.desc}</p>
+                      </div>
+                    </DropdownMenuItem>
+                  </Link>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Explore dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-sm px-2 gap-1 hidden xl:inline-flex">
+                  <Sparkles className="w-4 h-4" />
+                  {locale === "cs" ? "Prozkoumat" : "Explore"}
+                  <ChevronDown className="w-3 h-3 opacity-60" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-64 bg-popover text-popover-foreground">
+                {exploreLinks.map(link => (
+                  <Link key={link.href} href={localePath(link.href)}>
+                    <DropdownMenuItem className="cursor-pointer py-2.5">
+                      <link.icon className="w-4 h-4 mr-2.5 text-primary shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium">{link.label}</p>
+                        <p className="text-xs text-muted-foreground">{link.desc}</p>
+                      </div>
+                    </DropdownMenuItem>
+                  </Link>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Pricing link */}
+            <Link href={localePath("/pricing")}>
+              <Button
+                variant={isActive("/pricing") ? "secondary" : "ghost"}
+                size="sm"
+                className="text-sm px-2"
+              >
+                <Crown className="w-4 h-4 lg:mr-1.5" />
+                <span className="hidden lg:inline">{locale === "cs" ? "Premium" : "Premium"}</span>
+              </Button>
+            </Link>
           </div>
 
           {/* Right: Controls (Desktop + Mobile) */}
-          <div className="flex-1 flex items-center justify-end gap-1.5 shrink-0">
+          <div className="flex items-center justify-end gap-2 shrink-0 lg:w-48">
             {/* Desktop right section: theme toggle + language + user */}
             <div className="hidden lg:flex items-center gap-1.5 shrink-0">
               {/* Theme toggle */}

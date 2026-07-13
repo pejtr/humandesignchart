@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import { trpc } from "@/lib/trpc";
+import { GATE_DESCRIPTIONS } from "@/data/hdContent";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,8 +50,7 @@ export default function TransitCalendar() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMonth, setViewMonth] = useState(new Date());
 
-  const { data: hdData, isLoading: isLoadingContent } = trpc.content.hdData.useQuery();
-  const GATE_DESCRIPTIONS = hdData?.gates || {};
+  const isLoadingContent = false;
 
   useEffect(() => {
     if (locale === "en") {

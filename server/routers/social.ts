@@ -120,6 +120,39 @@ async function publishToTikTok(
   return `tt_${randomSuffix()}_${Date.now()}`;
 }
 
+async function publishToPinterest(
+  accessToken: string,
+  boardId: string,
+  caption: string,
+  imageUrl?: string | null
+): Promise<string> {
+  if (!imageUrl) throw new Error("Pinterest requires an image");
+
+  // Pinterest titles max 100 chars, take first line or truncated caption
+  const title = caption.split("\n")[0].slice(0, 95);
+
+  const res = await fetch("https://api.pinterest.com/v5/pins", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({
+      title: title,
+      description: caption,
+      board_id: boardId,
+      media_source: {
+        source_type: "image_url",
+        url: imageUrl,
+      },
+    }),
+  });
+
+  const data = await res.json() as { id?: string; message?: string };
+  if (!res.ok) throw new Error(data.message ?? "Pinterest publish failed");
+  return data.id ?? "";
+}
+
 // ─── LinkedIn publish logic ───────────────────────────────────────────────────
 
 async function publishPost(postId: number, userId: number) {
@@ -191,6 +224,14 @@ async function publishPost(postId: number, userId: number) {
             post.imageUrl
           );
           break;
+        case "pinterest":
+          platformPostId = await publishToPinterest(
+            account.accessToken,
+            account.pageId ?? account.accountId,
+            caption,
+            post.imageUrl
+          );
+          break;
         default:
           throw new Error(`Platform ${account.platform} not yet supported`);
       }
@@ -229,7 +270,7 @@ export async function publishScheduledPosts(): Promise<{ processed: number; succ
   const duePosts = await db
     .select()
     .from(socialPosts)
-    .where(and(eq(socialPosts.status, "scheduled"), lte(socialPosts.scheduledAt, now)))
+    .where(and(eq(socialPosts.status, "scheduled"), lte(socialPosts.scheduledAt, now.toISOString())))
     .limit(50);
   if (duePosts.length === 0) return { processed: 0, succeeded: 0, failed: 0 };
   console.log(`[SocialPublisher] Processing ${duePosts.length} scheduled posts`);
@@ -254,7 +295,7 @@ export const socialRouter = router({
     const accounts = await db
       .select()
       .from(socialAccounts)
-      .where(and(eq(socialAccounts.userId, ctx.user.id), eq(socialAccounts.isActive, true)))
+      .where(and(eq(socialAccounts.userId, ctx.user.id), eq(socialAccounts.isActive, 1)))
       .orderBy(socialAccounts.platform);
     return accounts.map((a: SocialAccount) => ({
       id: a.id,

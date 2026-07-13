@@ -230,8 +230,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
         plan: giftPlan,
         creditsAmount: 0,
         stripePaymentIntentId: session.payment_intent as string || null,
-        isRedeemed: false,
-        expiresAt,
+        isRedeemed: 0,
+        expiresAt: expiresAt.toISOString(),
       });
       // Notify owner about gift voucher purchase
       try {
@@ -245,6 +245,63 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
         console.warn("[Stripe Webhook] Failed to send owner notification:", e);
       }
       console.log(`[Stripe Webhook] Created gift voucher ${code} for user ${userId}`);
+    } else if (plan === "lifetime") {
+      // Lifetime subscription upgrade
+      await updateUserSubscription(userId, {
+        subscriptionStatus: "active",
+        subscriptionPlan: "lifetime" as any,
+        subscriptionCurrentPeriodEnd: null, // Never expires
+      });
+
+      // --- Affiliate commission tracking for lifetime ---
+      const affiliateCode = session.metadata?.affiliate_code;
+      if (affiliateCode) {
+        try {
+          const affiliate = await getUserByAffiliateCode(affiliateCode);
+          if (affiliate && affiliate.isAffiliate && affiliate.id !== userId) {
+            const rateMap: Record<string, number> = { bronze: 0.20, silver: 0.22, gold: 0.25 };
+            const commissionRate = rateMap[affiliate.affiliateTier ?? "bronze"] ?? 0.20;
+            const amountCzk = session.amount_total ? session.amount_total / 100 : 2888;
+            const commissionAmount = Math.round(amountCzk * commissionRate * 100) / 100;
+
+            await createAffiliateConversion({
+              affiliateUserId: affiliate.id,
+              convertedUserId: userId,
+              stripeSubscriptionId: session.payment_intent as string || null,
+              amount: amountCzk,
+              commissionRate,
+              commissionAmount,
+              status: "pending",
+            });
+
+            await logCreditTransaction(affiliate.id, 0, "affiliate_commission", {
+              convertedUserId: userId,
+              commissionAmount,
+              commissionRate,
+              sessionId: session.id,
+            });
+
+            try {
+              await notifyOwner({
+                title: `🤝 Affiliate konverze: ${commissionAmount} CZK (LIFETIME)`,
+                content: `Affiliate ${affiliate.name || affiliate.id} získal provizi ${commissionAmount} CZK za LIFETIME konverzi uživatele ${userId}.`,
+              });
+            } catch (e) { }
+          }
+        } catch (e) {
+          console.error("[Stripe Webhook] Affiliate commission error for lifetime:", e);
+        }
+      }
+
+      const customerEmail = session.metadata?.customer_email || session.customer_email || "neznámý";
+      const customerName = session.metadata?.customer_name || "zákazník";
+      try {
+        await notifyOwner({
+          title: `💎 Nové doživotní ocenění (LIFETIME)`,
+          content: `${customerName} (${customerEmail}) si zakoupil Doživotní přístup.\nUser ID: ${userId}`,
+        });
+      } catch (e) { }
+      console.log(`[Stripe Webhook] Upgraded user ${userId} to LIFETIME`);
     }
   }
 }

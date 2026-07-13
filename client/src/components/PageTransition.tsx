@@ -39,9 +39,8 @@ export default function PageTransition({ children }: PageTransitionProps) {
       className="page-transition"
       style={{
         opacity: isVisible ? 1 : 0,
-        transform: isVisible ? "translateY(0)" : "translateY(6px)",
-        transition: "opacity 250ms ease-out, transform 250ms ease-out",
-        willChange: "opacity, transform",
+        transition: "opacity 250ms ease-out",
+        willChange: "opacity",
       }}
     >
       {displayChildren}

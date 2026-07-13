@@ -13,7 +13,7 @@ export async function createNotification(
   if (!db) return null;
   const result = await db.insert(userNotifications).values({
     ...data,
-    isRead: false,
+    isRead: 0,
   });
   const insertId = (result[0] as unknown as { insertId: number }).insertId;
   const [row] = await db
@@ -43,7 +43,7 @@ export async function getUnreadCount(userId: number): Promise<number> {
   const rows = await db
     .select()
     .from(userNotifications)
-    .where(and(eq(userNotifications.userId, userId), eq(userNotifications.isRead, false)));
+    .where(and(eq(userNotifications.userId, userId), eq(userNotifications.isRead, 0)));
   return rows.length;
 }
 
@@ -52,7 +52,7 @@ export async function markNotificationRead(id: number, userId: number): Promise<
   if (!db) return;
   await db
     .update(userNotifications)
-    .set({ isRead: true })
+    .set({ isRead: 1 })
     .where(and(eq(userNotifications.id, id), eq(userNotifications.userId, userId)));
 }
 
@@ -61,6 +61,6 @@ export async function markAllNotificationsRead(userId: number): Promise<void> {
   if (!db) return;
   await db
     .update(userNotifications)
-    .set({ isRead: true })
+    .set({ isRead: 1 })
     .where(eq(userNotifications.userId, userId));
 }

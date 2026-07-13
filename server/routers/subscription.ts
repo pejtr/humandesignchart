@@ -26,7 +26,7 @@ export const subscriptionRouter = router({
 
     createCheckout: protectedProcedure
         .input(z.object({
-            plan: z.enum(["monthly", "annual", "credits", "gift_monthly", "gift_annual"]),
+            plan: z.enum(["monthly", "annual", "lifetime", "credits", "gift_monthly", "gift_annual"]),
             locale: z.string().default("cs"),
             origin: z.string(),
             recipientEmail: z.string().email().optional(),
@@ -55,11 +55,12 @@ export const subscriptionRouter = router({
             }
 
             const priceData = {
-                monthly: { czk: 8800, eur: 349, name: "Human Design Premium — Měsíční" },
-                annual: { czk: 88800, eur: 3500, name: "Human Design Premium — Roční" },
-                credits: { czk: 4400, eur: 179, name: "Human Design AI Credits (5×)" },
-                gift_monthly: { czk: 8800, eur: 349, name: "Dárkový poukaz — Premium Měsíc" },
-                gift_annual: { czk: 88800, eur: 3500, name: "Dárkový poukaz — Premium Rok" },
+                monthly: { czk: 18800, eur: 749, name: "Human Design Premium — Měsíční" },
+                annual: { czk: 118800, eur: 4700, name: "Human Design Premium — Roční" },
+                lifetime: { czk: 288800, eur: 11500, name: "Human Design Premium — Doživotně" },
+                credits: { czk: 7700, eur: 299, name: "Human Design AI Credits (5×)" },
+                gift_monthly: { czk: 18800, eur: 749, name: "Dárkový poukaz — Premium Měsíc" },
+                gift_annual: { czk: 118800, eur: 4700, name: "Dárkový poukaz — Premium Rok" },
             }[input.plan];
 
             const currency = isCzech ? "czk" : "eur";

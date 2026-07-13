@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { X, Sparkles, Brain, Star, ChevronRight, ChevronLeft } from "lucide-react";
 
@@ -83,7 +84,7 @@ export default function OnboardingModal({
     }
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[80] flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
@@ -188,6 +189,7 @@ export default function OnboardingModal({
           Krok {step + 1} z {steps.length}
         </p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

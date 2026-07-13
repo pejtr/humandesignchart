@@ -12,9 +12,11 @@ interface PremiumPaywallProps {
   /** Whether to show as a full blocking overlay or inline banner */
   variant?: "overlay" | "banner" | "inline";
   onClose?: () => void;
+  title?: string;
+  description?: string;
 }
 
-export default function PremiumPaywall({ variant = "inline", onClose }: PremiumPaywallProps) {
+export default function PremiumPaywall({ variant = "inline", onClose, title, description }: PremiumPaywallProps) {
   const { locale } = useLanguage();
   const { user } = useAuth();
   const isCzech = locale === "cs";
@@ -46,12 +48,12 @@ export default function PremiumPaywall({ variant = "inline", onClose }: PremiumP
           </div>
           <div>
             <p className="font-semibold text-sm text-foreground">
-              {isCzech ? "Vyčerpali jste bezplatný výklad" : "Free reading used"}
+              {title ? title : (isCzech ? "Vyčerpali jste bezplatný výklad" : "Free reading used")}
             </p>
             <p className="text-xs text-muted-foreground">
-              {isCzech
+              {description ? description : (isCzech
                 ? "Upgradujte na Premium pro neomezené AI výklady"
-                : "Upgrade to Premium for unlimited AI readings"}
+                : "Upgrade to Premium for unlimited AI readings")}
             </p>
           </div>
         </div>
@@ -143,12 +145,12 @@ export default function PremiumPaywall({ variant = "inline", onClose }: PremiumP
         <Crown className="w-6 h-6 text-purple-400" />
       </div>
       <h3 className="font-semibold mb-1">
-        {isCzech ? "Bezplatný výklad byl použit" : "Free reading used"}
+        {title ? title : (isCzech ? "Bezplatný výklad byl použit" : "Free reading used")}
       </h3>
       <p className="text-sm text-muted-foreground mb-4">
-        {isCzech
+        {description ? description : (isCzech
           ? "Upgradujte na Premium pro neomezené AI výklady."
-          : "Upgrade to Premium for unlimited AI readings."}
+          : "Upgrade to Premium for unlimited AI readings.")}
       </p>
       <div className="flex flex-col sm:flex-row gap-2 justify-center">
         <Button

@@ -45,7 +45,7 @@ export default function ReturnChart() {
 
   const selectedChart = useMemo(() => {
     if (!selectedChartId || !chartsQuery.data) return null;
-    return chartsQuery.data.find(c => c.id === parseInt(selectedChartId));
+    return chartsQuery.data.find((c: any) => c.id === parseInt(selectedChartId));
   }, [selectedChartId, chartsQuery.data]);
 
   const RETURN_INFO: Record<ReturnType, { title: string; icon: typeof Sun; description: string; period: string; color: string }> = {
@@ -218,7 +218,7 @@ export default function ReturnChart() {
                 <SelectValue placeholder={t.returnChart.selectChart} />
               </SelectTrigger>
               <SelectContent>
-                {chartsQuery.data?.map(chart => (
+                {chartsQuery.data?.map((chart: any) => (
                   <SelectItem key={chart.id} value={chart.id.toString()}>
                     {chart.name} ({chart.birthDate})
                   </SelectItem>

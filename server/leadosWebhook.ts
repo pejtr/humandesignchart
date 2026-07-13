@@ -86,7 +86,7 @@ async function handleLeadOSEvent(payload: LeadOSWebhookPayload): Promise<void> {
       await notifyOwner({
         title: `🎯 Nový lead v LeadOS CRM`,
         content: `**${name || "Neznámý"}** (${email || "bez emailu"})${company ? ` — ${company}` : ""}${score ? ` | Skóre: ${score}` : ""}`,
-      }).catch(() => {});
+      }).catch(() => { });
       break;
     }
 
@@ -154,7 +154,7 @@ async function handleLeadOSEvent(payload: LeadOSWebhookPayload): Promise<void> {
               title: notif.title,
               message: notif.message,
               data: notif.data,
-              createdAt: notif.createdAt.toISOString(),
+              createdAt: notif.createdAt,
             };
             broadcastToUser(targetUserId, payload);
           }
@@ -167,7 +167,7 @@ async function handleLeadOSEvent(payload: LeadOSWebhookPayload): Promise<void> {
         await notifyOwner({
           title: `💰 Lead konvertován v LeadOS!`,
           content: `**${name || email}** byl označen jako konvertovaný zákazník.${note ? `\nPoznámka: ${note}` : ""}`,
-        }).catch(() => {});
+        }).catch(() => { });
       }
       break;
     }
@@ -178,7 +178,7 @@ async function handleLeadOSEvent(payload: LeadOSWebhookPayload): Promise<void> {
       await notifyOwner({
         title: `📧 LeadOS: Nová email kampaň spuštěna`,
         content: `Kampaň: **${campaignName || "Neznámá"}**\nPočet příjemce: ${targetCount ?? "neznámo"}${email ? `\nSpouštěcč: ${email}` : ""}`,
-      }).catch(() => {});
+      }).catch(() => { });
 
       // Broadcast campaign notification to ALL connected users
       try {
@@ -205,7 +205,7 @@ async function handleLeadOSEvent(payload: LeadOSWebhookPayload): Promise<void> {
       await notifyOwner({
         title: `🛒 Nová objednávka v LeadOS`,
         content: `${email} — ${amount} ${currency?.toUpperCase() || "CZK"}`,
-      }).catch(() => {});
+      }).catch(() => { });
       break;
     }
 

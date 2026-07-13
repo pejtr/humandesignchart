@@ -86,6 +86,7 @@ export default function Encyclopedia() {
   const [circuitFilter, setCircuitFilter] = useState<string>("all");
   const [centerFilter, setCenterFilter] = useState<string>("all");
   const [selectedGate, setSelectedGate] = useState<GateDetail>(null);
+  const [selectedGeneKey, setSelectedGeneKey] = useState<GateDetail>(null);
   const [selectedChannel, setSelectedChannel] = useState<ChannelDetail>(null);
 
   const gatesArray = useMemo(() => {
@@ -105,7 +106,7 @@ export default function Encyclopedia() {
   }, [hdData]);
 
   const filteredGates = useMemo(() => {
-    return gatesArray.filter(g => {
+    return gatesArray.filter((g: any) => {
       const gateName = isEN ? g.data.name : (GATE_NAMES_CS[g.num] || g.data.name);
       const matchSearch = search === "" ||
         g.num.toString().includes(search) ||
@@ -119,7 +120,7 @@ export default function Encyclopedia() {
   }, [gatesArray, search, circuitFilter, centerFilter, isEN]);
 
   const filteredChannels = useMemo(() => {
-    return channelsArray.filter(c => {
+    return channelsArray.filter((c: any) => {
       const matchSearch = search === "" ||
         c.key.includes(search) ||
         c.data.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -130,7 +131,7 @@ export default function Encyclopedia() {
   }, [channelsArray, search, circuitFilter]);
 
   const centers = useMemo(() => {
-    const set = new Set(gatesArray.map(g => g.data.center));
+    const set = new Set(gatesArray.map((g: any) => g.data.center));
     return Array.from(set).sort();
   }, [gatesArray]);
 
@@ -178,7 +179,7 @@ export default function Encyclopedia() {
               >
                 {isEN ? "All" : "Vše"}
               </Button>
-              {["Individual", "Collective", "Tribal"].map(c => (
+              {["Individual", "Collective", "Tribal"].map((c: any) => (
                 <Button
                   key={c}
                   variant={circuitFilter === c ? "default" : "outline"}
@@ -206,6 +207,10 @@ export default function Encyclopedia() {
                 <Circle className="w-4 h-4" />
                 {isEN ? "9 Centers" : "9 center"}
               </TabsTrigger>
+              <TabsTrigger value="genekeys" className="gap-1.5">
+                <Sparkles className="w-4 h-4" />
+                {isEN ? "64 Gene Keys" : "64 Genových klíčů"}
+              </TabsTrigger>
             </TabsList>
 
             {/* ─── Gates Tab ─── */}
@@ -219,7 +224,7 @@ export default function Encyclopedia() {
                   >
                     {isEN ? "All centers" : "Všechna centra"}
                   </Button>
-                  {centers.map(c => (
+                  {centers.map((c: any) => (
                     <Button
                       key={c}
                       variant={centerFilter === c ? "secondary" : "ghost"}
@@ -387,6 +392,79 @@ export default function Encyclopedia() {
                 </div>
               )}
             </TabsContent>
+
+            {/* ─── Gene Keys Tab ─── */}
+            <TabsContent value="genekeys">
+              {activeTab === "genekeys" && (
+                <div className="mb-4 flex gap-2 flex-wrap">
+                  <Button
+                    variant={centerFilter === "all" ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => setCenterFilter("all")}
+                  >
+                    {isEN ? "All" : "Vše"}
+                  </Button>
+                  {centers.map((c: any) => (
+                    <Button
+                      key={c}
+                      variant={centerFilter === c ? "secondary" : "ghost"}
+                      size="sm"
+                      onClick={() => setCenterFilter(c)}
+                    >
+                      {centerNames[c] || c}
+                    </Button>
+                  ))}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredGates.map(({ num, data }, i) => (
+                  <motion.div
+                    key={num}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: Math.min(i * 0.02, 0.5) }}
+                  >
+                    <Card
+                      className="cursor-pointer hover:shadow-lg transition-all hover:-translate-y-0.5 h-full border-border/50"
+                      onClick={() => setSelectedGeneKey({ gateNum: num, data })}
+                    >
+                      <CardHeader className="pb-3 bg-muted/10 border-b border-border/30">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center font-serif font-bold text-primary-foreground text-lg shadow-sm">
+                            {num}
+                          </div>
+                          <div>
+                            <CardTitle className="text-sm font-semibold font-serif">
+                              {isEN ? `Gene Key ${num}` : `Genový klíč ${num}`}
+                            </CardTitle>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-4 space-y-3">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-red-500 font-medium uppercase tracking-wider">{isEN ? "Shadow" : "Stín"}</span>
+                          <span className="text-right text-muted-foreground">{isEN ? (data.shadowKeywordEn || data.shadowKeyword) : data.shadowKeyword}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs border-y border-border/20 py-2">
+                          <span className="text-green-600 font-medium uppercase tracking-wider">{isEN ? "Gift" : "Dar"}</span>
+                          <span className="text-right">{isEN ? (data.giftKeywordEn || data.giftKeyword) : data.giftKeyword}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-amber-500 font-medium uppercase tracking-wider flex items-center gap-1"><Sparkles className="w-3 h-3" /> {isEN ? "Siddhi" : "Siddhi"}</span>
+                          <span className="text-right font-serif">{isEN ? (data.siddhiKeywordEn || data.siddhiKeyword || "---") : (data.siddhiKeyword || "---")}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+              {filteredGates.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  {isEN ? "No Gene Keys match your search." : "Žádné Genové klíče neodpovídají vašemu hledání."}
+                </div>
+              )}
+            </TabsContent>
           </Tabs>
         </div>
       </main>
@@ -481,7 +559,7 @@ export default function Encyclopedia() {
                   <p className="text-sm text-muted-foreground leading-relaxed">{isEN ? (selectedChannel.data.descriptionEn || selectedChannel.data.description) : selectedChannel.data.description}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  {selectedChannel.data.gates.map(gateNum => {
+                  {selectedChannel.data.gates.map((gateNum: number) => {
                     const gateData = hdData?.gates[gateNum];
                     return gateData ? (
                       <div key={gateNum} className="p-3 rounded-lg bg-muted/50 border">
@@ -496,6 +574,63 @@ export default function Encyclopedia() {
                       </div>
                     ) : null;
                   })}
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Gene Key Detail Dialog */}
+      <Dialog open={!!selectedGeneKey} onOpenChange={() => setSelectedGeneKey(null)}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          {selectedGeneKey && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center font-bold text-primary-foreground text-2xl shadow-md">
+                    {selectedGeneKey.gateNum}
+                  </div>
+                  <div>
+                    <DialogTitle className="text-2xl font-serif">
+                      {isEN ? `Gene Key ${selectedGeneKey.gateNum}` : `Genový klíč ${selectedGeneKey.gateNum}`}
+                    </DialogTitle>
+                    <p className="text-sm text-muted-foreground">
+                      {isEN ? "Transformational Pathway" : "Transformační cesta"}
+                    </p>
+                  </div>
+                </div>
+              </DialogHeader>
+              <div className="space-y-5 mt-2">
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="p-4 rounded-xl bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-red-500" />
+                    <p className="text-xs font-semibold text-red-700 dark:text-red-400 mb-1 uppercase tracking-widest">{isEN ? "Shadow (Victim Pattern)" : "Stín (Vzorec oběti)"}</p>
+                    <p className="text-xl font-medium text-red-900 dark:text-red-300">
+                      {isEN ? (selectedGeneKey.data.shadowKeywordEn || selectedGeneKey.data.shadowKeyword) : selectedGeneKey.data.shadowKeyword}
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-green-50/50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/50 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-green-500" />
+                    <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-1 uppercase tracking-widest">{isEN ? "Gift (Creative Genius)" : "Dar (Kreativní génius)"}</p>
+                    <p className="text-xl font-medium text-green-900 dark:text-green-300">
+                      {isEN ? (selectedGeneKey.data.giftKeywordEn || selectedGeneKey.data.giftKeyword) : selectedGeneKey.data.giftKeyword}
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-amber-500" />
+                    <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1 uppercase tracking-widest flex items-center gap-1.5"><Sparkles className="w-3.5 h-3.5" /> {isEN ? "Siddhi (Divine Essence)" : "Siddhi (Božská esence)"}</p>
+                    <p className="text-xl font-serif font-medium text-amber-900 dark:text-amber-300">
+                      {isEN ? (selectedGeneKey.data.siddhiKeywordEn || selectedGeneKey.data.siddhiKeyword || "---") : (selectedGeneKey.data.siddhiKeyword || "---")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-muted/30 border border-border/50 text-center">
+                  <p className="text-xs text-muted-foreground mb-1">{isEN ? "Corresponds to HD Gate of" : "Odpovídá HD bráně"}</p>
+                  <p className="text-sm font-medium">{isEN ? (selectedGeneKey.data.nameEn || selectedGeneKey.data.name) : (GATE_NAMES_CS[selectedGeneKey.gateNum] || selectedGeneKey.data.name)}</p>
                 </div>
               </div>
             </>

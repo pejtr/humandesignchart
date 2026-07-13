@@ -6,6 +6,9 @@ export const getLoginUrl = () => {
   const appId = import.meta.env.VITE_APP_ID;
 
   if (!oauthPortalUrl || !appId) {
+    if (import.meta.env.DEV) {
+      return "/api/oauth/mock";
+    }
     return "/login"; // Fallback if auth is not configured
   }
 

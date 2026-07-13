@@ -162,7 +162,7 @@ export default function VariablesAnalysis() {
 
   const selectedChart = useMemo(() => {
     if (!selectedChartId || !chartsQuery.data) return null;
-    return chartsQuery.data.find(c => c.id === parseInt(selectedChartId));
+    return chartsQuery.data.find((c: any) => c.id === parseInt(selectedChartId));
   }, [selectedChartId, chartsQuery.data]);
 
   const chartData = selectedChart?.chartData as any;
@@ -224,7 +224,7 @@ export default function VariablesAnalysis() {
                 <SelectValue placeholder="Vyberte uloženou mapu..." />
               </SelectTrigger>
               <SelectContent>
-                {chartsQuery.data?.map(chart => (
+                {chartsQuery.data?.map((chart: any) => (
                   <SelectItem key={chart.id} value={chart.id.toString()}>
                     {chart.name} ({chart.birthDate})
                   </SelectItem>

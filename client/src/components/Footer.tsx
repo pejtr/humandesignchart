@@ -30,7 +30,7 @@ export default function Footer() {
                 </svg>
               </div>
               <span className="font-serif text-lg font-bold tracking-tight text-foreground">
-                Human Design
+                Human Design Mapa
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -42,10 +42,10 @@ export default function Footer() {
           <div>
             <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{t.footer.features}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href={localePath("/calculate")} className="hover:text-primary transition-colors">{t.footer.chartCalculator}</Link></li>
-              <li><Link href={localePath("/transits")} className="hover:text-primary transition-colors">{t.footer.dailyTransits}</Link></li>
-              <li><Link href={localePath("/compare")} className="hover:text-primary transition-colors">{t.footer.chartComparison}</Link></li>
-              <li><Link href={localePath("/celebrities")} className="hover:text-primary transition-colors">{t.footer.celebrityCharts}</Link></li>
+              <li><Link href={localePath("/calculate")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.chartCalculator}</Link></li>
+              <li><Link href={localePath("/transits")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.dailyTransits}</Link></li>
+              <li><Link href={localePath("/compare")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.chartComparison}</Link></li>
+              <li><Link href={localePath("/celebrities")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.celebrityCharts}</Link></li>
             </ul>
           </div>
 
@@ -53,11 +53,11 @@ export default function Footer() {
           <div>
             <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{t.footer.learn}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href={localePath("/iching")} className="hover:text-primary transition-colors">{t.footer.iChingOracle}</Link></li>
-              <li><Link href={localePath("/blog")} className="hover:text-primary transition-colors">{t.footer.typesStrategy}</Link></li>
-              <li><Link href={localePath("/blog")} className="hover:text-primary transition-colors">{t.footer.authorityLabel}</Link></li>
-              <li><Link href={localePath("/blog")} className="hover:text-primary transition-colors">{t.footer.gatesChannels}</Link></li>
-              <li><Link href={localePath("/blog")} className="hover:text-primary transition-colors">Blog</Link></li>
+              <li><Link href={localePath("/iching")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.iChingOracle}</Link></li>
+              <li><Link href={localePath("/blog")} className="cursor-pointer hover:text-primary transition-colors">{locale === "cs" ? "Typy a strategie" : "Types & Strategy"}</Link></li>
+              <li><Link href={localePath("/blog")} className="cursor-pointer hover:text-primary transition-colors">{locale === "cs" ? "Autorita" : "Authority"}</Link></li>
+              <li><Link href={localePath("/encyclopedia")} className="cursor-pointer hover:text-primary transition-colors">{locale === "cs" ? "Brány a dráhy" : "Gates & Channels"}</Link></li>
+              <li><Link href={localePath("/blog")} className="cursor-pointer hover:text-primary transition-colors">Blog</Link></li>
             </ul>
           </div>
 
@@ -65,9 +65,8 @@ export default function Footer() {
           <div>
             <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{t.footer.accountLabel}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href={localePath("/dashboard")} className="hover:text-primary transition-colors">{t.common.dashboard}</Link></li>
-              <li><Link href={localePath("/dashboard")} className="hover:text-primary transition-colors">{t.footer.myCharts}</Link></li>
-              <li><Link href={localePath("/dashboard")} className="hover:text-primary transition-colors">{t.footer.aiReadings}</Link></li>
+              <li><Link href={localePath("/dashboard")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.myCharts}</Link></li>
+              <li><Link href={localePath("/dashboard?tab=readings")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.aiReadings}</Link></li>
             </ul>
           </div>
 

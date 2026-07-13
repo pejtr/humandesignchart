@@ -272,6 +272,43 @@ class SDKServer {
 
     // If user not in DB, sync from OAuth server automatically
     if (!user) {
+      if (sessionUserId === "dev-mock-local-user-id") {
+        // Fallback for local mock auth if the database is not available
+        return {
+          id: 1,
+          openId: "dev-mock-local-user-id",
+          name: session.name || "Dev User",
+          email: "dev@example.local",
+          loginMethod: "mock",
+          role: "user",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          lastSignedIn: new Date().toISOString(),
+          stripeCustomerId: null,
+          stripeSubscriptionId: null,
+          subscriptionStatus: "none",
+          subscriptionPlan: "none",
+          subscriptionCurrentPeriodEnd: null,
+          aiReadingCredits: 50,
+          referralCode: null,
+          currentStreak: 0,
+          longestStreak: 0,
+          lastLoginDate: null,
+          notificationPreferences: {},
+          lastDailyRewardAt: null,
+          level: "master",
+          totalCreditsEarned: 0,
+          isAffiliate: 0,
+          affiliateCode: null,
+          affiliateTier: "bronze",
+          affiliateTotalEarned: 0,
+          affiliatePendingPayout: 0,
+          crmStatus: null,
+          crmNote: null,
+          crmUpdatedAt: null,
+          notificationPrefs: {},
+        } as User;
+      }
       try {
         const userInfo = await this.getUserInfoWithJwt(sessionCookie ?? "");
         await db.upsertUser({

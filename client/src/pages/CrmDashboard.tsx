@@ -126,11 +126,10 @@ function LeadCard({
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left p-3 rounded-lg border transition-all duration-200 hover:border-purple-500/50 ${
-        selected
+      className={`w-full text-left p-3 rounded-lg border transition-all duration-200 hover:border-purple-500/50 ${selected
           ? "border-purple-500 bg-purple-500/10"
           : "border-white/10 bg-white/5 hover:bg-white/8"
-      }`}
+        }`}
     >
       <div className="flex items-start gap-3">
         {/* Avatar */}
@@ -158,9 +157,8 @@ function LeadCard({
           )}
           <div className="flex flex-wrap gap-1">
             <span
-              className={`text-[10px] px-1.5 py-0.5 rounded border ${
-                STATUS_COLORS[lead.status] ?? "bg-gray-500/20 text-gray-300"
-              }`}
+              className={`text-[10px] px-1.5 py-0.5 rounded border ${STATUS_COLORS[lead.status] ?? "bg-gray-500/20 text-gray-300"
+                }`}
             >
               {lead.status}
             </span>
@@ -451,14 +449,14 @@ function SseStreamPanel() {
     events.length > 0
       ? events
       : [
-          {
-            id: "demo1",
-            type: "lead_activity",
-            title: "Čekám na LeadOS data",
-            message: "Připojuji se k SSE streamu...",
-            time: new Date().toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" }),
-          },
-        ];
+        {
+          id: "demo1",
+          type: "lead_activity",
+          title: "Čekám na LeadOS data",
+          message: "Připojuji se k SSE streamu...",
+          time: new Date().toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" }),
+        },
+      ];
 
   return (
     <div className="flex flex-col h-full">
@@ -608,7 +606,7 @@ export default function CrmDashboard() {
     );
   }
 
-  const leads = (leadsData?.leads ?? []) as EnrichedLead[];
+  const leads = (leadsData && !Array.isArray(leadsData) && "leads" in leadsData ? leadsData.leads : Array.isArray(leadsData) ? leadsData : []) as EnrichedLead[];
   const selectedLead = leads.find((l) => l.id === selectedLeadId) ?? null;
 
   return (
@@ -637,11 +635,10 @@ export default function CrmDashboard() {
               <button
                 key={s ?? "all"}
                 onClick={() => setStatusFilter(s)}
-                className={`text-[11px] px-2 py-1 rounded border transition-colors ${
-                  statusFilter === s
+                className={`text-[11px] px-2 py-1 rounded border transition-colors ${statusFilter === s
                     ? "border-purple-500 bg-purple-500/20 text-purple-300"
                     : "border-white/10 text-gray-400 hover:border-white/30"
-                }`}
+                  }`}
               >
                 {s ?? "Vše"}
               </button>
@@ -683,16 +680,16 @@ export default function CrmDashboard() {
               <div className="space-y-2 pr-2">
                 {leadsLoading
                   ? [...Array(5)].map((_, i) => (
-                      <Skeleton key={i} className="h-24 bg-white/5 rounded-lg" />
-                    ))
+                    <Skeleton key={i} className="h-24 bg-white/5 rounded-lg" />
+                  ))
                   : leads.length === 0
-                  ? (
-                    <div className="text-center py-8 text-gray-500 text-sm">
-                      <p>Žádné leady nenalezeny.</p>
-                      <p className="text-xs mt-1">Zkontrolujte LEADOS_API_KEY.</p>
-                    </div>
-                  )
-                  : leads.map((lead) => (
+                    ? (
+                      <div className="text-center py-8 text-gray-500 text-sm">
+                        <p>Žádné leady nenalezeny.</p>
+                        <p className="text-xs mt-1">Zkontrolujte LEADOS_API_KEY.</p>
+                      </div>
+                    )
+                    : leads.map((lead) => (
                       <LeadCard
                         key={lead.id}
                         lead={lead}

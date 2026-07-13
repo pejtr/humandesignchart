@@ -234,7 +234,7 @@ export default function Pricing() {
         {/* Payment gateway integration notice */}
         <div className="mb-8 flex items-center gap-3 rounded-xl border border-amber-400/40 bg-amber-50/80 dark:bg-amber-950/30 dark:border-amber-500/30 px-5 py-3.5 text-sm text-amber-800 dark:text-amber-300 shadow-sm">
           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-400/20 text-amber-600 dark:text-amber-400">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
           </span>
           <span>
             <strong className="font-semibold">
@@ -263,7 +263,7 @@ export default function Pricing() {
 
           {/* Plans Tab */}
           <TabsContent value="plans">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-6">
               {/* Free Plan */}
               <Card className="border-border/50 bg-card/50">
                 <CardHeader className="pb-4">
@@ -304,7 +304,7 @@ export default function Pricing() {
                     <Badge className="bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30">{p.monthlyPlan}</Badge>
                   </div>
                   <CardTitle className="text-2xl">
-                    {isCzech ? "88 Kč" : "€3.49"}
+                    {isCzech ? "188 Kč" : "€7.49"}
                     <span className="text-sm font-normal text-muted-foreground ml-1">{p.perMonth}</span>
                   </CardTitle>
                   <CardDescription>{isCzech ? "Zrušte kdykoli" : "Cancel anytime"}</CardDescription>
@@ -347,14 +347,14 @@ export default function Pricing() {
                 <CardHeader className="pb-4 pt-6">
                   <div className="flex items-center justify-between mb-2">
                     <Badge className="bg-violet-500/20 text-violet-300 border-violet-500/30">{p.annualPlan}</Badge>
-                    <Badge variant="outline" className="text-green-400 border-green-500/30 text-xs">{p.savePercent}</Badge>
+                    <Badge variant="outline" className="text-green-400 border-green-500/30 text-xs">Ušetříte 47 %</Badge>
                   </div>
                   <CardTitle className="text-2xl">
-                    {isCzech ? "888 Kč" : "€35"}
+                    {isCzech ? "1 188 Kč" : "€47"}
                     <span className="text-sm font-normal text-muted-foreground ml-1">{p.perYear}</span>
                   </CardTitle>
                   <CardDescription>
-                    {isCzech ? "≈ 74 Kč/měsíc · " : "≈ €2.92/month · "}{p.billedAnnually}
+                    {isCzech ? "≈ 99 Kč/měsíc · " : "≈ €3.91/month · "}{p.billedAnnually}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -373,6 +373,44 @@ export default function Pricing() {
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* Lifetime Plan */}
+              <Card className="border-amber-500/50 bg-amber-950/10 relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-amber-600 text-white px-3 py-1 border-none shadow-orange-500/20 shadow-lg">
+                    <Crown className="w-3 h-3 mr-1" />
+                    {isCzech ? "Exkluzivně" : "Exclusive"}
+                  </Badge>
+                </div>
+                <CardHeader className="pb-4 pt-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge className="bg-amber-500/20 text-amber-500 dark:text-amber-400 border-amber-500/30">
+                      {isCzech ? "Doživotní" : "Lifetime"}
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-2xl">
+                    {isCzech ? "2 888 Kč" : "€115"}
+                  </CardTitle>
+                  <CardDescription>
+                    {isCzech ? "Jednorázově napořád" : "One-time forever"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {premiumFeatures.map((f, i) => (
+                    <div key={i} className="flex items-start gap-2 text-sm">
+                      <Check className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
+                      <span>{f}</span>
+                    </div>
+                  ))}
+                  <Button
+                    className="w-full mt-4 bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/30 shadow-lg border-none"
+                    disabled={createCheckout.isPending || (user && user.subscriptionPlan === "lifetime")}
+                    onClick={() => handleCheckout("lifetime" as any)}
+                  >
+                    {user && user.subscriptionPlan === "lifetime" ? p.currentPlan : (isCzech ? "Získat Doživotně" : "Get Lifetime")}
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Credit Pack */}
@@ -386,7 +424,7 @@ export default function Pricing() {
                     <div className="font-semibold flex items-center gap-2">
                       {p.creditPack}
                       <Badge variant="outline" className="text-amber-400 border-amber-500/30 text-xs">
-                        {isCzech ? "44 Kč" : "€1.79"}
+                        {isCzech ? "77 Kč" : "€2.99"}
                       </Badge>
                     </div>
                     <div className="text-sm text-muted-foreground">{p.creditPackDesc}</div>
@@ -480,7 +518,7 @@ export default function Pricing() {
                     >
                       <Gift className="w-4 h-4 mr-2" />
                       {p.giftMonthly}
-                      <span className="ml-auto text-xs opacity-70">{isCzech ? "88 Kč" : "€3.49"}</span>
+                      <span className="ml-auto text-xs opacity-70">{isCzech ? "188 Kč" : "€7.49"}</span>
                     </Button>
                     <Button
                       className="bg-pink-600 hover:bg-pink-700 text-white"
@@ -489,7 +527,7 @@ export default function Pricing() {
                     >
                       <Gift className="w-4 h-4 mr-2" />
                       {p.giftAnnual}
-                      <span className="ml-auto text-xs opacity-70">{isCzech ? "888 Kč" : "€35"}</span>
+                      <span className="ml-auto text-xs opacity-70">{isCzech ? "1 188 Kč" : "€47"}</span>
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground text-center">

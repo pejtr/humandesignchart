@@ -244,7 +244,7 @@ function QueueTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
                           <div className="flex items-start justify-between gap-2 mb-1">
                             <p className="text-sm font-medium truncate">{post.title || post.caption.slice(0, 60)}</p>
                             <div className="flex gap-1 shrink-0">
-                              {platforms.map(p => {
+                              {platforms.map((p: any) => {
                                 const Icon = PLATFORM_ICONS[p] ?? Share2;
                                 return <Icon key={p} className="w-4 h-4 text-muted-foreground" />;
                               })}
@@ -630,8 +630,8 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
       ? "Získejte Access Token z LinkedIn Developer Portal → OAuth 2.0 Tools. Potřebujete oprávnění w_member_social."
       : "Get your Access Token from LinkedIn Developer Portal → OAuth 2.0 Tools. You need the w_member_social permission.",
     pinterest: locale === "cs"
-      ? "Pinterest API je momentálně v beta verzi. Získejte token z Pinterest Developer Portal."
-      : "Pinterest API is currently in beta. Get your token from the Pinterest Developer Portal.",
+      ? "Vygenerujte Access Token z Pinterest Developer Portal. Zadejte ho níže společně s Board ID."
+      : "Generate an Access Token from the Pinterest Developer Portal. Enter it below with the Board ID.",
     tiktok: locale === "cs"
       ? "Pro TikTok použijte Access Token z TikTok For Developers portálu."
       : "For TikTok, use the Access Token from TikTok For Developers portal.",
@@ -679,16 +679,18 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
                 <Input value={accountId} onChange={e => setAccountId(e.target.value)} placeholder="123456789" />
               </div>
             </div>
-            {(platform === "facebook" || platform === "instagram") && (
+            {(platform === "facebook" || platform === "instagram" || platform === "pinterest") && (
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>{t.accounts.pageId}</Label>
-                  <Input value={pageId} onChange={e => setPageId(e.target.value)} placeholder="Page ID" />
+                  <Label>{platform === "pinterest" ? "Board ID" : t.accounts.pageId}</Label>
+                  <Input value={pageId} onChange={e => setPageId(e.target.value)} placeholder={platform === "pinterest" ? "Zadejte Board ID" : "Page ID"} />
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Page Name</Label>
-                  <Input value={pageName} onChange={e => setPageName(e.target.value)} placeholder="Název stránky" />
-                </div>
+                {(platform === "facebook" || platform === "instagram") && (
+                  <div className="space-y-1.5">
+                    <Label>Page Name</Label>
+                    <Input value={pageName} onChange={e => setPageName(e.target.value)} placeholder="Název stránky" />
+                  </div>
+                )}
               </div>
             )}
             <div className="space-y-1.5">

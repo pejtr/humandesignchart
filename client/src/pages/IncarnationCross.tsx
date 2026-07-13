@@ -117,6 +117,7 @@ function GateDetailCard({
   color,
   icon,
   locale,
+  hdData,
 }: {
   gateNumber: number | undefined;
   label: string;
@@ -428,10 +429,10 @@ export default function IncarnationCross() {
       ? "#2a9d8f"
       : "#d4af37";
 
-  const sunGate = chart.personalityActivations?.find(p => p.planet === "Sun")?.gate;
-  const earthGate = chart.personalityActivations?.find(p => p.planet === "Earth")?.gate;
-  const designSunGate = chart.designActivations?.find(p => p.planet === "Sun")?.gate;
-  const designEarthGate = chart.designActivations?.find(p => p.planet === "Earth")?.gate;
+  const sunGate = chart.personalityActivations?.find((p: any) => p.planet === "Sun")?.gate;
+  const earthGate = chart.personalityActivations?.find((p: any) => p.planet === "Earth")?.gate;
+  const designSunGate = chart.designActivations?.find((p: any) => p.planet === "Sun")?.gate;
+  const designEarthGate = chart.designActivations?.find((p: any) => p.planet === "Earth")?.gate;
   const crossGateNumbers = crossData?.gates || [];
 
   const diagramGates: DiagramGate[] = [

@@ -179,22 +179,6 @@
 - [ ] Daily HD digest/notification
 - [x] Nutrition/Digestion guidance based on Variables (PHS) (VariablesAnalysis page)
 - [x] Environment guidance based on Variables (VariablesAnalysis page)
-- [x] AI chat guide (conversational HD assistant) (AiGuide page)
-- [x] Advanced PDF reports (light theme, multi-page, Czech)
-- [x] Chart sharing (public link, social media)
-- [x] Complete Gate encyclopedia (64 gates with I Ching) (Encyclopedia page)
-- [x] Complete Channel encyclopedia (36 channels with circuit info) (Encyclopedia page)
-- [x] Variable/Cognition deep analysis (VariablesAnalysis page with 4 tabs)
-- [ ] Dream Rave chart
-- [ ] Incarnation Cross deep analysis
-- [ ] ahumandesign.cz-inspired presentation style
-
-## Inkarnační Kříž — Detailní Analýza
-- [ ] Vytvořit kompletní data pro všechny hlavní Inkarnační kříže (Right Angle, Left Angle, Juxtaposition)
-- [ ] Stránka s detailní analýzou kříže — 4 brány, životní poslání, témata, výzvy
-- [ ] AI generované čtení kříže pro konkrétní uživatelský chart
-- [ ] Propojení ze stránky výsledků chartu
-- [ ] Přidat do navigace
 
 ## Oprava angličtiny v ChartResult
 - [x] Přeložit popisy typů v hdContent.ts do češtiny (TYPE_DESCRIPTIONS)

@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 
-export default function ChartCalculator() {
+export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | "test" | "typy" }) {
   const [, navigate] = useLocation();
   const { isAuthenticated } = useAuth();
   const { t, localePath, locale } = useLanguage();
@@ -26,10 +26,15 @@ export default function ChartCalculator() {
     keywords: "human design calculator, bodygraph calculator, free human design chart, human design birth chart",
     locale: "en_US",
   } : {
-    title: "✨ Kalkulačka Human Design mapy zdarma 🔮",
-    description: "Vypočítejte svou Human Design mapu zdarma. Zadejte datum, čas a místo narození a zjistěte svůj typ, strategii, autoritu a profil.",
+    title: seoType === "kalkulacka" ? "✨ Human Design Kalkulačka Zdarma 🔮" :
+      seoType === "test" ? "✨ Human Design Test Osobnosti Zdarma 🔮" :
+        seoType === "typy" ? "✨ Human Design Typy - Zjistěte ten svůj 🔮" :
+          "✨ Kalkulačka Human Design mapy zdarma 🔮",
+    description: seoType === "test" ? "Udělejte si přesný Human Design test osobnosti. Zadejte své údaje a zjistěte svůj typ, strategii a profil." :
+      seoType === "typy" ? "Poznejte všechny Human Design typy – Generátor, Projektor, Manifestor, Reflektor. Jaký typ jste vy?" :
+        "Vypočítejte svou Human Design mapu zdarma přes naši kalkulačku. Zadejte datum, čas a místo narození a zjistěte svůj typ, strategii, autoritu a profil.",
     ogImage: OG_IMAGES.calculator,
-    keywords: "human design kalkulačka, bodygraph kalkulačka, human design mapa zdarma, human design narození",
+    keywords: "human design kalkulačka, human design test, human design typy, bodygraph, free human design chart",
     locale: "cs_CZ",
   });
 
@@ -143,10 +148,16 @@ export default function ChartCalculator() {
               {t.nav.calculateChart}
             </div>
             <h1 className="font-serif text-3xl md:text-4xl font-bold mb-3">
-              {t.calculator.title}
+              {seoType === "kalkulacka" && isEn === false ? "Human Design Kalkulačka Zdarma" :
+                seoType === "test" && isEn === false ? "Human Design Test Osobnosti Zdarma" :
+                  seoType === "typy" && isEn === false ? "Human Design Typy (Vypočítejte svůj typ)" :
+                    t.calculator.title}
             </h1>
             <p className="text-muted-foreground">
-              {t.calculator.description}
+              {seoType === "kalkulacka" && isEn === false ? "Využijte nejkomplexnější přesnou Human Design kalkulačku v češtině. Zjistěte ihned, jak byla vaše energetická mapa poskládána v momentě narození." :
+                seoType === "test" && isEn === false ? "Na rozdíl od jiných psychologických testů vychází Human design test z přesného výpočtu hvězd a vaší DNA v čase zrození. Udělejte si svůj test zdarma." :
+                  seoType === "typy" && isEn === false ? "Generátor, Projektor, Manifestor nebo Reflektor? Použijte náš výpočet a objevte svůj přesný typ a strategii pro lepší život." :
+                    t.calculator.description}
             </p>
           </div>
 
@@ -233,8 +244,8 @@ export default function ChartCalculator() {
                           disabled={!isAuthenticated}
                           onClick={() => setCategory(opt.value)}
                           className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-xs font-medium transition-all duration-150 ${active
-                              ? 'border-primary bg-primary/10 text-primary'
-                              : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                            ? 'border-primary bg-primary/10 text-primary'
+                            : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
                             }`}
                         >
                           <Icon className="w-4 h-4" />
@@ -289,13 +300,18 @@ export default function ChartCalculator() {
                 <Button
                   type="submit"
                   size="lg"
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                  disabled={calculateMutation.isPending}
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={calculateMutation.isPending || !locationResolved}
                 >
                   {calculateMutation.isPending ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                       {t.calculator.calculating}
+                    </>
+                  ) : !locationResolved ? (
+                    <>
+                      <MapPin className="w-5 h-5 mr-2" />
+                      Nejprve klikněte na "Najít" u Místa narození
                     </>
                   ) : (
                     <>

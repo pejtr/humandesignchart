@@ -268,7 +268,7 @@ export default function DailyTransit() {
             </Card>
           ) : charts.length > 1 ? (
             <div className="flex flex-wrap gap-2 mb-6">
-              {charts.map(chart => (
+              {charts.map((chart: any) => (
                 <button
                   key={chart.id}
                   onClick={() => setSelectedChartId(chart.id)}

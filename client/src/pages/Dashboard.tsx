@@ -100,7 +100,10 @@ export default function Dashboard() {
   const utils = trpc.useUtils();
   const { t, localePath, locale } = useLanguage();
   const readingTypeLabels = locale === 'en' ? readingTypeLabelsEN : readingTypeLabelsCS;
-  const [activeTab, setActiveTab] = useState<"charts" | "readings" | "transit" | "subscription" | "settings">("charts");
+
+  const initialTab = new URLSearchParams(window.location.search).get("tab") as any || "charts";
+  const [activeTab, setActiveTab] = useState<"charts" | "readings" | "transit" | "subscription" | "settings">(initialTab);
+
   const [expandedReading, setExpandedReading] = useState<number | null>(null);
   const [roleTagOpen, setRoleTagOpen] = useState<number | null>(null);
 
@@ -122,7 +125,7 @@ export default function Dashboard() {
       await utils.chart.list.cancel();
       const prev = utils.chart.list.getData();
       utils.chart.list.setData(undefined, (old: any) =>
-        old?.map((c: any) => c.id === vars.id ? { ...c, roleTag: vars.roleTag ?? c.roleTag } : c)
+        old?.map((c: any) => c.id === (vars as any).id ? { ...c, roleTag: (vars as any).roleTag ?? c.roleTag } : c)
       );
       return { prev };
     },
@@ -826,7 +829,7 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
       {/* Chart selector */}
       {charts.length > 1 && (
         <div className="flex flex-wrap gap-2 mb-6">
-          {charts.map(chart => (
+          {charts.map((chart: any) => (
             <button
               key={chart.id}
               onClick={() => setSelectedChartId(chart.id)}

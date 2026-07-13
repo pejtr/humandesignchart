@@ -1,4 +1,5 @@
-import "dotenv/config";
+import * as dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import { BLOG_ARTICLES } from "../data/blogArticles";
 import { BLOG_ARTICLES_EN } from "../data/blogArticlesEn";
@@ -38,13 +39,13 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // ─── SEO: Redirect www to root domains ──────────────────────────────
+  // ─── SEO: Force redirect non-www → www ──────────────────────────────
   app.use((req, res, next) => {
-    if (req.hostname === "www.humandesignmapa.cz") {
-      return res.redirect(301, `https://humandesignmapa.cz${req.originalUrl}`);
+    if (req.hostname === "humandesignmapa.cz") {
+      return res.redirect(301, `https://www.humandesignmapa.cz${req.originalUrl}`);
     }
-    if (req.hostname === "www.humandesignchart.app") {
-      return res.redirect(301, `https://humandesignchart.app${req.originalUrl}`);
+    if (req.hostname === "humandesignchart.app") {
+      return res.redirect(301, `https://www.humandesignchart.app${req.originalUrl}`);
     }
     next();
   });

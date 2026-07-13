@@ -361,20 +361,20 @@ export default function Home() {
 
   const blogPosts = isCs
     ? [
-      { slug: "co-je-human-design", title: "Co je Human Design?", excerpt: "Kompletní průvodce pro začátečníky — zjistěte, jak systém funguje a jak vám může pomoci.", cat: "Základy HD", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/images/blog-fallback.png", featured: true },
-      { slug: "5-typu-human-design", title: "5 typů v Human Designu", excerpt: "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.", cat: "Typy", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/images/blog-fallback.png", featured: false },
-      { slug: "strategie-v-human-design", title: "Strategie: Klíč ke správným rozhodnutím", excerpt: "Reagovat, informovat, čekat na pozvání — naučte se svou strategii.", cat: "Strategie", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/images/blog-fallback.png", featured: false },
-      { slug: "autorita-v-human-design", title: "Autorita: Jak dělat správná rozhodnutí", excerpt: "Emocionální, sakrální, slezinná — každý typ má svůj vnitřní kompas rozhodování.", cat: "Autorita", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/images/blog-fallback.png", featured: false },
-      { slug: "profily-v-human-design", title: "12 profilů v Human Designu", excerpt: "Váš profil odhaluje vaši životní roli a způsob, jakým se učíte a rostete.", cat: "Profily", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/images/blog-fallback.png", featured: false },
-      { slug: "human-design-a-vztahy", title: "Human Design a vztahy", excerpt: "Jak porozumět partnerské dynamice a zlepšit komunikaci s blízkými.", cat: "Vztahy", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/images/blog-fallback.png", featured: false },
+      { slug: "co-je-human-design", title: "Co je Human Design?", excerpt: "Kompletní průvodce pro začátečníky — zjistěte, jak systém funguje a jak vám může pomoci.", cat: "Základy HD", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/images/blog_what_is_hd.png", featured: true },
+      { slug: "5-typu-human-design", title: "5 typů v Human Designu", excerpt: "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.", cat: "Typy", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/images/blog_5_types.png", featured: false },
+      { slug: "strategie-v-human-design", title: "Strategie: Klíč ke správným rozhodnutím", excerpt: "Reagovat, informovat, čekat na pozvání — naučte se svou strategii.", cat: "Strategie", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/images/blog_strategy.png", featured: false },
+      { slug: "autorita-v-human-design", title: "Autorita: Jak dělat správná rozhodnutí", excerpt: "Emocionální, sakrální, slezinná — každý typ má svůj vnitřní kompas rozhodování.", cat: "Autorita", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/images/blog_authority.png", featured: false },
+      { slug: "profily-v-human-design", title: "12 profilů v Human Designu", excerpt: "Váš profil odhaluje vaši životní roli a způsob, jakým se učíte a rostete.", cat: "Profily", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/images/blog_profiles.png", featured: false },
+      { slug: "human-design-a-vztahy", title: "Human Design a vztahy", excerpt: "Jak porozumět partnerské dynamice a zlepšit komunikaci s blízkými.", cat: "Vztahy", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/images/blog_relationships.png", featured: false },
     ]
     : [
-      { slug: "what-is-human-design", title: "What is Human Design?", excerpt: "A complete beginner's guide — learn how the system works and how it can help you.", cat: "HD Basics", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/images/blog-fallback.png", featured: true },
-      { slug: "5-types-human-design", title: "5 Human Design Types", excerpt: "Discover all 5 types — Generator, Projector, Manifestor, MG, and Reflector.", cat: "Types", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/images/blog-fallback.png", featured: false },
-      { slug: "human-design-strategy", title: "Strategy: The Key to Right Decisions", excerpt: "Respond, inform, wait for the invitation — learn your unique strategy.", cat: "Strategy", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/images/blog-fallback.png", featured: false },
-      { slug: "human-design-authority", title: "Inner Authority Explained", excerpt: "Emotional, sacral, splenic — every type has its own inner compass for decisions.", cat: "Authority", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/images/blog-fallback.png", featured: false },
-      { slug: "human-design-profiles", title: "12 Human Design Profiles", excerpt: "Your profile reveals your life role and the way you learn, grow, and connect.", cat: "Profiles", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/images/blog-fallback.png", featured: false },
-      { slug: "human-design-relationships", title: "Human Design & Relationships", excerpt: "Understand partnership dynamics and improve communication with loved ones.", cat: "Relationships", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/images/blog-fallback.png", featured: false },
+      { slug: "what-is-human-design", title: "What is Human Design?", excerpt: "A complete beginner's guide — learn how the system works and how it can help you.", cat: "HD Basics", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/images/blog_what_is_hd.png", featured: true },
+      { slug: "5-types-human-design", title: "5 Human Design Types", excerpt: "Discover all 5 types — Generator, Projector, Manifestor, MG, and Reflector.", cat: "Types", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/images/blog_5_types.png", featured: false },
+      { slug: "human-design-strategy", title: "Strategy: The Key to Right Decisions", excerpt: "Respond, inform, wait for the invitation — learn your unique strategy.", cat: "Strategy", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/images/blog_strategy.png", featured: false },
+      { slug: "human-design-authority", title: "Inner Authority Explained", excerpt: "Emotional, sacral, splenic — every type has its own inner compass for decisions.", cat: "Authority", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/images/blog_authority.png", featured: false },
+      { slug: "human-design-profiles", title: "12 Human Design Profiles", excerpt: "Your profile reveals your life role and the way you learn, grow, and connect.", cat: "Profiles", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/images/blog_profiles.png", featured: false },
+      { slug: "human-design-relationships", title: "Human Design & Relationships", excerpt: "Understand partnership dynamics and improve communication with loved ones.", cat: "Relationships", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/images/blog_relationships.png", featured: false },
     ];
 
   return (
@@ -384,15 +384,19 @@ export default function Home() {
       {/* ── Hero Section ─────────────────────────────────────────────────── */}
       <section
         ref={heroRef}
-        className="relative flex flex-col justify-center overflow-hidden"
-        style={{
-          minHeight: '55vh',
-          backgroundImage: 'url(https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/WUcqCUXbXPPoyTKt.webp)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundColor: '#f5f0f8',
-        }}
+        className="relative flex flex-col justify-center overflow-hidden bg-[#f5f0f8]"
+        style={{ minHeight: '55vh' }}
       >
+        {/* Ambient Animated Background */}
+        <div
+          className="absolute inset-0 z-0 animate-ambient-pan"
+          style={{
+            backgroundImage: 'url(https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/WUcqCUXbXPPoyTKt.webp)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.85,
+          }}
+        />
         {/* Decorative sacred circle — always visible including mobile */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 1 }}>
           <div className="w-[280px] h-[280px] md:w-[500px] md:h-[500px] rounded-full border-2 border-purple-300/40 animate-[spin_60s_linear_infinite]" />
@@ -440,14 +444,14 @@ export default function Home() {
               className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
             >
               <Button
-                  size="lg"
-                  className="text-white text-base px-8 py-6 shadow-lg transition-all hover:scale-105 rounded-lg"
-                  style={{ background: '#2a9d8f', border: 'none' }}
-                 asChild>
-              <Link href={localePath("/calculate")}>
+                size="lg"
+                className="text-white text-base px-8 py-6 shadow-lg transition-all hover:scale-105 rounded-lg"
+                style={{ background: '#2a9d8f', border: 'none' }}
+                asChild>
+                <Link href={localePath("/calculate")}>
                   {isCs ? "Vytvořit moji mapu zdarma" : "Get my free chart"}
                 </Link>
-            </Button>
+              </Button>
 
               <ChartCounter isCs={isCs} />
             </motion.div>
@@ -558,11 +562,11 @@ export default function Home() {
                   <h3 className="font-serif text-xl font-semibold mb-3 text-foreground">{s.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed mb-5">{s.desc}</p>
                   <Button variant="outline" size="sm" className={`border-2 font-medium transition-all ${btnStyles[i]}`} asChild>
-              <Link href={localePath("/calculate")}>
+                    <Link href={localePath("/calculate")}>
                       {s.cta}
                       <ArrowRight className="w-4 h-4 ml-1.5" />
                     </Link>
-            </Button>
+                  </Button>
                 </motion.div>
               );
             })}

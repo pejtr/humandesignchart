@@ -1,7 +1,8 @@
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Sun, Moon } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 const GATE_NAMES_CS: Record<number, string> = {
   1: "Sebevyjádření", 2: "Směr Já", 3: "Uspořádání", 4: "Formulace", 5: "Pevné vzorce",
@@ -36,6 +37,7 @@ const GATE_NAMES_EN: Record<number, string> = {
 };
 
 export default function DailyEnergyBar() {
+  const [, setLocation] = useLocation();
   const { locale, localePath } = useLanguage();
   const isCs = locale === "cs";
 
@@ -76,35 +78,89 @@ export default function DailyEnergyBar() {
           {/* Planets row */}
           <div className="flex items-center gap-4 flex-1 justify-center">
             {/* Sun */}
-            <div className="flex items-center gap-1.5 shrink-0">
-              <Sun className="w-3.5 h-3.5 shrink-0" style={{ color: "#ffd700", filter: "drop-shadow(0 0 6px #ffd700)" }} />
-              <span className="font-black tracking-wider" style={{ color: "#ffe566", textShadow: "0 0 10px #ffd700, 0 0 20px #ffd70088" }}>
-                {isCs ? "Brána" : "Gate"} {sun.gate}.{sun.line}
-              </span>
-              <span className="text-purple-300/60 hidden md:inline">— {gateNames[sun.gate] || ""}</span>
-            </div>
+            <TooltipProvider>
+              <Tooltip delayDuration={300}>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5 shrink-0 hover:bg-white/5 p-1.5 rounded-lg transition-colors cursor-help">
+                    <Sun className="w-3.5 h-3.5 shrink-0" style={{ color: "#ffd700", filter: "drop-shadow(0 0 6px #ffd700)" }} />
+                    <span className="font-black tracking-wider" style={{ color: "#ffe566", textShadow: "0 0 10px #ffd700, 0 0 20px #ffd70088" }}>
+                      {isCs ? "Brána" : "Gate"} {sun.gate}.{sun.line}
+                    </span>
+                    <span className="text-purple-300/60 hidden md:inline">— {gateNames[sun.gate] || ""}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="bg-background border-primary/20 shadow-xl max-w-xs text-center p-3">
+                  <p className="font-semibold text-primary">{isCs ? "Tranzit Slunce (70 % vlivu)" : "Sun Transit (70% influence)"}</p>
+                  <p className="text-xs font-medium bg-primary/10 text-primary py-0.5 px-2 rounded-full inline-block mt-1 mb-2">
+                    {isCs ? sun.theme : sun.themeEn}
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed mb-2">
+                    {isCs ? sun.description : sun.descriptionEn}
+                  </p>
+                  <p className="text-[10px] text-primary/70 font-semibold uppercase tracking-wider">{isCs ? "Klikněte pro denní výklad" : "Click for daily reading"}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
             <span style={{ color: "rgba(139,92,246,0.5)" }}>✦</span>
 
             {/* Earth */}
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-[14px] shrink-0" style={{ color: "#4ade80", filter: "drop-shadow(0 0 6px #4ade80)", lineHeight: 1 }}>⊕</span>
-              <span className="font-black tracking-wider" style={{ color: "#86efac", textShadow: "0 0 10px #4ade80, 0 0 20px #4ade8088" }}>
-                {isCs ? "Brána" : "Gate"} {earth.gate}.{earth.line}
-              </span>
-              <span className="text-purple-300/60 hidden md:inline">— {gateNames[earth.gate] || ""}</span>
-            </div>
+            <TooltipProvider>
+              <Tooltip delayDuration={300}>
+                <TooltipTrigger asChild>
+                  <div
+                    onClick={() => setLocation(localePath("/daily-transit"))}
+                    className="flex items-center gap-1.5 shrink-0 hover:bg-white/5 p-1.5 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <span className="text-[14px] shrink-0" style={{ color: "#4ade80", filter: "drop-shadow(0 0 6px #4ade80)", lineHeight: 1 }}>⊕</span>
+                    <span className="font-black tracking-wider" style={{ color: "#86efac", textShadow: "0 0 10px #4ade80, 0 0 20px #4ade8088" }}>
+                      {isCs ? "Brána" : "Gate"} {earth.gate}.{earth.line}
+                    </span>
+                    <span className="text-purple-300/60 hidden md:inline">— {gateNames[earth.gate] || ""}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="bg-background border-green-500/30 shadow-xl max-w-xs text-center p-3">
+                  <p className="font-semibold text-green-500">{isCs ? "Tranzit Země (Ukotvení)" : "Earth Transit (Grounding)"}</p>
+                  <p className="text-xs font-medium bg-green-500/10 text-green-500 py-0.5 px-2 rounded-full inline-block mt-1 mb-2">
+                    {isCs ? earth.theme : earth.themeEn}
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed mb-2">
+                    {isCs ? earth.description : earth.descriptionEn}
+                  </p>
+                  <p className="text-[10px] text-green-500/70 font-semibold uppercase tracking-wider">{isCs ? "Klikněte pro denní výklad" : "Click for daily reading"}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
             {moon && (
               <>
                 <span style={{ color: "rgba(139,92,246,0.5)" }}>✦</span>
-                <div className="hidden lg:flex items-center gap-1.5 shrink-0">
-                  <Moon className="w-3.5 h-3.5 shrink-0" style={{ color: "#67e8f9", filter: "drop-shadow(0 0 6px #67e8f9)" }} />
-                  <span className="font-black tracking-wider" style={{ color: "#a5f3fc", textShadow: "0 0 10px #67e8f9, 0 0 20px #67e8f988" }}>
-                    {isCs ? "Brána" : "Gate"} {moon.gate}.{moon.line}
-                  </span>
-                  <span className="text-purple-300/60 hidden xl:inline">— {gateNames[moon.gate] || ""}</span>
-                </div>
+                <TooltipProvider>
+                  <Tooltip delayDuration={300}>
+                    <TooltipTrigger asChild>
+                      <div
+                        onClick={() => setLocation(localePath("/daily-transit"))}
+                        className="hidden lg:flex items-center gap-1.5 shrink-0 hover:bg-white/5 p-1.5 rounded-lg transition-colors cursor-pointer"
+                      >
+                        <Moon className="w-3.5 h-3.5 shrink-0" style={{ color: "#67e8f9", filter: "drop-shadow(0 0 6px #67e8f9)" }} />
+                        <span className="font-black tracking-wider" style={{ color: "#a5f3fc", textShadow: "0 0 10px #67e8f9, 0 0 20px #67e8f988" }}>
+                          {isCs ? "Brána" : "Gate"} {moon.gate}.{moon.line}
+                        </span>
+                        <span className="text-purple-300/60 hidden xl:inline">— {gateNames[moon.gate] || ""}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-background border-cyan-500/30 shadow-xl max-w-xs text-center p-3">
+                      <p className="font-semibold text-cyan-500">{isCs ? "Tranzit Měsíce (Nálady)" : "Moon Transit (Moods)"}</p>
+                      <p className="text-xs font-medium bg-cyan-500/10 text-cyan-500 py-0.5 px-2 rounded-full inline-block mt-1 mb-2">
+                        {isCs ? moon.theme : moon.themeEn}
+                      </p>
+                      <p className="text-xs text-muted-foreground leading-relaxed mb-2">
+                        {isCs ? moon.description : moon.descriptionEn}
+                      </p>
+                      <p className="text-[10px] text-cyan-500/70 font-semibold uppercase tracking-wider">{isCs ? "Klikněte pro denní výklad" : "Click for daily reading"}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </>
             )}
           </div>

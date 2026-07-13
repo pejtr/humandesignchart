@@ -67,8 +67,8 @@ export default function RoleCompatibility() {
   const chartsQuery = trpc.chart.list.useQuery(undefined, { enabled: isAuthenticated });
   const charts = chartsQuery.data || [];
 
-  const chartA = useMemo(() => charts.find(c => c.id === chartIdA), [charts, chartIdA]);
-  const chartB = useMemo(() => charts.find(c => c.id === chartIdB), [charts, chartIdB]);
+  const chartA = useMemo(() => charts.find((c: any) => c.id === chartIdA), [charts, chartIdA]);
+  const chartB = useMemo(() => charts.find((c: any) => c.id === chartIdB), [charts, chartIdB]);
 
   const compat = useMemo(() => {
     if (!chartA || !chartB) return null;
@@ -144,7 +144,7 @@ export default function RoleCompatibility() {
                   {isCs ? "Vaše mapa (Já):" : "Your chart (Me):"}
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {charts.map(c => (
+                  {charts.map((c: any) => (
                     <button
                       key={c.id}
                       onClick={() => setChartIdA(c.id === chartIdA ? null : c.id)}
@@ -167,7 +167,7 @@ export default function RoleCompatibility() {
                   {isCs ? "Mapa druhé osoby:" : "Other person's chart:"}
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {charts.filter(c => c.id !== chartIdA).map(c => (
+                  {charts.filter((c: any) => c.id !== chartIdA).map((c: any) => (
                     <button
                       key={c.id}
                       onClick={() => setChartIdB(c.id === chartIdB ? null : c.id)}

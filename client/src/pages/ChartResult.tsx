@@ -32,6 +32,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { SacredGeometry } from "@/components/SacredGeometry";
 import { TiltCard } from "@/components/TiltCard";
 import { SocialShareButtons } from "@/components/SocialShareButtons";
+import { GeneKeysSequence } from "@/components/GeneKeysSequence";
 
 // ─── ShareReadingButton ─────────────────────────────────────────────────────
 function ShareReadingButton({ readingId }: { readingId: number }) {
@@ -289,7 +290,12 @@ export default function ChartResult() {
 
     const abort = new AbortController();
     streamAbortRef.current = abort;
-    setAiStreaming(true);
+    if (type === "daily_transit") {
+      setDailyTransitLoading(true);
+      setDailyTransitReading("");
+    } else {
+      setAiStreaming(true);
+    }
 
     const params = new URLSearchParams({
       chartData: encodeURIComponent(JSON.stringify(chart)),
@@ -347,6 +353,8 @@ export default function ChartResult() {
         }
       });
   };
+
+
 
   const handleRating = async (rating: "up" | "down") => {
     setAiRating(rating);
@@ -1058,7 +1066,7 @@ export default function ChartResult() {
                             </div>
                             {desc && <p className="text-[10px] text-muted-foreground mb-2">{desc.theme}</p>}
                             <div className="flex flex-wrap gap-1">
-                              {center.gates.map(g => (
+                              {center.gates.map((g: any) => (
                                 <span key={g} className={`text-[10px] px-1.5 py-0.5 rounded ${center.activatedGates.includes(g)
                                   ? "bg-primary/20 text-primary font-medium"
                                   : "bg-muted/30 text-muted-foreground"
@@ -1114,6 +1122,19 @@ export default function ChartResult() {
                         );
                       })}
                     </div>
+                  </TabsContent>
+
+                  {/* Gene Keys Sequence */}
+                  <TabsContent value="genekeys" className="mt-4">
+                    {subStatus?.isPremium ? (
+                      <GeneKeysSequence chart={chart} />
+                    ) : (
+                      <PremiumPaywall
+                        variant="inline"
+                        title={locale === "cs" ? "Zlatá Cesta k dispozici v Premium" : "Golden Path available in Premium"}
+                        description={locale === "cs" ? "Získejte okamžitý přístup k detailní analýze svých Genových Klíčů a všem dalším Premium funkcím platformy." : "Get instant access to detailed Gene Keys analysis and all other Premium features."}
+                      />
+                    )}
                   </TabsContent>
 
                   {/* All Activated Gates */}
@@ -1202,7 +1223,7 @@ export default function ChartResult() {
 
                   {/* Dream Rave (Spánek a Sny) */}
                   <TabsContent value="dreamrave" className="mt-4">
-                    {chart.dreamRave ? (
+                    {(chart as any).dreamRave ? (
                       <Card className="bg-card border-border/50 shadow-sm">
                         <CardHeader className="pb-3 border-b border-border/30 bg-muted/20">
                           <div className="flex items-center justify-between">
@@ -1215,7 +1236,7 @@ export default function ChartResult() {
                               </CardDescription>
                             </div>
                             <Badge variant="outline" className="text-sm bg-indigo-500/10 text-indigo-400 border-indigo-500/20 px-3 py-1">
-                              Snový Typ: {(t.types as any)[chart.dreamRave.type] || chart.dreamRave.type}
+                              Snový Typ: {(t.types as any)[(chart as any).dreamRave.type] || (chart as any).dreamRave.type}
                             </Badge>
                           </div>
                         </CardHeader>
@@ -1225,7 +1246,7 @@ export default function ChartResult() {
                             <h3 className="text-sm font-semibold flex items-center gap-1.5 mb-2 text-amber-500"><Sun className="w-4 h-4" /> Světelná Složka (Light Field)</h3>
                             <p className="text-xs text-muted-foreground mb-3 border-l-2 border-amber-500/30 pl-2">Vztahuje se k programování osobnosti a mentálních aspektů během spánku.</p>
                             <div className="flex flex-wrap gap-2">
-                              {chart.dreamRave.activeRealms.lightField.length > 0 ? chart.dreamRave.activeRealms.lightField.map(g => (
+                              {(chart as any).dreamRave.activeRealms.lightField.length > 0 ? (chart as any).dreamRave.activeRealms.lightField.map((g: any) => (
                                 <Badge key={g} variant="outline" className="border-amber-500/30 bg-amber-500/5 text-amber-600">Brána {g} - {hdData?.gates[g]?.name}</Badge>
                               )) : <span className="text-xs text-muted-foreground italic">Žádné brány aktivní</span>}
                             </div>
@@ -1236,7 +1257,7 @@ export default function ChartResult() {
                             <h3 className="text-sm font-semibold flex items-center gap-1.5 mb-2 text-emerald-500"><Globe className="w-4 h-4" /> Pozemská Rovina (Earth Plane)</h3>
                             <p className="text-xs text-muted-foreground mb-3 border-l-2 border-emerald-500/30 pl-2">Vztahuje se k přežití, komunitě a materiálizaci kolektivních zkušeností z ostatních časových pásem.</p>
                             <div className="flex flex-wrap gap-2">
-                              {chart.dreamRave.activeRealms.earthPlane.length > 0 ? chart.dreamRave.activeRealms.earthPlane.map(g => (
+                              {(chart as any).dreamRave.activeRealms.earthPlane.length > 0 ? (chart as any).dreamRave.activeRealms.earthPlane.map((g: any) => (
                                 <Badge key={g} variant="outline" className="border-emerald-500/30 bg-emerald-500/5 text-emerald-600">Brána {g} - {hdData?.gates[g]?.name}</Badge>
                               )) : <span className="text-xs text-muted-foreground italic">Žádné brány aktivní</span>}
                             </div>
@@ -1247,7 +1268,7 @@ export default function ChartResult() {
                             <h3 className="text-sm font-semibold flex items-center gap-1.5 mb-2 text-rose-500"><Target className="w-4 h-4" /> Sféra stínů (Demon Realm)</h3>
                             <p className="text-xs text-muted-foreground mb-3 border-l-2 border-rose-500/30 pl-2">Vztahuje se k nevědomému podmiňování, hlubokým strachům a přežití formy.</p>
                             <div className="flex flex-wrap gap-2">
-                              {chart.dreamRave.activeRealms.demonRealm.length > 0 ? chart.dreamRave.activeRealms.demonRealm.map(g => (
+                              {(chart as any).dreamRave.activeRealms.demonRealm.length > 0 ? (chart as any).dreamRave.activeRealms.demonRealm.map((g: any) => (
                                 <Badge key={g} variant="outline" className="border-rose-500/30 bg-rose-500/5 text-rose-600">Brána {g} - {hdData?.gates[g]?.name}</Badge>
                               )) : <span className="text-xs text-muted-foreground italic">Žádné brány aktivní</span>}
                             </div>

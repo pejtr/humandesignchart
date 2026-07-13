@@ -103,7 +103,7 @@ function CenterGrid({ centers, nameA, nameB, locale }: {
   };
   return (
     <div className="grid grid-cols-3 gap-2">
-      {centers.map(c => (
+      {centers.map((c: any) => (
         <div key={c.name} className="p-2 rounded-lg border border-border/40 bg-muted/10 text-center">
           <p className="text-[10px] font-medium text-muted-foreground mb-1">{locale === "cs" ? (CENTER_CS[c.name] || c.name) : c.name}</p>
           <div className="flex items-center justify-center gap-1 mb-1">
@@ -207,12 +207,12 @@ export default function CompositeChart() {
   };
 
   const result = analyzeQuery.data;
-  const nameA = result?.chartA.name || charts.find(c => c.id === chartIdA)?.name || "Osoba A";
-  const nameB = result?.chartB.name || charts.find(c => c.id === chartIdB)?.name || "Osoba B";
+  const nameA = result?.chartA.name || charts.find((c: any) => c.id === chartIdA)?.name || "Osoba A";
+  const nameB = result?.chartB.name || charts.find((c: any) => c.id === chartIdB)?.name || "Osoba B";
 
   // Group charts by category
-  const selfCharts = charts.filter(c => c.category === "self");
-  const otherCharts = charts.filter(c => c.category !== "self");
+  const selfCharts = charts.filter((c: any) => c.category === "self");
+  const otherCharts = charts.filter((c: any) => c.category !== "self");
 
   if (!isAuthenticated) {
     return (
@@ -295,7 +295,7 @@ export default function CompositeChart() {
                           <div className="px-2 py-1 text-[10px] text-muted-foreground uppercase tracking-widest">
                             {locale === "cs" ? "Moje mapy" : "My charts"}
                           </div>
-                          {selfCharts.map(c => (
+                          {selfCharts.map((c: any) => (
                             <SelectItem key={c.id} value={c.id.toString()}>
                               <div className="flex items-center gap-2">
                                 <span>👤</span> {c.name}
@@ -309,7 +309,7 @@ export default function CompositeChart() {
                           <div className="px-2 py-1 text-[10px] text-muted-foreground uppercase tracking-widest mt-1">
                             {locale === "cs" ? "Ostatní osoby" : "Other people"}
                           </div>
-                          {otherCharts.map(c => (
+                          {otherCharts.map((c: any) => (
                             <SelectItem key={c.id} value={c.id.toString()}>
                               <div className="flex items-center gap-2">
                                 <span>{c.category === "family" ? "❤️" : c.category === "friend" ? "👥" : c.category === "client" ? "💼" : "⭐"}</span>
@@ -337,7 +337,7 @@ export default function CompositeChart() {
                       <SelectValue placeholder={locale === "cs" ? "Vyberte mapu..." : "Select chart..."} />
                     </SelectTrigger>
                     <SelectContent>
-                      {charts.filter(c => c.id !== chartIdA).map(c => (
+                      {charts.filter((c: any) => c.id !== chartIdA).map((c: any) => (
                         <SelectItem key={c.id} value={c.id.toString()}>
                           <div className="flex items-center gap-2">
                             <span>{c.category === "self" ? "👤" : c.category === "family" ? "❤️" : c.category === "friend" ? "👥" : c.category === "client" ? "💼" : "⭐"}</span>

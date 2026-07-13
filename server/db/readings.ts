@@ -73,7 +73,7 @@ export async function countAiReadingsByUserToday(userId: number) {
         .where(
             and(
                 eq(aiReadings.userId, userId),
-                gte(aiReadings.createdAt, startOfToday)
+                gte(aiReadings.createdAt, startOfToday.toISOString())
             )
         );
     return result.length;

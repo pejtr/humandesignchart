@@ -426,10 +426,10 @@ export default function BlogArticle() {
                       {isEn ? "Calculate your free chart" : "Vypočítejte si mapu zdarma"}
                     </p>
                     <Button size="sm" className="w-full bg-primary text-primary-foreground" asChild>
-              <Link href={localePath("/calculate")}>
+                      <Link href={localePath("/calculate")}>
                         {isEn ? "Free chart" : "Mapa zdarma"}
                       </Link>
-            </Button>
+                    </Button>
                   </CardContent>
                 </Card>
               </div>
@@ -603,7 +603,7 @@ export default function BlogArticle() {
       })()}
 
       {/* ── Social Share Buttons ────────────────────────────────────────────────── */}
-      <ShareButtons article={article} isEn={isEn} locale={locale} />
+      <ShareButtons article={article as any} isEn={isEn} locale={locale} />
 
       <section className="py-8 border-t border-border/50">
         <div className="container max-w-4xl">

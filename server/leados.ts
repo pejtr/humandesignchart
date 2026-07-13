@@ -154,7 +154,35 @@ export async function sendEmail(params: {
   html: string;
   text?: string;
 }): Promise<{ success: boolean; messageId?: string }> {
-  return leadosRequest("POST", "/email/send", params);
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) {
+    console.warn("[Brevo] BREVO_API_KEY is not configured — email aborted");
+    return { success: false };
+  }
+
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "api-key": apiKey,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      sender: { name: "Human Design Mapa", email: "info@humandesignmapa.cz" },
+      to: [{ email: params.to }],
+      subject: params.subject,
+      htmlContent: params.html,
+      textContent: params.text || params.html.replace(/<[^>]*>?/gm, ""),
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => "");
+    throw new Error(`Brevo API Error ${response.status}: ${errorText}`);
+  }
+
+  const data = (await response.json()) as { messageId: string };
+  return { success: true, messageId: data.messageId };
 }
 
 // ─── Webhook verification ─────────────────────────────────────────────────────

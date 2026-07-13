@@ -72,10 +72,23 @@ function findActivatedChannels(
 export const transitRouter = router({
     current: publicProcedure.query(async () => {
         const { now, positions, transitGates } = await calculateTransitGates();
+        const { GATE_DESCRIPTIONS } = await import("../data/hdContent");
+
+        const enrichedGates = transitGates.map(t => {
+            const desc = GATE_DESCRIPTIONS[t.gate];
+            return {
+                ...t,
+                theme: desc?.theme || "",
+                themeEn: desc?.themeEn || "",
+                description: desc?.description || "",
+                descriptionEn: desc?.descriptionEn || "",
+            };
+        });
+
         return {
             timestamp: now.toISOString(),
             positions,
-            transitGates,
+            transitGates: enrichedGates,
         };
     }),
 
