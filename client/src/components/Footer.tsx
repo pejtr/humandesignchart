@@ -54,6 +54,7 @@ export default function Footer() {
             <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{t.footer.learn}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link href={localePath("/iching")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.iChingOracle}</Link></li>
+              <li><Link href={localePath("/andelska-cisla")} className="cursor-pointer hover:text-primary transition-colors">{locale === "cs" ? "Andělská čísla" : "Angel Numbers"}</Link></li>
               <li><Link href={localePath("/blog")} className="cursor-pointer hover:text-primary transition-colors">{locale === "cs" ? "Typy a strategie" : "Types & Strategy"}</Link></li>
               <li><Link href={localePath("/blog")} className="cursor-pointer hover:text-primary transition-colors">{locale === "cs" ? "Autorita" : "Authority"}</Link></li>
               <li><Link href={localePath("/encyclopedia")} className="cursor-pointer hover:text-primary transition-colors">{locale === "cs" ? "Brány a dráhy" : "Gates & Channels"}</Link></li>

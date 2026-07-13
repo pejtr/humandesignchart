@@ -121,6 +121,7 @@ export default function Navbar() {
     { href: "/celebrities", label: t.nav.celebrities, icon: Users, desc: locale === "cs" ? "Mapy známých osobností" : "Charts of famous people" },
     { href: "/iching", label: t.nav.iChing, icon: Hexagon, desc: locale === "cs" ? "I-Ťing orákulum" : "I Ching Oracle" },
     { href: "/incarnation-cross", label: locale === "cs" ? "Inkarnační kříž" : "Incarnation Cross", icon: Target, desc: locale === "cs" ? "Životní poslání a 4 brány kříže" : "Life purpose and 4 gates of the cross" },
+    { href: "/andelska-cisla", label: locale === "cs" ? "Andělská čísla" : "Angel Numbers", icon: Sparkles, desc: locale === "cs" ? "Významy asynchronicit" : "Meanings of synchronicity" },
   ];
 
   return (
