@@ -23,13 +23,14 @@ import { gamificationRouter } from "./routers/gamification";
 import { affiliateRouter } from "./routers/affiliate";
 import { compositeRouter } from "./routers/composite";
 import { contentRouter } from "./routers/content";
-import { angelNumbersRouter } from "./routers/angelNumbers";
 
 // Pre-existing routers (already extracted before this refactoring)
 import { socialRouter } from "./routers/social";
 import { leadosRouter } from "./routers/leados";
 import { chatRouter } from "./routers/chat";
 import { userRouter } from "./routers/user";
+import { adsRouter } from "./routers/ads";
+import { angelNumbersRouter } from "./routers/angelNumbers";
 
 export const appRouter = router({
   system: systemRouter,
@@ -53,6 +54,7 @@ export const appRouter = router({
   affiliate: affiliateRouter,
   composite: compositeRouter,
   content: contentRouter,
+  ads: adsRouter,
   angelNumbers: angelNumbersRouter,
 });
 

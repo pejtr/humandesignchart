@@ -58,28 +58,22 @@ const validatePayload = (input: NotificationPayload): NotificationPayload => {
 };
 
 /**
- * Dispatches a project-owner notification through the Manus Notification Service.
- * Returns `true` if the request was accepted, `false` when the upstream service
- * cannot be reached (callers can fall back to email/slack). Validation errors
- * bubble up as TRPC errors so callers can fix the payload.
+ * Dispatches a project-owner push notification through the optional notification
+ * backend. Returns `true` if the request was accepted, `false` when the backend
+ * is not configured or cannot be reached. This is best-effort: callers (webhooks)
+ * must not fail just because owner notifications are unavailable. Validation
+ * errors still bubble up as TRPC errors so callers can fix the payload.
  */
 export async function notifyOwner(
   payload: NotificationPayload
 ): Promise<boolean> {
   const { title, content } = validatePayload(payload);
 
-  if (!ENV.forgeApiUrl) {
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "Notification service URL is not configured.",
-    });
-  }
-
-  if (!ENV.forgeApiKey) {
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "Notification service API key is not configured.",
-    });
+  if (!ENV.forgeApiUrl || !ENV.forgeApiKey) {
+    console.warn(
+      "[notifyOwner] Notification backend not configured (set STORAGE_API_URL / STORAGE_API_KEY to enable); skipping owner notification."
+    );
+    return false;
   }
 
   const endpoint = buildEndpointUrl(ENV.forgeApiUrl);

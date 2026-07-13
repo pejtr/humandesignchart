@@ -39,7 +39,10 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // ─── SEO: Force redirect non-www → www ──────────────────────────────
+  // ─── SEO: Canonical host = www (the configured Railway domain) ───────
+  // The bare apex (humandesignmapa.cz) currently has no DNS of its own, so
+  // www MUST serve directly. We only redirect the apex → www (fires only if
+  // the apex is ever pointed at Railway); www is never redirected away.
   app.use((req, res, next) => {
     if (req.hostname === "humandesignmapa.cz") {
       return res.redirect(301, `https://www.humandesignmapa.cz${req.originalUrl}`);
@@ -220,9 +223,7 @@ async function startServer() {
     const userPrompt = getReadingPrompt(chart, readingType, isEn);
 
     const { ENV } = await import("./env");
-    const apiUrl = ENV.forgeApiUrl
-      ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-      : "https://forge.manus.im/v1/chat/completions";
+    const apiUrl = `${ENV.llmBaseUrl.replace(/\/$/, "")}/chat/completions`;
 
     // SSE headers
     res.setHeader("Content-Type", "text/event-stream");
@@ -238,10 +239,10 @@ async function startServer() {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          authorization: `Bearer ${ENV.forgeApiKey}`,
+          authorization: `Bearer ${ENV.llmApiKey}`,
         },
         body: JSON.stringify({
-          model: "gemini-2.5-flash",
+          model: ENV.llmModel,
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },

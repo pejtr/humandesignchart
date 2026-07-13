@@ -48,6 +48,7 @@ const AdminCRM = lazy(() => import("./pages/AdminCRM"));
 const RoleCompatibility = lazy(() => import("./pages/RoleCompatibility"));
 const CrmDashboard = lazy(() => import("./pages/CrmDashboard"));
 const HumanDesignTest = lazy(() => import("./pages/HumanDesignTest"));
+const AdminAds = lazy(() => import("./pages/AdminAds"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -132,6 +133,7 @@ function LocaleRoutes() {
             <Route path="/:locale/composite" component={CompositeChart} />
             <Route path="/:locale/role-compatibility" component={RoleCompatibility} />
             <Route path="/:locale/admin/crm" component={AdminCRM} />
+            <Route path="/:locale/admin/ads" component={AdminAds} />
             <Route path="/:locale/crm-dashboard" component={CrmDashboard} />
             <Route path="/:locale/pricing" component={Pricing} />
             <Route path="/:locale/payment/success" component={PaymentSuccess} />
@@ -187,10 +189,10 @@ function LocaleRoutes() {
             {/* 404 */}
             <Route path="/404" component={NotFound} />
             <Route component={NotFound} />
-          </Switch>
-        </Suspense>
-      </PageTransition>
-    </div>
+          </Switch >
+        </Suspense >
+      </PageTransition >
+    </div >
   );
 }
 
