@@ -181,7 +181,7 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
             };
         }),
 
-    personalizedByData: protectedProcedure
+    personalizedByData: publicProcedure
         .input(z.object({
             chartData: z.any(),
             locale: z.string().optional(),
