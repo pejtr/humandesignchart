@@ -1,24 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
-import { Helmet } from "react-helmet-async";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Star, Shield, Zap, Heart, Moon, Sun } from "lucide-react";
 import HDLoader from "@/components/HDLoader";
 import PageTransition from "@/components/PageTransition";
+import { useSEO } from "@/hooks/useSEO";
 
 export default function AndelskaCisla() {
     const { data: articles, isLoading } = trpc.angelNumbers.list.useQuery();
+
+    useSEO({
+        title: "Andělská čísla | Významy od 000 do 9999 | Human Design Mapa",
+        description: "Objevte skutečný význam andělských čísel a jak souvisí s vaším Human Designem."
+    });
 
     if (isLoading) return <HDLoader />;
 
     return (
         <PageTransition>
-            <Helmet>
-                <title>Andělská čísla | Významy od 000 do 9999 | Human Design Mapa</title>
-                <meta name="description" content="Objevte skutečný význam andělských čísel a jak souvisí s vaším Human Designem." />
-            </Helmet>
 
             <div className="container py-8 max-w-6xl mx-auto space-y-12">
                 <div className="text-center space-y-4 max-w-3xl mx-auto">
@@ -41,7 +43,7 @@ export default function AndelskaCisla() {
                                         <Badge variant="outline">{article.categoryLabel}</Badge>
                                         <div className="text-muted-foreground text-sm flex space-x-1 items-center">
                                             <Sparkles className="w-4 h-4" />
-                                            <span>{article.timeToRead || article.readingTime} min</span>
+                                            <span>{article.readingTime} min</span>
                                         </div>
                                     </div>
                                     <CardTitle className="group-hover:text-purple-700 transition-colors">
