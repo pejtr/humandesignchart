@@ -42,19 +42,15 @@ function verifyState(state: string | undefined): boolean {
 
 /**
  * Build the OAuth redirect URI. For the production domain we always return the
- * canonical `www` host (the one registered in the Google OAuth client), so the
- * flow never bounces between apex and www and the token-exchange redirect_uri
- * always matches the authorization request.
+ * canonical `www` host (the one registered in the Google OAuth client). The
+ * apex domain has no DNS record, so using it here prevents Google from reaching
+ * the callback at all.
  */
 function getRedirectUri(req: Request): string {
   const host = (req.get("host") ?? "").toLowerCase();
 
-  // ALWAYS use the non-www domain for Google OAuth redirect_uri matching because
-  // the Google Cloud Console was likely configured for humandesignmapa.cz (without www) 
-  // before the canonical www redirect was introduced. 
-  // Google's token exchange requires strict matching.
   if (host === "humandesignmapa.cz" || host === "www.humandesignmapa.cz") {
-    return "https://humandesignmapa.cz/api/oauth/callback";
+    return "https://www.humandesignmapa.cz/api/oauth/callback";
   }
 
   const forwardedProto = (req.headers["x-forwarded-proto"] as string | undefined)
