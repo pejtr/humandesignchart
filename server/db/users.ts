@@ -17,6 +17,12 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     try {
         const values: InsertUser = {
             openId: user.openId,
+            // The production database predates the Drizzle defaults on these
+            // NOT NULL columns. Supplying them explicitly keeps new OAuth users
+            // insertable without mutating existing affiliate data on updates.
+            isAffiliate: user.isAffiliate ?? 0,
+            affiliateTotalEarned: user.affiliateTotalEarned ?? 0,
+            affiliatePendingPayout: user.affiliatePendingPayout ?? 0,
         };
         const updateSet: Record<string, unknown> = {};
 
