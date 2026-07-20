@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Compass, Loader2, MapPin, Calendar, Clock, Info, User, Heart, Users, Briefcase, Baby, Star, UserCheck, HelpCircle, Lock } from "lucide-react";
+import { Compass, Loader2, MapPin, Calendar, Clock, Info, User, Heart, Users, Briefcase, Baby, Star, UserCheck, HelpCircle, Lock, Code2, Copy, Check } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -48,6 +48,18 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
   const [timezoneOffset, setTimezoneOffset] = useState(0);
   const [locationResolved, setLocationResolved] = useState(false);
   const [category, setCategory] = useState<string>("self");
+
+  const [embedCopied, setEmbedCopied] = useState(false);
+  const handleCopyEmbed = () => {
+    const domain = isEn ? "https://www.humandesignchart.app" : "https://www.humandesignmapa.cz";
+    const brandName = isEn ? "Human Design Chart" : "Human Design Mapa";
+    const code = `<iframe src="${domain}/embed/calculator" width="100%" height="600" frameborder="0"></iframe>\n<p style="text-align:center;font-size:12px;">Powered by <a href="${domain}">${brandName}</a></p>`;
+    navigator.clipboard.writeText(code).then(() => {
+      setEmbedCopied(true);
+      toast.success(isEn ? "Embed code copied!" : "Kód byl zkopírován!");
+      setTimeout(() => setEmbedCopied(false), 2000);
+    });
+  };
 
   const RELATIONSHIP_OPTIONS = [
     { value: "self", labelCs: "Já", labelEn: "Myself", icon: User },
@@ -323,6 +335,47 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
               </form>
             </CardContent>
           </Card>
+          <div className="mt-12 mb-8">
+            <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shadow-sm relative overflow-hidden">
+              <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl pointer-events-none" />
+              <CardHeader className="pb-3">
+                <CardTitle className="font-serif text-lg flex items-center gap-2">
+                  <Code2 className="w-5 h-5 text-primary" />
+                  {isEn ? "Embed on Your Website (Free Tool)" : "Vložte si kalkulačku zdarma na svůj web"}
+                </CardTitle>
+                <CardDescription>
+                  {isEn
+                    ? "Are you an astrologer, life coach, or blogger? Use our free chart widget to engage your audience and keep them on your site! Just copy the code below."
+                    : "Jste astrolog, kouč nebo bloger? Vložte si na web naši Human design kalkulačku s profesionálním designem pro své návštěvníky zdarma!"
+                  }
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="relative">
+                  <pre className="p-4 rounded-xl bg-slate-950 text-slate-50 text-xs overflow-x-auto font-mono">
+                    {`<iframe 
+  src="${isEn ? 'https://www.humandesignchart.app' : 'https://www.humandesignmapa.cz'}/embed/calculator" 
+  width="100%" 
+  height="600" 
+  frameborder="0"
+></iframe>
+<p style="text-align:center;font-size:12px;">
+  Powered by <a href="${isEn ? 'https://www.humandesignchart.app' : 'https://www.humandesignmapa.cz'}">${isEn ? 'Human Design Chart' : 'Human Design Mapa'}</a>
+</p>`}
+                  </pre>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="absolute top-2 right-2 h-8"
+                    onClick={handleCopyEmbed}
+                  >
+                    {embedCopied ? <Check className="w-3.5 h-3.5 mr-1 text-green-500" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                    {isEn ? "Copy Code" : "Kopírovat kód"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </main>
 

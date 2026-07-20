@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, BookOpen } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSEO } from "@/hooks/useSEO";
 
 // I Ching hexagram data (64 hexagrams)
 const HEXAGRAMS: Array<{
@@ -108,21 +109,19 @@ export default function IChing() {
   const [oracleResult, setOracleResult] = useState<typeof HEXAGRAMS[0] | null>(null);
   const { t, locale, localePath } = useLanguage();
 
-  useEffect(() => {
-    if (locale === "en") {
-      document.title = "☯️ I Ching Oracle — Human Design Hexagrams & Wisdom 🎴";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Consult the I Ching oracle. Explore all 64 hexagrams and their connection to Human Design gates and life themes."
-      );
-    } else {
-      document.title = "☯️ I-Ťing Orákulum — Human Design Hexagramy & Moudrost 🎴";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Konzultujte I-Ťing orákulum. Prozkoumejte všech 64 hexagramů a jejich spojení s bránami Human Design."
-      );
-    }
-  }, [locale]);
+  useSEO(locale === "en" ? {
+    title: "☯️ I Ching Oracle — Human Design Hexagrams & Wisdom 🎴",
+    description: "Consult the I Ching oracle. Explore all 64 hexagrams and their connection to Human Design gates and life themes.",
+    keywords: "i ching oracle, iching hexagrams, 64 hexagrams, human design gates, i ching wisdom",
+    ogType: "website",
+    locale: "en_US",
+  } : {
+    title: "☯️ I-Ťing Orákulum — Human Design Hexagramy & Moudrost 🎴",
+    description: "Konzultujte I-Ťing orákulum. Prozkoumejte všech 64 hexagramů a jejich spojení s bránami Human Design.",
+    keywords: "i-ťing orákulum, i-ťing hexagramy, 64 hexagramů, brány human design, i-ťing moudrost",
+    ogType: "website",
+    locale: "cs_CZ",
+  });
 
   const castOracle = () => {
     const idx = Math.floor(Math.random() * 64);

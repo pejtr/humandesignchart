@@ -7,6 +7,7 @@ import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Gift, Users, ArrowRight, Check } from "lucide-react";
+import { useSEO } from "@/hooks/useSEO";
 
 interface Props {
   code: string;
@@ -24,19 +25,26 @@ export default function ReferralLanding({ code }: Props) {
     { enabled: !!code }
   );
 
+  useSEO(isCzech ? {
+    title: "✨ Váš přítel vás zve do Human Design — získejte výklad zdarma!",
+    description: "Váš přítel vám poslal pozvánku do Human Design. Vytvořte si svou mapu zdarma a získejte personalizovaný AI výklad.",
+    ogType: "website",
+    locale: "cs_CZ",
+    noIndex: true,
+  } : {
+    title: "✨ Your friend invited you to Human Design — get a free reading!",
+    description: "Your friend invited you to Human Design. Create your free chart and get a personalized AI reading.",
+    ogType: "website",
+    locale: "en_US",
+    noIndex: true,
+  });
+
   // Store referral code in localStorage so it can be applied after login
   useEffect(() => {
     if (code) {
       localStorage.setItem("pendingReferralCode", code);
     }
   }, [code]);
-
-  // Set page title
-  useEffect(() => {
-    document.title = isCzech
-      ? "✨ Váš přítel vás zve do Human Design — získejte výklad zdarma!"
-      : "✨ Your friend invited you to Human Design — get a free reading!";
-  }, [isCzech]);
 
   const handleGetStarted = () => {
     if (isAuthenticated) {

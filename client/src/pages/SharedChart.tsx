@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import HDLoader from "@/components/HDLoader";
+import { useSEO } from "@/hooks/useSEO";
 import {
   ArrowLeft, Compass, Eye, Zap, Shield, Target,
   Sun, Moon, Star, Brain, Hexagon, CircleDot, Globe,
@@ -41,7 +42,7 @@ const DEFINITION_CS: Record<string, string> = {
 };
 
 export default function SharedChart() {
-  const { localePath } = useLanguage();
+  const { locale, localePath } = useLanguage();
   const params = useParams<{ token: string }>();
   const [, navigate] = useLocation();
 
@@ -49,6 +50,17 @@ export default function SharedChart() {
     { token: params.token || "" },
     { enabled: !!params.token }
   );
+
+  const chartName = data?.ownerName || "Human Design Chart";
+  const chartType = data?.chartData?.type || "";
+
+  useSEO({
+    title: `Sdílená Human Design Mapa — ${chartName} | HumanDesignMapa.cz`,
+    description: `Prohlédněte si sdílenou Human Design mapu ${chartName}. Typ: ${locale === "cs" ? (TYPE_CS[chartType] || chartType) : chartType || ""}`,
+    keywords: "sdílená human design mapa, human design chart shared, bodygraph",
+    ogType: "website",
+    noIndex: true,
+  });
 
   if (isLoading) return <HDLoader />;
 

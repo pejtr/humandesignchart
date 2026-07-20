@@ -8,8 +8,10 @@ import { Sparkles, Star, Shield, Zap, Heart, Moon, Sun } from "lucide-react";
 import HDLoader from "@/components/HDLoader";
 import PageTransition from "@/components/PageTransition";
 import { useSEO } from "@/hooks/useSEO";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function AndelskaCisla() {
+    const { localePath } = useLanguage();
     const { data: articles, isLoading } = trpc.angelNumbers.list.useQuery();
 
     useSEO({
@@ -35,7 +37,7 @@ export default function AndelskaCisla() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {articles?.map((article) => (
-                        <Link key={article.slug} href={`/cs/andelska-cisla/${article.slug}`}>
+                        <Link key={article.slug} href={localePath(`/andelska-cisla/${article.slug}`)}>
                             <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col group overflow-hidden border-2 hover:border-purple-200">
                                 <div className={`h-4 bg-gradient-to-r from-purple-400 to-indigo-400`} />
                                 <CardHeader>

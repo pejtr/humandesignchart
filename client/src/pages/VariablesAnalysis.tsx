@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UtensilsCrossed, MapPin, Eye, Brain, LogIn, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSEO } from "@/hooks/useSEO";
 
 // Comprehensive PHS/Variables data in Czech
 const DIGESTION_TYPES: Record<string, { name: string; description: string; tips: string[]; foods: string[] }> = {
@@ -140,21 +141,19 @@ export default function VariablesAnalysis() {
   const { isAuthenticated } = useAuth();
   const { locale } = useLanguage();
 
-  useEffect(() => {
-    if (locale === "en") {
-      document.title = "🧬 Human Design Variables — Digestion, Environment & PHS 🌿";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Explore your Human Design Variables: digestion type, environment, perspective, and awareness. Deep PHS analysis for optimal living."
-      );
-    } else {
-      document.title = "🧬 Human Design Proměnné — Trávení, Prostředí & PHS 🌿";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Prozkoumejte své Human Design Proměnné: typ trávení, prostředí, perspektivu a vědomí. Hluboká PHS analýza pro optimální život."
-      );
-    }
-  }, [locale]);
+  useSEO(locale === "en" ? {
+    title: "🧬 Human Design Variables — Digestion, Environment & PHS 🌿",
+    description: "Explore your Human Design Variables: digestion type, environment, perspective, and awareness. Deep PHS analysis for optimal living.",
+    keywords: "human design variables, PHS, digestion type, environment, perspective, awareness, primary health system",
+    ogType: "website",
+    locale: "en_US",
+  } : {
+    title: "🧬 Human Design Proměnné — Trávení, Prostředí & PHS 🌿",
+    description: "Prozkoumejte své Human Design Proměnné: typ trávení, prostředí, perspektivu a vědomí. Hluboká PHS analýza pro optimální život.",
+    keywords: "human design proměnné, PHS, typ trávení, prostředí, perspektiva, vědomí, primární zdravotní systém",
+    ogType: "website",
+    locale: "cs_CZ",
+  });
 
   const [selectedChartId, setSelectedChartId] = useState<string>("");
 

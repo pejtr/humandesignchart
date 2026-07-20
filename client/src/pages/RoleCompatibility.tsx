@@ -11,6 +11,7 @@ import { Loader2, Sparkles, Users, Heart, Zap, ChevronDown, ChevronUp } from "lu
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Streamdown } from "streamdown";
+import { useSEO } from "@/hooks/useSEO";
 
 const ROLE_TAGS = [
   { value: "partner",    label: "💑 Partner",       color: "bg-pink-500/20 text-pink-300 border-pink-500/30" },
@@ -57,6 +58,20 @@ export default function RoleCompatibility() {
   const { isAuthenticated, loading } = useAuth();
   const { locale, localePath } = useLanguage();
   const isCs = locale === "cs";
+
+  useSEO(isCs ? {
+    title: "💞 Human Design Kompatibilita Rolí — Vztahová Analýza 💑",
+    description: "Zjistěte kompatibilitu svých Human Design profilů a rolí. Analyzujte vztahy, partnerství a týmovou dynamiku podle HD.",
+    keywords: "human design kompatibilita, role, vztahová analýza, profilová kompatibilita, HD vztahy",
+    ogType: "website",
+    locale: "cs_CZ",
+  } : {
+    title: "💞 Human Design Role Compatibility — Relationship Analysis 💑",
+    description: "Discover Human Design profile and role compatibility. Analyze relationships, partnerships and team dynamics by HD.",
+    keywords: "human design compatibility, role compatibility, profile analysis, relationship HD, team dynamics",
+    ogType: "website",
+    locale: "en_US",
+  });
 
   const [chartIdA, setChartIdA] = useState<number | null>(null);
   const [chartIdB, setChartIdB] = useState<number | null>(null);

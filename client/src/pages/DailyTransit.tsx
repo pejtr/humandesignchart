@@ -1,5 +1,5 @@
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import Navbar from "@/components/Navbar";
@@ -12,47 +12,26 @@ import { Streamdown } from "streamdown";
 import { Link } from "wouter";
 import { getLoginUrl } from "@/const";
 import { toast } from "sonner";
-
-const PLANET_SYMBOLS: Record<string, string> = {
-  Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
-  Jupiter: "♃", Saturn: "♄", Uranus: "⛢", Neptune: "♆", Pluto: "♇",
-  "North Node": "☊", "South Node": "☋",
-};
-
-const PLANET_COLORS: Record<string, string> = {
-  Sun: "text-amber-500",
-  Moon: "text-slate-400",
-  Mercury: "text-cyan-500",
-  Venus: "text-pink-400",
-  Mars: "text-red-500",
-  Jupiter: "text-orange-400",
-  Saturn: "text-stone-500",
-  Uranus: "text-teal-400",
-  Neptune: "text-indigo-400",
-  Pluto: "text-purple-500",
-  "North Node": "text-emerald-500",
-  "South Node": "text-rose-400",
-};
+import { PLANET_SYMBOLS, PLANET_COLORS } from "@/lib/hdConstants";
+import { useSEO } from "@/hooks/useSEO";
 
 export default function DailyTransit() {
   const { t, locale, localePath } = useLanguage();
   const { user, isAuthenticated, loading } = useAuth();
 
-  useEffect(() => {
-    if (locale === "en") {
-      document.title = "🌅 Daily Human Design Transit — Today's Planetary Gates 🪐";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "See today's Human Design transit gates and how current planetary positions activate your bodygraph."
-      );
-    } else {
-      document.title = "🌅 Denní Human Design Tranzit — Dnešní Planetární Brány 🪐";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Zjistěte dnešní tranzitové brány Human Design a jak aktuální planeterní pozice aktivují váš bodygraph."
-      );
-    }
-  }, [locale]);
+  useSEO(locale === "en" ? {
+    title: "🌅 Daily Human Design Transit — Today's Planetary Gates 🪐",
+    description: "See today's Human Design transit gates and how current planetary positions activate your bodygraph.",
+    keywords: "human design daily transit, today's gates, planetary positions, bodygraph activation, daily energy",
+    ogType: "website",
+    locale: "en_US",
+  } : {
+    title: "🌅 Denní Human Design Tranzit — Dnešní Planetární Brány 🪐",
+    description: "Zjistěte dnešní tranzitové brány Human Design a jak aktuální planeterní pozice aktivují váš bodygraph.",
+    keywords: "human design denní tranzit, dnešní brány, planetární pozice, aktivace bodygraphu, denní energie",
+    ogType: "website",
+    locale: "cs_CZ",
+  });
 
   const [selectedChartId, setSelectedChartId] = useState<number | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);

@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSEO } from "@/hooks/useSEO";
 import {
   ArrowLeft, Sparkles, Zap, Users, Heart, GitCompare,
   Loader2, Info, Star, Shield, TrendingUp, ChevronDown, ChevronUp,
@@ -167,6 +168,21 @@ export default function CompositeChart() {
 
   const { isAuthenticated } = useAuth();
   const { locale } = useLanguage();
+
+  useSEO(locale === "en" ? {
+    title: "💞 Human Design Composite Chart — Relationship Analysis 💑",
+    description: "Create a Human Design composite chart to analyze relationship dynamics, shared strengths, and growth areas between two people.",
+    keywords: "human design composite chart, relationship analysis, composite bodygraph, relationship compatibility, HD composite",
+    ogType: "website",
+    locale: "en_US",
+  } : {
+    title: "💞 Human Design Kompozitní Mapa — Analýza Vztahu 💑",
+    description: "Vytvořte Human Design kompozitní mapu pro analýzu vztahové dynamiky, sdílených silných stránek a oblastí růstu mezi dvěma lidmi.",
+    keywords: "human design kompozitní mapa, analýza vztahu, kompozitní bodygraph, kompatibilita vztahů, HD kompozit",
+    ogType: "website",
+    locale: "cs_CZ",
+  });
+
   const [chartIdA, setChartIdA] = useState<number | null>(preselectedId);
   const [chartIdB, setChartIdB] = useState<number | null>(null);
   const [aiReading, setAiReading] = useState<string | null>(null);

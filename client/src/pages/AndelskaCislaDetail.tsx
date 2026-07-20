@@ -7,6 +7,7 @@ import PageTransition from "@/components/PageTransition";
 import NotFound from "./NotFound";
 import { ChevronRight, ArrowLeft } from "lucide-react";
 import { useSEO } from "@/hooks/useSEO";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Simple markdown renderer
 function renderMarkdown(md: string) {
@@ -20,6 +21,7 @@ function renderMarkdown(md: string) {
 }
 
 export default function AndelskaCislaDetail() {
+    const { localePath } = useLanguage();
     const params = useParams<{ slug: string }>();
     const slug = params?.slug;
     const { data: article, isLoading } = trpc.angelNumbers.getBySlug.useQuery({ slug: slug! }, {
@@ -37,7 +39,7 @@ export default function AndelskaCislaDetail() {
     return (
         <PageTransition>
             <div className="container py-8 max-w-4xl mx-auto space-y-8">
-                <Link href="/cs/andelska-cisla" className="text-muted-foreground hover:text-foreground inline-flex items-center text-sm font-medium transition-colors">
+                <Link href={localePath("/andelska-cisla")} className="text-muted-foreground hover:text-foreground inline-flex items-center text-sm font-medium transition-colors">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Zpět na přehled čísel
                 </Link>
@@ -81,7 +83,7 @@ export default function AndelskaCislaDetail() {
                     <p className="text-purple-100 mb-8 max-w-2xl mx-auto text-lg hover:text-white transition-colors duration-300">
                         Jako <span className="font-semibold text-white bg-white/20 px-2 py-0.5 rounded">{article.hdConnection}</span> máte jedinečnou kapacitu pro manifestaci a růst. Zjistěte, co je vaším darem.
                     </p>
-                    <Link href="/cs/calculate">
+                    <Link href={localePath("/calculate")}>
                         <Button size="lg" variant="secondary" className="text-purple-700 font-bold hover:bg-white/90">
                             Vypočítat mapu zdarma <ChevronRight className="ml-2 w-5 h-5" />
                         </Button>

@@ -4,6 +4,7 @@ import {
     activateAffiliate, getAffiliateConversions,
     getAffiliatePayouts, createAffiliatePayout,
 } from "../db";
+import { getAffiliateTier, getCommissionRate } from "../services/affiliate";
 
 export const affiliateRouter = router({
     activate: protectedProcedure.mutation(async ({ ctx }) => {
@@ -39,11 +40,8 @@ export const affiliateRouter = router({
         const payouts = await getAffiliatePayouts(ctx.user.id);
 
         const activeConversions = conversions.filter(c => c.status !== "cancelled").length;
-        let tier: "bronze" | "silver" | "gold" = "bronze";
-        if (activeConversions >= 21) tier = "gold";
-        else if (activeConversions >= 6) tier = "silver";
-
-        const commissionRate = tier === "gold" ? 0.60 : tier === "silver" ? 0.50 : 0.40;
+        const tier = getAffiliateTier(activeConversions);
+        const commissionRate = getCommissionRate(tier);
 
         return {
             isAffiliate: user[0].isAffiliate,

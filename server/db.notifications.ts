@@ -2,7 +2,7 @@
  * Database helpers for user_notifications table.
  */
 
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import { userNotifications, type InsertUserNotification, type UserNotification } from "../drizzle/schema";
 
@@ -40,11 +40,11 @@ export async function getUserNotifications(
 export async function getUnreadCount(userId: number): Promise<number> {
   const db = await getDb();
   if (!db) return 0;
-  const rows = await db
-    .select()
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
     .from(userNotifications)
     .where(and(eq(userNotifications.userId, userId), eq(userNotifications.isRead, 0)));
-  return rows.length;
+  return result[0]?.count ?? 0;
 }
 
 export async function markNotificationRead(id: number, userId: number): Promise<void> {

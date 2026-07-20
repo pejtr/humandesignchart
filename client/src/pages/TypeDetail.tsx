@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Compass, ArrowLeft, Sparkles, Users, Zap, Shield, Target, Heart, Brain } from "lucide-react";
-import { useEffect } from "react";
+import { useSEO } from "@/hooks/useSEO";
 
 interface TypeInfo {
   name: string;
@@ -406,19 +406,18 @@ export default function TypeDetail() {
   const labels = LABELS[locale];
   const typeInfo = typeData[typeKey];
 
-  useEffect(() => {
-    if (typeInfo) {
-      document.title = typeInfo.metaTitle;
-      const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) metaDesc.setAttribute("content", typeInfo.metaDescription);
-      else {
-        const meta = document.createElement("meta");
-        meta.name = "description";
-        meta.content = typeInfo.metaDescription;
-        document.head.appendChild(meta);
-      }
-    }
-  }, [typeInfo]);
+  useSEO(typeInfo ? {
+    title: typeInfo.metaTitle,
+    description: typeInfo.metaDescription,
+    keywords: `human design ${typeKey}, ${typeInfo.localName}, ${typeInfo.name} type, ${typeInfo.strategy}, ${typeInfo.aura}`,
+    ogType: "website",
+    locale: locale === "en" ? "en_US" : "cs_CZ",
+  } : {
+    title: locale === "en" ? "Human Design Type — Generator, Projector, Manifestor & Reflector" : "Human Design Typ — Generátor, Projektor, Manifestor & Reflektor",
+    description: locale === "en" ? "Learn about all Human Design types: Generator, Manifesting Generator, Projector, Manifestor, and Reflector." : "Přečtěte si o všech Human Design typech: Generátor, Manifestující Generátor, Projektor, Manifestor a Reflektor.",
+    ogType: "website",
+    locale: locale === "en" ? "en_US" : "cs_CZ",
+  });
 
   if (!typeInfo) {
     return (

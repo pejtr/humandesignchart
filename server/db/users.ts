@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { users, InsertUser } from "../../drizzle/schema";
 import { getDb } from "./index";
 import { ENV } from "../_core/env";
@@ -99,23 +99,23 @@ export async function updateUserSubscription(userId: number, data: Partial<{
 export async function addAiReadingCredits(userId: number, credits: number) {
     const db = await getDb();
     if (!db) throw new Error("Database not available");
-    const user = await db.select({ credits: users.aiReadingCredits }).from(users).where(eq(users.id, userId)).limit(1);
-    const current = user[0]?.credits ?? 0;
-    await db.update(users).set({ aiReadingCredits: current + credits }).where(eq(users.id, userId));
+    // Atomic increment — no read-modify-write race condition
+    await db.update(users).set({
+        aiReadingCredits: sql`COALESCE(${users.aiReadingCredits}, 0) + ${credits}`,
+    }).where(eq(users.id, userId));
 }
 
 export async function consumeAiReadingCredit(userId: number) {
     const db = await getDb();
     if (!db) throw new Error("Database not available");
-    const user = await db.select({ credits: users.aiReadingCredits }).from(users).where(eq(users.id, userId)).limit(1);
-    const current = user[0]?.credits ?? 0;
-    if (current > 0) {
-        await db.update(users).set({ aiReadingCredits: current - 1 }).where(eq(users.id, userId));
-        return true;
-    }
-    return false;
+    // Atomic decrement with floor at 0 — only decrements if > 0
+    const result = await db.update(users).set({
+        aiReadingCredits: sql`GREATEST(COALESCE(${users.aiReadingCredits}, 0) - 1, 0)`,
+    }).where(eq(users.id, userId));
+    // Check if any row was affected (credits were > 0)
+    return (result[0] as any).affectedRows > 0;
 }
-export async function updateUserPreferences(userId: number, preferences: any) {
+export async function updateUserPreferences(userId: number, preferences: Record<string, boolean>) {
     const db = await getDb();
     if (!db) throw new Error("Database not available");
     await db.update(users).set({ notificationPreferences: preferences }).where(eq(users.id, userId));

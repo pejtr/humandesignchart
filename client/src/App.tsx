@@ -33,6 +33,7 @@ const ReturnChart = lazy(() => import("./pages/ReturnChart"));
 const TransitCalendar = lazy(() => import("./pages/TransitCalendar"));
 const VariablesAnalysis = lazy(() => import("./pages/VariablesAnalysis"));
 const SharedChart = lazy(() => import("./pages/SharedChart"));
+const EmbedCalculator = lazy(() => import("./pages/EmbedCalculator"));
 const TypeDetail = lazy(() => import("./pages/TypeDetail"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogArticle = lazy(() => import("./pages/BlogArticle"));
@@ -54,6 +55,11 @@ const AdminAds = lazy(() => import("./pages/AdminAds"));
 
 function PageLoader() {
   return <HDLoader />;
+}
+
+/** Wraps a lazy-loaded component in its own ErrorBoundary so a crash in one route doesn't take down the whole app. */
+function SafeRoute({ children }: { children: React.ReactNode }) {
+  return <ErrorBoundary>{children}</ErrorBoundary>;
 }
 
 /**
@@ -104,44 +110,98 @@ function LocaleRoutes() {
 
             {/* Core pages */}
             <Route path="/:locale/calculate">
-              {() => <ChartCalculator />}
+              {() => <SafeRoute><ChartCalculator /></SafeRoute>}
             </Route>
             <Route path="/:locale/human-design-kalkulacka">
-              {() => <ChartCalculator seoType="kalkulacka" />}
+              {() => <SafeRoute><ChartCalculator seoType="kalkulacka" /></SafeRoute>}
             </Route>
             <Route path="/:locale/human-design-test">
-              {() => <HumanDesignTest />}
+              {() => <SafeRoute><HumanDesignTest /></SafeRoute>}
             </Route>
             <Route path="/:locale/human-design-typy">
-              {() => <ChartCalculator seoType="typy" />}
+              {() => <SafeRoute><ChartCalculator seoType="typy" /></SafeRoute>}
             </Route>
-            <Route path="/:locale/chart/:id" component={ChartResult} />
-            <Route path="/:locale/dashboard" component={Dashboard} />
-            <Route path="/:locale/compare" component={ChartComparison} />
-            <Route path="/:locale/transits" component={Transits} />
-            <Route path="/:locale/iching" component={IChing} />
-            <Route path="/:locale/celebrities" component={Celebrities} />
-            <Route path="/:locale/encyclopedia" component={Encyclopedia} />
-            <Route path="/:locale/ai-guide" component={AiGuide} />
-            <Route path="/:locale/return-chart" component={ReturnChart} />
-            <Route path="/:locale/transit-calendar" component={TransitCalendar} />
-            <Route path="/:locale/variables" component={VariablesAnalysis} />
-            <Route path="/:locale/types/:type" component={TypeDetail} />
-            <Route path="/:locale/blog" component={Blog} />
-            <Route path="/:locale/blog/:slug" component={BlogArticle} />
-            <Route path="/:locale/incarnation-cross" component={IncarnationCross} />
-            <Route path="/:locale/andelska-cisla" component={AndelskaCisla} />
-            <Route path="/:locale/andelska-cisla/:slug" component={AndelskaCislaDetail} />
-            <Route path="/:locale/daily-transit" component={DailyTransit} />
-            <Route path="/:locale/social-scheduler" component={SocialScheduler} />
-            <Route path="/:locale/composite" component={CompositeChart} />
-            <Route path="/:locale/role-compatibility" component={RoleCompatibility} />
-            <Route path="/:locale/admin/crm" component={AdminCRM} />
-            <Route path="/:locale/admin/ads" component={AdminAds} />
-            <Route path="/:locale/crm-dashboard" component={CrmDashboard} />
-            <Route path="/:locale/pricing" component={Pricing} />
-            <Route path="/:locale/payment/success" component={PaymentSuccess} />
-            <Route path="/:locale/payment/cancel" component={PaymentCancel} />
+            <Route path="/:locale/chart/:id">
+              {(params: any) => <SafeRoute><ChartResult id={params.id} /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/dashboard">
+              {() => <SafeRoute><Dashboard /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/compare">
+              {() => <SafeRoute><ChartComparison /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/transits">
+              {() => <SafeRoute><Transits /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/iching">
+              {() => <SafeRoute><IChing /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/celebrities">
+              {() => <SafeRoute><Celebrities /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/encyclopedia">
+              {() => <SafeRoute><Encyclopedia /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/ai-guide">
+              {() => <SafeRoute><AiGuide /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/return-chart">
+              {() => <SafeRoute><ReturnChart /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/transit-calendar">
+              {() => <SafeRoute><TransitCalendar /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/variables">
+              {() => <SafeRoute><VariablesAnalysis /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/types/:type">
+              {(params: any) => <SafeRoute><TypeDetail type={params.type} /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/blog">
+              {() => <SafeRoute><Blog /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/blog/:slug">
+              {(params: any) => <SafeRoute><BlogArticle slug={params.slug} /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/incarnation-cross">
+              {() => <SafeRoute><IncarnationCross /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/andelska-cisla">
+              {() => <SafeRoute><AndelskaCisla /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/andelska-cisla/:slug">
+              {(params: any) => <SafeRoute><AndelskaCislaDetail slug={params.slug} /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/daily-transit">
+              {() => <SafeRoute><DailyTransit /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/social-scheduler">
+              {() => <SafeRoute><SocialScheduler /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/composite">
+              {() => <SafeRoute><CompositeChart /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/role-compatibility">
+              {() => <SafeRoute><RoleCompatibility /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/admin/crm">
+              {() => <SafeRoute><AdminCRM /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/admin/ads">
+              {() => <SafeRoute><AdminAds /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/crm-dashboard">
+              {() => <SafeRoute><CrmDashboard /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/pricing">
+              {() => <SafeRoute><Pricing /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/payment/success">
+              {() => <SafeRoute><PaymentSuccess /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/payment/cancel">
+              {() => <SafeRoute><PaymentCancel /></SafeRoute>}
+            </Route>
 
             {/* Referral landing pages */}
             <Route path="/:locale/refer/:code">
@@ -149,7 +209,12 @@ function LocaleRoutes() {
             </Route>
 
             {/* Shared charts (no locale prefix — public links) */}
-            <Route path="/shared/:token" component={SharedChart} />
+            <Route path="/embed/calculator">
+              {() => <SafeRoute><EmbedCalculator /></SafeRoute>}
+            </Route>
+            <Route path="/shared/:token">
+              {(params: any) => <SafeRoute><SharedChart token={params.token} /></SafeRoute>}
+            </Route>
             {/* Referral without locale prefix */}
             <Route path="/refer/:code">
               {(params: any) => {

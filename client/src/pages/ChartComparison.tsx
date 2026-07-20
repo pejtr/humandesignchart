@@ -1,4 +1,4 @@
-import { useState, useEffect, } from "react";
+import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Users, Zap, MapPin, Calendar, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSEO } from "@/hooks/useSEO";
 import type { HumanDesignChartData } from "@shared/types";
 
 interface ChartFormData {
@@ -120,21 +121,19 @@ export default function ChartComparison() {
   const [chartB, setChartB] = useState<HumanDesignChartData | null>(null);
   const { t, locale, localePath } = useLanguage();
 
-  useEffect(() => {
-    if (locale === "en") {
-      document.title = "🔗 Human Design Chart Comparison — Relationship Compatibility 💑";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Compare two Human Design charts side by side. Discover electromagnetic connections, shared channels, and relationship compatibility."
-      );
-    } else {
-      document.title = "🔗 Porovnání Human Design Map — Kompatibilita Vztahů 💑";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Porovnejte dvě Human Design mapy vedle sebe. Objevte elektromagnetická spojení, sdílené dráhy a kompatibilitu vztahů."
-      );
-    }
-  }, [locale]);
+  useSEO(locale === "en" ? {
+    title: "🔗 Human Design Chart Comparison — Relationship Compatibility 💑",
+    description: "Compare two Human Design charts side by side. Discover electromagnetic connections, shared channels, and relationship compatibility.",
+    keywords: "human design chart comparison, relationship compatibility, electromagnetic connections, bodygraph comparison, HD compatibility",
+    ogType: "website",
+    locale: "en_US",
+  } : {
+    title: "🔗 Porovnání Human Design Map — Kompatibilita Vztahů 💑",
+    description: "Porovnejte dvě Human Design mapy vedle sebe. Objevte elektromagnetická spojení, sdílené dráhy a kompatibilitu vztahů.",
+    keywords: "porovnání human design map, kompatibilita vztahů, elektromagnetická spojení, porovnání bodygraphu, HD kompatibilita",
+    ogType: "website",
+    locale: "cs_CZ",
+  });
 
   
   const calcA = trpc.chart.calculate.useMutation({

@@ -19,21 +19,7 @@ import type { HumanDesignChartData } from "@shared/types";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
-
-const CROSS_TYPE_CS: Record<string, string> = {
-  "Right Angle Cross": "Pravý Úhlový Kříž",
-  "Left Angle Cross": "Levý Úhlový Kříž",
-  "Juxtaposition Cross": "Juxtapoziční Kříž",
-};
-
-function translateCrossName(name: string, locale: string): string {
-  if (locale === "en") return name;
-  let result = name;
-  for (const [en, cz] of Object.entries(CROSS_TYPE_CS)) {
-    result = result.replace(en, cz);
-  }
-  return result;
-}
+import { translateCrossName } from "@/lib/hdConstants";
 
 // ─── Sacred Geometry Cross SVG Diagram ────────────────────────────────────────
 interface DiagramGate {
@@ -315,7 +301,7 @@ export default function IncarnationCross() {
       : "Discover the meaning of your Incarnation Cross in Human Design. Explore your 4 defining gates, life purpose themes, and get a personalized AI-generated reading of your unique cross.",
     ogImage: OG_IMAGES.calculator,
     ogUrl: isCs
-      ? "https://humandesignmapa.cz/cs/incarnation-cross"
+      ? "https://www.humandesignmapa.cz/cs/incarnation-cross"
       : "https://humandesignchart.app/en/incarnation-cross",
     locale: isCs ? "cs_CZ" : "en_US",
     keywords: isCs

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -9,6 +9,7 @@ import { Users, Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import TypeAuraIcon from "@/components/TypeAuraIcon";
+import { useSEO } from "@/hooks/useSEO";
 import type { HumanDesignChartData } from "@shared/types";
 
 const CELEBRITIES = [
@@ -45,21 +46,19 @@ export default function Celebrities() {
   const [chartData, setChartData] = useState<HumanDesignChartData | null>(null);
   const { t, locale, localePath } = useLanguage();
 
-  useEffect(() => {
-    if (locale === "en") {
-      document.title = "⭐ Human Design Celebrity Charts — Famous People's Blueprints 🌟";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Explore Human Design charts of famous people. See the type, profile, authority, and bodygraph of celebrities and historical figures."
-      );
-    } else {
-      document.title = "⭐ Human Design Mapy Celebrit — Slavné Osobnosti 🌟";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Prozkoumejte Human Design mapy známých osobností. Zjistěte typ, profil, autoritu a bodygraph celebrit a historických postav."
-      );
-    }
-  }, [locale]);
+  useSEO(locale === "en" ? {
+    title: "⭐ Human Design Celebrity Charts — Famous People's Blueprints 🌟",
+    description: "Explore Human Design charts of famous people. See the type, profile, authority, and bodygraph of celebrities and historical figures.",
+    keywords: "human design celebrities, famous people human design, celebrity bodygraph, albert einstein human design, oprah winfrey type",
+    ogType: "website",
+    locale: "en_US",
+  } : {
+    title: "⭐ Human Design Mapy Celebrit — Slavné Osobnosti 🌟",
+    description: "Prozkoumejte Human Design mapy známých osobností. Zjistěte typ, profil, autoritu a bodygraph celebrit a historických postav.",
+    keywords: "human design celebrity, slavné osobnosti human design, bodygraph celebrit, albert einstein human design, typ opery",
+    ogType: "website",
+    locale: "cs_CZ",
+  });
 
   const calcMutation = trpc.chart.calculate.useMutation({
     onSuccess: (data) => setChartData(data as unknown as HumanDesignChartData),

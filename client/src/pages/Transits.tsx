@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import Navbar from "@/components/Navbar";
@@ -11,13 +11,9 @@ import { Loader2, Star, RefreshCw, Globe, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
+import { PLANET_SYMBOLS } from "@/lib/hdConstants";
+import { useSEO } from "@/hooks/useSEO";
 import type { HumanDesignChartData } from "@shared/types";
-
-const PLANET_SYMBOLS: Record<string, string> = {
-  Sun: "☉", Earth: "⊕", Moon: "☽", "North Node": "☊", "South Node": "☋",
-  Mercury: "☿", Venus: "♀", Mars: "♂", Jupiter: "♃", Saturn: "♄",
-  Uranus: "♅", Neptune: "♆", Pluto: "♇",
-};
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -30,21 +26,19 @@ const fadeUp = {
 export default function Transits() {
   const { t, locale, localePath } = useLanguage();
 
-  useEffect(() => {
-    if (locale === "en") {
-      document.title = "🪐 Human Design Planetary Transits — Today's Active Gates 🌟";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "View current Human Design planetary transits. See which gates are active today and how they interact with your natal chart."
-      );
-    } else {
-      document.title = "🪐 Human Design Planetární Tranzity — Aktuální Brány 🌟";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Zobrazit aktuální Human Design planetární tranzity. Zjistěte, které brány jsou dnes aktivní a jak interagují s vaší natální mapou."
-      );
-    }
-  }, [locale]);
+  useSEO(locale === "en" ? {
+    title: "🪐 Human Design Planetary Transits — Today's Active Gates 🌟",
+    description: "View current Human Design planetary transits. See which gates are active today and how they interact with your natal chart.",
+    keywords: "human design transits, planetary transits, daily gates, bodygraph transits, HD transit calendar",
+    ogType: "website",
+    locale: "en_US",
+  } : {
+    title: "🪐 Human Design Planetární Tranzity — Aktuální Brány 🌟",
+    description: "Zobrazit aktuální Human Design planetární tranzity. Zjistěte, které brány jsou dnes aktivní a jak interagují s vaší natální mapou.",
+    keywords: "human design tranzity, planetární tranzity, denní brány, bodygraph tranzity, HD tranzitní kalendář",
+    ogType: "website",
+    locale: "cs_CZ",
+  });
 
   const { isAuthenticated } = useAuth();
   const [selectedChartId, setSelectedChartId] = useState<string>("none");

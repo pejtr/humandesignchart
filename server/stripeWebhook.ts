@@ -4,19 +4,18 @@
  */
 import Stripe from "stripe";
 import { Express, Request, Response } from "express";
-import { getUserByOpenId, updateUserSubscription, addAiReadingCredits, createGiftVoucher, getUserById, getUserByAffiliateCode, createAffiliateConversion, addCreditsWithLog, logCreditTransaction } from "./db";
+import { updateUserSubscription } from "./db";
 import { getDb } from "./db";
 import { users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { notifyOwner } from "./_core/notification";
 import { sendLeadOSEvent } from "./leados";
-
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+import { ENV } from "./_core/env";
+import { fulfillCreditsOrder, fulfillGiftVoucherOrder, fulfillLifetimeOrder, trackAffiliateCommission } from "./services/payment";
 
 export function getStripe(): Stripe | null {
-  if (!stripeSecretKey) return null;
-  return new Stripe(stripeSecretKey, { apiVersion: "2026-02-25.clover" });
+  if (!ENV.stripeSecretKey) return null;
+  return new Stripe(ENV.stripeSecretKey, { apiVersion: "2026-02-25.clover" });
 }
 
 /** Register the Stripe webhook route — MUST be before express.json() */
@@ -42,7 +41,7 @@ export function registerStripeWebhook(app: Express) {
       const stripe = getStripe();
       if (!stripe) {
         console.warn("[Stripe Webhook] Stripe not configured");
-        return res.status(200).json({ received: true });
+        return res.status(ENV.isProduction ? 503 : 200).json({ received: true, configured: false });
       }
 
       const sig = req.headers["stripe-signature"] as string;
@@ -51,8 +50,10 @@ export function registerStripeWebhook(app: Express) {
       let event: Stripe.Event;
 
       try {
-        if (webhookSecret && sig) {
-          event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
+        if (ENV.stripeWebhookSecret && sig) {
+          event = stripe.webhooks.constructEvent(rawBody, sig, ENV.stripeWebhookSecret);
+        } else if (ENV.isProduction) {
+          return res.status(400).send("Webhook signature verification is not configured");
         } else {
           // No webhook secret — parse body directly (dev/test only)
           event = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
@@ -122,60 +123,18 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
 
   const mode = session.mode;
   const plan = session.metadata?.plan;
+  const affiliateCode = session.metadata?.affiliate_code;
 
   if (mode === "subscription" && session.subscription) {
-    // Subscription purchase — handled by subscription.created event
-    const planLabel = session.metadata?.plan === "annual" ? "Roční Premium" : "Měsíční Premium";
+    const planLabel = plan === "annual" ? "Roční Premium" : "Měsíční Premium";
     const customerEmail = session.metadata?.customer_email || session.customer_email || "neznámý";
     const customerName = session.metadata?.customer_name || "nový zákazník";
 
-    // --- Affiliate commission tracking ---
-    const affiliateCode = session.metadata?.affiliate_code;
+    // Track affiliate commission
+    const amountCzk = session.amount_total ? session.amount_total / 100 : (plan === "annual" ? 888 : 88);
     if (affiliateCode) {
-      try {
-        const affiliate = await getUserByAffiliateCode(affiliateCode);
-        if (affiliate && affiliate.isAffiliate && affiliate.id !== userId) {
-          // Determine commission rate based on tier
-          const rateMap: Record<string, number> = { bronze: 0.20, silver: 0.22, gold: 0.25 };
-          const commissionRate = rateMap[affiliate.affiliateTier ?? "bronze"] ?? 0.20;
-          // Amount in CZK (from Stripe amount_total in haléře → CZK)
-          const amountCzk = session.amount_total ? session.amount_total / 100 : (session.metadata?.plan === "annual" ? 888 : 88);
-          const commissionAmount = Math.round(amountCzk * commissionRate * 100) / 100;
-
-          await createAffiliateConversion({
-            affiliateUserId: affiliate.id,
-            convertedUserId: userId,
-            stripeSubscriptionId: session.subscription as string || null,
-            amount: amountCzk,
-            commissionRate,
-            commissionAmount,
-            status: "pending",
-          });
-
-          // Log credit transaction for audit
-          await logCreditTransaction(affiliate.id, 0, "affiliate_commission", {
-            convertedUserId: userId,
-            commissionAmount,
-            commissionRate,
-            sessionId: session.id,
-          });
-
-          console.log(`[Stripe Webhook] Affiliate commission: ${commissionAmount} CZK (${commissionRate * 100}%) for affiliate ${affiliate.id} from user ${userId}`);
-
-          try {
-            await notifyOwner({
-              title: `🤝 Affiliate konverze: ${commissionAmount} CZK`,
-              content: `Affiliate ${affiliate.name || affiliate.id} (kód: ${affiliateCode}) získal provizi ${commissionAmount} CZK (${commissionRate * 100}%) za konverzi uživatele ${userId}.\nSesion: ${session.id}`,
-            });
-          } catch (e) {
-            console.warn("[Stripe Webhook] Failed to notify owner about affiliate conversion:", e);
-          }
-        }
-      } catch (e) {
-        console.error("[Stripe Webhook] Affiliate commission error:", e);
-      }
+      await trackAffiliateCommission(affiliateCode, userId, amountCzk, session.subscription as string);
     }
-    // --- End affiliate tracking ---
 
     try {
       await notifyOwner({
@@ -185,123 +144,37 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
     } catch (e) {
       console.warn("[Stripe Webhook] Failed to send owner notification:", e);
     }
-    // Fire subscription_upgraded event to LeadOS
     sendLeadOSEvent({
       event: "subscription_upgraded",
       data: {
         userId: userId ?? undefined,
         email: session.metadata?.customer_email || (session as any).customer_email || undefined,
         plan: "premium",
-        amount: session.amount_total ? session.amount_total / 100 : undefined,
+        amount: amountCzk,
         currency: session.currency?.toUpperCase() ?? "CZK",
         score: 100,
       },
     });
     console.log(`[Stripe Webhook] Subscription checkout completed for user ${userId}`);
   } else if (mode === "payment") {
-    // One-time payment: credits or gift voucher
     if (plan === "credits") {
-      await addAiReadingCredits(userId, 5);
-      const customerEmail = session.metadata?.customer_email || session.customer_email || "neznámý";
-      const customerName = session.metadata?.customer_name || "zákazník";
-      try {
-        await notifyOwner({
-          title: `💳 Nákup kreditů (5× AI výklad)`,
-          content: `${customerName} (${customerEmail}) zakoupil balíček 5 AI výkladů.\n\nUser ID: ${userId}\nČas: ${new Date().toLocaleString("cs-CZ")}`,
-        });
-      } catch (e) {
-        console.warn("[Stripe Webhook] Failed to send owner notification:", e);
-      }
-      console.log(`[Stripe Webhook] Added 5 credits to user ${userId}`);
+      await fulfillCreditsOrder(userId, 5, "Stripe");
     } else if (plan === "gift_monthly" || plan === "gift_annual") {
-      // Create gift voucher
-      const code = generateVoucherCode();
       const giftPlan = plan === "gift_monthly" ? "monthly" : "annual";
-      const expiresAt = new Date();
-      expiresAt.setFullYear(expiresAt.getFullYear() + 1); // Valid for 1 year
-
-      await createGiftVoucher({
-        code,
-        purchasedByUserId: userId,
-        recipientEmail: session.metadata?.recipient_email || null,
-        recipientName: session.metadata?.recipient_name || null,
-        senderName: session.metadata?.sender_name || null,
-        personalMessage: session.metadata?.personal_message || null,
+      await fulfillGiftVoucherOrder(userId, giftPlan, {
+        userId,
         plan: giftPlan,
-        creditsAmount: 0,
-        stripePaymentIntentId: session.payment_intent as string || null,
-        isRedeemed: 0,
-        expiresAt: expiresAt.toISOString(),
-      });
-      // Notify owner about gift voucher purchase
-      try {
-        const recipientEmail = session.metadata?.recipient_email || "neznámý";
-        const senderName = session.metadata?.sender_name || "zákazník";
-        await notifyOwner({
-          title: `🎁 Dárkový poukaz zakoupen (${giftPlan})`,
-          content: `${senderName} zakoupil dárkový poukaz pro ${recipientEmail}.\nKód: ${code}\nUser ID: ${userId}\nČas: ${new Date().toLocaleString("cs-CZ")}`,
-        });
-      } catch (e) {
-        console.warn("[Stripe Webhook] Failed to send owner notification:", e);
-      }
-      console.log(`[Stripe Webhook] Created gift voucher ${code} for user ${userId}`);
+        recipientEmail: session.metadata?.recipient_email,
+        recipientName: session.metadata?.recipient_name,
+        senderName: session.metadata?.sender_name,
+        personalMessage: session.metadata?.personal_message,
+      }, "Stripe");
     } else if (plan === "lifetime") {
-      // Lifetime subscription upgrade
-      await updateUserSubscription(userId, {
-        subscriptionStatus: "active",
-        subscriptionPlan: "lifetime" as any,
-        subscriptionCurrentPeriodEnd: null, // Never expires
-      });
-
-      // --- Affiliate commission tracking for lifetime ---
-      const affiliateCode = session.metadata?.affiliate_code;
+      const amountCzk = session.amount_total ? session.amount_total / 100 : 2888;
+      await fulfillLifetimeOrder(userId, amountCzk, session.payment_intent as string, "Stripe");
       if (affiliateCode) {
-        try {
-          const affiliate = await getUserByAffiliateCode(affiliateCode);
-          if (affiliate && affiliate.isAffiliate && affiliate.id !== userId) {
-            const rateMap: Record<string, number> = { bronze: 0.20, silver: 0.22, gold: 0.25 };
-            const commissionRate = rateMap[affiliate.affiliateTier ?? "bronze"] ?? 0.20;
-            const amountCzk = session.amount_total ? session.amount_total / 100 : 2888;
-            const commissionAmount = Math.round(amountCzk * commissionRate * 100) / 100;
-
-            await createAffiliateConversion({
-              affiliateUserId: affiliate.id,
-              convertedUserId: userId,
-              stripeSubscriptionId: session.payment_intent as string || null,
-              amount: amountCzk,
-              commissionRate,
-              commissionAmount,
-              status: "pending",
-            });
-
-            await logCreditTransaction(affiliate.id, 0, "affiliate_commission", {
-              convertedUserId: userId,
-              commissionAmount,
-              commissionRate,
-              sessionId: session.id,
-            });
-
-            try {
-              await notifyOwner({
-                title: `🤝 Affiliate konverze: ${commissionAmount} CZK (LIFETIME)`,
-                content: `Affiliate ${affiliate.name || affiliate.id} získal provizi ${commissionAmount} CZK za LIFETIME konverzi uživatele ${userId}.`,
-              });
-            } catch (e) { }
-          }
-        } catch (e) {
-          console.error("[Stripe Webhook] Affiliate commission error for lifetime:", e);
-        }
+        await trackAffiliateCommission(affiliateCode, userId, amountCzk, session.payment_intent as string);
       }
-
-      const customerEmail = session.metadata?.customer_email || session.customer_email || "neznámý";
-      const customerName = session.metadata?.customer_name || "zákazník";
-      try {
-        await notifyOwner({
-          title: `💎 Nové doživotní ocenění (LIFETIME)`,
-          content: `${customerName} (${customerEmail}) si zakoupil Doživotní přístup.\nUser ID: ${userId}`,
-        });
-      } catch (e) { }
-      console.log(`[Stripe Webhook] Upgraded user ${userId} to LIFETIME`);
     }
   }
 }
@@ -368,14 +241,4 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   console.log(`[Stripe Webhook] Payment failed for user ${user.id}`);
 }
 
-function generateVoucherCode(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "HD-";
-  for (let i = 0; i < 4; i++) {
-    for (let j = 0; j < 4; j++) {
-      code += chars[Math.floor(Math.random() * chars.length)];
-    }
-    if (i < 3) code += "-";
-  }
-  return code;
-}
+

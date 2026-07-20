@@ -6,8 +6,14 @@ import crypto from "crypto";
 export const shareRouter = router({
     createLink: publicProcedure
         .input(z.object({
-            chartData: z.any(),
-            ownerName: z.string().optional(),
+            chartData: z.unknown().refine((value) => {
+                try {
+                    return JSON.stringify(value).length <= 250_000;
+                } catch {
+                    return false;
+                }
+            }, "Chart data is too large"),
+            ownerName: z.string().trim().max(255).optional(),
         }))
         .mutation(async ({ input }) => {
             const token = crypto.randomBytes(16).toString("hex");

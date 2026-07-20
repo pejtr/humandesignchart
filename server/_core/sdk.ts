@@ -129,10 +129,15 @@ class SDKServer {
       throw ForbiddenError("User not found");
     }
 
-    await db.upsertUser({
-      openId: user.openId,
-      lastSignedIn: new Date().toISOString().slice(0, 19).replace('T', ' '),
-    });
+    // Debounced lastSignedIn update — only write if >5 min since last update
+    const lastSignedIn = user.lastSignedIn ? new Date(user.lastSignedIn).getTime() : 0;
+    const fiveMinAgo = Date.now() - 5 * 60 * 1000;
+    if (lastSignedIn < fiveMinAgo) {
+      await db.upsertUser({
+        openId: user.openId,
+        lastSignedIn: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      }).catch(() => { /* non-critical, best-effort */ });
+    }
 
     return user;
   }

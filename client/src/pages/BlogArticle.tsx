@@ -1,12 +1,13 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useParams, useLocation, Link } from "wouter";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
+import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import {
   ArrowLeft, Clock, Calendar, Compass, ArrowRight, BookOpen, Tag,
   Share2, Link2, Check,
@@ -46,7 +47,7 @@ function renderMarkdown(md: string): string {
 // ─── Social Share Buttons Component ──────────────────────────────────────────
 function ShareButtons({ article, isEn, locale }: { article: { slug: string; title: string; excerpt: string }; isEn: boolean; locale: string }) {
   const [copied, setCopied] = useState(false);
-  const baseUrl = locale === 'en' ? 'https://humandesignchart.app' : 'https://humandesignmapa.cz';
+  const baseUrl = locale === 'en' ? 'https://www.humandesignchart.app' : 'https://www.humandesignmapa.cz';
   const articleUrl = `${baseUrl}/blog/${article.slug}`;
   const shareText = `${article.title} — ${article.excerpt.slice(0, 100)}...`;
 
@@ -116,128 +117,80 @@ export default function BlogArticle() {
   // Also fetch article list for "related articles" sidebar
   const { data: listData } = trpc.content.blogList.useQuery({ locale });
 
-  // Helper to upsert a <meta> tag
-  function setMeta(selector: string, attr: string, value: string) {
-    let el = document.querySelector(selector);
-    if (el) {
-      el.setAttribute(attr, value);
-    } else {
-      el = document.createElement("meta");
-      const parts = selector.match(/\[([^=]+)=["']([^"']+)["']\]/);
-      if (parts) {
-        el.setAttribute(parts[1], parts[2]);
-      }
-      el.setAttribute(attr, value);
-      el.setAttribute("data-blog-meta", "true");
-      document.head.appendChild(el);
-    }
-  }
+  const articleSlug = article?.slug || slug;
+  const csBase = "https://www.humandesignmapa.cz";
+  const enBase = "https://www.humandesignchart.app";
+  const articleUrl = `https://${locale === 'cs' ? csBase : enBase}/${locale}/blog/${articleSlug}`;
 
-  useEffect(() => {
-    if (article) {
-      const articleUrl = `https://${locale === 'cs' ? 'humandesignmapa.cz' : 'humandesignchart.app'}/${locale}/blog/${article.slug}`;
-      document.title = article.metaTitle;
-
-      // Standard meta
-      setMeta('meta[name="description"]', "content", article.metaDescription);
-
-      // Open Graph meta tags
-      setMeta('meta[property="og:title"]', "content", article.metaTitle);
-      setMeta('meta[property="og:description"]', "content", article.metaDescription);
-      setMeta('meta[property="og:type"]', "content", "article");
-      setMeta('meta[property="og:url"]', "content", articleUrl);
-      setMeta('meta[property="og:locale"]', "content", locale === 'cs' ? 'cs_CZ' : 'en_US');
-      if (article.coverImage) {
-        setMeta('meta[property="og:image"]', "content", article.coverImage);
-        setMeta('meta[property="og:image:width"]', "content", "1200");
-        setMeta('meta[property="og:image:height"]', "content", "630");
-        setMeta('meta[property="og:image:alt"]', "content", article.title);
-        setMeta('meta[property="og:site_name"]', "content", "Human Design Mapa");
-      }
-
-      // Twitter Card
-      setMeta('meta[name="twitter:card"]', "content", "summary_large_image");
-      setMeta('meta[name="twitter:title"]', "content", article.metaTitle);
-      setMeta('meta[name="twitter:description"]', "content", article.metaDescription);
-      if (article.coverImage) {
-        setMeta('meta[name="twitter:image"]', "content", article.coverImage);
-      }
-
-      // Canonical URL
-      let canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) {
-        canonical.setAttribute("href", articleUrl);
-      } else {
-        canonical = document.createElement("link");
-        canonical.setAttribute("rel", "canonical");
-        canonical.setAttribute("href", articleUrl);
-        canonical.setAttribute("data-blog-meta", "true");
-        document.head.appendChild(canonical);
-      }
-      let jsonLd = document.querySelector('script[data-blog-jsonld]');
-      if (!jsonLd) {
-        jsonLd = document.createElement("script");
-        jsonLd.setAttribute("type", "application/ld+json");
-        jsonLd.setAttribute("data-blog-jsonld", "true");
-        document.head.appendChild(jsonLd);
-      }
-      const wordCount = article.content ? article.content.split(/\s+/).length : 0;
-      const structuredData = [
-        {
-          "@context": "https://schema.org",
-          "@type": "Article",
-          headline: article.title,
-          description: article.metaDescription,
-          datePublished: article.publishedAt,
-          dateModified: article.updatedAt,
-          inLanguage: locale === 'cs' ? 'cs-CZ' : 'en-US',
-          wordCount,
-          keywords: article.tags?.join(', ') ?? '',
-          author: {
-            "@type": "Organization",
-            name: "Human Design Chart",
-            url: locale === 'cs' ? "https://humandesignmapa.cz" : "https://humandesignchart.app",
-          },
-          publisher: {
-            "@type": "Organization",
-            name: locale === 'cs' ? "Human Design Mapa" : "Human Design Chart",
-            url: locale === 'cs' ? "https://humandesignmapa.cz" : "https://humandesignchart.app",
-            logo: {
-              "@type": "ImageObject",
-              url: locale === 'cs' ? "https://humandesignmapa.cz/favicon.ico" : "https://humandesignchart.app/favicon.ico",
-            },
-          },
-          ...(article.coverImage ? {
-            image: {
-              "@type": "ImageObject",
-              url: article.coverImage,
-              width: 800,
-              height: 450,
-            },
-          } : {}),
-          mainEntityOfPage: {
-            "@type": "WebPage",
-            "@id": articleUrl,
-          },
-          url: articleUrl,
+  useSEO(article ? {
+    title: article.metaTitle,
+    description: article.metaDescription,
+    ogImage: article.coverImage || OG_IMAGES.blog,
+    ogType: "article",
+    ogUrl: articleUrl,
+    locale: locale === 'cs' ? 'cs_CZ' : 'en_US',
+    keywords: article.tags?.join(', ') ?? '',
+    articlePublishedTime: article.publishedAt,
+    articleModifiedTime: article.updatedAt,
+    twitterCreator: "@humandesignmapa",
+    alternateLocales: [
+      { lang: 'cs', url: `${csBase}/cs/blog/${articleSlug}` },
+      { lang: 'en', url: `${enBase}/en/blog/${articleSlug}` },
+    ],
+    jsonLd: [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: article.title,
+        description: article.metaDescription,
+        datePublished: article.publishedAt,
+        dateModified: article.updatedAt,
+        inLanguage: locale === 'cs' ? 'cs-CZ' : 'en-US',
+        wordCount: article.content ? article.content.split(/\s+/).length : 0,
+        keywords: article.tags?.join(', ') ?? '',
+        author: {
+          "@type": "Organization",
+          name: "Human Design Chart",
+          url: locale === 'cs' ? "https://www.humandesignmapa.cz" : "https://www.humandesignchart.app",
         },
-        {
-          "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: `https://${locale === 'cs' ? 'humandesignmapa.cz' : 'humandesignchart.app'}/${locale}` },
-            { "@type": "ListItem", position: 2, name: locale === 'cs' ? 'Blog' : 'Blog', item: `https://${locale === 'cs' ? 'humandesignmapa.cz' : 'humandesignchart.app'}/${locale}/blog` },
-            { "@type": "ListItem", position: 3, name: article.title, item: articleUrl },
-          ],
+        publisher: {
+          "@type": "Organization",
+          name: locale === 'cs' ? "Human Design Mapa" : "Human Design Chart",
+          url: locale === 'cs' ? "https://www.humandesignmapa.cz" : "https://www.humandesignchart.app",
+          logo: {
+            "@type": "ImageObject",
+            url: locale === 'cs' ? "https://www.humandesignmapa.cz/favicon.ico" : "https://www.humandesignchart.app/favicon.ico",
+          },
         },
-      ];
-      jsonLd.textContent = JSON.stringify(structuredData);
-    }
-    return () => {
-      const el = document.querySelector('script[data-blog-jsonld]');
-      if (el) el.remove();
-    };
-  }, [article, locale]);
+        ...(article.coverImage ? {
+          image: {
+            "@type": "ImageObject",
+            url: article.coverImage,
+            width: 800,
+            height: 450,
+          },
+        } : {}),
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": articleUrl,
+        },
+        url: articleUrl,
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: `https://${locale === 'cs' ? 'www.humandesignmapa.cz' : 'www.humandesignchart.app'}/${locale}` },
+          { "@type": "ListItem", position: 2, name: locale === 'cs' ? 'Blog' : 'Blog', item: `https://${locale === 'cs' ? 'www.humandesignmapa.cz' : 'www.humandesignchart.app'}/${locale}/blog` },
+          { "@type": "ListItem", position: 3, name: article.title, item: articleUrl },
+        ],
+      },
+    ],
+  } : {
+    title: isEn ? "Blog — Human Design Articles & Guides" : "Blog — Human Design Články & Průvodce",
+    description: isEn ? "Read expert articles about Human Design: types, profiles, gates, channels, relationships and more." : "Čtěte odborné články o Human Design: typy, profily, brány, dráhy, vztahy a další.",
+    ogType: "website",
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);

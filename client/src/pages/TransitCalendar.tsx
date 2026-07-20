@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
 import { trpc } from "@/lib/trpc";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, ChevronLeft, ChevronRight, Sun, Moon, Sparkles, ArrowRight } from "lucide-react";
+import { useSEO } from "@/hooks/useSEO";
 
 
 const PLANET_NAMES_CS: Record<string, string> = {
@@ -52,21 +53,19 @@ export default function TransitCalendar() {
 
   const isLoadingContent = false;
 
-  useEffect(() => {
-    if (locale === "en") {
-      document.title = "📅 Human Design Transit Calendar — Daily & Weekly Overview 🌙";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Plan with the Human Design transit calendar. See daily and weekly gate activations and their influence on your energy."
-      );
-    } else {
-      document.title = "📅 Human Design Tranzitní Kalendář — Denní & Týdenní Přehled 🌙";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Plánujte s Human Design tranzitním kalendářem. Sledujte denní a týdenní aktivace brán a jejich vliv na vaši energii."
-      );
-    }
-  }, [locale]);
+  useSEO(locale === "en" ? {
+    title: "📅 Human Design Transit Calendar — Daily & Weekly Overview 🌙",
+    description: "Plan with the Human Design transit calendar. See daily and weekly gate activations and their influence on your energy.",
+    keywords: "human design transit calendar, daily transit, weekly transit, gate activations, HD calendar",
+    ogType: "website",
+    locale: "en_US",
+  } : {
+    title: "📅 Human Design Tranzitní Kalendář — Denní & Týdenní Přehled 🌙",
+    description: "Plánujte s Human Design tranzitním kalendářem. Sledujte denní a týdenní aktivace brán a jejich vliv na vaši energii.",
+    keywords: "human design tranzitní kalendář, denní tranzit, týdenní tranzit, aktivace bran, HD kalendář",
+    ogType: "website",
+    locale: "cs_CZ",
+  });
 
   const transitQuery = trpc.transit.current.useQuery(undefined, {
     refetchInterval: 60000,

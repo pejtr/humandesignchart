@@ -24,31 +24,31 @@ class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex items-center justify-center min-h-screen p-8 bg-background">
-          <div className="flex flex-col items-center w-full max-w-2xl p-8">
+        <div className="flex items-center justify-center min-h-[50vh] p-8">
+          <div className="flex flex-col items-center w-full max-w-lg p-8">
             <AlertTriangle
-              size={48}
-              className="text-destructive mb-6 flex-shrink-0"
+              size={40}
+              className="text-destructive mb-4 flex-shrink-0"
             />
-
-            <h2 className="text-xl mb-4">An unexpected error occurred.</h2>
-
-            <div className="p-4 w-full rounded bg-muted overflow-auto mb-6">
-              <pre className="text-sm text-muted-foreground whitespace-break-spaces">
-                {this.state.error?.stack}
+            <h2 className="text-lg font-semibold mb-2">Došlo k neočekávané chybě</h2>
+            <p className="text-sm text-muted-foreground mb-4 text-center">
+              Tato část aplikace selhala. Zkuste stránku obnovit.
+            </p>
+            <div className="p-3 w-full rounded bg-muted overflow-auto mb-4 max-h-32">
+              <pre className="text-xs text-muted-foreground whitespace-break-spaces">
+                {this.state.error?.message}
               </pre>
             </div>
-
             <button
               onClick={() => window.location.reload()}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg",
+                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm",
                 "bg-primary text-primary-foreground",
                 "hover:opacity-90 cursor-pointer"
               )}
             >
-              <RotateCcw size={16} />
-              Reload Page
+              <RotateCcw size={14} />
+              Obnovit stránku
             </button>
           </div>
         </div>

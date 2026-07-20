@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sun, Moon, LogIn, Loader2, RotateCcw, Info } from "lucide-react";
 import Bodygraph from "@/components/Bodygraph";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSEO } from "@/hooks/useSEO";
 
 type ReturnType = "solar" | "saturn" | "chiron" | "uranus";
 
@@ -19,21 +20,19 @@ export default function ReturnChart() {
   const { isAuthenticated } = useAuth();
   const { t, locale } = useLanguage();
 
-  useEffect(() => {
-    if (locale === "en") {
-      document.title = "🌀 Human Design Return Charts — Solar, Saturn & Chiron 🪐";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Calculate your Human Design Solar Return, Saturn Return, and Chiron Return charts. Discover how planetary cycles shape your life."
-      );
-    } else {
-      document.title = "🌀 Human Design Return Charty — Solární, Saturnův & Chironův 🪐";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Vypočítejte svůj Human Design Solární Return, Saturnův Return a Chironův Return. Zjistěte, jak planetární cykly formují váš život."
-      );
-    }
-  }, [locale]);
+  useSEO(locale === "en" ? {
+    title: "🌀 Human Design Return Charts — Solar, Saturn & Chiron 🪐",
+    description: "Calculate your Human Design Solar Return, Saturn Return, and Chiron Return charts. Discover how planetary cycles shape your life.",
+    keywords: "human design return charts, solar return, saturn return, chiron return, planetary cycles",
+    ogType: "website",
+    locale: "en_US",
+  } : {
+    title: "🌀 Human Design Return Charty — Solární, Saturnův & Chironův 🪐",
+    description: "Vypočítejte svůj Human Design Solární Return, Saturnův Return a Chironův Return. Zjistěte, jak planetární cykly formují váš život.",
+    keywords: "human design return charty, solární return, saturnův return, chironův return, planetární cykly",
+    ogType: "website",
+    locale: "cs_CZ",
+  });
 
   const [selectedChartId, setSelectedChartId] = useState<string>("");
   const [returnType, setReturnType] = useState<ReturnType>("solar");

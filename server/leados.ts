@@ -303,12 +303,12 @@ export async function syncUserAsLead(user: {
           <p>Ahoj${user.name ? ` ${user.name}` : ""},</p>
           <p>Právě jsi se zaregistroval/a do Human Design Mapy — systému sebepoznání, který ti ukáže, jak funguje tvá energie a jaké je tvé životní poslání.</p>
           <p><strong>Jako uvítací dárek máš 1 bezplatný AI výklad zdarma.</strong></p>
-          <p>Začni výpočtem své mapy na <a href="https://humandesignmapa.cz">humandesignmapa.cz</a></p>
+          <p>Začni výpočtem své mapy na <a href="https://www.humandesignmapa.cz">www.humandesignmapa.cz</a></p>
           <hr style="border: 1px solid #e5e7eb; margin: 24px 0;" />
-          <p style="color: #6b7280; font-size: 14px;">Human Design Mapa · humandesignmapa.cz</p>
+          <p style="color: #6b7280; font-size: 14px;">Human Design Mapa · www.humandesignmapa.cz</p>
         </div>
       `,
-      text: `Vítej v Human Design Mapě! Jako uvítací dárek máš 1 bezplatný AI výklad. Začni na humandesignmapa.cz`,
+      text: `Vítej v Human Design Mapě! Jako uvítací dárek máš 1 bezplatný AI výklad. Začni na www.humandesignmapa.cz`,
     });
   } catch (err) {
     // Non-critical — log but don't throw

@@ -30,14 +30,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SacredGeometry } from "@/components/SacredGeometry";
-
-const typeColors: Record<string, string> = {
-  Manifestor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  Generator: "bg-amber-50 text-amber-700 border-amber-200",
-  "Manifesting Generator": "bg-orange-50 text-orange-700 border-orange-200",
-  Projector: "bg-violet-50 text-violet-700 border-violet-200",
-  Reflector: "bg-slate-100 text-slate-700 border-slate-200",
-};
+import { TYPE_COLORS, PLANET_SYMBOLS, PLANET_COLORS } from "@/lib/hdConstants";
 
 const categoryIcons: Record<string, typeof Users> = {
   self: Star,
@@ -427,7 +420,7 @@ export default function Dashboard() {
                             {data && (
                               <div className="space-y-2">
                                 <div className="flex flex-wrap gap-1.5">
-                                  <Badge className={typeColors[data.type] || "bg-primary/20 text-primary"}>
+                                  <Badge className={TYPE_COLORS[data.type] || "bg-primary/20 text-primary"}>
                                     {czType}
                                   </Badge>
                                   <Badge variant="outline" className="text-xs">{data.profile}</Badge>
@@ -798,19 +791,6 @@ function DailyTransitWidget({ charts }: { charts: Array<{ id: number; name: stri
   );
 
   const transit = transitQuery.data;
-
-  const PLANET_SYMBOLS: Record<string, string> = {
-    Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
-    Jupiter: "♃", Saturn: "♄", Uranus: "⛢", Neptune: "♆", Pluto: "♇",
-    "North Node": "☊", "South Node": "☋",
-  };
-
-  const PLANET_COLORS: Record<string, string> = {
-    Sun: "text-amber-500", Moon: "text-slate-400", Mercury: "text-cyan-500",
-    Venus: "text-pink-400", Mars: "text-red-500", Jupiter: "text-orange-400",
-    Saturn: "text-stone-500", Uranus: "text-teal-400", Neptune: "text-indigo-400",
-    Pluto: "text-purple-500", "North Node": "text-emerald-500", "South Node": "text-rose-400",
-  };
 
   if (charts.length === 0) {
     return (

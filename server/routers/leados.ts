@@ -4,7 +4,7 @@
  */
 
 import { z } from "zod";
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, adminProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import {
   getLeads,
@@ -21,14 +21,6 @@ import {
 import { getDb } from "../db";
 import { users, charts } from "../../drizzle/schema";
 import { inArray } from "drizzle-orm";
-
-// Admin guard middleware
-const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.user.role !== "admin") {
-    throw new TRPCError({ code: "FORBIDDEN", message: "Admin only" });
-  }
-  return next({ ctx });
-});
 
 export const leadosRouter = router({
   // ── Analytics ─────────────────────────────────────────────────────────────

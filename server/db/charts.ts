@@ -1,4 +1,4 @@
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { charts, InsertChart, sharedCharts, InsertSharedChart } from "../../drizzle/schema";
 import { getDb } from "./index";
 
@@ -64,6 +64,6 @@ export async function getSharedChart(token: string) {
 export async function countTotalCharts(): Promise<number> {
     const db = await getDb();
     if (!db) return 0;
-    const result = await db.select().from(charts);
-    return result.length;
+    const result = await db.select({ count: sql<number>`count(*)` }).from(charts);
+    return result[0]?.count ?? 0;
 }

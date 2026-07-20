@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Streamdown } from "streamdown";
 import { Link } from "wouter";
+import { useSEO } from "@/hooks/useSEO";
 
 type Message = {
   id: string;
@@ -268,91 +269,45 @@ export default function AiGuide() {
   const { locale, localePath } = useLanguage();
   const isEn = locale === 'en';
 
-  useEffect(() => {
-    const title = isEn
-      ? 'AI Human Design Guide — Chat with Your Personal HD Assistant'
-      : 'AI Průvodce Human Design — Chat s Vaším Osobním HD Asistentem';
-    const description = isEn
-      ? 'Chat with your personal AI Human Design guide. Ask questions about your type, strategy, authority, profile, and get instant personalized answers based on your unique chart.'
-      : 'Chatujte s vaším osobním AI průvodcem Human Design. Ptejte se na váš typ, strategii, autoritu, profil a získejte okamžité personalizované odpovědi na základě vaší jedinečné mapy.';
-    const pageUrl = isEn
-      ? 'https://humandesignchart.app/en/ai-guide'
-      : 'https://humandesignmapa.cz/cs/ai-guide';
-    const ogImage = '/images/og-ai-guide_b44c2f20.webp';
-
-    document.title = title;
-
-    // Helper to upsert a meta tag
-    const setMeta = (selector: string, attr: string, value: string) => {
-      let el = document.querySelector(selector);
-      if (el) {
-        el.setAttribute(attr, value);
-      } else {
-        el = document.createElement('meta');
-        const parts = selector.match(/\[([^=]+)=["']([^"']+)["']\]/);
-        if (parts) el.setAttribute(parts[1], parts[2]);
-        el.setAttribute(attr, value);
-        el.setAttribute('data-page-meta', 'ai-guide');
-        document.head.appendChild(el);
-      }
-    };
-
-    setMeta('meta[name="description"]', 'content', description);
-    setMeta('meta[property="og:title"]', 'content', title);
-    setMeta('meta[property="og:description"]', 'content', description);
-    setMeta('meta[property="og:type"]', 'content', 'website');
-    setMeta('meta[property="og:url"]', 'content', pageUrl);
-    setMeta('meta[property="og:image"]', 'content', ogImage);
-    setMeta('meta[property="og:image:width"]', 'content', '1200');
-    setMeta('meta[property="og:image:height"]', 'content', '630');
-    setMeta('meta[property="og:locale"]', 'content', isEn ? 'en_US' : 'cs_CZ');
-    setMeta('meta[name="twitter:card"]', 'content', 'summary_large_image');
-    setMeta('meta[name="twitter:title"]', 'content', title);
-    setMeta('meta[name="twitter:description"]', 'content', description);
-    setMeta('meta[name="twitter:image"]', 'content', ogImage);
-
-    // Canonical URL
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (canonical) {
-      canonical.setAttribute('href', pageUrl);
-    } else {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      canonical.setAttribute('href', pageUrl);
-      canonical.setAttribute('data-page-meta', 'ai-guide');
-      document.head.appendChild(canonical);
-    }
-
-    // JSON-LD structured data
-    let jsonLd = document.querySelector('script[data-page-jsonld="ai-guide"]');
-    if (!jsonLd) {
-      jsonLd = document.createElement('script');
-      jsonLd.setAttribute('type', 'application/ld+json');
-      jsonLd.setAttribute('data-page-jsonld', 'ai-guide');
-      document.head.appendChild(jsonLd);
-    }
-    jsonLd.textContent = JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'WebApplication',
-      name: title,
-      description,
-      url: pageUrl,
+  useSEO(isEn ? {
+    title: 'AI Human Design Guide — Chat with Your Personal HD Assistant',
+    description: 'Chat with your personal AI Human Design guide. Ask questions about your type, strategy, authority, profile, and get instant personalized answers based on your unique chart.',
+    keywords: 'human design ai guide, ai human design assistant, personal HD chat, human design questions, AI bodygraph analysis',
+    ogImage: '/images/og-ai-guide_b44c2f20.webp',
+    ogUrl: 'https://humandesignchart.app/en/ai-guide',
+    ogType: "website",
+    locale: "en_US",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: 'AI Human Design Guide — Chat with Your Personal HD Assistant',
+      description: 'Chat with your personal AI Human Design guide. Ask questions about your type, strategy, authority, profile, and get instant personalized answers based on your unique chart.',
+      url: 'https://humandesignchart.app/en/ai-guide',
       applicationCategory: 'LifestyleApplication',
-      inLanguage: isEn ? 'en-US' : 'cs-CZ',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-      provider: {
-        '@type': 'Organization',
-        name: 'Human Design Chart',
-        url: isEn ? 'https://humandesignchart.app' : 'https://humandesignmapa.cz',
-      },
-    });
-
-    return () => {
-      document.title = isEn ? 'Free Human Design Chart Calculator & AI Reading' : 'Human Design Mapa Zdarma — Kalkulačka a AI Výklad';
-      document.querySelectorAll('[data-page-meta="ai-guide"]').forEach(el => el.remove());
-      document.querySelector('script[data-page-jsonld="ai-guide"]')?.remove();
-    };
-  }, [isEn]);
+      inLanguage: 'en-US',
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      provider: { "@type": "Organization", name: "Human Design Chart", url: "https://www.humandesignchart.app" },
+    },
+  } : {
+    title: 'AI Průvodce Human Design — Chat s Vaším Osobním HD Asistentem',
+    description: 'Chatujte s vaším osobním AI průvodcem Human Design. Ptejte se na váš typ, strategii, autoritu, profil a získejte okamžité personalizované odpovědi na základě vaší jedinečné mapy.',
+    keywords: 'human design ai průvodce, ai human design asistent, osobní HD chat, otázky human design, AI analýza bodygraphu',
+    ogImage: '/images/og-ai-guide_b44c2f20.webp',
+    ogUrl: 'https://www.humandesignmapa.cz/cs/ai-guide',
+    ogType: "website",
+    locale: "cs_CZ",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: 'AI Průvodce Human Design — Chat s Vaším Osobním HD Asistentem',
+      description: 'Chatujte s vaším osobním AI průvodcem Human Design. Ptejte se na váš typ, strategii, autoritu, profil a získejte okamžité personalizované odpovědi na základě vaší jedinečné mapy.',
+      url: 'https://www.humandesignmapa.cz/cs/ai-guide',
+      applicationCategory: 'LifestyleApplication',
+      inLanguage: 'cs-CZ',
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      provider: { "@type": "Organization", name: "Human Design Mapa", url: "https://www.humandesignmapa.cz" },
+    },
+  });
 
   const SUGGESTED_QUESTIONS = isEn ? [
     "What is my daily transit today?",

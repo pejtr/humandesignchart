@@ -25,6 +25,7 @@ import {
   User, Users, Heart, Briefcase, UserCheck, HelpCircle, GitCompare,
 } from "lucide-react";
 import { generateChartPDF } from "@/lib/pdfExport";
+import { PLANET_SYMBOLS, TYPE_COLORS, translateCrossName } from "@/lib/hdConstants";
 import type { HumanDesignChartData } from "@shared/types";
 import OnboardingModal, { useOnboarding } from "@/components/OnboardingModal";
 import PremiumPaywall from "@/components/PremiumPaywall";
@@ -69,35 +70,8 @@ function ShareReadingButton({ readingId }: { readingId: number }) {
   );
 }
 
-// Czech cross type translations
-const CROSS_TYPE_CS: Record<string, string> = {
-  "Right Angle Cross": "Pravý Úhlový Kříž",
-  "Left Angle Cross": "Levý Úhlový Kříž",
-  "Juxtaposition Cross": "Juxtapoziční Kříž",
-};
-
-function translateCrossName(name: string, locale?: string): string {
-  if (locale === "en") return name;
-  let result = name;
-  for (const [en, cz] of Object.entries(CROSS_TYPE_CS)) {
-    result = result.replace(en, cz);
-  }
-  return result;
-}
-
-const PLANET_SYMBOLS: Record<string, string> = {
-  Sun: "☉", Earth: "⊕", Moon: "☽", "North Node": "☊", "South Node": "☋",
-  Mercury: "☿", Venus: "♀", Mars: "♂", Jupiter: "♃", Saturn: "♄",
-  Uranus: "♅", Neptune: "♆", Pluto: "♇",
-};
-
-const TYPE_COLORS: Record<string, string> = {
-  Manifestor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  Generator: "bg-amber-50 text-amber-700 border-amber-200",
-  "Manifesting Generator": "bg-orange-50 text-orange-700 border-orange-200",
-  Projector: "bg-violet-50 text-violet-700 border-violet-200",
-  Reflector: "bg-slate-100 text-slate-700 border-slate-200",
-};
+// Czech cross type translations — now imported from shared constants
+// translateCrossName, PLANET_SYMBOLS, TYPE_COLORS are imported above
 
 interface DetailModalState {
   type: "gate" | "channel" | "center" | "type" | "profile" | "authority" | null;

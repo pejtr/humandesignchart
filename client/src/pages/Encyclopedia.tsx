@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/Navbar";
@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Search, BookOpen, Zap, Circle, ArrowRight, Sparkles, Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { useSEO } from "@/hooks/useSEO";
 
 // Czech gate names
 const GATE_NAMES_CS: Record<number, string> = {
@@ -64,21 +65,19 @@ export default function Encyclopedia() {
   const hdContentQuery = trpc.content.getHdContent.useQuery();
   const hdData = hdContentQuery.data;
 
-  useEffect(() => {
-    if (isEN) {
-      document.title = "📖 Human Design Encyclopedia — Gates, Channels & Centers 🔮";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Browse all 64 gates, 36 channels, and 9 centers of Human Design. Detailed descriptions, I Ching hexagrams, and circuit information."
-      );
-    } else {
-      document.title = "📖 Human Design Encyklopedie — Brány, Dráhy & Centra 🔮";
-      document.querySelector('meta[name="description"]')?.setAttribute(
-        "content",
-        "Prozkoumejte všech 64 brán, 36 dráh a 9 center Human Design. Podrobné popisy, I-Ťing hexagramy a informace o okruzích."
-      );
-    }
-  }, [locale, isEN]);
+  useSEO(isEN ? {
+    title: "📖 Human Design Encyclopedia — Gates, Channels & Centers 🔮",
+    description: "Browse all 64 gates, 36 channels, and 9 centers of Human Design. Detailed descriptions, I Ching hexagrams, and circuit information.",
+    keywords: "human design encyclopedia, gates, channels, centers, 64 gates, 36 channels, 9 centers, HD reference",
+    ogType: "website",
+    locale: "en_US",
+  } : {
+    title: "📖 Human Design Encyklopedie — Brány, Dráhy & Centra 🔮",
+    description: "Prozkoumejte všech 64 brán, 36 dráh a 9 center Human Design. Podrobné popisy, I-Ťing hexagramy a informace o okruzích.",
+    keywords: "human design encyklopedie, brány, dráhy, centra, 64 bran, 36 drah, 9 center, HD reference",
+    ogType: "website",
+    locale: "cs_CZ",
+  });
   const circuitNames = isEN ? CIRCUIT_NAMES_EN : CIRCUIT_NAMES_CS;
 
   const [search, setSearch] = useState("");

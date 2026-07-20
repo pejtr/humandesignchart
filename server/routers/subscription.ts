@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
-import { countAiReadingsByUserToday, updateUserSubscription, getUserById } from "../db";
+import { countAiReadingsByUserToday, updateUserSubscription } from "../db";
 import { getStripe } from "../stripeWebhook";
 import { isPremiumUser, canGenerateAiReading, FREE_TIER } from "../stripeProducts";
 import { ENV } from "../_core/env";
@@ -10,7 +10,6 @@ export const subscriptionRouter = router({
         const user = ctx.user;
         const totalReadings = await countAiReadingsByUserToday(user.id);
         const premium = isPremiumUser(user);
-        const isOwner = !!ENV.ownerOpenId && user.openId === ENV.ownerOpenId;
         return {
             isPremium: premium,
             plan: user.subscriptionPlan,
@@ -20,10 +19,9 @@ export const subscriptionRouter = router({
             totalReadings,
             freeReadingsLeft: premium ? null : Math.max(0, FREE_TIER.AI_READINGS_LIMIT - totalReadings),
             canGenerateReading: canGenerateAiReading(user, totalReadings).allowed,
-            isOwner,
+            isOwner: !!ENV.ownerOpenId && user.openId === ENV.ownerOpenId,
         };
     }),
-
     createCheckout: protectedProcedure
         .input(z.object({
             plan: z.enum(["monthly", "annual", "lifetime", "credits", "gift_monthly", "gift_annual"]),
@@ -37,51 +35,65 @@ export const subscriptionRouter = router({
         .mutation(async ({ ctx, input }) => {
             const stripe = getStripe();
             if (!stripe) throw new Error("Stripe not configured");
-
             const user = ctx.user;
             const isGift = input.plan.startsWith("gift_");
             const isSubscription = input.plan === "monthly" || input.plan === "annual";
             const isCzech = input.locale === "cs";
-
             let customerId = user.stripeCustomerId;
             if (!customerId) {
-                const customer = await stripe.customers.create({
-                    email: user.email || undefined,
-                    name: user.name || undefined,
-                    metadata: { user_id: user.id.toString() },
-                });
+                const customer = await stripe.customers.create({ email: user.email || undefined, name: user.name || undefined, metadata: { user_id: user.id.toString() } });
                 customerId = customer.id;
                 await updateUserSubscription(user.id, { stripeCustomerId: customerId });
             }
-
             const priceData = {
-                monthly: { czk: 18800, eur: 749, name: "Human Design Premium — Měsíční" },
-                annual: { czk: 118800, eur: 4700, name: "Human Design Premium — Roční" },
-                lifetime: { czk: 288800, eur: 11500, name: "Human Design Premium — Doživotně" },
-                credits: { czk: 7700, eur: 299, name: "Human Design AI Credits (5×)" },
-                gift_monthly: { czk: 18800, eur: 749, name: "Dárkový poukaz — Premium Měsíc" },
-                gift_annual: { czk: 118800, eur: 4700, name: "Dárkový poukaz — Premium Rok" },
+                monthly: { czk: 18800, eur: 749, name: "Human Design Premium - Mesicni" },
+                annual: { czk: 118800, eur: 4700, name: "Human Design Premium - Rocni" },
+                lifetime: { czk: 288800, eur: 11500, name: "Human Design Premium - Dozivotne" },
+                credits: { czk: 7700, eur: 299, name: "Human Design AI Credits (5x)" },
+                gift_monthly: { czk: 18800, eur: 749, name: "Darkovy poukaz - Premium Mesic" },
+                gift_annual: { czk: 118800, eur: 4700, name: "Darkovy poukaz - Premium Rok" },
             }[input.plan];
-
             const currency = isCzech ? "czk" : "eur";
             const unitAmount = isCzech ? priceData.czk : priceData.eur;
-
-            const metadata: Record<string, string> = {
-                user_id: user.id.toString(),
-                customer_email: user.email || "",
-                customer_name: user.name || "",
-                plan: input.plan,
-            };
-
+            const metadata: Record<string, string> = { user_id: user.id.toString(), customer_email: user.email || "", customer_name: user.name || "", plan: input.plan };
             if (isGift) {
                 if (input.recipientEmail) metadata.recipient_email = input.recipientEmail;
                 if (input.recipientName) metadata.recipient_name = input.recipientName;
                 if (input.senderName) metadata.sender_name = input.senderName;
                 if (input.personalMessage) metadata.personal_message = input.personalMessage.slice(0, 500);
             }
-
             const successUrl = `${input.origin}/${input.locale}/payment/success?plan=${input.plan}`;
             const cancelUrl = `${input.origin}/${input.locale}/payment/cancel`;
+
+            if (!isSubscription && isCzech && ENV.comgateMerchantId) {
+                const { createComgateCheckoutSession } = await import("../_core/comgate");
+                
+                const rawMeta: any = {
+                    u: user.id,
+                    p: input.plan,
+                    email: user.email,
+                    name: user.name,
+                };
+                if (input.recipientEmail) rawMeta.recEmail = input.recipientEmail;
+                if (input.recipientName) rawMeta.recName = input.recipientName;
+                if (input.senderName) rawMeta.sndName = input.senderName;
+                
+                const refId = Buffer.from(JSON.stringify(rawMeta)).toString("base64").substring(0, 255);
+
+                try {
+                    const comgateRes = await createComgateCheckoutSession({
+                        price: unitAmount,
+                        currency: "CZK",
+                        label: priceData.name,
+                        refId: refId,
+                        email: user.email || "neznamy@zakaznik.cz",
+                        lang: "cs"
+                    });
+                    return { url: comgateRes.redirectUrl };
+                } catch (e: any) {
+                    console.error("[Comgate API error]", e);
+                }
+            }
 
             if (isSubscription) {
                 const session = await stripe.checkout.sessions.create({
@@ -90,6 +102,10 @@ export const subscriptionRouter = router({
                     client_reference_id: user.id.toString(),
                     metadata,
                     allow_promotion_codes: true,
+                    // Apple Pay and Google Pay are offered automatically by Stripe
+                    // when cards are enabled and the domain is registered in Stripe.
+                    // PayPal is opt-in because Stripe must approve it for the account.
+                    payment_method_types: (ENV.stripeEnablePaypal ? ["card", "paypal"] : ["card"]) as any,
                     line_items: [{
                         price_data: {
                             currency,
@@ -114,6 +130,7 @@ export const subscriptionRouter = router({
                     client_reference_id: user.id.toString(),
                     metadata,
                     allow_promotion_codes: true,
+                    payment_method_types: (ENV.stripeEnablePaypal ? ["card", "paypal"] : ["card"]) as any,
                     line_items: [{
                         price_data: {
                             currency,
