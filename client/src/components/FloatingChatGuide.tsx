@@ -3,7 +3,7 @@ import { AIChatBox, Message } from "./AIChatBox";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Bot, X, Maximize2, Minimize2 } from "lucide-react";
+import { Bot, X, Maximize2, Minimize2, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import { getLoginUrl } from "@/const";
@@ -117,13 +117,13 @@ export function FloatingChatGuide() {
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
-                        className="fixed bottom-6 right-6 z-50 lg:bottom-10 lg:right-10"
+                        className="fixed bottom-[5.5rem] right-4 md:bottom-6 md:right-6 z-50 lg:bottom-10 lg:right-10"
                     >
                         <Button
                             onClick={() => setIsOpen(true)}
-                            className="w-14 h-14 rounded-full shadow-2xl bg-primary hover:bg-primary/90 flex items-center justify-center p-0"
+                            className="w-14 h-14 rounded-full shadow-2xl bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 flex items-center justify-center p-0 border-0"
                         >
-                            <Bot className="w-7 h-7 text-primary-foreground" />
+                            <Sparkles className="w-6 h-6 text-white" />
                         </Button>
                     </motion.div>
                 )}
@@ -147,8 +147,8 @@ export function FloatingChatGuide() {
                     >
                         <div className="flex items-center justify-between p-3 border-b bg-muted/30">
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
-                                    <Bot className="w-4 h-4 text-primary-foreground" />
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shrink-0">
+                                    <Sparkles className="w-4 h-4 text-white" />
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-semibold leading-none">{isEn ? "AI HD Guide" : "AI HD Průvodce"}</h3>
@@ -167,7 +167,7 @@ export function FloatingChatGuide() {
 
                         {!isAuthenticated ? (
                             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-card">
-                                <Bot className="w-12 h-12 text-muted-foreground/30 mb-4" />
+                                <Sparkles className="w-12 h-12 text-purple-300 mb-4" />
                                 <p className="text-sm text-muted-foreground mb-4">
                                     {isEn ? "Please sign in to chat with your personal AI guide." : "Pro chatování s AI průvodcem se prosím přihlaste."}
                                 </p>

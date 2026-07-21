@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import HDLoader from "@/components/HDLoader";
 import PageTransition from "@/components/PageTransition";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import NotFound from "./NotFound";
 import { ChevronRight, ArrowLeft } from "lucide-react";
 import { useSEO } from "@/hooks/useSEO";
@@ -38,7 +40,9 @@ export default function AndelskaCislaDetail() {
 
     return (
         <PageTransition>
-            <div className="container py-8 max-w-4xl mx-auto space-y-8">
+            <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <div className="flex-1 container py-8 max-w-4xl mx-auto space-y-8">
                 <Link href={localePath("/andelska-cisla")} className="text-muted-foreground hover:text-foreground inline-flex items-center text-sm font-medium transition-colors">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Zpět na přehled čísel
@@ -89,7 +93,9 @@ export default function AndelskaCislaDetail() {
                         </Button>
                     </Link>
                 </div>
+                </div>
             </div>
+            <Footer />
         </PageTransition>
     );
 }
