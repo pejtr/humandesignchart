@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
+import { useMetaPixel } from "@/hooks/useMetaPixel";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ export default function PaymentSuccess() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const isEn = locale === "en";
+  const meta = useMetaPixel();
 
   // Refetch subscription status after successful payment
   const utils = trpc.useUtils();
@@ -24,6 +26,23 @@ export default function PaymentSuccess() {
     // Invalidate subscription status so it refreshes
     utils.subscription.status.invalidate();
     document.title = isEn ? "✨ Payment Successful — Welcome to Premium!" : "✨ Platba úspěšná — Vítejte v Premium!";
+
+    // Track Purchase event (META Pixel + Conversions API) — fires once per mount
+    const plan = new URLSearchParams(window.location.search).get("plan") as
+      | "monthly"
+      | "annual"
+      | "credits"
+      | "lifetime"
+      | null;
+    const planValue =
+      plan === "annual" ? 1188 : plan === "lifetime" ? 2888 : plan === "credits" ? 77 : 188;
+    const currency = isEn ? "EUR" : "CZK";
+    meta.purchase(plan === "credits" ? 77 : planValue, {
+      content_ids: plan ? [plan] : undefined,
+      content_type: "product",
+      currency,
+      predicted_ltv: plan === "annual" ? 1188 : plan === "lifetime" ? 2888 : plan === "credits" ? 77 : 188,
+    });
   }, [isEn]);
 
   const nextSteps = isEn ? [

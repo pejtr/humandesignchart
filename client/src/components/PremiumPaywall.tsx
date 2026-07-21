@@ -1,6 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,7 @@ export default function PremiumPaywall({ variant = "inline", onClose, title, des
   const { locale } = useLanguage();
   const { user } = useAuth();
   const isCzech = locale === "cs";
+  const meta = useMetaPixel();
 
   const createCheckout = trpc.subscription.createCheckout.useMutation({
     onSuccess: (data) => {
@@ -32,6 +34,12 @@ export default function PremiumPaywall({ variant = "inline", onClose, title, des
   });
 
   const handleUpgrade = (plan: "monthly" | "annual" | "credits") => {
+    // Track InitiateCheckout before redirect (META Pixel + Conversions API)
+    const planValue = plan === "annual" ? 1188 : plan === "credits" ? 77 : 188;
+    meta.initiateCheckout(planValue, {
+      content_ids: [plan],
+      content_type: "product",
+    });
     if (!user) {
       window.location.href = getLoginUrl();
       return;

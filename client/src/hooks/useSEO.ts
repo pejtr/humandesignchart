@@ -112,6 +112,9 @@ export function useSEO(options: SEOOptions) {
 
   useEffect(() => {
     document.title = title;
+    // Set <html lang> dynamically for correct language signal to crawlers
+    const langCode = locale === "cs_CZ" ? "cs" : locale === "en_US" ? "en" : locale === "ru_RU" ? "ru" : locale === "uk_UA" ? "uk" : locale === "de_DE" ? "de" : locale === "hu_HU" ? "hu" : (locale || "cs").split("_")[0];
+    document.documentElement.setAttribute("lang", langCode);
     setMeta('meta[name="description"]', "content", description);
     if (keywords) setMeta('meta[name="keywords"]', "content", keywords);
     if (noIndex) {

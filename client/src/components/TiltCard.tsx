@@ -1,8 +1,17 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 
 export const TiltCard: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className = "" }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    // Only enable tilt on devices with a fine pointer (mouse) and when user
+    // hasn't requested reduced motion (desktop perf: no RAF overhead on touch).
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setEnabled(finePointer && !reducedMotion);
+  }, []);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -14,7 +23,7 @@ export const TiltCard: React.FC<{ children: React.ReactNode, className?: string 
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
+    if (!ref.current || !enabled) return;
 
     const rect = ref.current.getBoundingClientRect();
 
@@ -32,6 +41,7 @@ export const TiltCard: React.FC<{ children: React.ReactNode, className?: string 
   };
 
   const handleMouseLeave = () => {
+    if (!enabled) return;
     x.set(0);
     y.set(0);
   };
@@ -42,8 +52,8 @@ export const TiltCard: React.FC<{ children: React.ReactNode, className?: string 
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{
-        rotateY,
-        rotateX,
+        rotateY: enabled ? rotateY : 0,
+        rotateX: enabled ? rotateX : 0,
         transformStyle: "preserve-3d",
       }}
       className={`relative ${className}`}

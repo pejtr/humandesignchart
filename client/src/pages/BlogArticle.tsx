@@ -32,6 +32,9 @@ function renderMarkdown(md: string): string {
     .replace(/^## (.+)$/gm, '<h2 class="font-serif text-2xl font-bold mt-10 mb-4">$1</h2>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Images: ![alt](url) — destination photos & illustrations
+    .replace(/!\[([^\]]*)\]\((\/[^)]+|\/manus-storage\/[^)]+|https?:\/\/[^)]+)\)/g,
+      '<figure class="my-8"><img src="$2" alt="$1" loading="lazy" class="w-full rounded-2xl shadow-lg" /><figcaption class="text-center text-sm text-muted-foreground mt-2">$1</figcaption></figure>')
     // Internal links: [text](/path) — open in same tab
     .replace(/\[([^\]]+)\]\((\/[^)]+)\)/g, '<a href="$2" class="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">$1</a>')
     // External links: [text](https://...) — open in new tab

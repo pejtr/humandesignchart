@@ -291,7 +291,7 @@ export const en = {
   footer: {
     description: "Discover your unique design. The most comprehensive Human Design app available.",
     features: "Features",
-    chartCalculator: "Free Chart",
+    chartCalculator: "Human Design Chart",
     dailyTransits: "Daily Transits",
     chartComparison: "Chart Comparison",
     celebrityCharts: "Celebrities",

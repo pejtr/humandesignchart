@@ -51,13 +51,16 @@ async function startServer() {
     next();
   });
 
-  // Canonical host redirects
+  // Canonical host redirects — normalize to https + www for both domains
   app.use((req, res, next) => {
-    if (req.hostname === "humandesignmapa.cz") {
-      return res.redirect(301, `https://www.humandesignmapa.cz${req.originalUrl}`);
-    }
-    if (req.hostname === "humandesignchart.app") {
-      return res.redirect(301, `https://www.humandesignchart.app${req.originalUrl}`);
+    const host = req.hostname;
+    const isMapa = host === "humandesignmapa.cz" || host === "www.humandesignmapa.cz";
+    const isChart = host === "humandesignchart.app" || host === "www.humandesignchart.app";
+    if (!isMapa && !isChart) return next();
+    const canonicalHost = isMapa ? "www.humandesignmapa.cz" : "www.humandesignchart.app";
+    // Redirect any non-canonical scheme/host (http, or missing www) to https://www.
+    if (req.secure === false || host !== canonicalHost) {
+      return res.redirect(301, `https://${canonicalHost}${req.originalUrl}`);
     }
     next();
   });

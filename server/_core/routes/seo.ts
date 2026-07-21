@@ -1,7 +1,7 @@
 import { Express } from "express";
-import { BLOG_ARTICLES } from "../data/blogArticles";
-import { BLOG_ARTICLES_EN } from "../data/blogArticlesEn";
-import { ANGEL_NUMBERS } from "../data/angelNumbers";
+import { BLOG_ARTICLES } from "../../data/blogArticles";
+import { BLOG_ARTICLES_EN } from "../../data/blogArticlesEn";
+import { ANGEL_NUMBERS } from "../../data/angelNumbers";
 
 export function registerSeoRoutes(app: Express) {
   // ─── Sitemap.xml (bilingual with hreflang) ─────────────────────────────
@@ -41,10 +41,16 @@ export function registerSeoRoutes(app: Express) {
     ];
 
     const generateUrlNode = (locUrl: string, csAlt: string, enAlt: string, changefreq: string, priority: string, lastmod: string) => {
+      const altBase = enBase; // International locales live on the EN domain
+      const altPath = enAlt.replace(enBase + "/en/", "/");
       const alternates = [
         `    <xhtml:link rel="alternate" hreflang="cs" href="${csAlt}" />`,
         `    <xhtml:link rel="alternate" hreflang="en" href="${enAlt}" />`,
-        `    <xhtml:link rel="alternate" hreflang="x-default" href="${enAlt}" />`
+        `    <xhtml:link rel="alternate" hreflang="ru" href="${altBase}/ru/${altPath}" />`,
+        `    <xhtml:link rel="alternate" hreflang="uk" href="${altBase}/uk/${altPath}" />`,
+        `    <xhtml:link rel="alternate" hreflang="de" href="${altBase}/de/${altPath}" />`,
+        `    <xhtml:link rel="alternate" hreflang="hu" href="${altBase}/hu/${altPath}" />`,
+        `    <xhtml:link rel="alternate" hreflang="x-default" href="${enAlt}" />`,
       ].join("\n");
       return `  <url>\n    <loc>${locUrl}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n${alternates}\n  </url>`;
     };

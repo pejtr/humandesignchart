@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Cookie, X, Settings2 } from "lucide-react";
+import { initPixelAfterConsent } from "@/hooks/useMetaPixel";
 
 const CONSENT_KEY = "hd-cookie-consent";
 
@@ -33,12 +34,14 @@ export function CookieConsent() {
     const state: ConsentState = { necessary: true, analytics: true, marketing: true, accepted: true };
     localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
     setShow(false);
+    initPixelAfterConsent();
   };
 
   const acceptSelected = () => {
     const state: ConsentState = { ...consent, accepted: true };
     localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
     setShow(false);
+    if (state.marketing) initPixelAfterConsent();
   };
 
   const rejectAll = () => {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { trpc } from "@/lib/trpc";
 import { X, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ const STORAGE_KEY = "hd_newsletter_dismissed";
 export default function NewsletterPopup() {
   const { locale } = useLanguage();
   const isEn = locale === "en";
+  const meta = useMetaPixel();
   const [isVisible, setIsVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -18,6 +20,11 @@ export default function NewsletterPopup() {
     onSuccess: () => {
       setStatus("success");
       localStorage.setItem(STORAGE_KEY, "true");
+      // Track Lead event (newsletter signup = qualified lead for retargeting)
+      meta.lead({
+        content_category: "newsletter",
+        content_name: "Newsletter Subscription",
+      });
     },
     onError: (err) => {
       setStatus("error");

@@ -291,7 +291,7 @@ export const cs = {
   footer: {
     description: "Poznejte svůj jedinečný design. Nejkomplexnější Human Design aplikace v češtině.",
     features: "Funkce",
-    chartCalculator: "Mapa zdarma",
+    chartCalculator: "Mapa Human Design zdarma",
     dailyTransits: "Denní tranzity",
     chartComparison: "Porovnání map",
     celebrityCharts: "Celebrity",

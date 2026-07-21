@@ -12,6 +12,7 @@ import { notifyOwner } from "./_core/notification";
 import { sendLeadOSEvent } from "./leados";
 import { ENV } from "./_core/env";
 import { fulfillCreditsOrder, fulfillGiftVoucherOrder, fulfillLifetimeOrder, trackAffiliateCommission } from "./services/payment";
+import { trackConversion } from "./metaConversionsApi";
 
 export function getStripe(): Stripe | null {
   if (!ENV.stripeSecretKey) return null;
@@ -125,16 +126,51 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
   const plan = session.metadata?.plan;
   const affiliateCode = session.metadata?.affiliate_code;
 
+  // Fetch user for email + ip (for CAPI user matching)
+  let userEmail: string | undefined;
+  let userIp: string | undefined;
+  let userAgent: string | undefined;
+  try {
+    const db = await getDb();
+    if (db) {
+      const u = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+      if (u.length > 0) {
+        userEmail = u[0].email ?? undefined;
+        userIp = (u[0] as any).lastIp ?? undefined;
+        userAgent = (u[0] as any).lastUserAgent ?? undefined;
+      }
+    }
+  } catch (e) {
+    console.warn("[Stripe Webhook] Failed to fetch user for CAPI:", e);
+  }
+
+  const currency = (session.currency?.toUpperCase() ?? "CZK") as string;
+  const amountCzk = session.amount_total ? session.amount_total / 100 : (plan === "annual" ? 888 : 88);
+
   if (mode === "subscription" && session.subscription) {
     const planLabel = plan === "annual" ? "Roční Premium" : "Měsíční Premium";
     const customerEmail = session.metadata?.customer_email || session.customer_email || "neznámý";
     const customerName = session.metadata?.customer_name || "nový zákazník";
 
     // Track affiliate commission
-    const amountCzk = session.amount_total ? session.amount_total / 100 : (plan === "annual" ? 888 : 88);
     if (affiliateCode) {
       await trackAffiliateCommission(affiliateCode, userId, amountCzk, session.subscription as string);
     }
+
+    // META Conversions API — server-side Purchase (dedup with client pixel via event_id)
+    await trackConversion({
+      eventName: "Purchase",
+      email: userEmail ?? customerEmail,
+      userId,
+      value: amountCzk,
+      currency,
+      contentIds: [plan ?? "subscription"],
+      contentName: "Premium Subscription",
+      contentCategory: "subscription",
+      predictedLtv: amountCzk,
+      leadOSEvent: "subscription_upgraded",
+      leadOSData: { plan: "premium" },
+    });
 
     try {
       await notifyOwner({
@@ -144,21 +180,20 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
     } catch (e) {
       console.warn("[Stripe Webhook] Failed to send owner notification:", e);
     }
-    sendLeadOSEvent({
-      event: "subscription_upgraded",
-      data: {
-        userId: userId ?? undefined,
-        email: session.metadata?.customer_email || (session as any).customer_email || undefined,
-        plan: "premium",
-        amount: amountCzk,
-        currency: session.currency?.toUpperCase() ?? "CZK",
-        score: 100,
-      },
-    });
     console.log(`[Stripe Webhook] Subscription checkout completed for user ${userId}`);
   } else if (mode === "payment") {
     if (plan === "credits") {
       await fulfillCreditsOrder(userId, 5, "Stripe");
+      await trackConversion({
+        eventName: "Purchase",
+        email: userEmail,
+        userId,
+        value: amountCzk,
+        currency,
+        contentIds: ["credits"],
+        contentName: "Credit Pack",
+        contentCategory: "credits",
+      });
     } else if (plan === "gift_monthly" || plan === "gift_annual") {
       const giftPlan = plan === "gift_monthly" ? "monthly" : "annual";
       await fulfillGiftVoucherOrder(userId, giftPlan, {
@@ -170,11 +205,24 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
         personalMessage: session.metadata?.personal_message,
       }, "Stripe");
     } else if (plan === "lifetime") {
-      const amountCzk = session.amount_total ? session.amount_total / 100 : 2888;
-      await fulfillLifetimeOrder(userId, amountCzk, session.payment_intent as string, "Stripe");
+      const amountCzkLifetime = session.amount_total ? session.amount_total / 100 : 2888;
+      await fulfillLifetimeOrder(userId, amountCzkLifetime, session.payment_intent as string, "Stripe");
       if (affiliateCode) {
-        await trackAffiliateCommission(affiliateCode, userId, amountCzk, session.payment_intent as string);
+        await trackAffiliateCommission(affiliateCode, userId, amountCzkLifetime, session.payment_intent as string);
       }
+      await trackConversion({
+        eventName: "Purchase",
+        email: userEmail,
+        userId,
+        value: amountCzkLifetime,
+        currency,
+        contentIds: ["lifetime"],
+        contentName: "Lifetime Premium",
+        contentCategory: "subscription",
+        predictedLtv: amountCzkLifetime,
+        leadOSEvent: "subscription_upgraded",
+        leadOSData: { plan: "lifetime" },
+      });
     }
   }
 }

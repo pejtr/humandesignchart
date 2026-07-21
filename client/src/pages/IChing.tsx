@@ -110,14 +110,14 @@ export default function IChing() {
   const { t, locale, localePath } = useLanguage();
 
   useSEO(locale === "en" ? {
-    title: "☯️ I Ching Oracle — Human Design Hexagrams & Wisdom 🎴",
-    description: "Consult the I Ching oracle. Explore all 64 hexagrams and their connection to Human Design gates and life themes.",
+    title: "I Ching Oracle: 64 Hexagrams & Their Meaning in Human Design",
+    description: "Consult the ancient I Ching oracle online. Explore all 64 hexagrams, their judgments, and how they connect to Human Design gates and your life themes. Free.",
     keywords: "i ching oracle, iching hexagrams, 64 hexagrams, human design gates, i ching wisdom",
     ogType: "website",
     locale: "en_US",
   } : {
-    title: "☯️ I-Ťing Orákulum — Human Design Hexagramy & Moudrost 🎴",
-    description: "Konzultujte I-Ťing orákulum. Prozkoumejte všech 64 hexagramů a jejich spojení s bránami Human Design.",
+    title: "I-Ťing Orákulum: 64 hexagramů a jejich význam v Human Designu",
+    description: "Konzultujte starodávné I-Ťing orákulum online. Prozkoumejte všech 64 hexagramů, jejich výroky a propojení s bránami Human Design. Zdarma.",
     keywords: "i-ťing orákulum, i-ťing hexagramy, 64 hexagramů, brány human design, i-ťing moudrost",
     ogType: "website",
     locale: "cs_CZ",

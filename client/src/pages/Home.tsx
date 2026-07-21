@@ -315,9 +315,9 @@ export default function Home() {
     locale: "cs_CZ",
   } : {
     title: "✨ Free Human Design Chart Calculator & AI Reading 🔮",
-    description: "Calculate your free Human Design chart. Discover your type, strategy, authority and get a personalized AI reading.",
+    description: "Calculate your free Human Design chart. Discover your type, strategy, authority and get a personalized AI reading. Available in English, Czech, Russian, Ukrainian, German & Hungarian.",
     ogImage: OG_IMAGES.homepage,
-    keywords: "human design, human design chart, bodygraph calculator, free human design, human design type, human design authority",
+    keywords: "human design, human design chart, bodygraph calculator, free human design, human design type, human design authority, human design berechnen, хьюман дизайн, дизайн человека, дизайн людини, human design elemzés, human dizajn",
     locale: "en_US",
   });
   const typesData = getTypesData(isCs);
@@ -472,7 +472,7 @@ export default function Home() {
       </section>      <div className="mystical-divider" />
 
       {/* ── 5 Types Section ─────────────────────────────────────────────────── */}
-      <section className="py-20 bg-gradient-to-b from-white to-purple-50/40 bg-sacred-geometry overflow-hidden">
+      <section className="py-20 bg-gradient-to-b from-white to-purple-50/40 bg-sacred-geometry overflow-hidden" style={{ contentVisibility: "auto", containIntrinsicSize: "800px" }}>
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} custom={0} variants={fadeUp} className="text-center mb-14">
             <h2 className="font-serif text-3xl md:text-5xl font-bold text-foreground">
@@ -524,7 +524,7 @@ export default function Home() {
       <div className="mystical-divider" />
 
       {/* ── How to start — 3 steps ─────────────────────────────────────── */}
-      <section className="py-20 overflow-hidden">
+      <section className="py-20 overflow-hidden" style={{ contentVisibility: "auto", containIntrinsicSize: "700px" }}>
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="text-center mb-14">
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">
@@ -577,7 +577,7 @@ export default function Home() {
       <div className="mystical-divider" />
 
       {/* ── Features Grid ────────────────────────────────────────────── */}
-      <section className="py-20 bg-muted/30 bg-sacred-geometry">
+      <section className="py-20 bg-muted/30 bg-sacred-geometry" style={{ contentVisibility: "auto", containIntrinsicSize: "600px" }}>
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="text-center mb-12">
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">{t.home.featuresTitle}</h2>
@@ -605,7 +605,7 @@ export default function Home() {
       <div className="mystical-divider" />
 
       {/* ── How it works ───────────────────────────────────────────── */}
-      <section className="py-20 bg-ethereal dark:bg-card" style={{ background: 'var(--tw-dark, #f9f7f2)' }}>
+      <section className="py-20 bg-ethereal dark:bg-card" style={{ background: 'var(--tw-dark, #f9f7f2)', contentVisibility: "auto", containIntrinsicSize: "700px" }}>
         <div className="container">
           <motion.h2
             initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
@@ -637,7 +637,7 @@ export default function Home() {
       <div className="mystical-divider" />
 
       {/* ── Blog Preview — Editorial Layout ──────────────────────────── */}
-      <section className="py-20">
+      <section className="py-20" style={{ contentVisibility: "auto", containIntrinsicSize: "600px" }}>
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
@@ -729,7 +729,7 @@ export default function Home() {
       <SocialProof />
 
       {/* ── CTA Section ────────────────────────────────────────────── */}
-      <section className="py-20 relative overflow-hidden bg-sacred-geometry">
+      <section className="py-20 relative overflow-hidden bg-sacred-geometry" style={{ contentVisibility: "auto", containIntrinsicSize: "400px" }}>
         <div className="absolute inset-0 bg-dots opacity-30 pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
         <div className="container relative z-10">

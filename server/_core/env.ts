@@ -37,4 +37,11 @@ export const ENV = {
   forgeApiKey: process.env.STORAGE_API_KEY ?? "",
   leadosApiKey: process.env.LEADOS_API_KEY ?? "",
   leadosWebhookSecret: process.env.LEADOS_WEBHOOK_SECRET ?? "",
+  // ─── META / Facebook Pixel & Conversions API ────────────────────────────
+  // Client-side pixel id (VITE_ prefix is exposed to the browser bundle)
+  metaPixelId: process.env.VITE_META_PIXEL_ID ?? "",
+  // Server-side token for Conversions API (never exposed to the client)
+  metaAccessToken: process.env.META_ACCESS_TOKEN ?? "",
+  metaPixelIdServer: process.env.META_PIXEL_ID ?? process.env.VITE_META_PIXEL_ID ?? "",
+  metaBusinessId: process.env.META_BUSINESS_ID ?? "",
 };

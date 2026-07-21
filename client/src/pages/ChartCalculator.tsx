@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -13,17 +13,20 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
+import { useMetaPixel } from "@/hooks/useMetaPixel";
 
 export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | "test" | "typy" }) {
   const [, navigate] = useLocation();
   const { isAuthenticated } = useAuth();
   const { t, localePath, locale } = useLanguage();
   const isEn = locale === "en";
+  const meta = useMetaPixel();
+
   useSEO(isEn ? {
     title: "✨ Free Human Design Chart Calculator 🔮",
-    description: "Calculate your free Human Design bodygraph chart. Enter your birth date, time and place to discover your type, strategy, authority and profile.",
+    description: "Calculate your free Human Design bodygraph chart. Enter your birth date, time and place to discover your type, strategy, authority and profile. Available in English, Czech, Russian, Ukrainian, German & Hungarian.",
     ogImage: OG_IMAGES.calculator,
-    keywords: "human design calculator, bodygraph calculator, free human design chart, human design birth chart",
+    keywords: "human design calculator, bodygraph calculator, free human design chart, human design birth chart, human design berechnen kostenlos, human design analyse kostenlos, хьюман дизайн рассчитать, дизайн человека бесплатно, дизайн людини розрахувати, human design elemzés",
     locale: "en_US",
   } : {
     title: seoType === "kalkulacka" ? "✨ Human Design Kalkulačka Zdarma 🔮" :
@@ -70,6 +73,16 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
     { value: "celebrity", labelCs: "Kamarád", labelEn: "Friend", icon: Star },
   ];
 
+  // Track ViewContent on page mount (the main funnel entry — key for retargeting)
+  useEffect(() => {
+    const pageType = seoType ?? "calculator";
+    meta.viewContent({
+      content_name: "Human Design Chart Calculator",
+      content_category: pageType === "test" ? "personality_test" : pageType === "typy" ? "types" : "calculator",
+      content_ids: [pageType],
+    });
+  }, [seoType]);
+
   const calculateMutation = trpc.chart.calculate.useMutation({
     onSuccess: (data) => {
       sessionStorage.setItem("chartResult", JSON.stringify(data));
@@ -113,6 +126,14 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
     if (!name || !birthDate || !birthTime || !locationResolved) {
       toast.error("Vyplňte prosím všechna pole a vyhledejte lokaci.");
       return;
+    }
+
+    // If not authenticated, track registration intent before redirect to login
+    if (!isAuthenticated) {
+      meta.completeRegistration({
+        content_name: "Chart Calculation Started",
+        status: true,
+      });
     }
 
     calculateMutation.mutate({

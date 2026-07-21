@@ -18,7 +18,9 @@ import { CookieConsent } from "./components/CookieConsent";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { AuthSidebar } from "./components/AuthSidebar";
 import { FloatingChatGuide } from "./components/FloatingChatGuide";
+import { useUTM } from "./hooks/useUTM";
 import { useAuth } from "./_core/hooks/useAuth";
+import type { Locale } from "./contexts/LanguageContext";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
 const ChartResult = lazy(() => import("./pages/ChartResult"));
@@ -64,13 +66,17 @@ function SafeRoute({ children }: { children: React.ReactNode }) {
 
 /**
  * Detect preferred language from browser settings.
- * Returns "cs" if Czech/Slovak is preferred, "en" otherwise.
+ * Returns detected locale based on Accept-Language header.
  */
-function detectPreferredLocale(): "cs" | "en" {
+function detectPreferredLocale(): Locale {
   const langs = navigator.languages || [navigator.language];
   for (const lang of langs) {
     const code = lang.toLowerCase().split("-")[0];
     if (code === "cs" || code === "sk") return "cs";
+    if (code === "ru") return "ru";
+    if (code === "uk") return "uk";
+    if (code === "de" || code === "at" || code === "ch") return "de";
+    if (code === "hu") return "hu";
     if (code === "en") return "en";
   }
   return "en";
@@ -272,6 +278,7 @@ function WelcomeModalWrapper() {
 }
 
 function App() {
+  useUTM();
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light" switchable>

@@ -55,14 +55,14 @@ export default function TransitCalendar() {
 
   useSEO(locale === "en" ? {
     title: "📅 Human Design Transit Calendar — Daily & Weekly Overview 🌙",
-    description: "Plan with the Human Design transit calendar. See daily and weekly gate activations and their influence on your energy.",
-    keywords: "human design transit calendar, daily transit, weekly transit, gate activations, HD calendar",
+    description: "Plan with the Human Design transit calendar. See today's transits and daily & weekly gate activations and their influence on your energy.",
+    keywords: "human design transit calendar, human design transit today, daily transit, weekly transit, gate activations, HD calendar",
     ogType: "website",
     locale: "en_US",
   } : {
     title: "📅 Human Design Tranzitní Kalendář — Denní & Týdenní Přehled 🌙",
-    description: "Plánujte s Human Design tranzitním kalendářem. Sledujte denní a týdenní aktivace brán a jejich vliv na vaši energii.",
-    keywords: "human design tranzitní kalendář, denní tranzit, týdenní tranzit, aktivace bran, HD kalendář",
+    description: "Plánujte s Human Design tranzitním kalendářem. Sledujte dnešní tranzity a denní a týdenní aktivace brán a jejich vliv na vaši energii.",
+    keywords: "human design tranzitní kalendář, human design tranzit dnes, denní tranzit, týdenní tranzit, aktivace bran, HD kalendář",
     ogType: "website",
     locale: "cs_CZ",
   });

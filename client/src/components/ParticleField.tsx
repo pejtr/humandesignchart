@@ -14,6 +14,9 @@ interface Particle {
  * Subtle floating particle animation for hero backgrounds.
  * Renders tiny glowing dots that drift slowly, creating a spiritual/cosmic atmosphere.
  * Lightweight canvas-based, pauses when not visible.
+ *
+ * Desktop perf: particles halved on large screens (>1024px) and disabled entirely
+ * when the user prefers reduced motion.
  */
 export function ParticleField({ className = "" }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -26,6 +29,12 @@ export function ParticleField({ className = "" }: { className?: string }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Respect user's motion preference
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+
     const resize = () => {
       const rect = canvas.parentElement?.getBoundingClientRect();
       if (rect) {
@@ -36,8 +45,9 @@ export function ParticleField({ className = "" }: { className?: string }) {
     resize();
     window.addEventListener("resize", resize);
 
-    // Initialize particles
-    const count = Math.min(50, Math.floor((canvas.width * canvas.height) / 15000));
+    // Desktop: fewer particles + no glow for performance
+    const maxParticles = isDesktop ? 25 : 50;
+    const count = Math.min(maxParticles, Math.floor((canvas.width * canvas.height) / 15000));
     particlesRef.current = Array.from({ length: count }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
@@ -53,29 +63,25 @@ export function ParticleField({ className = "" }: { className?: string }) {
       const particles = particlesRef.current;
 
       for (const p of particles) {
-        // Move
         p.x += p.speedX;
         p.y += p.speedY;
 
-        // Fade in/out
         p.opacity += p.fadeDir * 0.003;
         if (p.opacity >= 0.8) p.fadeDir = -1;
         if (p.opacity <= 0.1) p.fadeDir = 1;
 
-        // Wrap around
         if (p.x < -5) p.x = canvas.width + 5;
         if (p.x > canvas.width + 5) p.x = -5;
         if (p.y < -5) p.y = canvas.height + 5;
         if (p.y > canvas.height + 5) p.y = -5;
 
-        // Draw
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(168, 130, 255, ${p.opacity})`;
         ctx.fill();
 
-        // Glow effect for larger particles
-        if (p.size > 1.2) {
+        // Glow only on mobile (smaller viewport = fewer particles total)
+        if (!isDesktop && p.size > 1.2) {
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size * 2.5, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(168, 130, 255, ${p.opacity * 0.15})`;
@@ -86,7 +92,6 @@ export function ParticleField({ className = "" }: { className?: string }) {
       animRef.current = requestAnimationFrame(animate);
     };
 
-    // Use IntersectionObserver to only animate when visible
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { X, Sparkles, Gift } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { Link } from "wouter";
 
 export default function ExitIntentPopup() {
   const { t, locale, localePath } = useLanguage();
   const [show, setShow] = useState(false);
   const isCs = locale === "cs";
+  const meta = useMetaPixel();
 
   const handleMouseLeave = useCallback((e: MouseEvent) => {
     // Only trigger when mouse leaves from the top of the viewport
@@ -14,6 +16,12 @@ export default function ExitIntentPopup() {
       const dismissed = localStorage.getItem("hd_exit_popup_dismissed");
       if (!dismissed) {
         setShow(true);
+        // Track AddToCart (discount offer shown = strong intent signal)
+        meta.addToCart(isCs ? 188 : 7.49, {
+          content_name: "Exit Intent Discount 10%",
+          content_ids: ["exit_discount_10"],
+          content_type: "product",
+        });
       }
     }
   }, [show]);

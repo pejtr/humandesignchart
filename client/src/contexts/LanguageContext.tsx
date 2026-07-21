@@ -2,39 +2,45 @@ import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { useLocation } from "wouter";
 import { cs } from "@shared/i18n/cs";
 import { en } from "@shared/i18n/en";
+import { ru } from "@shared/i18n/ru";
+import { uk } from "@shared/i18n/uk";
+import { de } from "@shared/i18n/de";
+import { hu } from "@shared/i18n/hu";
 
-export type Locale = "cs" | "en";
+export type Locale = "cs" | "en" | "ru" | "uk" | "de" | "hu";
+
+const TRANSLATIONS: Record<Locale, typeof cs> = {
+  cs,
+  en: en as typeof cs,
+  ru: ru as typeof cs,
+  uk: uk as typeof cs,
+  de: de as typeof cs,
+  hu: hu as typeof cs,
+};
 
 interface LanguageContextValue {
   locale: Locale;
   t: typeof cs;
-  /** Build a path with the current locale prefix */
   localePath: (path: string) => string;
-  /** Switch language — returns the new URL */
   switchLocaleUrl: (newLocale: Locale) => string;
 }
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-/**
- * Extract locale from the current URL path.
- * /en/... → "en", /cs/... → "cs", anything else → default
- */
+const ALL_LOCALES: Locale[] = ["cs", "en", "ru", "uk", "de", "hu"];
+
 function getLocaleFromPath(path: string): Locale {
-  if (path.startsWith("/en/") || path === "/en") return "en";
-  if (path.startsWith("/cs/") || path === "/cs") return "cs";
-  // Legacy routes without prefix default to Czech (existing behavior)
+  for (const l of ALL_LOCALES) {
+    if (path.startsWith(`/${l}/`) || path === `/${l}`) return l;
+  }
   return "cs";
 }
 
-/**
- * Strip the locale prefix from a path.
- * /en/calculate → /calculate, /cs/blog → /blog
- */
 function stripLocale(path: string): string {
-  if (path.startsWith("/en/")) return path.slice(3);
-  if (path.startsWith("/cs/")) return path.slice(3);
-  if (path === "/en" || path === "/cs") return "/";
+  for (const l of ALL_LOCALES) {
+    if (path.startsWith(`/${l}/`)) return path.slice(3);
+    if (path === `/${l}`) return "/";
+  }
   return path;
 }
 
@@ -42,17 +48,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const locale = getLocaleFromPath(location);
 
-  const translations = locale === "en" ? en : cs;
-
   const value = useMemo<LanguageContextValue>(() => ({
     locale,
-    t: translations as typeof cs,
+    t: TRANSLATIONS[locale] ?? TRANSLATIONS.en,
     localePath: (path: string) => {
-      // Root path
       if (path === "/") return `/${locale}`;
-      // Already has locale prefix
       if (path.startsWith(`/${locale}/`)) return path;
-      // Strip any existing locale prefix and add current one
       const clean = stripLocale(path);
       return `/${locale}${clean}`;
     },
@@ -61,7 +62,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       if (clean === "/") return `/${newLocale}`;
       return `/${newLocale}${clean}`;
     },
-  }), [locale, location, translations]);
+  }), [locale, location]);
 
   return (
     <LanguageContext.Provider value={value}>
@@ -73,7 +74,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 export function useLanguage() {
   const ctx = useContext(LanguageContext);
   if (!ctx) {
-    // Fallback for components outside provider (shouldn't happen)
     return {
       locale: "cs" as Locale,
       t: cs,

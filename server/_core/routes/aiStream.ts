@@ -53,7 +53,7 @@ export function registerAiStreamRoute(app: Express) {
     const systemPrompt = getSystemPrompt(isEn);
     const userPrompt = getReadingPrompt(chart, readingType, isEn);
 
-    const { ENV } = await import("./env");
+    const { ENV } = await import("../env");
     const apiUrl = `${ENV.llmBaseUrl.replace(/\/$/, "")}/chat/completions`;
 
     res.setHeader("Content-Type", "text/event-stream");
