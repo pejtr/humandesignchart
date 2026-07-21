@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Compass, Loader2, MapPin, Calendar, Clock, Info, User, Heart, Users, Briefcase, Baby, Star, UserCheck, HelpCircle, Lock, Code2, Copy, Check } from "lucide-react";
+import { Compass, Loader2, MapPin, Calendar, Clock, Info, User, Heart, Users, Briefcase, Baby, Star, UserCheck, HelpCircle, Lock, Code2, Copy, Check, Globe, Palette, Sparkles } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -357,45 +357,95 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
             </CardContent>
           </Card>
           <div className="mt-12 mb-8">
-            <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shadow-sm relative overflow-hidden">
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl pointer-events-none" />
-              <CardHeader className="pb-3">
-                <CardTitle className="font-serif text-lg flex items-center gap-2">
-                  <Code2 className="w-5 h-5 text-primary" />
-                  {isEn ? "Embed on Your Website (Free Tool)" : "Vložte si kalkulačku zdarma na svůj web"}
-                </CardTitle>
-                <CardDescription>
+            <div className="rounded-2xl border border-purple-200 bg-gradient-to-br from-purple-50 via-white to-indigo-50 shadow-sm overflow-hidden">
+              <div className="p-6 md:p-8">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                    <Globe className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-lg font-bold text-slate-900">
+                      {isEn ? "Embed Free Calculator on Your Site" : "Vložte si kalkulačku zdarma na web"}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {isEn ? "No registration required" : "Bez registrace"}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-600 mb-6 max-w-lg">
                   {isEn
-                    ? "Are you an astrologer, life coach, or blogger? Use our free chart widget to engage your audience and keep them on your site! Just copy the code below."
-                    : "Jste astrolog, kouč nebo bloger? Vložte si na web naši Human design kalkulačku s profesionálním designem pro své návštěvníky zdarma!"
-                  }
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="relative">
-                  <pre className="p-4 rounded-xl bg-slate-950 text-slate-50 text-xs overflow-x-auto font-mono">
-                    {`<iframe 
-  src="${isEn ? 'https://www.humandesignchart.app' : 'https://www.humandesignmapa.cz'}/embed/calculator" 
-  width="100%" 
-  height="600" 
+                    ? "Astrologers, coaches, and bloggers — engage your audience with a professional Human Design calculator. Just paste the code:"
+                    : "Astrologové, koučové a blogeři — zaujměte své návštěvníky profesionální Human Design kalkulačkou. Stačí vložit kód:"}
+                </p>
+
+                <div className="grid md:grid-cols-2 gap-6 items-start">
+                  <div className="relative order-2 md:order-1">
+                    <div className="relative rounded-xl border border-slate-200 bg-white shadow-md overflow-hidden">
+                      <div className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 border-b border-slate-200">
+                        <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
+                        <span className="ml-2 text-[10px] text-slate-400 font-mono truncate">vase-web.cz</span>
+                      </div>
+                      <div className="p-4 bg-gradient-to-b from-purple-50 to-slate-50 min-h-[180px] flex flex-col items-center justify-center text-center">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center mb-3">
+                          <Sparkles className="w-6 h-6 text-white" />
+                        </div>
+                        <p className="text-sm font-bold text-slate-800 mb-1">Human Design Mapa</p>
+                        <p className="text-xs text-slate-500 mb-3">{isEn ? "Generate your chart for free" : "Vygenerujte si mapu zdarma"}</p>
+                        <div className="w-full max-w-[200px] space-y-2">
+                          <div className="h-7 rounded-lg bg-white border border-slate-200 shadow-sm" />
+                          <div className="flex gap-2">
+                            <div className="h-7 flex-1 rounded-lg bg-white border border-slate-200 shadow-sm" />
+                            <div className="h-7 flex-1 rounded-lg bg-white border border-slate-200 shadow-sm" />
+                          </div>
+                          <div className="h-8 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 shadow-sm" />
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-center text-[10px] text-slate-400 mt-2 italic">
+                      {isEn ? "Preview of the embedded widget" : "Náhled vloženého widgetu"}
+                    </p>
+                  </div>
+
+                  <div className="order-1 md:order-2 space-y-3">
+                    <div className="relative">
+                      <pre className="p-4 rounded-xl bg-slate-950 text-emerald-300 text-[11px] leading-relaxed overflow-x-auto font-mono shadow-inner">
+{`<iframe
+  src="${isEn ? 'https://www.humandesignchart.app' : 'https://www.humandesignmapa.cz'}/embed/calculator"
+  width="100%"
+  height="600"
   frameborder="0"
 ></iframe>
 <p style="text-align:center;font-size:12px;">
   Powered by <a href="${isEn ? 'https://www.humandesignchart.app' : 'https://www.humandesignmapa.cz'}">${isEn ? 'Human Design Chart' : 'Human Design Mapa'}</a>
 </p>`}
-                  </pre>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="absolute top-2 right-2 h-8"
-                    onClick={handleCopyEmbed}
-                  >
-                    {embedCopied ? <Check className="w-3.5 h-3.5 mr-1 text-green-500" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
-                    {isEn ? "Copy Code" : "Kopírovat kód"}
-                  </Button>
+                      </pre>
+                      <Button
+                        size="sm"
+                        className="absolute top-2 right-2 h-8 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md"
+                        onClick={handleCopyEmbed}
+                      >
+                        {embedCopied ? <Check className="w-3.5 h-3.5 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                        {isEn ? "Copy" : "Kopírovat"}
+                      </Button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 text-xs text-slate-500">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-purple-100 text-purple-700">
+                        <Palette className="w-3 h-3" /> {isEn ? "Responsive" : "Responzivní"}
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-indigo-100 text-indigo-700">
+                        <Code2 className="w-3 h-3" /> {isEn ? "Copy & paste" : "Kopírovat a vložit"}
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700">
+                        <Sparkles className="w-3 h-3" /> {isEn ? "Free forever" : "Zdarma navždy"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </main>
