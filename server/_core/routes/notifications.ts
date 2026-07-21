@@ -21,7 +21,7 @@ export function registerNotificationRoutes(app: Express) {
     res.setHeader("X-Accel-Buffering", "no");
     res.flushHeaders();
 
-    const { addConnection, removeConnection } = await import("../notificationBroadcast");
+    const { addConnection, removeConnection } = await import("../../notificationBroadcast");
     addConnection(userId, res);
 
     res.write(`: connected\n\n`);

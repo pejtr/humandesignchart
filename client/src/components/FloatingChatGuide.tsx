@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { AIChatBox, Message } from "./AIChatBox";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -11,6 +12,7 @@ import { getLoginUrl } from "@/const";
 export function FloatingChatGuide() {
     const { isAuthenticated } = useAuth();
     const { locale } = useLanguage();
+    const [location] = useLocation();
     const isEn = locale === "en";
 
     const [isOpen, setIsOpen] = useState(false);
@@ -105,7 +107,7 @@ export function FloatingChatGuide() {
         }
     };
 
-    if (typeof window !== 'undefined' && window.location.pathname.includes('/ai-guide')) {
+    if (location.includes('/ai-guide')) {
         return null;
     }
 

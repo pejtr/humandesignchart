@@ -4,7 +4,9 @@
  * Layout: Top Lead Profiles (left) | D3 Relationship Map (center) | Live SSE Stream (right)
  */
 import { useEffect, useRef, useState, useCallback } from "react";
-import * as d3 from "d3";
+import { select, type Selection, type BaseType } from "d3-selection";
+import { forceManyBody, forceCenter, forceCollide, forceSimulation } from "d3-force";
+import type { SimulationNodeDatum, SimulationLinkDatum } from "d3-force";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
@@ -198,7 +200,7 @@ function LeadCard({
 
 // ─── D3 Relationship Map ──────────────────────────────────────────────────────
 
-interface GraphNode extends d3.SimulationNodeDatum {
+interface GraphNode extends SimulationNodeDatum {
   id: string;
   name: string;
   hdType: string | null;
@@ -207,7 +209,7 @@ interface GraphNode extends d3.SimulationNodeDatum {
   isCenter?: boolean;
 }
 
-interface GraphLink extends d3.SimulationLinkDatum<GraphNode> {
+interface GraphLink extends SimulationLinkDatum<GraphNode> {
   strength: number;
   label: string;
 }
@@ -232,7 +234,7 @@ function RelationshipMap({
     const height = container.clientHeight || 400;
 
     // Clear previous
-    d3.select(svgRef.current).selectAll("*").remove();
+    select(svgRef.current).selectAll("*").remove();
 
     const svg = d3
       .select(svgRef.current)
@@ -280,8 +282,7 @@ function RelationshipMap({
     }
 
     // Force simulation
-    const simulation = d3
-      .forceSimulation<GraphNode>(nodes)
+    const simulation = forceSimulation<GraphNode>(nodes)
       .force(
         "link",
         d3
@@ -290,9 +291,9 @@ function RelationshipMap({
           .distance(80)
           .strength((d) => d.strength * 0.3)
       )
-      .force("charge", d3.forceManyBody().strength(-120))
-      .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collision", d3.forceCollide(36));
+      .force("charge", forceManyBody().strength(-120))
+      .force("center", forceCenter(width / 2, height / 2))
+      .force("collision", forceCollide(36));
 
     // Links
     const link = svg
@@ -328,7 +329,7 @@ function RelationshipMap({
             if (!event.active) simulation.alphaTarget(0);
             d.fx = null;
             d.fy = null;
-          }) as unknown as (selection: d3.Selection<d3.BaseType, GraphNode, SVGGElement, unknown>) => void
+          }) as unknown as (selection: Selection<BaseType, GraphNode, SVGGElement, unknown>) => void
       )
       .on("click", (_, d) => {
         const lead = topLeads.find((l) => String(l.id) === d.id);

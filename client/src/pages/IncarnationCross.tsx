@@ -19,7 +19,7 @@ import type { HumanDesignChartData } from "@shared/types";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
-import { translateCrossName } from "@/lib/hdConstants";
+import { translateCrossName, CROSS_TYPE_CS } from "@/lib/hdConstants";
 
 // ─── Sacred Geometry Cross SVG Diagram ────────────────────────────────────────
 interface DiagramGate {

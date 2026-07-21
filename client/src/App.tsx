@@ -17,7 +17,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { AuthSidebar } from "./components/AuthSidebar";
-import { FloatingChatGuide } from "./components/FloatingChatGuide";
+const FloatingChatGuide = lazy(() => import("./components/FloatingChatGuide").then(m => ({ default: m.FloatingChatGuide })));
 import { useUTM } from "./hooks/useUTM";
 import { useAuth } from "./_core/hooks/useAuth";
 import type { Locale } from "./contexts/LanguageContext";
@@ -293,7 +293,9 @@ function App() {
             <CookieConsent />
             <AuthSidebar />
             <MobileBottomNav />
-            <FloatingChatGuide />
+            <Suspense fallback={null}>
+              <FloatingChatGuide />
+            </Suspense>
             <LocaleRoutes />
           </LanguageProvider>
         </TooltipProvider>

@@ -183,7 +183,10 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
 
     personalizedByData: publicProcedure
         .input(z.object({
-            chartData: z.any(),
+            chartData: z.record(z.unknown()).refine(
+              (val) => JSON.stringify(val).length <= 500_000,
+              "Chart data too large"
+            ),
             locale: z.string().optional(),
         }))
         .mutation(async ({ input }) => {

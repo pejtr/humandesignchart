@@ -1,5 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 import { ParticleField } from "@/components/ParticleField";
 import { TiltCard } from "@/components/TiltCard";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
-import { SocialProof } from "@/components/SocialProof";
+const SocialProof = lazy(() => import("@/components/SocialProof").then(m => ({ default: m.SocialProof })));
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import {
@@ -726,7 +726,9 @@ export default function Home() {
       <div className="mystical-divider" />
 
       {/* ── Social Proof Section ──────────────────────────────────── */}
-      <SocialProof />
+      <Suspense fallback={null}>
+        <SocialProof />
+      </Suspense>
 
       {/* ── CTA Section ────────────────────────────────────────────── */}
       <section className="py-20 relative overflow-hidden bg-sacred-geometry" style={{ contentVisibility: "auto", containIntrinsicSize: "400px" }}>

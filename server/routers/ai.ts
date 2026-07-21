@@ -15,7 +15,10 @@ export const aiRouter = router({
     generateReading: protectedProcedure
         .input(z.object({
             chartId: z.number(),
-            chartData: z.any(),
+            chartData: z.record(z.unknown()).refine(
+              (val) => JSON.stringify(val).length <= 500_000,
+              "Chart data too large"
+            ),
             readingType: z.enum(["overview", "type_strategy", "profile", "authority", "incarnation_cross", "channels", "gates", "variables", "relationships", "career"]),
         }))
         .mutation(async ({ ctx, input }) => {

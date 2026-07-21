@@ -25,7 +25,7 @@ import {
   User, Users, Heart, Briefcase, UserCheck, HelpCircle, GitCompare,
 } from "lucide-react";
 import { generateChartPDF } from "@/lib/pdfExport";
-import { PLANET_SYMBOLS, TYPE_COLORS, translateCrossName } from "@/lib/hdConstants";
+import { PLANET_SYMBOLS, TYPE_COLORS, translateCrossName, CROSS_TYPE_CS } from "@/lib/hdConstants";
 import type { HumanDesignChartData } from "@shared/types";
 import OnboardingModal, { useOnboarding } from "@/components/OnboardingModal";
 import PremiumPaywall from "@/components/PremiumPaywall";
