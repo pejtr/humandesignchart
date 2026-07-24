@@ -265,11 +265,10 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
     const abort = new AbortController();
     streamAbortRef.current = abort;
     if (type === "daily_transit") {
-      setDailyTransitLoading(true);
-      setDailyTransitReading("");
-    } else {
-      setAiStreaming(true);
+      handleDailyTransitReading();
+      return;
     }
+    setAiStreaming(true);
 
     const params = new URLSearchParams({
       chartData: encodeURIComponent(JSON.stringify(chart)),
@@ -605,7 +604,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                 <div ref={aiSectionRef}>
                   {showPaywall ? (
                     <PremiumPaywall variant="inline" />
-                  ) : !aiReading && !aiStreaming && !aiMutation.isPending ? (
+                  ) : !aiReading && !dailyTransitReading && !aiStreaming && !aiMutation.isPending && !dailyTransitLoading && !personalizedTransitMutation.isPending ? (
                     <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-violet-50 p-6 shadow-md">
                       {/* Decorative glow */}
                       <div className="absolute -top-8 -right-8 w-40 h-40 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
@@ -646,7 +645,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                                     setAiReadingType(item.key);
                                     handleAiReading(item.key);
                                   }}
-                                  disabled={aiStreaming || aiMutation.isPending || dailyTransitLoading}
+                                  disabled={aiStreaming || aiMutation.isPending || dailyTransitLoading || personalizedTransitMutation.isPending}
                                 >
                                   {item.label}
                                 </Button>
@@ -663,7 +662,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                         </div>
                       </div>
                     </div>
-                  ) : (aiStreaming || aiMutation.isPending) && !aiReading ? (
+                  ) : (aiStreaming || aiMutation.isPending || dailyTransitLoading || personalizedTransitMutation.isPending) && !aiReading && !dailyTransitReading ? (
                     <Card className="border-primary/20 bg-primary/5">
                       <CardContent className="py-8">
                         <div className="flex flex-col items-center gap-3 text-center">
@@ -672,12 +671,16 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                           </div>
                           <div>
                             <p className="font-semibold text-sm">{t.chart.generatingReading}</p>
-                            <p className="text-xs text-muted-foreground mt-1">AI analýza vaší mapy probíhá...</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {dailyTransitLoading || personalizedTransitMutation.isPending
+                                ? (locale === "cs" ? "Generuji denní výklad tranzitů..." : "Generating daily transit reading...")
+                                : "AI analýza vaší mapy probíhá..."}
+                            </p>
                           </div>
                         </div>
                       </CardContent>
                     </Card>
-                  ) : (aiReading || dailyTransitReading || dailyTransitLoading) ? (
+                  ) : (aiReading || dailyTransitReading) ? (
                     <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background shadow-sm">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
