@@ -56,9 +56,28 @@ export default function AndelskaCisla() {
                         {articles?.map((article) => (
                             <Link key={article.slug} href={localePath(`/andelska-cisla/${article.slug}`)}>
                                 <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col group overflow-hidden border-2 hover:border-purple-200">
-                                    <div className={`h-32 bg-gradient-to-br ${getGradient(article.categoryLabel)} flex items-center justify-center relative overflow-hidden`}>
-                                        <span className="text-6xl font-bold text-white/20 select-none">{article.number}</span>
-                                        <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors" />
+                                    <div className={`h-40 bg-gradient-to-br ${getGradient(article.categoryLabel)} flex items-center justify-center relative overflow-hidden`}>
+                                        {(article as any).imageUrl ? (
+                                            <img
+                                                src={(article as any).imageUrl}
+                                                alt={article.title}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                        ) : (
+                                            <>
+                                                {/* Sacred geometry glowing rings */}
+                                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/30 via-transparent to-black/30" />
+                                                <div className="absolute w-32 h-32 rounded-full border border-white/20 scale-125 group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
+                                                <div className="absolute w-20 h-20 rounded-full border border-white/30 scale-100 group-hover:rotate-45 transition-transform duration-700 pointer-events-none" />
+                                                
+                                                {/* Glowing Angel Number */}
+                                                <span className="text-5xl font-extrabold text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)] select-none font-serif tracking-widest relative z-10 group-hover:scale-110 transition-transform duration-300">
+                                                    {article.number}
+                                                </span>
+                                            </>
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
+                                        <Sparkles className="absolute top-3 right-3 w-5 h-5 text-white/70 group-hover:text-white group-hover:rotate-12 transition-all" />
                                     </div>
                                     <CardHeader>
                                         <div className="flex justify-between items-start mb-2">

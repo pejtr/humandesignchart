@@ -106,6 +106,12 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
     }
   }
 
+  const birthDateFormatted = chart.birthDate
+    ? (chart.birthDate.includes("-")
+        ? new Date(chart.birthDate).toLocaleDateString("cs-CZ")
+        : chart.birthDate)
+    : "";
+
   const html = `<!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -169,7 +175,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
     </div>
     <div class="header-right">
       <div class="header-name">${name}</div>
-      <div class="header-date">${new Date().toLocaleDateString("cs-CZ")}</div>
+      <div class="header-date">${birthDateFormatted || new Date().toLocaleDateString("cs-CZ")}</div>
     </div>
   </div>
   <div class="accent-bar"></div>

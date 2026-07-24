@@ -76,6 +76,24 @@ export default function Footer() {
             <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{locale === "cs" ? "Další projekty" : "Partner Sites"}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="relative group/tip">
+                <a href="https://www.akcni-letenky.com" target="_blank" rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors">
+                  Akční Letenky
+                </a>
+                <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-56 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
+                  Akční letenky do celého světa — tipy na levné letenky, výhodné nabídky a chybných tarifů.
+                </span>
+              </li>
+              <li className="relative group/tip">
+                <a href="https://www.lastminutedovolene.cz" target="_blank" rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors">
+                  Last Minute Dovolené
+                </a>
+                <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-56 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
+                  Nejlepší last minute zájezdy a vyhledávač výhodných dovolených u moře.
+                </span>
+              </li>
+              <li className="relative group/tip">
                 <a href="https://www.bezmasajidla.cz" target="_blank" rel="noopener noreferrer"
                   className="hover:text-primary transition-colors">
                   Bezmasá Jídla

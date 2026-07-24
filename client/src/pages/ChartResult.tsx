@@ -173,10 +173,13 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
     return transitQuery.data.transitGates.map(tg => tg.gate);
   }, [transitQuery.data]);
 
-  const isNewChart = params.id === "new";
+  const isNewChart = params.id === "new" || params.id === "now" || !params.id || isNaN(Number(params.id));
+  const chartIdNum = parseInt(params.id || "0");
+  const isNumericId = !isNaN(chartIdNum) && chartIdNum > 0 && !isNewChart;
+
   const savedChartQuery = trpc.chart.get.useQuery(
-    { id: parseInt(params.id || "0") },
-    { enabled: !isNewChart && !!params.id }
+    { id: chartIdNum },
+    { enabled: isNumericId }
   );
 
   useEffect(() => {
@@ -184,11 +187,21 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
       const stored = sessionStorage.getItem("chartResult");
       const meta = sessionStorage.getItem("chartMeta");
       if (stored) {
-        setChart(JSON.parse(stored));
-        // Trigger onboarding for first-time chart viewers
+        const parsedChart = JSON.parse(stored);
+        setChart(parsedChart);
         setTimeout(() => triggerOnboarding(), 1200);
       }
-      if (meta) setChartMeta(JSON.parse(meta));
+      if (meta) {
+        setChartMeta(JSON.parse(meta));
+      } else if (stored) {
+        const parsed = JSON.parse(stored);
+        setChartMeta({
+          name: parsed.name || "Moje mapa",
+          birthDate: parsed.birthDate || "",
+          birthTime: parsed.birthTime || "",
+          birthPlace: parsed.birthPlace || "",
+        });
+      }
     }
   }, [isNewChart]);
 
@@ -221,20 +234,34 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
 
   const handleSave = () => {
     if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
-    if (!chart || !chartMeta) return;
+    if (!chart) return;
+    if (!chartMeta) {
+      setChartMeta({
+        name: (chart as any).name || "Moje mapa",
+        birthDate: (chart as any).birthDate || "",
+        birthTime: (chart as any).birthTime || "",
+        birthPlace: (chart as any).birthPlace || "",
+      });
+    }
     setShowSaveDialog(true);
   };
 
   const confirmSave = () => {
-    if (!chart || !chartMeta) return;
+    if (!chart) return;
+    const meta = chartMeta || {
+      name: (chart as any).name || "Moje mapa",
+      birthDate: (chart as any).birthDate || "",
+      birthTime: (chart as any).birthTime || "",
+      birthPlace: (chart as any).birthPlace || "",
+    };
     saveMutation.mutate({
-      name: chartMeta.name,
-      birthDate: chartMeta.birthDate || chart.birthDate,
-      birthTime: chartMeta.birthTime || chart.birthTime,
-      birthPlace: chartMeta.birthPlace || chart.birthPlace,
-      latitude: String(chartMeta.latitude || "0"),
-      longitude: String(chartMeta.longitude || "0"),
-      timezone: chartMeta.timezone || chart.timezone,
+      name: meta.name || "Moje mapa",
+      birthDate: meta.birthDate || (chart as any).birthDate || "",
+      birthTime: meta.birthTime || (chart as any).birthTime || "",
+      birthPlace: meta.birthPlace || (chart as any).birthPlace || "",
+      latitude: String(meta.latitude || "0"),
+      longitude: String(meta.longitude || "0"),
+      timezone: meta.timezone || (chart as any).timezone || "Europe/Prague",
       category: saveCategory,
       chartData: chart as any,
     });
@@ -326,6 +353,13 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
         }
       });
   };
+
+  // Auto-start overview AI reading on chart load so user doesn't wait
+  useEffect(() => {
+    if (chart && isAuthenticated && !aiReading && !aiStreaming && !aiMutation.isPending && !dailyTransitLoading && !personalizedTransitMutation.isPending) {
+      handleAiReading("overview");
+    }
+  }, [chart, isAuthenticated]);
 
 
 
@@ -1414,6 +1448,54 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
               })()}
             </DialogHeader>
           </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* ─── Save Chart Dialog ─── */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl">
+              {locale === "cs" ? "Uložit mapu do mé sbírky" : "Save chart to my collection"}
+            </DialogTitle>
+            <DialogDescription>
+              {locale === "cs"
+                ? "Vyberte kategorii pro přehledné uspořádání ve vaší sbírce."
+                : "Choose a category to organize this chart in your collection."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-3">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground">
+                {locale === "cs" ? "Kategorie" : "Category"}
+              </label>
+              <select
+                value={saveCategory}
+                onChange={(e: any) => setSaveCategory(e.target.value)}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
+                <option value="self">{locale === "cs" ? "👤 Moje mapa (Já)" : "👤 My Chart (Self)"}</option>
+                <option value="family">{locale === "cs" ? "👨‍👩‍👧 Rodina" : "👨‍👩‍👧 Family"}</option>
+                <option value="friend">{locale === "cs" ? "🤝 Přátelé" : "🤝 Friends"}</option>
+                <option value="client">{locale === "cs" ? "💼 Klienti" : "💼 Clients"}</option>
+                <option value="celebrity">{locale === "cs" ? "⭐ Celebrity / Známé osobnosti" : "⭐ Celebrities"}</option>
+                <option value="other">{locale === "cs" ? "📁 Ostatní" : "📁 Other"}</option>
+              </select>
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-2 sm:justify-end">
+            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>
+              {locale === "cs" ? "Zrušit" : "Cancel"}
+            </Button>
+            <Button onClick={confirmSave} disabled={saveMutation.isPending}>
+              {saveMutation.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />}
+              {saveMutation.isPending
+                ? (locale === "cs" ? "Ukládám..." : "Saving...")
+                : (locale === "cs" ? "Uložit" : "Save")}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
