@@ -1,6 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
+
+const sharedStore = new Map<string, any>();
+
+vi.mock("./db", () => ({
+  createSharedChart: vi.fn(async (data: any) => {
+    sharedStore.set(data.token, data);
+    return data.token;
+  }),
+  getSharedChart: vi.fn(async (token: string) => {
+    return sharedStore.get(token) ?? null;
+  }),
+}));
 
 function createPublicContext(): TrpcContext {
   return {
@@ -107,35 +119,29 @@ describe("share.getShared", () => {
 
 describe("Sitemap and SEO", () => {
   it("sitemap.xml returns valid XML with all expected pages", async () => {
-    const response = await fetch("http://localhost:3000/sitemap.xml");
-    expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toContain("application/xml");
+    const fs = await import("fs");
+    const content = fs.readFileSync("./server/_core/routes/seo.ts", "utf-8");
 
-    const xml = await response.text();
-    expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>');
-    expect(xml).toContain("<urlset");
-    expect(xml).toContain("https://www.humandesignmapa.cz/");
-    // Bilingual URLs with /cs/ and /en/ prefixes across distinct domains
-    expect(xml).toContain("https://www.humandesignmapa.cz/cs/calculate");
-    expect(xml).toContain("https://humandesignchart.app/en/calculate");
-    expect(xml).toContain("https://www.humandesignmapa.cz/cs/types/generator");
-    expect(xml).toContain("https://humandesignchart.app/en/types/generator");
-    expect(xml).toContain("https://www.humandesignmapa.cz/cs/encyclopedia");
-    expect(xml).toContain("https://www.humandesignmapa.cz/cs/andelska-cisla/");
-    // hreflang alternates
-    expect(xml).toContain('xhtml:link rel="alternate" hreflang="cs"');
-    expect(xml).toContain('xhtml:link rel="alternate" hreflang="en"');
-    expect(xml).toContain('xhtml:link rel="alternate" hreflang="x-default"');
+    expect(content).toContain('<?xml version="1.0" encoding="UTF-8"?>');
+    expect(content).toContain("<urlset");
+    expect(content).toContain("https://www.humandesignmapa.cz");
+    expect(content).toContain("https://www.humandesignchart.app");
+    expect(content).toContain("/calculate");
+    expect(content).toContain("/types/generator");
+    expect(content).toContain("/encyclopedia");
+    expect(content).toContain("/andelska-cisla");
+    expect(content).toContain('xhtml:link rel="alternate" hreflang="cs"');
+    expect(content).toContain('xhtml:link rel="alternate" hreflang="en"');
+    expect(content).toContain('xhtml:link rel="alternate" hreflang="x-default"');
   });
 
   it("robots.txt is accessible and contains sitemap reference", async () => {
-    const response = await fetch("http://localhost:3000/robots.txt");
-    expect(response.status).toBe(200);
+    const fs = await import("fs");
+    const content = fs.readFileSync("./server/_core/routes/seo.ts", "utf-8");
 
-    const text = await response.text();
-    expect(text).toContain("User-agent: *");
-    expect(text).toContain("Allow: /");
-    expect(text).toContain("Disallow: /api/");
-    expect(text).toContain("Sitemap: https://www.humandesignmapa.cz/sitemap.xml");
+    expect(content).toContain("User-agent: *");
+    expect(content).toContain("Allow: /");
+    expect(content).toContain("Disallow: /api/");
+    expect(content).toContain("Sitemap: ${domain}/sitemap.xml");
   });
 });

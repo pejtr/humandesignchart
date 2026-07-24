@@ -396,11 +396,11 @@ const LABELS = {
   },
 };
 
-export default function TypeDetail() {
+export default function TypeDetail({ type: propType }: { type?: string } = {}) {
   const params = useParams<{ type: string }>();
   const [, navigate] = useLocation();
   const { locale, localePath } = useLanguage();
-  const typeKey = params.type || "";
+  const typeKey = propType || params.type || "";
 
   const typeData = locale === "en" ? TYPE_DATA_EN : TYPE_DATA_CS;
   const labels = LABELS[locale];

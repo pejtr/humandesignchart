@@ -4,9 +4,19 @@
  * Layout: Top Lead Profiles (left) | D3 Relationship Map (center) | Live SSE Stream (right)
  */
 import { useEffect, useRef, useState, useCallback } from "react";
-import { select, type Selection, type BaseType } from "d3-selection";
-import { forceManyBody, forceCenter, forceCollide, forceSimulation } from "d3-force";
-import type { SimulationNodeDatum, SimulationLinkDatum } from "d3-force";
+import {
+  select,
+  forceLink,
+  forceManyBody,
+  forceCenter,
+  forceCollide,
+  forceSimulation,
+  drag,
+  type Selection,
+  type BaseType,
+  type SimulationNodeDatum,
+  type SimulationLinkDatum,
+} from "d3";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
@@ -210,6 +220,8 @@ interface GraphNode extends SimulationNodeDatum {
 }
 
 interface GraphLink extends SimulationLinkDatum<GraphNode> {
+  source: string | GraphNode;
+  target: string | GraphNode;
   strength: number;
   label: string;
 }
@@ -236,8 +248,7 @@ function RelationshipMap({
     // Clear previous
     select(svgRef.current).selectAll("*").remove();
 
-    const svg = d3
-      .select(svgRef.current)
+    const svg = select(svgRef.current)
       .attr("width", width)
       .attr("height", height);
 
@@ -285,8 +296,7 @@ function RelationshipMap({
     const simulation = forceSimulation<GraphNode>(nodes)
       .force(
         "link",
-        d3
-          .forceLink<GraphNode, GraphLink>(links)
+        forceLink<GraphNode, GraphLink>(links)
           .id((d) => d.id)
           .distance(80)
           .strength((d) => d.strength * 0.3)
@@ -314,8 +324,7 @@ function RelationshipMap({
       .join("g")
       .attr("cursor", "pointer")
       .call(
-        d3
-          .drag<SVGGElement, GraphNode>()
+        drag<SVGGElement, GraphNode>()
           .on("start", (event, d) => {
             if (!event.active) simulation.alphaTarget(0.3).restart();
             d.fx = d.x;

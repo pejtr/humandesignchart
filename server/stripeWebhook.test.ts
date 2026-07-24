@@ -23,10 +23,14 @@ vi.mock("./_core/notification", () => ({
   notifyOwner: vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock("drizzle-orm", () => ({
-  eq: vi.fn((a, b) => ({ a, b })),
-  desc: vi.fn((a) => a),
-}));
+vi.mock("drizzle-orm", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("drizzle-orm")>();
+  return {
+    ...actual,
+    eq: vi.fn((a, b) => ({ a, b })),
+    desc: vi.fn((a) => a),
+  };
+});
 
 import * as db from "./db";
 import { getStripe } from "./stripeWebhook";

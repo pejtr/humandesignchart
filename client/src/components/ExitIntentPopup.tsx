@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { X, Sparkles, Gift } from "lucide-react";
+import { X, Sparkles, Compass } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { Link } from "wouter";
@@ -16,11 +16,10 @@ export default function ExitIntentPopup() {
       const dismissed = localStorage.getItem("hd_exit_popup_dismissed");
       if (!dismissed) {
         setShow(true);
-        // Track AddToCart (discount offer shown = strong intent signal)
-        meta.addToCart(isCs ? 188 : 7.49, {
-          content_name: "Exit Intent Discount 10%",
-          content_ids: ["exit_discount_10"],
-          content_type: "product",
+        // Track engagement signal
+        meta.viewContent({
+          content_name: "Exit Intent Engagement",
+          content_ids: ["exit_engagement"],
         });
       }
     }
@@ -59,7 +58,7 @@ export default function ExitIntentPopup() {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with mystical gradient */}
-        <div className="relative bg-gradient-to-br from-amber-600 via-amber-500 to-yellow-400 p-8 text-center">
+        <div className="relative bg-gradient-to-br from-purple-700 via-violet-600 to-indigo-600 p-8 text-center">
           {/* Sacred geometry overlay */}
           <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
             <circle cx="200" cy="100" r="80" fill="none" stroke="white" strokeWidth="0.5" />
@@ -71,13 +70,13 @@ export default function ExitIntentPopup() {
           
           <div className="relative z-10">
             <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-4">
-              <Gift className="w-8 h-8 text-white" />
+              <Compass className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-2xl font-serif font-bold text-white mb-1">
-              {isCs ? "Počkejte! Máme pro vás dárek" : "Wait! We have a gift for you"}
+              {isCs ? "Chcete znát svůj typ?" : "Curious about your type?"}
             </h3>
             <p className="text-white/90 text-sm">
-              {isCs ? "Exkluzivní nabídka jen pro vás" : "Exclusive offer just for you"}
+              {isCs ? "Zjistěte svůj Human Design za 30 sekund" : "Discover your Human Design in 30 seconds"}
             </p>
           </div>
         </div>
@@ -85,28 +84,22 @@ export default function ExitIntentPopup() {
         {/* Content */}
         <div className="bg-white p-8 text-center">
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-full px-4 py-2 mb-4">
-              <Sparkles className="w-4 h-4 text-amber-600" />
-              <span className="text-amber-800 font-semibold text-sm">
-                {isCs ? "10% SLEVA" : "10% OFF"}
-              </span>
-            </div>
             <h4 className="text-xl font-serif font-bold text-gray-900 mb-2">
               {isCs 
-                ? "Na váš první AI rozbor Human Designu" 
-                : "On your first AI Human Design reading"}
+                ? "Váš chart je zdarma a okamžitě" 
+                : "Your chart is free and instant"}
             </h4>
             <p className="text-gray-600 text-sm leading-relaxed">
               {isCs
-                ? "Získejte personalizovaný rozbor vaší mapy od AI s 10% slevou. Odhalte svůj jedinečný design a životní strategii."
-                : "Get a personalized AI reading of your chart with 10% off. Discover your unique design and life strategy."}
+                ? "Zadejte datum, čas a místo narození. Zjistěte svůj typ, strategii a autoritu — zcela zdarma."
+                : "Enter your birth date, time, and place. Discover your type, strategy, and authority — completely free."}
             </p>
           </div>
 
           <div className="space-y-3">
             <Link href={localePath("/calculate")} onClick={dismiss}>
-              <button className="w-full py-3 px-6 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-semibold rounded-xl transition-all hover:scale-[1.02] shadow-lg shadow-amber-200/50">
-                {isCs ? "Získat mapu se slevou 10 %" : "Get chart with 10% off"}
+              <button className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all hover:scale-[1.02] shadow-lg shadow-purple-200/50">
+                {isCs ? "Vytvořit mapu zdarma" : "Create free chart"}
               </button>
             </Link>
             <button

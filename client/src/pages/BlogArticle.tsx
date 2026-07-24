@@ -105,12 +105,12 @@ function ShareButtons({ article, isEn, locale }: { article: { slug: string; titl
   );
 }
 
-export default function BlogArticle() {
+export default function BlogArticle({ slug: propSlug }: { slug?: string } = {}) {
   const { localePath, locale } = useLanguage();
   const isEn = locale === 'en';
   const params = useParams<{ slug: string }>();
   const [, navigate] = useLocation();
-  const slug = params.slug || "";
+  const slug = propSlug || params.slug || "";
 
   const { data: article, isLoading } = trpc.content.blogPost.useQuery(
     { slug, locale },

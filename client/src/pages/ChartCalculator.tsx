@@ -124,7 +124,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !birthDate || !birthTime || !locationResolved) {
-      toast.error("Vyplňte prosím všechna pole a vyhledejte lokaci.");
+      toast.error(isEn ? "Please fill in all fields and search for a location." : "Vyplňte prosím všechna pole a vyhledejte lokaci.");
       return;
     }
 
@@ -344,7 +344,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                   ) : !locationResolved ? (
                     <>
                       <MapPin className="w-5 h-5 mr-2" />
-                      Nejprve klikněte na "Najít" u Místa narození
+                      {isEn ? 'First click "Find" for Birth Place' : 'Nejprve klikněte na "Najít" u Místa narození'}
                     </>
                   ) : (
                     <>

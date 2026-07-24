@@ -13,13 +13,13 @@ export function registerAiRoutes(app: Express) {
       return;
     }
     try {
-      const { sdk } = await import("./sdk");
+      const { sdk } = await import("../sdk");
       const user = await sdk.authenticateRequest(req as any);
       if (!user) {
         res.status(401).json({ error: "Unauthorized" });
         return;
       }
-      const { updateReadingRating } = await import("../db");
+      const { updateReadingRating } = await import("../../db");
       await updateReadingRating(parsed.data.readingId, user.id, parsed.data.rating);
       res.json({ success: true });
     } catch (err) {

@@ -30,20 +30,68 @@ async function getFonts() {
 
 export async function generateOGImage(
     chartData: HumanDesignChartData,
-    ownerName?: string | null
+    ownerName?: string | null,
+    locale: string = "cs"
 ): Promise<Buffer> {
     const fonts = await getFonts();
 
-    const typeTranslations: Record<string, string> = {
-        "Manifestor": "Manifestor",
-        "Generator": "Generátor",
-        "Manifesting Generator": "Manifestující Generátor",
-        "Projector": "Projektor",
-        "Reflector": "Reflektor"
+    const typeTranslations: Record<string, Record<string, string>> = {
+        cs: {
+            "Manifestor": "Manifestor",
+            "Generator": "Generátor",
+            "Manifesting Generator": "Manifestující Generátor",
+            "Projector": "Projektor",
+            "Reflector": "Reflektor"
+        },
+        en: {
+            "Manifestor": "Manifestor",
+            "Generator": "Generator",
+            "Manifesting Generator": "Manifesting Generator",
+            "Projector": "Projector",
+            "Reflector": "Reflector"
+        },
+        de: {
+            "Manifestor": "Manifestor",
+            "Generator": "Generator",
+            "Manifesting Generator": "Manifestierender Generator",
+            "Projector": "Projektor",
+            "Reflector": "Reflektor"
+        },
+        ru: {
+            "Manifestor": "Манифестор",
+            "Generator": "Генератор",
+            "Manifesting Generator": "Манифестирующий Генератор",
+            "Projector": "Проектор",
+            "Reflector": "Рефлектор"
+        },
+        uk: {
+            "Manifestor": "Маніфестор",
+            "Generator": "Генератор",
+            "Manifesting Generator": "Маніфестуючий Генератор",
+            "Projector": "Проектор",
+            "Reflector": "Рефлектор"
+        },
+        hu: {
+            "Manifestor": "Manifesztor",
+            "Generator": "Generátor",
+            "Manifesting Generator": "Manifesztáló Generátor",
+            "Projector": "Projektor",
+            "Reflector": "Reflektor"
+        }
     };
 
-    const translatedType = typeTranslations[chartData.type] || chartData.type;
-    const name = ownerName ? ownerName : "Human Design Mapa";
+    const labels: Record<string, { profile: string; authority: string; brand: string }> = {
+        cs: { profile: "Profil", authority: "Autorita", brand: "Human Design Mapa" },
+        en: { profile: "Profile", authority: "Authority", brand: "Human Design Chart" },
+        de: { profile: "Profil", authority: "Autorität", brand: "Human Design Chart" },
+        ru: { profile: "Профиль", authority: "Авторитет", brand: "Human Design Карта" },
+        uk: { profile: "Профіль", authority: "Авторитет", brand: "Human Design Карта" },
+        hu: { profile: "Profil", authority: "Autoritás", brand: "Human Design Térkép" }
+    };
+
+    const loc = labels[locale] ? locale : "cs";
+    const translatedType = (typeTranslations[loc] || typeTranslations.cs)[chartData.type] || chartData.type;
+    const name = ownerName ? ownerName : labels[loc].brand;
 
     // Use raw objects instead of TSX to ensure full compatibility with esbuild on Node backend
     const svg = await satori(
@@ -188,7 +236,7 @@ export async function generateOGImage(
                                                         fontSize: '32px',
                                                         fontWeight: 400,
                                                     },
-                                                    children: `Profil ${chartData.profile}`
+                                                    children: `${labels[loc].profile} ${chartData.profile}`
                                                 }
                                             }
                                         ]
@@ -206,7 +254,7 @@ export async function generateOGImage(
                                             color: 'rgba(255,255,255,0.8)',
                                             marginTop: '25px',
                                         },
-                                        children: `Autorita: ${chartData.authority}`
+                                        children: `${labels[loc].authority}: ${chartData.authority}`
                                     }
                                 }
                             ]

@@ -21,9 +21,9 @@ export interface ComgatePaymentOutput {
 function parseComgateResponse(body: string): Record<string, string> {
     const params = new URLSearchParams(body);
     const result: Record<string, string> = {};
-    for (const [key, value] of params.entries()) {
+    params.forEach((value, key) => {
         result[key] = value;
-    }
+    });
     return result;
 }
 

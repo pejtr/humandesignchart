@@ -5,6 +5,11 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+// Mock db connection for unit tests when DB is offline
+vi.mock("./db", () => ({
+  getDb: vi.fn().mockResolvedValue(null),
+}));
+
 // ─── SSE Broadcaster unit tests ───────────────────────────────────────────────
 describe("SSE Broadcaster", () => {
   it("exports required functions", async () => {
@@ -182,9 +187,9 @@ describe("tRPC notifications router", () => {
 
 // ─── SSE endpoint existence test ──────────────────────────────────────────────
 describe("SSE endpoint registration", () => {
-  it("server/_core/index.ts registers /api/notifications/stream", async () => {
+  it("server/_core/routes/notifications.ts registers /api/notifications/stream", async () => {
     const fs = await import("fs");
-    const content = fs.readFileSync("./server/_core/index.ts", "utf-8");
+    const content = fs.readFileSync("./server/_core/routes/notifications.ts", "utf-8");
     expect(content).toContain("/api/notifications/stream");
     expect(content).toContain("text/event-stream");
     expect(content).toContain("addConnection");

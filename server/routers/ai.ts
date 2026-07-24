@@ -15,7 +15,7 @@ export const aiRouter = router({
     generateReading: protectedProcedure
         .input(z.object({
             chartId: z.number(),
-            chartData: z.record(z.unknown()).refine(
+            chartData: z.record(z.string(), z.unknown()).refine(
               (val) => JSON.stringify(val).length <= 500_000,
               "Chart data too large"
             ),

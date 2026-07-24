@@ -22,10 +22,10 @@ function renderMarkdown(md: string) {
         .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' class='text-purple-600 font-bold hover:underline'>$1</a>");
 }
 
-export default function AndelskaCislaDetail() {
+export default function AndelskaCislaDetail({ slug: propSlug }: { slug?: string } = {}) {
     const { localePath } = useLanguage();
     const params = useParams<{ slug: string }>();
-    const slug = params?.slug;
+    const slug = propSlug || params?.slug;
     const { data: article, isLoading } = trpc.angelNumbers.getBySlug.useQuery({ slug: slug! }, {
         enabled: !!slug
     });

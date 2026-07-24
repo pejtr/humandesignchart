@@ -42,7 +42,7 @@ export const chartRouter = router({
             longitude: z.string(),
             timezone: z.string(),
             category: z.enum(["self", "family", "friend", "client", "celebrity", "other"]).default("other"),
-            chartData: z.record(z.unknown()).refine(
+            chartData: z.record(z.string(), z.unknown()).refine(
               (val) => JSON.stringify(val).length <= 500_000,
               "Chart data too large"
             ),

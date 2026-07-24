@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -108,32 +108,6 @@ export default function Pricing() {
   const isCzech = locale === "cs";
   const isPremium = subStatus?.isPremium;
   const freeReadingsLeft = subStatus?.freeReadingsLeft ?? 1;
-
-  // Urgency countdown — ends at next Sunday midnight (resets weekly)
-  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
-  useEffect(() => {
-    const getNextSunday = () => {
-      const now = new Date();
-      const day = now.getDay(); // 0=Sun, 1=Mon...
-      const daysUntilSunday = day === 0 ? 7 : 7 - day;
-      const next = new Date(now);
-      next.setDate(now.getDate() + daysUntilSunday);
-      next.setHours(23, 59, 59, 0);
-      return next;
-    };
-    const target = getNextSunday();
-    const tick = () => {
-      const diff = target.getTime() - Date.now();
-      if (diff <= 0) { setTimeLeft({ hours: 0, minutes: 0, seconds: 0 }); return; }
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      setTimeLeft({ hours: h, minutes: m, seconds: s });
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, []);
 
   const freeFeatures = isCzech ? [
     "5 bezplatných AI výkladů",
@@ -313,16 +287,6 @@ export default function Pricing() {
 
               {/* Annual Plan */}
               <Card className="border-violet-500/50 bg-violet-950/10 relative">
-                {/* Urgency timer banner */}
-                <div className="absolute -top-8 left-0 right-0 flex justify-center">
-                  <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-3 py-1 text-xs text-amber-700 dark:text-amber-300">
-                    <span className="animate-pulse w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
-                    {isCzech ? "Sleva končí za" : "Offer ends in"}
-                    <span className="font-mono font-bold">
-                      {String(timeLeft.hours).padStart(2, "0")}:{String(timeLeft.minutes).padStart(2, "0")}:{String(timeLeft.seconds).padStart(2, "0")}
-                    </span>
-                  </div>
-                </div>
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-violet-600 text-white px-3 py-1">
                     <Zap className="w-3 h-3 mr-1" />
@@ -574,14 +538,9 @@ export default function Pricing() {
           </TabsContent>
         </Tabs>
 
-        {/* Test card info */}
+        {/* Secure payments note */}
         <div className="mt-12 text-center">
           <p className="text-xs text-muted-foreground">
-            {isCzech
-              ? "Testovací platba: karta 4242 4242 4242 4242 · libovolné datum a CVC"
-              : "Test payment: card 4242 4242 4242 4242 · any expiry and CVC"}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
             {isCzech
               ? "Platby jsou zpracovávány bezpečně přes Stripe"
               : "Payments are processed securely via Stripe"}

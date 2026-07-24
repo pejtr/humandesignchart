@@ -41,23 +41,34 @@ const DEFINITION_CS: Record<string, string> = {
   "No Definition": "Bez definice",
 };
 
-export default function SharedChart() {
+export default function SharedChart({ token: propToken }: { token?: string } = {}) {
   const { locale, localePath } = useLanguage();
   const params = useParams<{ token: string }>();
   const [, navigate] = useLocation();
 
+  const token = propToken || params.token || "";
+
   const { data, isLoading, error } = trpc.share.getShared.useQuery(
-    { token: params.token || "" },
+    { token },
     { enabled: !!params.token }
   );
 
   const chartName = data?.ownerName || "Human Design Chart";
   const chartType = data?.chartData?.type || "";
 
+  const ogImageUrl = `${window.location.origin}/api/og/shared/${params.token}?locale=${locale}`;
+
   useSEO({
-    title: `Sdílená Human Design Mapa — ${chartName} | HumanDesignMapa.cz`,
-    description: `Prohlédněte si sdílenou Human Design mapu ${chartName}. Typ: ${locale === "cs" ? (TYPE_CS[chartType] || chartType) : chartType || ""}`,
-    keywords: "sdílená human design mapa, human design chart shared, bodygraph",
+    title: locale === "cs"
+      ? `Sdílená Human Design Mapa — ${chartName}`
+      : `Shared Human Design Chart — ${chartName}`,
+    description: locale === "cs"
+      ? `Prohlédněte si sdílenou Human Design mapu ${chartName}. Typ: ${TYPE_CS[chartType] || chartType || ""}`
+      : `View the shared Human Design chart of ${chartName}. Type: ${chartType || ""}`,
+    ogImage: ogImageUrl,
+    keywords: locale === "cs"
+      ? "sdílená human design mapa, human design chart shared, bodygraph"
+      : "shared human design chart, bodygraph, human design map",
     ogType: "website",
     noIndex: true,
   });
@@ -69,13 +80,17 @@ export default function SharedChart() {
       <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="container pt-24 pb-16 text-center">
-          <h1 className="font-serif text-3xl font-bold mb-4">Sdílená mapa nenalezena</h1>
+          <h1 className="font-serif text-3xl font-bold mb-4">
+            {locale === "cs" ? "Sdílená mapa nenalezena" : "Shared chart not found"}
+          </h1>
           <p className="text-muted-foreground mb-6">
-            Tento odkaz je neplatný nebo vypršel. Sdílené mapy jsou platné 30 dní.
+            {locale === "cs"
+              ? "Tento odkaz je neplatný nebo vypršel. Sdílené mapy jsou platné 30 dní."
+              : "This link is invalid or has expired. Shared charts are valid for 30 days."}
           </p>
           <Button onClick={() => navigate(localePath("/"))}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Zpět na hlavní stránku
+            {locale === "cs" ? "Zpět na hlavní stránku" : "Back to homepage"}
           </Button>
         </div>
         <Footer />
@@ -110,7 +125,7 @@ export default function SharedChart() {
             <Card className="bg-card border-border/50 shadow-sm">
               <CardHeader className="pb-2">
                 <CardTitle className="font-serif text-lg">Bodygraph</CardTitle>
-                <CardDescription>Vizuální mapa energetických center</CardDescription>
+                <CardDescription>{locale === "cs" ? "Vizuální mapa energetických center" : "Visual map of energy centers"}</CardDescription>
               </CardHeader>
               <CardContent className="flex justify-center">
                 <Bodygraph chart={chart} width={380} height={460} />
@@ -123,31 +138,31 @@ export default function SharedChart() {
             {/* Overview */}
             <Card className="bg-card border-border/50">
               <CardHeader>
-                <CardTitle className="font-serif text-xl">Přehled</CardTitle>
+                <CardTitle className="font-serif text-xl">{locale === "cs" ? "Přehled" : "Overview"}</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-xs text-muted-foreground mb-1">Typ</p>
+                  <p className="text-xs text-muted-foreground mb-1">{locale === "cs" ? "Typ" : "Type"}</p>
                   <p className="font-semibold text-sm">{czType}</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-xs text-muted-foreground mb-1">Strategie</p>
+                  <p className="text-xs text-muted-foreground mb-1">{locale === "cs" ? "Strategie" : "Strategy"}</p>
                   <p className="font-semibold text-sm">{chart.strategy}</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-xs text-muted-foreground mb-1">Autorita</p>
+                  <p className="text-xs text-muted-foreground mb-1">{locale === "cs" ? "Autorita" : "Authority"}</p>
                   <p className="font-semibold text-sm">{chart.authority}</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-xs text-muted-foreground mb-1">Profil</p>
+                  <p className="text-xs text-muted-foreground mb-1">{locale === "cs" ? "Profil" : "Profile"}</p>
                   <p className="font-semibold text-sm">{chart.profile} {chart.profileName}</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-xs text-muted-foreground mb-1">Definice</p>
+                  <p className="text-xs text-muted-foreground mb-1">{locale === "cs" ? "Definice" : "Definition"}</p>
                   <p className="font-semibold text-sm">{czDefinition}</p>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-muted/50">
-                  <p className="text-xs text-muted-foreground mb-1">Inkarnační kříž</p>
+                  <p className="text-xs text-muted-foreground mb-1">{locale === "cs" ? "Inkarnační kříž" : "Incarnation Cross"}</p>
                   <p className="font-semibold text-xs">{chart.incarnationCross?.name || "—"}</p>
                 </div>
               </CardContent>
@@ -156,7 +171,7 @@ export default function SharedChart() {
             {/* Defined Centers */}
             <Card className="bg-card border-border/50">
               <CardHeader>
-                <CardTitle className="font-serif text-lg">Definovaná centra</CardTitle>
+                <CardTitle className="font-serif text-lg">{locale === "cs" ? "Definovaná centra" : "Defined Centers"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
@@ -172,13 +187,13 @@ export default function SharedChart() {
             {/* Active Gates */}
             <Card className="bg-card border-border/50">
               <CardHeader>
-                <CardTitle className="font-serif text-lg">Aktivní brány</CardTitle>
+                <CardTitle className="font-serif text-lg">{locale === "cs" ? "Aktivní brány" : "Active Gates"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-1.5">
                   {chart.activatedGates?.map((g: any) => (
                     <Badge key={g.gate} variant="outline" className="text-xs py-0.5">
-                      Brána {g.gate}
+                      {locale === "cs" ? `Brána ${g.gate}` : `Gate ${g.gate}`}
                     </Badge>
                   ))}
                 </div>
@@ -189,7 +204,7 @@ export default function SharedChart() {
             {chart.channels && chart.channels.length > 0 && (
               <Card className="bg-card border-border/50">
                 <CardHeader>
-                  <CardTitle className="font-serif text-lg">Kanály</CardTitle>
+                  <CardTitle className="font-serif text-lg">{locale === "cs" ? "Kanály" : "Channels"}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
@@ -206,13 +221,17 @@ export default function SharedChart() {
             {/* CTA */}
             <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
               <CardContent className="py-6 text-center">
-                <h3 className="font-serif text-xl font-bold mb-2">Chcete vlastní mapu s AI výkladem?</h3>
+                <h3 className="font-serif text-xl font-bold mb-2">
+                  {locale === "cs" ? "Chcete vlastní mapu s AI výkladem?" : "Want your own chart with AI reading?"}
+                </h3>
                 <p className="text-muted-foreground mb-4">
-                  Vytvořte si svou Human Design mapu zdarma a získejte personalizovaný AI rozbor.
+                  {locale === "cs"
+                    ? "Vytvořte si svou Human Design mapu zdarma a získejte personalizovaný AI rozbor."
+                    : "Create your Human Design chart for free and get a personalized AI reading."}
                 </p>
                 <Button onClick={() => navigate(localePath("/calculate"))} className="bg-primary text-primary-foreground">
                   <Compass className="w-4 h-4 mr-2" />
-                  Vytvořit moji mapu zdarma
+                  {locale === "cs" ? "Vytvořit moji mapu zdarma" : "Create my free chart"}
                 </Button>
               </CardContent>
             </Card>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { X, Sparkles, Brain, Star, ChevronRight, ChevronLeft } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface OnboardingStep {
   icon: React.ReactNode;
@@ -47,30 +48,56 @@ export default function OnboardingModal({
   onRequestAiReading,
 }: OnboardingModalProps) {
   const [step, setStep] = useState(0);
+  const { locale } = useLanguage();
+  const isCs = locale === "cs";
 
-  const steps: OnboardingStep[] = [
-    {
-      icon: <Star className="w-8 h-8" />,
-      title: `Jste ${chartType}`,
-      description: `Váš typ určuje, jak vaše aura interaguje se světem a jaká je vaše správná strategie pro rozhodování a životní tok.`,
-      highlight: `Typ je nejzákladnější informace ve vašem Human Design chartu.`,
-      color: "#7c3aed",
-    },
-    {
-      icon: <Brain className="w-8 h-8" />,
-      title: `Vaše autorita: ${chartAuthority}`,
-      description: `Autorita je váš vnitřní kompas — říká vám, jak dělat správná rozhodnutí. Není to mysl, ale tělesná inteligence.`,
-      highlight: `Naučte se naslouchat své autoritě a rozhodování se stane přirozeným.`,
-      color: "#2a9d8f",
-    },
-    {
-      icon: <Sparkles className="w-8 h-8" />,
-      title: "Získejte Hloubkový výklad",
-      description: `Váš profil ${chartProfile} a inkarnační kříž odhalují vaše životní poslání. Hloubkový výklad vám vše vysvětlí srozumitelně v češtině.`,
-      highlight: `Klikněte na "Hloubkový výklad vaší mapy" v pravém sloupci — je to první věc nahoře.`,
-      color: "#d4af37",
-    },
-  ];
+  const steps: OnboardingStep[] = isCs
+    ? [
+        {
+          icon: <Star className="w-8 h-8" />,
+          title: `Jste ${chartType}`,
+          description: `Váš typ určuje, jak vaše aura interaguje se světem a jaká je vaše správná strategie pro rozhodování a životní tok.`,
+          highlight: `Typ je nejzákladnější informace ve vašem Human Design chartu.`,
+          color: "#7c3aed",
+        },
+        {
+          icon: <Brain className="w-8 h-8" />,
+          title: `Vaše autorita: ${chartAuthority}`,
+          description: `Autorita je váš vnitřní kompas — říká vám, jak dělat správná rozhodnutí. Není to mysl, ale tělesná inteligence.`,
+          highlight: `Naučte se naslouchat své autoritě a rozhodování se stane přirozeným.`,
+          color: "#2a9d8f",
+        },
+        {
+          icon: <Sparkles className="w-8 h-8" />,
+          title: "Získejte Hloubkový výklad",
+          description: `Váš profil ${chartProfile} a inkarnační kříž odhalují vaše životní poslání. Hloubkový výklad vám vše vysvětlí srozumitelně.`,
+          highlight: `Klikněte na "Hloubkový výklad vaší mapy" v pravém sloupci — je to první věc nahoře.`,
+          color: "#d4af37",
+        },
+      ]
+    : [
+        {
+          icon: <Star className="w-8 h-8" />,
+          title: `You are a ${chartType}`,
+          description: `Your type determines how your aura interacts with the world and what your correct strategy is for decision-making and life flow.`,
+          highlight: `Type is the most fundamental information in your Human Design chart.`,
+          color: "#7c3aed",
+        },
+        {
+          icon: <Brain className="w-8 h-8" />,
+          title: `Your Authority: ${chartAuthority}`,
+          description: `Authority is your inner compass — it tells you how to make correct decisions. It's not the mind, but bodily intelligence.`,
+          highlight: `Learn to listen to your authority and decision-making becomes natural.`,
+          color: "#2a9d8f",
+        },
+        {
+          icon: <Sparkles className="w-8 h-8" />,
+          title: "Get a Deep Reading",
+          description: `Your profile ${chartProfile} and incarnation cross reveal your life purpose. A deep reading will explain everything clearly.`,
+          highlight: `Click "Deep Reading of Your Map" in the right column — it's the first thing at the top.`,
+          color: "#d4af37",
+        },
+      ];
 
   const currentStep = steps[step];
   const isLast = step === steps.length - 1;
@@ -97,7 +124,7 @@ export default function OnboardingModal({
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-muted transition-colors z-10"
-          aria-label="Přeskočit průvodce"
+          aria-label={isCs ? "Přeskočit průvodce" : "Skip guide"}
         >
           <X className="w-4 h-4 text-muted-foreground" />
         </button>
@@ -164,9 +191,9 @@ export default function OnboardingModal({
             className="text-muted-foreground"
           >
             {step > 0 ? (
-              <><ChevronLeft className="w-4 h-4 mr-1" /> Zpět</>
+              <><ChevronLeft className="w-4 h-4 mr-1" /> {isCs ? "Zpět" : "Back"}</>
             ) : (
-              "Přeskočit"
+              isCs ? "Přeskočit" : "Skip"
             )}
           </Button>
 
@@ -177,16 +204,16 @@ export default function OnboardingModal({
             style={{ background: currentStep.color, border: "none" }}
           >
             {isLast ? (
-              <><Sparkles className="w-4 h-4 mr-1.5" /> Spustit Hloubkový výklad</>
+              <><Sparkles className="w-4 h-4 mr-1.5" /> {isCs ? "Spustit Hloubkový výklad" : "Start Deep Reading"}</>
             ) : (
-              <>Další <ChevronRight className="w-4 h-4 ml-1" /></>
+              <>{isCs ? "Další" : "Next"} <ChevronRight className="w-4 h-4 ml-1" /></>
             )}
           </Button>
         </div>
 
         {/* Step counter */}
         <p className="text-center text-xs text-muted-foreground pb-4">
-          Krok {step + 1} z {steps.length}
+          {isCs ? `Krok ${step + 1} z ${steps.length}` : `Step ${step + 1} of ${steps.length}`}
         </p>
       </div>
     </div>,

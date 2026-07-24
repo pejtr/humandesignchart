@@ -8,7 +8,7 @@ export function registerGptRoutes(app: Express) {
       if (!birthDate || !birthTime || latitude == null || longitude == null || timezoneOffset == null) {
         return res.status(400).json({ error: "Missing required fields" });
       }
-      const { calculateChart } = await import("../humandesign");
+      const { calculateChart } = await import("../../humandesign");
       const chart = calculateChart(
         birthDate,
         birthTime,

@@ -183,7 +183,7 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
 
     personalizedByData: publicProcedure
         .input(z.object({
-            chartData: z.record(z.unknown()).refine(
+            chartData: z.record(z.string(), z.unknown()).refine(
               (val) => JSON.stringify(val).length <= 500_000,
               "Chart data too large"
             ),
@@ -191,7 +191,7 @@ Vytvoř osobní denní tranzitový výklad pro tuto osobu.`;
         }))
         .mutation(async ({ input }) => {
             const isEn = input.locale === 'en';
-            const chartData = input.chartData as HumanDesignChartData;
+            const chartData = input.chartData as unknown as HumanDesignChartData;
             const { now, transitGates } = await calculateTransitGates();
             const transitGatesClean = transitGates.map(({ longitude, ...rest }) => rest);
 

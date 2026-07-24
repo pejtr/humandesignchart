@@ -4,66 +4,65 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 describe("SSE Streaming Endpoint", () => {
   it("should have SSE endpoint registered at /api/ai/stream", async () => {
-    // Verify the endpoint exists by checking the server core index
     const fs = await import("fs");
-    const indexContent = fs.readFileSync(
-      "./server/_core/index.ts",
+    const streamContent = fs.readFileSync(
+      "./server/_core/routes/aiStream.ts",
       "utf-8"
     );
-    expect(indexContent).toContain('app.get("/api/ai/stream"');
-    expect(indexContent).toContain("text/event-stream");
-    expect(indexContent).toContain("X-Accel-Buffering");
+    expect(streamContent).toContain('app.get("/api/ai/stream"');
+    expect(streamContent).toContain("text/event-stream");
+    expect(streamContent).toContain("X-Accel-Buffering");
   });
 
   it("should have rating endpoint registered at /api/ai/rating", async () => {
     const fs = await import("fs");
-    const indexContent = fs.readFileSync(
-      "./server/_core/index.ts",
+    const aiContent = fs.readFileSync(
+      "./server/_core/routes/ai.ts",
       "utf-8"
     );
-    expect(indexContent).toContain('app.post("/api/ai/rating"');
-    expect(indexContent).toContain('"up"');
-    expect(indexContent).toContain('"down"');
+    expect(aiContent).toContain('app.post("/api/ai/rating"');
+    expect(aiContent).toContain('"up"');
+    expect(aiContent).toContain('"down"');
   });
 
   it("should handle stream: true in LLM request body", async () => {
     const fs = await import("fs");
-    const indexContent = fs.readFileSync(
-      "./server/_core/index.ts",
+    const streamContent = fs.readFileSync(
+      "./server/_core/routes/aiStream.ts",
       "utf-8"
     );
-    expect(indexContent).toContain("stream: true");
-    expect(indexContent).toContain("max_tokens: 4096");
+    expect(streamContent).toContain("stream: true");
+    expect(streamContent).toContain("max_tokens: 4096");
   });
 
   it("should emit data: {token} SSE events", async () => {
     const fs = await import("fs");
-    const indexContent = fs.readFileSync(
-      "./server/_core/index.ts",
+    const streamContent = fs.readFileSync(
+      "./server/_core/routes/aiStream.ts",
       "utf-8"
     );
-    expect(indexContent).toContain('JSON.stringify({ token })');
-    expect(indexContent).toContain('JSON.stringify({ done: true })');
+    expect(streamContent).toContain('JSON.stringify({ token })');
+    expect(streamContent).toContain('JSON.stringify({ done: true })');
   });
 
   it("should save completed reading to DB after stream ends", async () => {
     const fs = await import("fs");
-    const indexContent = fs.readFileSync(
-      "./server/_core/index.ts",
+    const streamContent = fs.readFileSync(
+      "./server/_core/routes/aiStream.ts",
       "utf-8"
     );
-    expect(indexContent).toContain("createAiReading");
-    expect(indexContent).toContain("fullContent && chartId");
+    expect(streamContent).toContain("createAiReading");
+    expect(streamContent).toContain("fullContent && chartId");
   });
 
   it("should authenticate request using sdk before streaming", async () => {
     const fs = await import("fs");
-    const indexContent = fs.readFileSync(
-      "./server/_core/index.ts",
+    const streamContent = fs.readFileSync(
+      "./server/_core/routes/aiStream.ts",
       "utf-8"
     );
-    expect(indexContent).toContain("sdk.authenticateRequest");
-    expect(indexContent).toContain('res.status(401)');
+    expect(streamContent).toContain("sdk.authenticateRequest");
+    expect(streamContent).toContain('res.status(401)');
   });
 });
 
@@ -76,9 +75,9 @@ describe("AI Reading Rating Schema", () => {
       "./drizzle/schema.ts",
       "utf-8"
     );
-    expect(schemaContent).toContain('rating: mysqlEnum("rating"');
-    expect(schemaContent).toContain('"up"');
-    expect(schemaContent).toContain('"down"');
+    expect(schemaContent).toContain('rating: mysqlEnum');
+    expect(schemaContent).toContain("'up'");
+    expect(schemaContent).toContain("'down'");
   });
 
   it("should have rating as optional (nullable) field", async () => {

@@ -11,11 +11,11 @@ export type Locale = "cs" | "en" | "ru" | "uk" | "de" | "hu";
 
 const TRANSLATIONS: Record<Locale, typeof cs> = {
   cs,
-  en: en as typeof cs,
-  ru: ru as typeof cs,
-  uk: uk as typeof cs,
-  de: de as typeof cs,
-  hu: hu as typeof cs,
+  en: en as unknown as typeof cs,
+  ru: ru as unknown as typeof cs,
+  uk: uk as unknown as typeof cs,
+  de: de as unknown as typeof cs,
+  hu: hu as unknown as typeof cs,
 };
 
 interface LanguageContextValue {

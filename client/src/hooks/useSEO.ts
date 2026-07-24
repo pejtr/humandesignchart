@@ -133,7 +133,7 @@ export function useSEO(options: SEOOptions) {
     setMeta('meta[property="og:image:width"]', "content", "1200");
     setMeta('meta[property="og:image:height"]', "content", "630");
     setMeta('meta[property="og:locale"]', "content", locale);
-    setMeta('meta[property="og:site_name"]', "content", "Human Design Mapa");
+    setMeta('meta[property="og:site_name"]', "content", locale === "cs_CZ" ? "Human Design Mapa" : "Human Design Chart");
 
     // Twitter Card
     setMeta('meta[name="twitter:card"]', "content", "summary_large_image");

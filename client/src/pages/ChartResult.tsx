@@ -78,7 +78,7 @@ interface DetailModalState {
   id: string | number | null;
 }
 
-export default function ChartResult() {
+export default function ChartResult({ id: propId }: { id?: string } = {}) {
   const params = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { isAuthenticated } = useAuth();
@@ -160,7 +160,7 @@ export default function ChartResult() {
     setAiReadingType("daily_transit");
     setAiReading(null);
     setDailyTransitReading(null);
-    personalizedTransitMutation.mutate({ chartData: chart, locale });
+    personalizedTransitMutation.mutate({ chartData: chart as any, locale });
   };
 
   const transitQuery = trpc.transit.current.useQuery(undefined, {
@@ -236,7 +236,7 @@ export default function ChartResult() {
       longitude: String(chartMeta.longitude || "0"),
       timezone: chartMeta.timezone || chart.timezone,
       category: saveCategory,
-      chartData: chart,
+      chartData: chart as any,
     });
     setShowSaveDialog(false);
   };
@@ -289,7 +289,7 @@ export default function ChartResult() {
         if (!res.ok || !res.body) {
           // Fallback to tRPC mutation
           setAiStreaming(false);
-          aiMutation.mutate({ chartId: savedChartId || 0, chartData: chart, readingType: type as any });
+          aiMutation.mutate({ chartId: savedChartId || 0, chartData: chart as any, readingType: type as any });
           return;
         }
         const reader = res.body.getReader();
@@ -323,7 +323,7 @@ export default function ChartResult() {
         if (err.name !== "AbortError") {
           setAiStreaming(false);
           // Fallback to tRPC mutation
-          aiMutation.mutate({ chartId: savedChartId || 0, chartData: chart, readingType: type as any });
+          aiMutation.mutate({ chartId: savedChartId || 0, chartData: chart as any, readingType: type as any });
         }
       });
   };

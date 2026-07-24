@@ -67,8 +67,8 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
           icon: <Gift className="w-8 h-8" />,
           color: "#7c3aed",
           title: "Welcome to Human Design!",
-          description: "You've received 1 free AI reading as a welcome gift. Use it to explore your unique design.",
-          highlight: "Your credit is ready — click AI Guide or generate your chart to use it.",
+          description: "You've received 5 free AI readings as a welcome gift. Use them to explore your unique design.",
+          highlight: "Your credits are ready — click AI Guide or generate your chart to start.",
           cta: null,
         },
         {

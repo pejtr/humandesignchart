@@ -5,7 +5,7 @@ export function registerNotificationRoutes(app: Express) {
   app.get("/api/notifications/stream", async (req, res) => {
     let userId: number | null = null;
     try {
-      const { sdk } = await import("./sdk");
+      const { sdk } = await import("../sdk");
       const user = await sdk.authenticateRequest(req as any);
       if (user) userId = user.id;
     } catch { /* no-op */ }
