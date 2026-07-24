@@ -36,6 +36,27 @@ export default function DailyTransit() {
   const [selectedChartId, setSelectedChartId] = useState<number | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Active session chart from calculator as fallback
+  const sessionChart = useMemo(() => {
+    try {
+      const stored = sessionStorage.getItem("chartResult");
+      const meta = sessionStorage.getItem("chartMeta");
+      if (!stored) return null;
+      const chartData = JSON.parse(stored);
+      const chartMeta = meta ? JSON.parse(meta) : null;
+      return {
+        chartData,
+        name: chartMeta?.name || "Moje mapa",
+        type: chartData.type,
+        profile: chartData.profile,
+      };
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const sessionTransitMutation = trpc.transit.personalizedByData.useMutation();
+
   const chartsQuery = trpc.chart.list.useQuery(undefined, { enabled: isAuthenticated });
   const charts = chartsQuery.data || [];
 
@@ -48,19 +69,33 @@ export default function DailyTransit() {
     [effectiveChartId, refreshKey]
   );
 
-  // Personalized transit if they have a chart
+  // Personalized transit if they have a saved chart in DB
   const transitQuery = trpc.transit.personalized.useQuery(
     stableInput!,
     { enabled: isAuthenticated && !!effectiveChartId }
   );
 
+  // Trigger session chart transit if no saved chart in DB
+  useEffect(() => {
+    if (!effectiveChartId && sessionChart?.chartData && !sessionTransitMutation.data && !sessionTransitMutation.isPending) {
+      sessionTransitMutation.mutate({ chartData: sessionChart.chartData, locale });
+    }
+  }, [effectiveChartId, sessionChart, locale]);
+
   // General transit if they don't have a chart or are not logged in
   const generalTransitQuery = trpc.transit.current.useQuery(undefined, {
-    enabled: !isAuthenticated || !effectiveChartId
+    enabled: !isAuthenticated && !sessionChart
   });
 
-  const isGeneral = !isAuthenticated || !effectiveChartId;
-  const transit = isGeneral ? generalTransitQuery.data : transitQuery.data;
+  const isGeneral = !isAuthenticated && !sessionChart && !effectiveChartId;
+  const transit = isGeneral
+    ? generalTransitQuery.data
+    : (effectiveChartId ? transitQuery.data : (sessionTransitMutation.data ? {
+        ...sessionTransitMutation.data,
+        chartName: sessionChart?.name || "Moje mapa",
+        chartType: sessionChart?.type || "",
+        chartProfile: sessionChart?.profile || "",
+      } : null));
 
   const getShareText = () => {
     if (!transit) return "";
@@ -225,7 +260,23 @@ export default function DailyTransit() {
           </div>
 
           {/* Chart selector */}
-          {charts.length === 0 ? (
+          {charts.length === 0 && sessionChart ? (
+            <div className="mb-6 p-4 rounded-xl bg-primary/10 border border-primary/20 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary shrink-0" />
+                <span className="text-sm font-medium text-foreground">
+                  {locale === "cs"
+                    ? `Zobrazen osobní tranzit pro mapu: ${sessionChart.name}`
+                    : `Showing personal transit for chart: ${sessionChart.name}`}
+                </span>
+              </div>
+              <Link href={localePath("/chart/now")}>
+                <Button size="sm" variant="outline" className="text-xs h-8">
+                  {locale === "cs" ? "Zobrazit moji mapu" : "View my chart"}
+                </Button>
+              </Link>
+            </div>
+          ) : charts.length === 0 ? (
             <Card className="mb-6 border-dashed">
               <CardContent className="py-10 text-center">
                 <Moon className="w-10 h-10 text-muted-foreground mx-auto mb-3" />

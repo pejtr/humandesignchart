@@ -78,6 +78,54 @@ interface DetailModalState {
   id: string | number | null;
 }
 
+function AiReadingProgress({ locale }: { locale: string }) {
+  const [progress, setProgress] = useState(8);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 94) return 94;
+        const diff = 95 - prev;
+        const inc = Math.max(1, Math.floor(diff / 6));
+        return prev + inc;
+      });
+    }, 350);
+    return () => clearInterval(timer);
+  }, []);
+
+  const getStage = (p: number) => {
+    if (locale === "cs") {
+      if (p < 25) return "⚡ Analýza bran a definic...";
+      if (p < 60) return "🧠 Výpočet profilu a autority...";
+      if (p < 88) return "✨ Formulování osobního výkladu...";
+      return "🔮 Dokončování výkladu...";
+    }
+    if (p < 25) return "⚡ Analyzing gates & definitions...";
+    if (p < 60) return "🧠 Calculating profile & authority...";
+    if (p < 88) return "✨ Formatting personalized reading...";
+    return "🔮 Finalizing blueprint...";
+  };
+
+  return (
+    <div className="w-full max-w-md mx-auto space-y-3 py-3">
+      <div className="flex items-center justify-between text-xs font-semibold text-primary">
+        <span className="flex items-center gap-1.5">
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-primary shrink-0" />
+          {getStage(progress)}
+        </span>
+        <span className="font-mono text-sm font-bold text-primary">{progress}%</span>
+      </div>
+
+      <div className="w-full h-3 bg-primary/10 rounded-full overflow-hidden p-0.5 border border-primary/20 shadow-inner">
+        <div
+          className="h-full bg-gradient-to-r from-purple-600 via-indigo-600 to-violet-500 rounded-full transition-all duration-300 ease-out shadow-sm"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function ChartResult({ id: propId }: { id?: string } = {}) {
   const params = useParams<{ id: string }>();
   const [, navigate] = useLocation();
@@ -218,6 +266,22 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
     }
   }, [savedChartQuery.data]);
 
+  const getCachedReading = (type: string): string | null => {
+    try {
+      const chartName = chartMeta?.name || (chart as any)?.name || "chart";
+      return sessionStorage.getItem(`hd_ai_${type}_${chartName}`);
+    } catch {
+      return null;
+    }
+  };
+
+  const setCachedReading = (type: string, content: string) => {
+    try {
+      const chartName = chartMeta?.name || (chart as any)?.name || "chart";
+      sessionStorage.setItem(`hd_ai_${type}_${chartName}`, content);
+    } catch { /* skip */ }
+  };
+
   const saveMutation = trpc.chart.save.useMutation({
     onSuccess: (data) => {
       setSavedChartId(data.id);
@@ -228,7 +292,11 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
 
   // Keep old mutation as fallback but prefer streaming
   const aiMutation = trpc.ai.generateReading.useMutation({
-    onSuccess: (data) => { setAiReading(data.content); setAiReadingId(data.id); },
+    onSuccess: (data) => {
+      setAiReading(data.content);
+      setAiReadingId(data.id);
+      if (aiReadingType && data.content) setCachedReading(aiReadingType, data.content);
+    },
     onError: (err) => toast.error("AI čtení selhalo: " + err.message),
   });
 
@@ -270,6 +338,15 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
 
   const handleAiReading = (type: string) => {
     if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+
+    const cached = getCachedReading(type);
+    if (cached) {
+      setAiReadingType(type);
+      setAiReading(cached);
+      setAiStreaming(false);
+      return;
+    }
+
     // Low-credit warning toast
     if (subStatus && !subStatus.isPremium) {
       const totalLeft = (subStatus.freeReadingsLeft ?? 0) + (subStatus.aiReadingCredits ?? 0);
@@ -335,6 +412,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
               }
               if (data.done) {
                 setAiStreaming(false);
+                if (accumulated) setCachedReading(type, accumulated);
               }
               if (data.error) {
                 setAiStreaming(false);
@@ -344,6 +422,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
           }
         }
         setAiStreaming(false);
+        if (accumulated) setCachedReading(type, accumulated);
       })
       .catch((err) => {
         if (err.name !== "AbortError") {
@@ -357,7 +436,13 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
   // Auto-start overview AI reading on chart load so user doesn't wait
   useEffect(() => {
     if (chart && isAuthenticated && !aiReading && !aiStreaming && !aiMutation.isPending && !dailyTransitLoading && !personalizedTransitMutation.isPending) {
-      handleAiReading("overview");
+      const cachedOverview = getCachedReading("overview");
+      if (cachedOverview) {
+        setAiReadingType("overview");
+        setAiReading(cachedOverview);
+      } else {
+        handleAiReading("overview");
+      }
     }
   }, [chart, isAuthenticated]);
 
@@ -698,20 +783,17 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                     </div>
                   ) : (aiStreaming || aiMutation.isPending || dailyTransitLoading || personalizedTransitMutation.isPending) && !aiReading && !dailyTransitReading ? (
                     <Card className="border-primary/20 bg-primary/5">
-                      <CardContent className="py-8">
-                        <div className="flex flex-col items-center gap-3 text-center">
-                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-sm">{t.chart.generatingReading}</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {dailyTransitLoading || personalizedTransitMutation.isPending
-                                ? (locale === "cs" ? "Generuji denní výklad tranzitů..." : "Generating daily transit reading...")
-                                : "AI analýza vaší mapy probíhá..."}
-                            </p>
-                          </div>
+                      <CardContent className="py-8 text-center">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                          <Sparkles className="w-6 h-6 animate-pulse text-primary" />
                         </div>
+                        <p className="font-semibold text-base mb-1">{t.chart.generatingReading}</p>
+                        <p className="text-xs text-muted-foreground mb-4">
+                          {dailyTransitLoading || personalizedTransitMutation.isPending
+                            ? (locale === "cs" ? "Příprava osobního denního tranzitu..." : "Preparing daily transit reading...")
+                            : (locale === "cs" ? "Generování hloubkového AI rozboru..." : "Generating deep AI reading...")}
+                        </p>
+                        <AiReadingProgress locale={locale} />
                       </CardContent>
                     </Card>
                   ) : (aiReading || dailyTransitReading) ? (
