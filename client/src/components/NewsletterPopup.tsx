@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { X, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ const STORAGE_KEY = "hd_newsletter_dismissed";
 export default function NewsletterPopup() {
   const { locale } = useLanguage();
   const isEn = locale === "en";
+  const { isAuthenticated } = useAuth();
   const meta = useMetaPixel();
   const [isVisible, setIsVisible] = useState(false);
   const [email, setEmail] = useState("");
@@ -33,11 +35,12 @@ export default function NewsletterPopup() {
   });
 
   useEffect(() => {
+    if (isAuthenticated) return;
     const dismissed = localStorage.getItem(STORAGE_KEY);
     if (dismissed) return;
     const timer = setTimeout(() => setIsVisible(true), 30000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isAuthenticated]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +54,7 @@ export default function NewsletterPopup() {
     localStorage.setItem(STORAGE_KEY, "true");
   };
 
-  if (!isVisible) return null;
+  if (isAuthenticated || !isVisible) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">

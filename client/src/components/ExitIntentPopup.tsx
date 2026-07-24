@@ -2,15 +2,18 @@ import { useState, useEffect, useCallback } from "react";
 import { X, Sparkles, Compass } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
 
 export default function ExitIntentPopup() {
   const { t, locale, localePath } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const [show, setShow] = useState(false);
   const isCs = locale === "cs";
   const meta = useMetaPixel();
 
   const handleMouseLeave = useCallback((e: MouseEvent) => {
+    if (isAuthenticated) return;
     // Only trigger when mouse leaves from the top of the viewport
     if (e.clientY <= 5 && !show) {
       const dismissed = localStorage.getItem("hd_exit_popup_dismissed");
@@ -23,9 +26,10 @@ export default function ExitIntentPopup() {
         });
       }
     }
-  }, [show]);
+  }, [show, isAuthenticated]);
 
   useEffect(() => {
+    if (isAuthenticated) return;
     // Don't show on mobile (no mouse leave detection)
     if (window.matchMedia("(pointer: coarse)").matches) return;
     
@@ -38,14 +42,14 @@ export default function ExitIntentPopup() {
       clearTimeout(timer);
       document.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [handleMouseLeave]);
+  }, [handleMouseLeave, isAuthenticated]);
 
   const dismiss = () => {
     setShow(false);
     localStorage.setItem("hd_exit_popup_dismissed", "true");
   };
 
-  if (!show) return null;
+  if (isAuthenticated || !show) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={dismiss}>
