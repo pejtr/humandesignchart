@@ -42,6 +42,8 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
+  app.set("trust proxy", true);
+
   // Baseline security headers
   app.disable("x-powered-by");
   app.use((_req, res, next) => {
@@ -58,8 +60,9 @@ async function startServer() {
     const isChart = host === "humandesignchart.app" || host === "www.humandesignchart.app";
     if (!isMapa && !isChart) return next();
     const canonicalHost = isMapa ? "www.humandesignmapa.cz" : "www.humandesignchart.app";
-    // Redirect any non-canonical scheme/host (http, or missing www) to https://www.
-    if (req.secure === false || host !== canonicalHost) {
+    const proto = (req.headers["x-forwarded-proto"] as string) || (req.secure ? "https" : "http");
+    const isHttps = proto === "https" || req.secure;
+    if (!isHttps || host !== canonicalHost) {
       return res.redirect(301, `https://${canonicalHost}${req.originalUrl}`);
     }
     next();
