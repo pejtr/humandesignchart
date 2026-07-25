@@ -117,6 +117,68 @@
     gtag('js', new Date());
     gtag('config', 'G-JMC9GGX4TH');
   </script>
+  <!-- LeadOS Universal Traffic Pixel -->
+  <script>
+  (function() {
+    const PROJECT_KEY = "proj_hdm"; // např. proj_hdm, proj_dsr, proj_italie
+    const INGEST_URL = "https://leados.cz/api/ingest";
+
+    // Persistentní Visitor ID & Session ID
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    
+    let visitorId = getCookie("los_vid");
+    if (!visitorId) {
+      visitorId = 'v_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+      document.cookie = "los_vid=" + visitorId + "; max-age=63072000; path=/; SameSite=Lax";
+    }
+    
+    let sessionId = sessionStorage.getItem("los_sid");
+    if (!sessionId) {
+      sessionId = 's_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+      sessionStorage.setItem("los_sid", sessionId);
+    }
+
+    // Získání UTM parametrů
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Odeslání události
+    function trackEvent(eventName, eventData = {}) {
+      const payload = {
+        eventType: eventName,
+        visitorId: visitorId,
+        sessionId: sessionId,
+        pageUrl: window.location.href,
+        path: window.location.pathname,
+        referrer: document.referrer || null,
+        deviceType: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+        utmSource: urlParams.get('utm_source') || null,
+        utmMedium: urlParams.get('utm_medium') || null,
+        utmCampaign: urlParams.get('utm_campaign') || null,
+        metadata: eventData
+      };
+
+      fetch(INGEST_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-project-key": PROJECT_KEY
+        },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).catch(err => console.warn("[LeadOS Analytics Error]", err));
+    }
+
+    // Automatické měření zobrazení stránky
+    window.addEventListener("DOMContentLoaded", () => trackEvent("page_view"));
+    
+    // Expozice pro vlastní události (nákup, registraci, proklik)
+    window.losTrack = trackEvent;
+  })();
+  </script>
 </head>
 
 <body>
