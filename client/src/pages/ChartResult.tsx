@@ -723,65 +723,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                 <div ref={aiSectionRef}>
                   {showPaywall ? (
                     <PremiumPaywall variant="inline" />
-                  ) : !aiReading && !dailyTransitReading && !aiStreaming && !aiMutation.isPending && !dailyTransitLoading && !personalizedTransitMutation.isPending ? (
-                    <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-violet-50 p-6 shadow-md">
-                      {/* Decorative glow */}
-                      <div className="absolute -top-8 -right-8 w-40 h-40 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
-                      <div className="relative z-10">
-                        <div className="flex items-start gap-4">
-                          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/30">
-                            <Sparkles className="w-7 h-7 text-white" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h2 className="font-serif text-xl font-bold text-foreground">AI výklad vaší mapy</h2>
-                              <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-medium">Nové</span>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                              Získáte <strong>srozumitelný výklad v češtině</strong> — co váš typ znamená, jak využít svou autoritu a jaké je vaše životní poslání.
-                            </p>
-                            <div className="flex flex-wrap gap-2 mb-5">
-                              {[
-                                { key: "overview", label: "✨ Kompletní přehled", primary: true },
-                                { key: "type_strategy", label: "💫 Typ & strategie", primary: false },
-                                { key: "profile", label: "🎭 Profil", primary: false },
-                                { key: "authority", label: "🧠 Autorita", primary: false },
-                                { key: "incarnation_cross", label: "★ Životní poslání", primary: false },
-                                { key: "career", label: "💼 Kariéra", primary: false },
-                                { key: "relationships", label: "❤️ Vztahy", primary: false },
-                                { key: "channels", label: "⚡ Kanály", primary: false },
-                                { key: "daily_transit", label: "🌟 Denní výklad", primary: false },
-                              ].map(item => (
-                                <Button
-                                  key={item.key}
-                                  size={item.primary ? "default" : "sm"}
-                                  variant={item.primary ? "default" : "outline"}
-                                  className={item.primary
-                                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90 font-semibold"
-                                    : "text-xs h-8 bg-white/70 hover:bg-white border-border/60"}
-                                  onClick={() => {
-                                    if (item.key === "daily_transit") { handleDailyTransitReading(); return; }
-                                    setAiReadingType(item.key);
-                                    handleAiReading(item.key);
-                                  }}
-                                  disabled={aiStreaming || aiMutation.isPending || dailyTransitLoading || personalizedTransitMutation.isPending}
-                                >
-                                  {item.label}
-                                </Button>
-                              ))}
-                            </div>
-                            {!isAuthenticated && (
-                              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                                <Info className="w-3.5 h-3.5" />
-                                Pro AI výklad se prosím{" "}
-                                <a href={getLoginUrl()} className="text-primary underline underline-offset-2">přihlašte</a>.
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (aiStreaming || aiMutation.isPending || dailyTransitLoading || personalizedTransitMutation.isPending) && !aiReading && !dailyTransitReading ? (
+                  ) : (aiStreaming || aiMutation.isPending || dailyTransitLoading || personalizedTransitMutation.isPending) && ((aiReadingType === "daily_transit" && !dailyTransitReading) || (aiReadingType !== "daily_transit" && !aiReading)) ? (
                     <Card className="border-primary/20 bg-primary/5">
                       <CardContent className="py-8 text-center">
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
@@ -796,7 +738,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                         <AiReadingProgress locale={locale} />
                       </CardContent>
                     </Card>
-                  ) : (aiReading || dailyTransitReading) ? (
+                  ) : (aiReadingType === "daily_transit" ? dailyTransitReading : aiReading) ? (
                     <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background shadow-sm">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
@@ -898,7 +840,65 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                         )}
                       </CardContent>
                     </Card>
-                  ) : null}
+                  ) : (
+                    <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-violet-50 p-6 shadow-md">
+                      {/* Decorative glow */}
+                      <div className="absolute -top-8 -right-8 w-40 h-40 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+                      <div className="relative z-10">
+                        <div className="flex items-start gap-4">
+                          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/30">
+                            <Sparkles className="w-7 h-7 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h2 className="font-serif text-xl font-bold text-foreground">AI výklad vaší mapy</h2>
+                              <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-medium">Nové</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                              Získáte <strong>srozumitelný výklad v češtině</strong> — co váš typ znamená, jak využít svou autoritu a jaké je vaše životní poslání.
+                            </p>
+                            <div className="flex flex-wrap gap-2 mb-5">
+                              {[
+                                { key: "overview", label: "✨ Kompletní přehled", primary: true },
+                                { key: "type_strategy", label: "💫 Typ & strategie", primary: false },
+                                { key: "profile", label: "🎭 Profil", primary: false },
+                                { key: "authority", label: "🧠 Autorita", primary: false },
+                                { key: "incarnation_cross", label: "★ Životní poslání", primary: false },
+                                { key: "career", label: "💼 Kariéra", primary: false },
+                                { key: "relationships", label: "❤️ Vztahy", primary: false },
+                                { key: "channels", label: "⚡ Kanály", primary: false },
+                                { key: "daily_transit", label: "🌟 Denní výklad", primary: false },
+                              ].map(item => (
+                                <Button
+                                  key={item.key}
+                                  size={item.primary ? "default" : "sm"}
+                                  variant={item.primary ? "default" : "outline"}
+                                  className={item.primary
+                                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90 font-semibold"
+                                    : "text-xs h-8 bg-white/70 hover:bg-white border-border/60"}
+                                  onClick={() => {
+                                    if (item.key === "daily_transit") { handleDailyTransitReading(); return; }
+                                    setAiReadingType(item.key);
+                                    handleAiReading(item.key);
+                                  }}
+                                  disabled={aiStreaming || aiMutation.isPending || dailyTransitLoading || personalizedTransitMutation.isPending}
+                                >
+                                  {item.label}
+                                </Button>
+                              ))}
+                            </div>
+                            {!isAuthenticated && (
+                              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                <Info className="w-3.5 h-3.5" />
+                                Pro AI výklad se prosím{" "}
+                                <a href={getLoginUrl()} className="text-primary underline underline-offset-2">přihlašte</a>.
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* ─── Type & Strategy Card ─── */}
