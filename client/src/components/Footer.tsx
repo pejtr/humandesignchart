@@ -129,15 +129,6 @@ export default function Footer() {
                   Průvodce cestováním po Itálii — destinace, tipy a inspirace na dovolenou.
                 </span>
               </li>
-              <li className="relative group/tip">
-                <a href="https://www.receptyzdravi.cz" target="_blank" rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors">
-                  Recepty Zdraví
-                </a>
-                <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-56 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Zdravé recepty, tipy na životosprávu a přírodní cesty ke zdraví.
-                </span>
-              </li>
             </ul>
           </div>
         </div>
