@@ -130,9 +130,9 @@ export default function Navbar() {
         ? "bg-background/95 backdrop-blur-xl shadow-sm border-b border-border/20"
         : "bg-background/70 backdrop-blur-md border-b border-border/10"
         }`}>
-        <nav className="w-full flex items-center justify-between h-16 px-4 lg:px-8 relative gap-4 max-w-screen-2xl mx-auto">
+        <nav className="w-full flex items-center justify-between h-16 px-3 sm:px-4 xl:px-8 relative gap-2 sm:gap-4 max-w-screen-2xl mx-auto">
           {/* Left: Logo */}
-          <div className="flex shrink-0 items-center justify-start lg:w-48">
+          <div className="flex shrink-0 items-center justify-start xl:w-48 min-w-0">
             <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline shrink-0 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
                 <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -147,14 +147,14 @@ export default function Navbar() {
                   <line x1="16.8" y1="7" x2="14" y2="10.5" />
                 </svg>
               </div>
-              <span className="font-serif text-xl font-bold tracking-tight text-foreground hidden md:block">
-                Human Design Mapa
+              <span className="font-serif text-xl font-bold tracking-tight text-foreground hidden sm:block truncate">
+                Human Design
               </span>
             </Link>
           </div>
 
           {/* Center: Desktop nav links */}
-          <div className="hidden lg:flex flex-1 items-center justify-center gap-1 xl:gap-2">
+          <div className="hidden xl:flex flex-1 items-center justify-center gap-1 xl:gap-2 min-w-0">
             {primaryLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <Button
@@ -231,9 +231,9 @@ export default function Navbar() {
           </div>
 
           {/* Right: Controls (Desktop + Mobile) */}
-          <div className="flex items-center justify-end gap-2 shrink-0 lg:w-48">
+          <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0 xl:w-48">
             {/* Desktop right section: theme toggle + language + user */}
-            <div className="hidden lg:flex items-center gap-1.5 shrink-0">
+            <div className="hidden xl:flex items-center gap-1.5 shrink-0">
               {/* Theme toggle */}
               <Button
                 variant="ghost"
@@ -337,8 +337,23 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Mobile: hamburger only */}
-            <div className="flex lg:hidden items-center gap-1">
+            {/* Compact navigation: keep sign-in visible, with the full menu one tap away. */}
+            <div className="flex xl:hidden items-center gap-1">
+              {!isAuthenticated && (
+                <a href={getLoginUrl()} aria-label={t.common.signIn}>
+                  <Button size="sm" className="h-9 px-2 sm:px-3 bg-primary text-primary-foreground hover:bg-primary/90">
+                    <User className="w-4 h-4 sm:hidden" />
+                    <span className="hidden sm:inline">{t.common.signIn}</span>
+                  </Button>
+                </a>
+              )}
+              {isAuthenticated && (
+                <Link href={localePath("/dashboard")} aria-label={t.common.dashboard}>
+                  <Button variant="ghost" size="icon" className="w-9 h-9 rounded-full">
+                    <User className="w-4 h-4 text-primary" />
+                  </Button>
+                </Link>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
@@ -363,7 +378,7 @@ export default function Navbar() {
       {/* Full-screen mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-[60] lg:hidden"
+          className="fixed inset-0 z-[60] xl:hidden"
           style={{ animation: "fadeIn 0.2s ease-out" }}
           aria-hidden="true"
         >
@@ -382,7 +397,7 @@ export default function Navbar() {
         role="dialog"
         aria-modal="true"
         aria-label={locale === "cs" ? "Navigační menu" : "Navigation menu"}
-        className="fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm z-[70] bg-background flex flex-col lg:hidden"
+        className="fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm z-[70] bg-background flex flex-col xl:hidden"
         style={{
           transform: mobileOpen ? "translateX(0)" : "translateX(100%)",
           transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",

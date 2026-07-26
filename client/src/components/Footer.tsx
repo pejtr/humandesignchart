@@ -30,7 +30,7 @@ export default function Footer() {
                 </svg>
               </div>
               <span className="font-serif text-lg font-bold tracking-tight text-foreground">
-                Human Design Mapa
+                Human Design
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">

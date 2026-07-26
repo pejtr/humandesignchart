@@ -13,7 +13,7 @@ import {
   Plus, Heart, Trash2, Loader2, LayoutDashboard,
   Star, Users, Compass, BookOpen, ThumbsUp, ThumbsDown,
   Share2, ChevronDown, ChevronUp, Calendar, Sparkles, Sun, Zap, CreditCard, Crown,
-  Settings, Bell,
+  Settings, Bell, Lock,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -158,6 +158,11 @@ export default function Dashboard() {
 
   const charts = chartsQuery.data || [];
   const readings = readingsQuery.data || [];
+  const focusChart = charts.find((chart: any) => chart.category === "self") || charts[0];
+  const focusData = focusChart?.chartData as any;
+  const focusType = focusData?.type ? ((t.types as any)[focusData.type] || focusData.type) : null;
+  const focusStrategy = focusData?.strategy ? (((t.hd as any)?.strategy)?.[focusData.strategy] || focusData.strategy) : null;
+  const isMember = !!subQuery.data?.isPremium;
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-hidden">
@@ -210,6 +215,74 @@ export default function Dashboard() {
                   {locale === 'en' ? 'New Chart' : 'Nová mapa'}
                 </Button>
               </Link>
+            </div>
+
+            {/* A daily value centre gives members a reason to return even when
+                they are not creating a new chart. */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-4 mb-8">
+              <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card">
+                <div className="absolute -right-10 -top-10 opacity-10 pointer-events-none">
+                  <SacredGeometry className="w-48 h-48" />
+                </div>
+                <CardContent className="relative p-5 md:p-6">
+                  <div className="flex items-center gap-2 mb-3 text-primary text-sm font-semibold">
+                    <Sparkles className="w-4 h-4" />
+                    {locale === "en" ? "Your focus for today" : "Váš dnešní fokus"}
+                  </div>
+                  {focusChart && focusData ? (
+                    <>
+                      <h2 className="font-serif text-2xl font-semibold mb-2">
+                        {locale === "en" ? "Return to your Strategy" : "Vraťte se ke své strategii"}
+                      </h2>
+                      <p className="text-muted-foreground max-w-xl mb-4">
+                        {locale === "en"
+                          ? `As a ${focusType || "Human Design type"}, notice where your Strategy is asking for less resistance today.`
+                          : `Jako ${focusType || "váš typ"} dnes sledujte, kde vám vaše Strategie pomáhá jednat s menším odporem.`}
+                        {focusStrategy ? ` ${locale === "en" ? "Your strategy:" : "Vaše strategie:"} ${focusStrategy}.` : ""}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <Link href={localePath(`/chart/${focusChart.id}`)}>
+                          <Button size="sm" className="gap-1.5"><Compass className="w-4 h-4" />{locale === "en" ? "Open my chart" : "Otevřít moji mapu"}</Button>
+                        </Link>
+                        <Link href={localePath("/daily-transit")}>
+                          <Button size="sm" variant="outline" className="gap-1.5"><Sun className="w-4 h-4" />{locale === "en" ? "Today's transit" : "Dnešní tranzit"}</Button>
+                        </Link>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="font-serif text-2xl font-semibold mb-2">{locale === "en" ? "Start your personal journey" : "Začněte svou osobní cestu"}</h2>
+                      <p className="text-muted-foreground mb-4">{locale === "en" ? "Create your first chart to unlock a daily focus tailored to your design." : "Vytvořte si první mapu a odemkněte denní fokus podle svého designu."}</p>
+                      <Link href={localePath("/calculate")}><Button size="sm" className="gap-1.5"><Plus className="w-4 h-4" />{locale === "en" ? "Create my chart" : "Vytvořit mapu"}</Button></Link>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className={`border-border/50 ${isMember ? "bg-purple-500/10 border-purple-500/25" : "bg-card"}`}>
+                <CardContent className="p-5 md:p-6 h-full flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-semibold text-muted-foreground">{locale === "en" ? "Your membership" : "Vaše členství"}</span>
+                      {isMember ? <Crown className="w-5 h-5 text-purple-400" /> : <Lock className="w-5 h-5 text-muted-foreground" />}
+                    </div>
+                    <p className="font-serif text-xl font-semibold mb-1">{isMember ? (locale === "en" ? "Premium is active" : "Premium je aktivní") : (locale === "en" ? "Free explorer" : "Bezplatný průzkumník")}</p>
+                    <p className="text-sm text-muted-foreground">{isMember ? (locale === "en" ? "Your saved charts, AI readings and advanced tools are ready." : "Vaše mapy, AI výklady a pokročilé nástroje jsou připravené.") : `${subQuery.data?.freeReadingsLeft ?? 0} ${locale === "en" ? "free AI readings remaining" : "bezplatných AI výkladů zbývá"}`}</p>
+                  </div>
+                  <Link href={localePath("/pricing")} className="mt-4"><Button variant={isMember ? "outline" : "default"} size="sm" className="w-full gap-1.5">{isMember ? (locale === "en" ? "Explore all benefits" : "Prohlédnout výhody") : (locale === "en" ? "Unlock Premium" : "Odemknout Premium")}<Zap className="w-4 h-4" /></Button></Link>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+              {[
+                { label: locale === "en" ? "Saved charts" : "Uložené mapy", value: charts.length, icon: Compass },
+                { label: locale === "en" ? "AI readings" : "AI výklady", value: readings.length || "—", icon: Sparkles },
+                { label: locale === "en" ? "Free readings left" : "Volné výklady", value: isMember ? "∞" : (subQuery.data?.freeReadingsLeft ?? "—"), icon: Zap },
+                { label: locale === "en" ? "Daily practice" : "Denní praxe", value: "→", icon: Calendar },
+              ].map(({ label, value, icon: Icon }) => (
+                <Card key={label} className="border-border/40 bg-card/70"><CardContent className="p-4"><Icon className="w-4 h-4 text-primary mb-2" /><div className="text-xl font-semibold">{value}</div><div className="text-xs text-muted-foreground mt-1">{label}</div></CardContent></Card>
+              ))}
             </div>
 
             {/* Tabs */}

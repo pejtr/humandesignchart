@@ -123,9 +123,13 @@ export function FloatingChatGuide() {
                     >
                         <Button
                             onClick={() => setIsOpen(true)}
-                            className="w-14 h-14 rounded-full shadow-2xl bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 flex items-center justify-center p-0 border-0"
+                            aria-label={isEn ? "Open AI guide" : "Otevřít AI průvodce"}
+                            title={isEn ? "Open AI guide" : "Otevřít AI průvodce"}
+                            className="relative w-14 h-14 rounded-2xl shadow-2xl shadow-purple-900/25 bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-700 hover:from-violet-600 hover:via-purple-700 hover:to-indigo-800 flex items-center justify-center p-0 border border-white/20 transition-transform hover:scale-105"
                         >
-                            <Sparkles className="w-6 h-6 text-white" />
+                            <span className="absolute inset-1 rounded-xl border border-white/20" aria-hidden="true" />
+                            <Bot className="relative w-6 h-6 text-white" />
+                            <Sparkles className="absolute right-2 top-1.5 w-3 h-3 text-violet-100" aria-hidden="true" />
                         </Button>
                     </motion.div>
                 )}
