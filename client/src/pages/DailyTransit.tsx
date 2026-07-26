@@ -20,15 +20,15 @@ export default function DailyTransit() {
   const { user, isAuthenticated, loading } = useAuth();
 
   useSEO(locale === "en" ? {
-    title: "🌅 Daily Human Design Transit — Today's Planetary Gates 🪐",
-    description: "See today's Human Design transit gates and how current planetary positions activate your bodygraph.",
-    keywords: "human design daily transit, today's gates, planetary positions, bodygraph activation, daily energy",
+    title: "🌅 Human Design Transit Today — Free Daily Planetary Reading 🪐",
+    description: "Track Human Design transit today! Discover current planetary gate positions, daily energy activations & personalized daily bodygraph readings. 100% free.",
+    keywords: "human design transit today, human design daily transit, today gates human design, daily human design reading free, planetary transit bodygraph, human design today",
     ogType: "website",
     locale: "en_US",
   } : {
-    title: "🌅 Denní Human Design Tranzit — Dnešní Planetární Brány 🪐",
-    description: "Zjistěte dnešní tranzitové brány Human Design a jak aktuální planeterní pozice aktivují váš bodygraph.",
-    keywords: "human design denní tranzit, dnešní brány, planetární pozice, aktivace bodygraphu, denní energie",
+    title: "🌅 Denní Human Design Tranzit Dnes — Planetární Brány & AI Výklad 🪐",
+    description: "Sledujte dnešní planetární tranzity Human Design v ČR. Zjistěte, které brány a dráhy aktivují dnešní planety ve vaší osobní mapě a získejte denní AI výklad.",
+    keywords: "human design denní tranzit, denní tranzit dnes, planetární brány, denní výklad human design, tranzity dnes cz, human design dnes",
     ogType: "website",
     locale: "cs_CZ",
   });

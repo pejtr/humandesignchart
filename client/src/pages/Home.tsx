@@ -308,17 +308,101 @@ export default function Home() {
   }, []);
 
   useSEO(isCs ? {
-    title: "✨ HUMAN DESIGN – Mapa vašeho Já | Odemkněte svůj potenciál! 🔮",
-    description: "🌟 Vypočítejte svou Human Design mapu zdarma. Zjistěte svůj typ, strategii, autoritu a získejte AI výklad svého životního poslání.",
+    title: "✨ HUMAN DESIGN CZ – Mapa Vašeho Já | Kalkulátor & AI Výklad Zdarma 🔮",
+    description: "🌟 Vypočítejte si svou Human Design mapu zdarma. Přesný kalkulátor, test typu (Generátor, Projektor, Manifestor), denní tranzity a osobitý AI výklad v češtině.",
     ogImage: OG_IMAGES.homepage,
-    keywords: "human design, human design mapa, bodygraph kalkulačka, human design zdarma, human design typ, human design autorita",
+    keywords: "human design mapa, human design cz, human design kalkulačka, human design zdarma, human design test zdarma, human design typy, bodygraph kalkulátor, human design denní tranzit",
     locale: "cs_CZ",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://www.humandesignmapa.cz/#website",
+          "url": "https://www.humandesignmapa.cz",
+          "name": "Human Design Mapa CZ",
+          "description": "Kalkulátor Human Design mapy zdarma, test osobnosti a AI výklad v češtině.",
+          "inLanguage": ["cs", "en"]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Jak vypočítat Human Design mapu zdarma?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Zadejte přesný datum, čas a místo narození do našeho kalkulátoru. Mapa se vygeneruje zdarma za několik sekund."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Co obsahuje bezplatný AI výklad Human Design?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Bezplatný AI výklad obsahuje váš energetický typ (Generátor, Projektor, Manifestor, Reflektor), profil, autoritu, definovaná centra a životní poslání."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Jak funguje denní tranzit Human Design?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Denní tranzit ukazuje aktuální pozice planet a jaké brány a dráhy aktivují ve vaší osobní mapě dnešní den."
+              }
+            }
+          ]
+        }
+      ]
+    }
   } : {
-    title: "✨ Free Human Design Chart Calculator & AI Reading 🔮",
-    description: "Calculate your free Human Design chart. Discover your type, strategy, authority and get a personalized AI reading. Available in English, Czech, Russian, Ukrainian, German & Hungarian.",
+    title: "✨ Free Human Design Chart Calculator & AI Reading 🔮 | Free Bodygraph",
+    description: "Calculate your free Human Design chart calculator & bodygraph. Get instant free Human Design readings, daily transit today & personality test interpretation. Available in 6 languages.",
     ogImage: OG_IMAGES.homepage,
-    keywords: "human design, human design chart, bodygraph calculator, free human design, human design type, human design authority, human design berechnen, хьюман дизайн, дизайн человека, дизайн людини, human design elemzés, human dizajn",
+    keywords: "human design calculator free, free human design chart, human design chart calculator, free human design reading, human design map, human design test free, human design transit today, human design chart, human design free, free human design chart reading",
     locale: "en_US",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://www.humandesignchart.app/#website",
+          "url": "https://www.humandesignchart.app",
+          "name": "Human Design Chart Calculator",
+          "description": "Free Human Design chart calculator, bodygraph generator and AI readings.",
+          "inLanguage": ["en", "cs"]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How to calculate a free Human Design chart?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Enter your date, time, and place of birth into our free Human Design chart calculator to get your instant bodygraph."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is included in a free Human Design reading?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Your free Human Design reading includes your energy type, strategy, inner authority, profile, defined centers, and channels."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What is Human Design transit today?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Daily Human Design transits track today's planetary movements and show which gates are activated in your chart."
+              }
+            }
+          ]
+        }
+      ]
+    }
   });
   const typesData = getTypesData(isCs);
 
@@ -719,6 +803,75 @@ export default function Home() {
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SEO FAQ Section (Targeting GSC Keywords) ──────────────── */}
+      <section className="py-16 bg-muted/20 border-t border-border/40" style={{ contentVisibility: "auto" }}>
+        <div className="container max-w-4xl">
+          <div className="text-center mb-10">
+            <span className="text-xs uppercase tracking-widest text-primary font-semibold">
+              {isCs ? "Často kladené otázky & SEO" : "FAQ & Human Design Guide"}
+            </span>
+            <h2 className="font-serif text-2xl md:text-3xl font-bold mt-1">
+              {isCs ? "Vše o Human Design Mapě a Kalkulátoru" : "Free Human Design Chart Calculator & Reading FAQ"}
+            </h2>
+            <p className="text-sm text-muted-foreground mt-2 max-w-2xl mx-auto">
+              {isCs
+                ? "Zjistěte, jak funguje výpočet Human Design mapy v ČR, co znamená váš typ, profil a denní planetární tranzity."
+                : "Learn how the free Human Design chart calculator works, discover your bodygraph type, authority, and today's planetary transit readings."}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm space-y-2">
+              <h3 className="font-serif font-bold text-base text-foreground flex items-center gap-2">
+                <Compass className="w-4 h-4 text-primary shrink-0" />
+                {isCs ? "Jak vypočítat Human Design mapu zdarma?" : "How to use the Free Human Design Calculator?"}
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {isCs
+                  ? "Stačí zadat váš přesný datum, čas a místo narození. Náš bezplatný kalkulátor okamžitě vygeneruje váš osobní bodygraph s přehledem typu, autority a profilu."
+                  : "Simply enter your birth date, exact time, and birth location into our free Human Design chart calculator to instantly generate your personalized bodygraph."}
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm space-y-2">
+              <h3 className="font-serif font-bold text-base text-foreground flex items-center gap-2">
+                <Brain className="w-4 h-4 text-primary shrink-0" />
+                {isCs ? "Co obsahuje bezplatný AI výklad mapy?" : "What is included in the Free Human Design Reading?"}
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {isCs
+                  ? "Získáte srozumitelný rozbor v češtině obsahující váš typ (Generátor, Projektor, Manifestor, Reflektor), strategii rozhodování, životní poslání a kanály."
+                  : "Our free AI Human Design reading includes your energy type, strategy, inner authority, profile lines, defined centers, and life purpose blueprint."}
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm space-y-2">
+              <h3 className="font-serif font-bold text-base text-foreground flex items-center gap-2">
+                <Star className="w-4 h-4 text-amber-500 shrink-0" />
+                {isCs ? "Co je denní tranzit Human Design?" : "What is Human Design Transit Today?"}
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {isCs
+                  ? "Denní tranzit sleduje aktuální pozice planet a ukazují, které brány a energetické dráhy ovlivňují vaši mapu a denní rozhodování dnešní den."
+                  : "Daily Human Design transits track today's planetary positions and reveal which gates and channels activate your bodygraph energy today."}
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm space-y-2">
+              <h3 className="font-serif font-bold text-base text-foreground flex items-center gap-2">
+                <Users className="w-4 h-4 text-primary shrink-0" />
+                {isCs ? "Jaké jsou Human Design typy a strategie?" : "Human Design Types & Personality Test"}
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {isCs
+                  ? "Existuje 5 základních typů: Generátor (37%), Manifestující Generátor (33%), Projektor (20%), Manifestor (9%) a Reflektor (1%). Každý má unikátní strategii."
+                  : "Human Design divides energy into 5 core types: Generator, Manifesting Generator, Projector, Manifestor, and Reflector, each with a unique decision-making strategy."}
+              </p>
+            </div>
           </div>
         </div>
       </section>

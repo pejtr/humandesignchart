@@ -16,11 +16,17 @@ export default function HumanDesignTest() {
     const { t, localePath, locale } = useLanguage();
     const isEn = locale === "en";
 
-    useSEO({
-        title: "✨ Human Design Test Osobnosti Zdarma 🔮",
-        description: "Udělejte si přesný Human Design test osobnosti. Zjistěte svůj typ, strategii a profil na základě data a místa zrození.",
+    useSEO(locale === "en" ? {
+        title: "✨ Free Human Design Test & Quiz | Instant Personality Type Test 🔮",
+        description: "Take the free Human Design test free & personality quiz. Discover your energy type (Generator, Projector, Manifestor, Reflector), strategy & authority.",
         ogImage: OG_IMAGES.calculator,
-        keywords: "human design test, human design quiz, human design kalkulacka",
+        keywords: "human design test free, free human design test, human design personality test, human design type quiz, human design calculator free, human design reading free",
+        locale: "en_US",
+    } : {
+        title: "✨ Human Design Test Osobnosti Zdarma — Zjistěte Svůj Typ 🔮",
+        description: "Udělejte si rychlý a přesný Human Design test zdarma v ČR. Zjistěte váš typ (Generátor, Projektor, Manifestor, Reflektor), strategii a profil.",
+        ogImage: OG_IMAGES.calculator,
+        keywords: "human design test zdarma, human design test free, human design quiz, human design typy test, human design mapa kalkulačka",
         locale: "cs_CZ",
     });
 

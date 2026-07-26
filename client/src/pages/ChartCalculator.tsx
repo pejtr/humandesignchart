@@ -23,21 +23,21 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
   const meta = useMetaPixel();
 
   useSEO(isEn ? {
-    title: "✨ Free Human Design Chart Calculator 🔮",
-    description: "Calculate your free Human Design bodygraph chart. Enter your birth date, time and place to discover your type, strategy, authority and profile. Available in English, Czech, Russian, Ukrainian, German & Hungarian.",
+    title: "✨ Free Human Design Chart Calculator & Reading | Bodygraph Generator 🔮",
+    description: "Calculate your free Human Design chart calculator & bodygraph. Get instant free Human Design reading, personality test result & authority breakdown. 100% free.",
     ogImage: OG_IMAGES.calculator,
-    keywords: "human design calculator, bodygraph calculator, free human design chart, human design birth chart, human design berechnen kostenlos, human design analyse kostenlos, хьюман дизайн рассчитать, дизайн человека бесплатно, дизайн людини розрахувати, human design elemzés",
+    keywords: "human design calculator free, free human design chart, human design chart calculator, free human design reading, human design test free, human design map, human design chart calculator free, free human design chart reading, human design free",
     locale: "en_US",
   } : {
-    title: seoType === "kalkulacka" ? "✨ Human Design Kalkulačka Zdarma 🔮" :
-      seoType === "test" ? "✨ Human Design Test Osobnosti Zdarma 🔮" :
-        seoType === "typy" ? "✨ Human Design Typy - Zjistěte ten svůj 🔮" :
-          "✨ Kalkulačka Human Design mapy zdarma 🔮",
-    description: seoType === "test" ? "Udělejte si přesný Human Design test osobnosti. Zadejte své údaje a zjistěte svůj typ, strategii a profil." :
-      seoType === "typy" ? "Poznejte všechny Human Design typy – Generátor, Projektor, Manifestor, Reflektor. Jaký typ jste vy?" :
-        "Vypočítejte svou Human Design mapu zdarma přes naši kalkulačku. Zadejte datum, čas a místo narození a zjistěte svůj typ, strategii, autoritu a profil.",
+    title: seoType === "kalkulacka" ? "✨ Human Design Kalkulačka Zdarma — Bodygraph & Výpočet 🔮" :
+      seoType === "test" ? "✨ Human Design Test Osobnosti Zdarma — Zjistěte svůj typ 🔮" :
+        seoType === "typy" ? "✨ Human Design Typy — Přehled & Kalkulátor 🔮" :
+          "✨ Kalkulačka Human Design Mapy Zdarma — AI Výklad & CZ 🔮",
+    description: seoType === "test" ? "Udělejte si přesný Human Design test osobnosti zdarma. Zadejte své údaje a zjistěte svůj typ, strategii, autoritu a profil." :
+      seoType === "typy" ? "Poznejte všechny Human Design typy – Generátor, Projektor, Manifestor, Reflektor. Jaký energetický typ jste vy?" :
+        "Vypočítejte svou Human Design mapu zdarma přes náš kalkulátor. Zadejte datum, čas a místo narození a zjistěte svůj typ, strategii, autoritu a profil.",
     ogImage: OG_IMAGES.calculator,
-    keywords: "human design kalkulačka, human design test, human design typy, bodygraph, free human design chart",
+    keywords: "human design kalkulačka, human design mapa, human design zdarma, human design test zdarma, human design typy, human design cz, bodygraph kalkulátor zdarma",
     locale: "cs_CZ",
   });
 
