@@ -154,7 +154,7 @@ export default function Navbar() {
           </div>
 
           {/* Center: Desktop nav links */}
-          <div className="hidden xl:flex flex-1 items-center justify-center gap-1 xl:gap-2 min-w-0">
+          <div className="hidden 2xl:flex flex-1 items-center justify-center gap-1 2xl:gap-2 min-w-0">
             {primaryLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <Button
@@ -173,8 +173,7 @@ export default function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-sm px-2 gap-1">
                   <Flame className="w-4 h-4" />
-                  <span className="hidden xl:inline">{locale === "cs" ? "Nástroje" : "Tools"}</span>
-                  <span className="xl:hidden">Tools</span>
+                  <span>{locale === "cs" ? "Nástroje" : "Tools"}</span>
                   <ChevronDown className="w-3 h-3 opacity-60" />
                 </Button>
               </DropdownMenuTrigger>
@@ -196,7 +195,7 @@ export default function Navbar() {
             {/* Explore dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-sm px-2 gap-1 hidden xl:inline-flex">
+                <Button variant="ghost" size="sm" className="text-sm px-2 gap-1 hidden 2xl:inline-flex">
                   <Sparkles className="w-4 h-4" />
                   {locale === "cs" ? "Prozkoumat" : "Explore"}
                   <ChevronDown className="w-3 h-3 opacity-60" />
@@ -233,7 +232,7 @@ export default function Navbar() {
           {/* Right: Controls (Desktop + Mobile) */}
           <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0 xl:w-48">
             {/* Desktop right section: theme toggle + language + user */}
-            <div className="hidden xl:flex items-center gap-1.5 shrink-0">
+            <div className="hidden 2xl:flex items-center gap-1.5 shrink-0">
               {/* Theme toggle */}
               <Button
                 variant="ghost"
@@ -338,7 +337,7 @@ export default function Navbar() {
             </div>
 
             {/* Compact navigation: keep sign-in visible, with the full menu one tap away. */}
-            <div className="flex xl:hidden items-center gap-1">
+            <div className="flex 2xl:hidden items-center gap-1">
               {!isAuthenticated && (
                 <a href={getLoginUrl()} aria-label={t.common.signIn}>
                   <Button size="sm" className="h-9 px-2 sm:px-3 bg-primary text-primary-foreground hover:bg-primary/90">
@@ -378,7 +377,7 @@ export default function Navbar() {
       {/* Full-screen mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-[60] xl:hidden"
+          className="fixed inset-0 z-[60] 2xl:hidden"
           style={{ animation: "fadeIn 0.2s ease-out" }}
           aria-hidden="true"
         >
@@ -397,7 +396,7 @@ export default function Navbar() {
         role="dialog"
         aria-modal="true"
         aria-label={locale === "cs" ? "Navigační menu" : "Navigation menu"}
-        className="fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm z-[70] bg-background flex flex-col xl:hidden"
+        className="fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm z-[70] bg-background flex flex-col 2xl:hidden"
         style={{
           transform: mobileOpen ? "translateX(0)" : "translateX(100%)",
           transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
