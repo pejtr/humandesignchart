@@ -64,6 +64,14 @@ function SafeRoute({ children }: { children: React.ReactNode }) {
   return <ErrorBoundary>{children}</ErrorBoundary>;
 }
 
+/** Social publishing is an internal staff tool, not a public member feature. */
+function StaffOnlyRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, loading, user } = useAuth();
+  if (loading) return <PageLoader />;
+  const canUseStaffTools = isAuthenticated && ["admin", "moderator"].includes(String((user as any)?.role ?? "").toLowerCase());
+  return canUseStaffTools ? <SafeRoute>{children}</SafeRoute> : <NotFound />;
+}
+
 /**
  * Detect preferred language from browser settings.
  * Returns detected locale based on Accept-Language header.
@@ -182,7 +190,7 @@ function LocaleRoutes() {
               {() => <SafeRoute><DailyTransit /></SafeRoute>}
             </Route>
             <Route path="/:locale/social-scheduler">
-              {() => <SafeRoute><SocialScheduler /></SafeRoute>}
+              {() => <StaffOnlyRoute><SocialScheduler /></StaffOnlyRoute>}
             </Route>
             <Route path="/:locale/composite">
               {() => <SafeRoute><CompositeChart /></SafeRoute>}

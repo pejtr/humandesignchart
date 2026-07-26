@@ -72,6 +72,7 @@ export default function Navbar() {
     staleTime: 60_000,
   });
   const isPremium = subStatus?.isPremium ?? false;
+  const canUseStaffTools = ["admin", "moderator"].includes(String((user as any)?.role ?? "").toLowerCase());
   // Credits: for premium users show ∞, for free users show numeric credits (incl. referral credits)
   const credits = subStatus?.aiReadingCredits ?? 0;
   const freeLeft = subStatus?.freeReadingsLeft ?? 0;
@@ -102,7 +103,6 @@ export default function Navbar() {
     { href: "/calculate", label: locale === "cs" ? "Nová mapa" : "New Chart", icon: Orbit },
     { href: "/daily-transit", label: locale === "cs" ? "Denní tranzit" : "Daily Transit", icon: Sun },
     { href: "/compare", label: t.nav.compare, icon: GitCompare },
-    { href: "/encyclopedia", label: locale === "cs" ? "Encyklopedie" : "Encyclopedia", icon: Layers },
     { href: "/blog", label: "Blog", icon: BookOpen },
   ];
 
@@ -115,6 +115,8 @@ export default function Navbar() {
     { href: "/variables", label: locale === "cs" ? "Proměnné (PHS)" : "Variables (PHS)", icon: Gem, desc: locale === "cs" ? "Strávení, prostředí, perspektiva, vědomí" : "Digestion, environment, perspective, awareness" },
     { href: "/social-scheduler", label: locale === "cs" ? "Plánovač sítí" : "Social Scheduler", icon: Share2, desc: locale === "cs" ? "Plánujte příspěvky na sociálních sítích" : "Schedule posts to social media" },
   ];
+
+  const visibleToolsLinks = toolsLinks.filter(link => link.href !== "/social-scheduler" || canUseStaffTools);
 
   const exploreLinks = [
     { href: "/encyclopedia", label: locale === "cs" ? "Encyklopedie" : "Encyclopedia", icon: Layers, desc: locale === "cs" ? "Průvodce všemi HD pojmy" : "Guide to all HD concepts" },
@@ -178,7 +180,7 @@ export default function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-64 bg-popover text-popover-foreground">
-                {toolsLinks.map(link => (
+                {visibleToolsLinks.map(link => (
                   <Link key={link.href} href={localePath(link.href)}>
                     <DropdownMenuItem className="cursor-pointer py-2.5">
                       <link.icon className="w-4 h-4 mr-2.5 text-primary shrink-0" />
@@ -504,7 +506,7 @@ export default function Navbar() {
             <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-widest px-3 pb-2">
               {locale === "cs" ? "Nástroje" : "Tools"}
             </p>
-            {toolsLinks.map(link => (
+            {visibleToolsLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <button
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-0.5 ${isActive(link.href)

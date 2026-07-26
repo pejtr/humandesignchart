@@ -93,7 +93,7 @@ export function AuthSidebar() {
 
   if (!isAuthenticated) return null;
 
-  const isAdmin = (user as any)?.role === "admin";
+  const canUseStaffTools = ["admin", "moderator"].includes(String((user as any)?.role ?? "").toLowerCase());
   const localePath = (path: string) => `/${locale}${path}`;
 
   const isActive = (href: string) => {
@@ -119,7 +119,7 @@ export function AuthSidebar() {
     >
       {/* Scrollable nav items */}
       <div className="flex flex-col gap-0.5 w-full px-1.5 flex-1 overflow-y-auto scrollbar-none">
-        {SIDEBAR_ITEMS.filter(item => !item.adminOnly || isAdmin).map((item) => {
+        {SIDEBAR_ITEMS.filter(item => !item.adminOnly || canUseStaffTools).map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
           const label = locale === "cs" ? item.labelCs : item.labelEn;
