@@ -106,6 +106,14 @@ export default function Navbar() {
     { href: "/blog", label: "Blog", icon: BookOpen },
   ];
 
+  // Keep the three highest-value actions visible between tablet and desktop.
+  // The labels collapse to icons first, then expand to short/full labels as space allows.
+  const compactPrimaryLinks = [
+    { ...primaryLinks[0], compactLabel: locale === "cs" ? "Mapa" : "Chart" },
+    { ...primaryLinks[1], compactLabel: locale === "cs" ? "Tranzit" : "Transit" },
+    { ...primaryLinks[2], compactLabel: locale === "cs" ? "Porovnání" : "Compare" },
+  ];
+
   const toolsLinks = [
     { href: "/daily-transit", label: locale === "cs" ? "Denní tranzit" : "Daily Transit", icon: Sun, desc: locale === "cs" ? "Jak dnešní planety ovlivňují tvůj design" : "How today's planets affect your design" },
     { href: "/return-chart", label: locale === "cs" ? "Return charty" : "Return Charts", icon: RotateCcw, desc: locale === "cs" ? "Solární, Saturnův a další Return charty" : "Solar, Saturn, and other Return charts" },
@@ -229,6 +237,25 @@ export default function Navbar() {
                 <span className="hidden lg:inline">{locale === "cs" ? "Premium" : "Premium"}</span>
               </Button>
             </Link>
+          </div>
+
+          {/* Compact primary nav: preserve the key actions before opening the menu. */}
+          <div className="hidden md:flex 2xl:hidden flex-1 items-center justify-center gap-1 min-w-0">
+            {compactPrimaryLinks.map(link => (
+              <Link key={link.href} href={localePath(link.href)}>
+                <Button
+                  variant={isActive(link.href) ? "secondary" : "ghost"}
+                  size="sm"
+                  aria-label={link.label}
+                  title={link.label}
+                  className="h-9 min-w-9 px-2 gap-1.5 text-xs xl:text-sm font-medium whitespace-nowrap"
+                >
+                  <link.icon className="w-4 h-4 shrink-0 opacity-80" />
+                  <span className="hidden lg:inline xl:hidden">{link.compactLabel}</span>
+                  <span className="hidden xl:inline">{link.label}</span>
+                </Button>
+              </Link>
+            ))}
           </div>
 
           {/* Right: Controls (Desktop + Mobile) */}
