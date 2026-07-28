@@ -37,8 +37,15 @@ export default function NewsletterPopup() {
   useEffect(() => {
     if (isAuthenticated) return;
     const dismissed = localStorage.getItem(STORAGE_KEY);
-    if (dismissed) return;
-    const timer = setTimeout(() => setIsVisible(true), 30000);
+    if (dismissed) {
+      // Check 90 days expiry
+      const ts = Number(dismissed);
+      if (isNaN(ts) || Date.now() - ts < 90 * 24 * 60 * 60 * 1000) {
+        return;
+      }
+    }
+    // Calm down timer: wait 90 seconds (1.5 minutes) before showing
+    const timer = setTimeout(() => setIsVisible(true), 90000);
     return () => clearTimeout(timer);
   }, [isAuthenticated]);
 
@@ -51,16 +58,16 @@ export default function NewsletterPopup() {
 
   const handleDismiss = () => {
     setIsVisible(false);
-    localStorage.setItem(STORAGE_KEY, "true");
+    localStorage.setItem(STORAGE_KEY, String(Date.now()));
   };
 
   if (isAuthenticated || !isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-      {/* Backdrop */}
+    <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-[100] p-0 sm:p-0 w-full sm:w-[360px] animate-in fade-in slide-in-from-bottom-5 duration-300">
+      {/* Light non-blocking backdrop on mobile only */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/40 sm:hidden"
         onClick={handleDismiss}
       />
 

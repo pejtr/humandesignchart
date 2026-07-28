@@ -14,29 +14,34 @@ export default function ExitIntentPopup() {
 
   const handleMouseLeave = useCallback((e: MouseEvent) => {
     if (isAuthenticated) return;
-    // Only trigger when mouse leaves from the top of the viewport
+    // Exclude calculation & chart result pages to avoid disturbing users
+    const path = window.location.pathname;
+    if (path.includes("/calculate") || path.includes("/chart")) return;
+
     if (e.clientY <= 5 && !show) {
       const dismissed = localStorage.getItem("hd_exit_popup_dismissed");
-      if (!dismissed) {
-        setShow(true);
-        // Track engagement signal
-        meta.viewContent({
-          content_name: "Exit Intent Engagement",
-          content_ids: ["exit_engagement"],
-        });
+      if (dismissed) {
+        const ts = Number(dismissed);
+        if (isNaN(ts) || Date.now() - ts < 90 * 24 * 60 * 60 * 1000) {
+          return;
+        }
       }
+      setShow(true);
+      meta.viewContent({
+        content_name: "Exit Intent Engagement",
+        content_ids: ["exit_engagement"],
+      });
     }
   }, [show, isAuthenticated]);
 
   useEffect(() => {
     if (isAuthenticated) return;
-    // Don't show on mobile (no mouse leave detection)
     if (window.matchMedia("(pointer: coarse)").matches) return;
     
-    // Wait 15 seconds before enabling exit intent
+    // Wait 45 seconds before enabling exit intent
     const timer = setTimeout(() => {
       document.addEventListener("mouseleave", handleMouseLeave);
-    }, 15000);
+    }, 45000);
 
     return () => {
       clearTimeout(timer);
@@ -46,15 +51,15 @@ export default function ExitIntentPopup() {
 
   const dismiss = () => {
     setShow(false);
-    localStorage.setItem("hd_exit_popup_dismissed", "true");
+    localStorage.setItem("hd_exit_popup_dismissed", String(Date.now()));
   };
 
   if (isAuthenticated || !show) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={dismiss}>
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      {/* Soft Backdrop */}
+      <div className="absolute inset-0 bg-black/35" />
       
       {/* Modal */}
       <div
