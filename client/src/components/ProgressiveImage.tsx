@@ -40,7 +40,7 @@ export function ProgressiveImage({
           observer.disconnect();
         }
       },
-      { rootMargin: "200px" }
+      { rootMargin: "600px" } // Preload 600px before reaching viewport
     );
     observer.observe(imgRef.current);
     return () => observer.disconnect();
@@ -52,28 +52,33 @@ export function ProgressiveImage({
       className={`relative overflow-hidden ${className}`}
       style={{ ...style, backgroundColor: placeholderColor }}
     >
-      {/* Placeholder with sacred geometry shimmer */}
+      {/* Placeholder shimmer */}
       {!isLoaded && (
-        <div className="absolute inset-0 animate-pulse">
+        <div className="absolute inset-0 animate-pulse pointer-events-none">
           <div
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(135deg, ${placeholderColor} 0%, rgba(139,92,246,0.05) 50%, ${placeholderColor} 100%)`,
+              background: `linear-gradient(135deg, ${placeholderColor} 0%, rgba(139,92,246,0.12) 50%, ${placeholderColor} 100%)`,
               backgroundSize: "200% 200%",
-              animation: "shimmer 2s ease-in-out infinite",
             }}
           />
         </div>
       )}
-      {/* Actual image — only starts loading when in viewport */}
+      {/* Actual image */}
       {isInView && (
         <img
           src={src}
           alt={alt}
-          className={`w-full h-full transition-all duration-700 ${imgClassName} ${
-            isLoaded ? "opacity-100 blur-0 scale-100" : "opacity-0 blur-sm scale-105"
+          decoding="async"
+          className={`w-full h-full transition-opacity duration-300 ${imgClassName} ${
+            isLoaded ? "opacity-100 blur-0" : "opacity-0"
           }`}
           onLoad={() => setIsLoaded(true)}
+          ref={(el) => {
+            if (el && el.complete && el.naturalWidth > 0 && !isLoaded) {
+              setIsLoaded(true);
+            }
+          }}
           loading="lazy"
         />
       )}
