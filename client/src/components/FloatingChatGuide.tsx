@@ -131,7 +131,7 @@ export function FloatingChatGuide() {
                             <img
                                 src="/images/brand/veleknezka-master-v1.png"
                                 alt=""
-                                className="h-full w-full rounded-full object-cover object-top"
+                                className="h-full w-full rounded-full object-cover object-[center_16%]"
                             />
                             <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-white/80 bg-violet-700 shadow-md" aria-hidden="true">
                                 <Moon className="h-3.5 w-3.5 -rotate-12 text-amber-100" />
@@ -163,7 +163,7 @@ export function FloatingChatGuide() {
                         <div className="flex items-center justify-between p-3 border-b bg-muted/30">
                             <div className="flex items-center gap-2">
                                 <div className="w-9 h-9 overflow-hidden rounded-full border border-amber-200/70 bg-[#160b2f] shrink-0">
-                                    <img src="/images/brand/veleknezka-master-v1.png" alt="" className="h-full w-full object-cover object-top" />
+                                    <img src="/images/brand/veleknezka-master-v1.png" alt="" className="h-full w-full object-cover object-[center_16%]" />
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-semibold leading-none">{isEn ? "The High Priestess" : "Velekněžka"}</h3>

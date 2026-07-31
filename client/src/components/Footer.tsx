@@ -157,31 +157,42 @@ export default function Footer() {
           <p className="mb-4 text-center text-[10px] font-semibold uppercase tracking-[0.32em] text-amber-800/65">
             {locale === "cs" ? "Naše další projekty" : "Our other projects"}
           </p>
-          <div className="flex gap-4 overflow-x-auto pb-2 [scrollbar-width:thin]">
-            {projects.map(project => (
-              <a
-                key={project.href}
-                href={project.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative h-40 min-w-[260px] flex-1 overflow-hidden rounded-2xl border border-white/50 bg-slate-900 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-              >
-                <img src={project.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/5" />
-                <span className="absolute left-4 top-3 rounded-full border border-white/20 bg-black/25 px-2.5 py-1 text-[9px] font-semibold tracking-wider text-white/85 backdrop-blur-md">
-                  {project.domain}
-                </span>
-                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 text-white">
-                  <div className="min-w-0">
-                    <h3 className="truncate font-serif text-lg font-semibold leading-tight">{project.name}</h3>
-                    <p className="mt-1 truncate text-[11px] text-white/75">{locale === "cs" ? project.cs : project.en}</p>
-                  </div>
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/40 bg-white/10 backdrop-blur-md transition group-hover:bg-white group-hover:text-slate-900">
-                    <ArrowUpRight className="h-4 w-4" />
-                  </span>
+          <div className="projects-marquee" aria-label={locale === "cs" ? "Další projekty" : "Other projects"}>
+            <div className="projects-marquee-track">
+              {[0, 1].map(groupIndex => (
+                <div
+                  key={groupIndex}
+                  className="projects-marquee-group"
+                  aria-hidden={groupIndex === 1 ? true : undefined}
+                >
+                  {projects.map(project => (
+                    <a
+                      key={`${groupIndex}-${project.href}`}
+                      href={project.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      tabIndex={groupIndex === 1 ? -1 : undefined}
+                      className="group relative h-40 w-[280px] shrink-0 overflow-hidden rounded-2xl border border-white/50 bg-slate-900 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl lg:w-[310px]"
+                    >
+                      <img src={project.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/5" />
+                      <span className="absolute left-4 top-3 rounded-full border border-white/20 bg-black/25 px-2.5 py-1 text-[9px] font-semibold tracking-wider text-white/85 backdrop-blur-md">
+                        {project.domain}
+                      </span>
+                      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 text-white">
+                        <div className="min-w-0">
+                          <h3 className="truncate font-serif text-lg font-semibold leading-tight">{project.name}</h3>
+                          <p className="mt-1 truncate text-[11px] text-white/75">{locale === "cs" ? project.cs : project.en}</p>
+                        </div>
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/40 bg-white/10 backdrop-blur-md transition group-hover:bg-white group-hover:text-slate-900">
+                          <ArrowUpRight className="h-4 w-4" />
+                        </span>
+                      </div>
+                    </a>
+                  ))}
                 </div>
-              </a>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
