@@ -37,6 +37,9 @@ export const ENV = {
   forgeApiKey: process.env.STORAGE_API_KEY ?? "",
   leadosApiKey: process.env.LEADOS_API_KEY ?? "",
   leadosWebhookSecret: process.env.LEADOS_WEBHOOK_SECRET ?? "",
+  highPriestessReferenceUrl:
+    process.env.HIGH_PRIESTESS_REFERENCE_URL ??
+    "https://www.humandesignmapa.cz/images/brand/veleknezka-master-v1.png",
   // ─── META / Facebook Pixel & Conversions API ────────────────────────────
   // Client-side pixel id (VITE_ prefix is exposed to the browser bundle)
   metaPixelId: process.env.VITE_META_PIXEL_ID ?? "",

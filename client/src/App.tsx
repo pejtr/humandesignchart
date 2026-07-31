@@ -15,10 +15,12 @@ import WelcomeModal, { useWelcomeModal } from "./components/WelcomeModal";
 import PageTransition from "./components/PageTransition";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
+import { useGA4PageViews } from "./hooks/useGA4";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { AuthSidebar } from "./components/AuthSidebar";
 const FloatingChatGuide = lazy(() => import("./components/FloatingChatGuide").then(m => ({ default: m.FloatingChatGuide })));
 import { useUTM } from "./hooks/useUTM";
+import { useSklikPageViews } from "./hooks/useSklik";
 import { useAuth } from "./_core/hooks/useAuth";
 import type { Locale } from "./contexts/LanguageContext";
 
@@ -287,6 +289,8 @@ function WelcomeModalWrapper() {
 
 function App() {
   useUTM();
+  useSklikPageViews();
+  useGA4PageViews();
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light" switchable>

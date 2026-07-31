@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Cookie, X, Settings2 } from "lucide-react";
 import { initPixelAfterConsent } from "@/hooks/useMetaPixel";
+import { initSklikAfterConsent } from "@/hooks/useSklik";
+import { ga4PageView, initGA4 } from "@/hooks/useGA4";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const CONSENT_KEY = "hd-cookie-consent";
@@ -11,27 +13,6 @@ type ConsentState = {
   marketing: boolean;
   accepted: boolean;
 };
-
-/** Initialize Google Analytics 4 page view tracking. Safe to call multiple times. */
-function ga4PageView(path: string) {
-  if (!(window as any).gtag) return;
-  (window as any).gtag("event", "page_view", { page_path: path });
-}
-
-/** Initialize Google Analytics 4 script after consent. */
-function initGA4() {
-  const gaId = (import.meta as any).env?.VITE_GA_MEASUREMENT_ID as string | undefined;
-  if (!gaId || (window as any).gtag) return;
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
-  document.head.appendChild(script);
-  (window as any).dataLayer = (window as any).dataLayer || [];
-  function gtag(...args: any[]) { (window as any).dataLayer.push(args); }
-  (window as any).gtag = gtag;
-  gtag("js", new Date());
-  gtag("config", gaId);
-}
 
 /** Initialize Microsoft Clarity after consent. Safe to call multiple times. */
 function initClarity() {
@@ -62,7 +43,7 @@ export function CookieConsent() {
       // Consent already given — initialize analytics on page load
       try {
         const parsed = JSON.parse(stored) as ConsentState;
-        if (parsed.marketing) initPixelAfterConsent();
+        if (parsed.marketing) { initPixelAfterConsent(); initSklikAfterConsent(); }
         if (parsed.analytics) { initGA4(); initClarity(); }
       } catch { /* ignore */ }
       return;
@@ -77,6 +58,7 @@ export function CookieConsent() {
     localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
     setShow(false);
     initPixelAfterConsent();
+    initSklikAfterConsent();
     initGA4();
     ga4PageView(window.location.pathname);
     initClarity();
@@ -86,7 +68,7 @@ export function CookieConsent() {
     const state: ConsentState = { ...consent, accepted: true };
     localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
     setShow(false);
-    if (state.marketing) initPixelAfterConsent();
+    if (state.marketing) { initPixelAfterConsent(); initSklikAfterConsent(); }
     if (state.analytics) {
       initGA4();
       ga4PageView(window.location.pathname);

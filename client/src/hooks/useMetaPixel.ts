@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { trackSklikEvent } from "@/hooks/useSklik";
+import { trackGA4Event } from "@/hooks/useGA4";
 
 /**
  * META Pixel tracking hook.
@@ -63,14 +65,44 @@ function fbq(): ((...args: unknown[]) => void) | undefined {
 
 /** Track a standard META Pixel event (client-side). */
 function trackEvent(name: MetaEventName, params?: MetaEventParams) {
+  const gaEventNames: Record<MetaEventName, string> = {
+    PageView: "page_view",
+    ViewContent: "view_item",
+    Search: "search",
+    AddToCart: "add_to_cart",
+    InitiateCheckout: "begin_checkout",
+    AddPaymentInfo: "add_payment_info",
+    Purchase: "purchase",
+    Lead: "generate_lead",
+    CompleteRegistration: "sign_up",
+    Subscribe: "subscribe",
+  };
+  const gaParams: Record<string, unknown> = { ...(params || {}) };
+  if (typeof gaParams.order_id === "string") {
+    gaParams.transaction_id = gaParams.order_id;
+    delete gaParams.order_id;
+  }
+  if (Array.isArray(gaParams.content_ids)) {
+    gaParams.items = gaParams.content_ids.map(itemId => ({
+      item_id: itemId,
+      item_name: gaParams.content_name || itemId,
+    }));
+  }
+  trackGA4Event(gaEventNames[name], gaParams);
+
   const consent = getConsent();
   if (!consent.marketing) return;
+  const sklikParams = { ...(params || {}) } as MetaEventParams;
+  if (sklikParams.currency && sklikParams.currency !== "CZK") delete sklikParams.currency;
+  if (name !== "Purchase" || typeof sklikParams.order_id === "string") {
+    trackSklikEvent(name, sklikParams);
+  }
   const pixelId = getPixelId();
   if (!pixelId) {
-    if (import.meta.env.DEV) console.warn("[META] No pixel ID configured");
+    if (import.meta.env.DEV) console.warn("[META] No pixel ID configured; Sklik event was still processed");
     return;
   }
-  // Standard event
+  // Standard META event. Sklik remains independent because META may be disabled.
   fbq()?.("track", name, params);
   // PageView is fired with trackSingle automatically by base code; for other events use track.
   if (import.meta.env.DEV) console.log("[META] track", name, params);
@@ -80,6 +112,7 @@ function trackEvent(name: MetaEventName, params?: MetaEventParams) {
 function trackPageView() {
   const consent = getConsent();
   if (!consent.marketing) return;
+  trackSklikEvent("PageView");
   const pixelId = getPixelId();
   if (!pixelId) return;
   fbq()?.("track", "PageView");

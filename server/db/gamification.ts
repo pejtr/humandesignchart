@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, gte } from "drizzle-orm";
 import { users, creditTransactions } from "../../drizzle/schema";
 import { getDb } from "./index";
 
@@ -6,6 +6,20 @@ export async function logCreditTransaction(userId: number, amount: number, reaso
     const db = await getDb();
     if (!db) throw new Error("Database not available");
     await db.insert(creditTransactions).values({ userId, amount, reason, metadata: metadata ?? null });
+}
+
+export async function hasRecentCreditTransaction(userId: number, reason: string, since: Date) {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    const result = await db.select({ id: creditTransactions.id })
+        .from(creditTransactions)
+        .where(and(
+            eq(creditTransactions.userId, userId),
+            eq(creditTransactions.reason, reason),
+            gte(creditTransactions.createdAt, since.toISOString().slice(0, 19).replace("T", " ")),
+        ))
+        .limit(1);
+    return result.length > 0;
 }
 
 export async function addCreditsWithLog(userId: number, amount: number, reason: string, metadata?: Record<string, unknown>) {

@@ -19,7 +19,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   Calendar, Clock, Wand2, Send, Trash2, Edit, CheckCircle,
   XCircle, Plus, Facebook, Linkedin, Instagram,
-  Copy, ExternalLink, Zap, Share2, Settings, RefreshCw
+  Copy, ExternalLink, Zap, Share2, Settings, RefreshCw,
+  LayoutDashboard, CalendarDays, Crown, Users, Image as ImageIcon,
+  TrendingUp, AlertTriangle, Radio
 } from "lucide-react";
 
 type Locale = "cs" | "en";
@@ -28,7 +30,7 @@ const T = {
   cs: {
     title: "Plánovač sociálních sítí",
     subtitle: "Plánujte a automatizujte příspěvky na sociálních sítích",
-    tabs: { queue: "Fronta", compose: "Nový příspěvek", aiGen: "AI Generátor", accounts: "Účty" },
+    tabs: { overview: "Přehled", calendar: "Kalendář", queue: "Fronta", compose: "Nový příspěvek", priestess: "Velekněžka", aiGen: "AI knihovna", influencers: "Influenceři", accounts: "Účty" },
     queue: {
       empty: "Fronta je prázdná",
       emptyDesc: "Vytvořte nový příspěvek nebo vygenerujte obsah pomocí AI.",
@@ -56,6 +58,7 @@ const T = {
         hd_type: "Typ HD", quote: "Citát", infographic: "Infografika",
         transit: "Tranzit", iching: "I-Ťing", promo: "Promo", custom: "Vlastní",
         tiktok_script: "TikTok Scénář",
+        story: "Story",
       },
     },
     aiGen: {
@@ -90,7 +93,7 @@ const T = {
   en: {
     title: "Social Media Scheduler",
     subtitle: "Plan and automate your social media posts",
-    tabs: { queue: "Queue", compose: "New Post", aiGen: "AI Generator", accounts: "Accounts" },
+    tabs: { overview: "Overview", calendar: "Calendar", queue: "Queue", compose: "New Post", priestess: "High Priestess", aiGen: "AI Library", influencers: "Influencers", accounts: "Accounts" },
     queue: {
       empty: "Queue is empty",
       emptyDesc: "Create a new post or generate content with AI.",
@@ -118,6 +121,7 @@ const T = {
         hd_type: "HD Type", quote: "Quote", infographic: "Infographic",
         transit: "Transit", iching: "I-Ching", promo: "Promo", custom: "Custom",
         tiktok_script: "TikTok Script",
+        story: "Story",
       },
     },
     aiGen: {
@@ -306,7 +310,7 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
   const [title, setTitle] = useState("");
   const [hashtags, setHashtags] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [postType, setPostType] = useState<"hd_type" | "quote" | "infographic" | "transit" | "iching" | "promo" | "custom" | "tiktok_script">("custom");
+  const [postType, setPostType] = useState<"hd_type" | "quote" | "infographic" | "transit" | "iching" | "promo" | "custom" | "tiktok_script" | "story">("custom");
   const [postLocale, setPostLocale] = useState<"cs" | "en">(locale);
   const [scheduledAt, setScheduledAt] = useState("");
   const [selectedAccounts, setSelectedAccounts] = useState<number[]>([]);
@@ -477,7 +481,7 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
 function AiGeneratorTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
   const [topic, setTopic] = useState("");
   const [style, setStyle] = useState<"dark_cosmic" | "light_minimal" | "golden_mystical">("dark_cosmic");
-  const [postType, setPostType] = useState<"hd_type" | "quote" | "infographic" | "transit" | "iching" | "promo" | "custom" | "tiktok_script">("hd_type");
+  const [postType, setPostType] = useState<"hd_type" | "quote" | "infographic" | "transit" | "iching" | "promo" | "custom" | "tiktok_script" | "story">("hd_type");
   const [aspectRatio, setAspectRatio] = useState<"1:1" | "4:5" | "9:16">("1:1");
   const [generatedImages, setGeneratedImages] = useState<{ imageUrl: string; prompt: string }[]>([]);
 
@@ -756,6 +760,147 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
   );
 }
 
+function OverviewTab({ locale }: { locale: Locale }) {
+  const { data: posts = [], isLoading } = trpc.social.listPosts.useQuery({ status: "all", limit: 100 });
+  const { data: accounts = [] } = trpc.social.listAccounts.useQuery();
+  if (isLoading) return <div className="grid gap-4 md:grid-cols-4">{[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-28" />)}</div>;
+  const counts = {
+    scheduled: posts.filter(p => p.status === "scheduled").length,
+    published: posts.filter(p => p.status === "published").length,
+    drafts: posts.filter(p => p.status === "draft").length,
+    failed: posts.filter(p => p.status === "failed").length,
+  };
+  const kpis = [
+    { label: locale === "cs" ? "Naplánováno" : "Scheduled", value: counts.scheduled, icon: CalendarDays, color: "text-blue-600 bg-blue-50" },
+    { label: locale === "cs" ? "Publikováno" : "Published", value: counts.published, icon: CheckCircle, color: "text-emerald-600 bg-emerald-50" },
+    { label: locale === "cs" ? "Koncepty" : "Drafts", value: counts.drafts, icon: Edit, color: "text-violet-600 bg-violet-50" },
+    { label: locale === "cs" ? "Vyžaduje pozornost" : "Needs attention", value: counts.failed, icon: AlertTriangle, color: "text-rose-600 bg-rose-50" },
+  ];
+  const upcoming = posts
+    .filter(p => p.status === "scheduled" && p.scheduledAt)
+    .sort((a, b) => new Date(a.scheduledAt!).getTime() - new Date(b.scheduledAt!).getTime())
+    .slice(0, 5);
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {kpis.map(({ label, value, icon: Icon, color }) => (
+          <Card key={label} className="border-border/60 shadow-sm"><CardContent className="flex items-center gap-4 p-5">
+            <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${color}`}><Icon className="h-5 w-5" /></div>
+            <div><p className="text-2xl font-bold">{value}</p><p className="text-xs text-muted-foreground">{label}</p></div>
+          </CardContent></Card>
+        ))}
+      </div>
+      <div className="grid gap-5 lg:grid-cols-[1.4fr_0.8fr]">
+        <Card>
+          <CardHeader><CardTitle className="text-lg">{locale === "cs" ? "Nejbližší obsah" : "Upcoming content"}</CardTitle><CardDescription>{locale === "cs" ? "Co čeká na publikování" : "What is next in your publishing queue"}</CardDescription></CardHeader>
+          <CardContent className="space-y-3">
+            {upcoming.length === 0 ? <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">{locale === "cs" ? "Zatím není nic naplánováno." : "Nothing scheduled yet."}</p> : upcoming.map(post => (
+              <div key={post.id} className="flex items-center gap-3 rounded-xl border p-3">
+                {post.imageUrl ? <img src={post.imageUrl} alt="" className="h-12 w-12 rounded-lg object-cover" /> : <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted"><ImageIcon className="h-5 w-5" /></div>}
+                <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{post.title || post.caption}</p><p className="text-xs text-muted-foreground">{new Date(post.scheduledAt!).toLocaleString(locale === "cs" ? "cs-CZ" : "en-US")}</p></div>
+                <Badge variant="secondary">{post.postType}</Badge>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+        <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-white">
+          <CardHeader><CardTitle className="flex items-center gap-2 text-lg"><Radio className="h-5 w-5 text-violet-600" />{locale === "cs" ? "Publikační připravenost" : "Publishing readiness"}</CardTitle></CardHeader>
+          <CardContent className="space-y-4 text-sm">
+            <div className="flex items-center justify-between"><span>{locale === "cs" ? "Připojené účty" : "Connected accounts"}</span><strong>{accounts.length}</strong></div>
+            <div className="flex items-center justify-between"><span>Instagram</span><strong>{accounts.filter(a => a.platform === "instagram").length}</strong></div>
+            <div className="flex items-center justify-between"><span>{locale === "cs" ? "Příspěvky bez chyby" : "Healthy posts"}</span><strong>{Math.max(posts.length - counts.failed, 0)}</strong></div>
+            <p className="rounded-lg bg-white/80 p-3 text-xs text-muted-foreground">{locale === "cs" ? "Vygenerovaný obsah se nejdřív uloží jako koncept nebo plán. Nic se nepublikuje bez vašeho potvrzení." : "Generated content is first saved as a draft or scheduled item. Nothing publishes without your confirmation."}</p>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function CalendarTab({ locale }: { locale: Locale }) {
+  const { data: posts = [] } = trpc.social.listPosts.useQuery({ status: "all", limit: 100 });
+  const days = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + index);
+    return date;
+  });
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader><CardTitle>{locale === "cs" ? "Obsahový kalendář · 7 dní" : "Content calendar · 7 days"}</CardTitle><CardDescription>{locale === "cs" ? "Rychlý přehled plánované komunikace napříč kanály" : "A quick view of scheduled communication across channels"}</CardDescription></CardHeader>
+      <CardContent className="overflow-x-auto pb-5">
+        <div className="grid min-w-[900px] grid-cols-7 gap-2">
+          {days.map(day => {
+            const dayPosts = posts.filter(post => post.scheduledAt && new Date(post.scheduledAt).toDateString() === day.toDateString());
+            return <div key={day.toISOString()} className="min-h-64 rounded-xl border bg-muted/10 p-2">
+              <div className="mb-3 border-b pb-2 text-center"><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{day.toLocaleDateString(locale === "cs" ? "cs-CZ" : "en-US", { weekday: "short" })}</p><p className="font-semibold">{day.getDate()}. {day.getMonth() + 1}.</p></div>
+              <div className="space-y-2">{dayPosts.map(post => <div key={post.id} className="rounded-lg border border-violet-100 bg-white p-2 shadow-sm"><p className="line-clamp-2 text-xs font-medium">{post.title || post.caption}</p><p className="mt-1 text-[10px] text-muted-foreground">{new Date(post.scheduledAt!).toLocaleTimeString(locale === "cs" ? "cs-CZ" : "en-US", { hour: "2-digit", minute: "2-digit" })}</p><Badge className="mt-2 text-[9px]" variant="secondary">{post.postType}</Badge></div>)}</div>
+            </div>;
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function HighPriestessTab({ locale }: { locale: Locale }) {
+  const utils = trpc.useUtils();
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [theme, setTheme] = useState("");
+  const [scheduleAt, setScheduleAt] = useState(() => `${new Date().toISOString().slice(0, 10)}T09:00`);
+  const [selectedAccountIds, setSelectedAccountIds] = useState<number[]>([]);
+  const { data: accounts = [] } = trpc.social.listAccounts.useQuery();
+  const instagramAccounts = accounts.filter(account => account.platform === "instagram");
+  const generate = trpc.social.generateHighPriestessStory.useMutation({ onError: error => toast.error(error.message) });
+  const save = trpc.social.savePost.useMutation({
+    onSuccess: () => { toast.success(locale === "cs" ? "Story byla přidána do plánu." : "Story added to the schedule."); utils.social.listPosts.invalidate(); },
+    onError: error => toast.error(error.message),
+  });
+  const story = generate.data;
+  const toggleAccount = (id: number) => setSelectedAccountIds(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);
+  return (
+    <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
+      <Card className="overflow-hidden border-violet-200">
+        <div className="aspect-[9/16] bg-slate-950">
+          <img src={story?.imageUrl || "/images/brand/veleknezka-master-v1.png"} alt="AI průvodkyně Velekněžka" className="h-full w-full object-cover" />
+        </div>
+        <CardContent className="p-4"><p className="text-xs text-muted-foreground">{locale === "cs" ? "Velekněžka je transparentně označená AI průvodkyně. Jednotný master portrét drží vizuální identitu napříč Stories." : "The High Priestess is a clearly disclosed AI guide. The master portrait keeps her identity consistent across Stories."}</p></CardContent>
+      </Card>
+      <div className="space-y-5">
+        <Card>
+          <CardHeader><CardTitle className="flex items-center gap-2"><Crown className="h-5 w-5 text-violet-600" />{locale === "cs" ? "Studio denního poselství" : "Daily message studio"}</CardTitle><CardDescription>{locale === "cs" ? "Tranzity → praktické poselství → branded Story → plán" : "Transits → practical message → branded Story → schedule"}</CardDescription></CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5"><Label>{locale === "cs" ? "Datum" : "Date"}</Label><Input type="date" value={date} onChange={event => { setDate(event.target.value); setScheduleAt(`${event.target.value}T09:00`); }} /></div>
+            <div className="space-y-1.5"><Label>{locale === "cs" ? "Volitelné téma" : "Optional theme"}</Label><Input value={theme} onChange={event => setTheme(event.target.value)} placeholder={locale === "cs" ? "např. rozhodování bez tlaku" : "e.g. decisions without pressure"} /></div>
+            <Button className="md:col-span-2" onClick={() => generate.mutate({ locale, publishDate: new Date(`${date}T12:00:00`), theme: theme || undefined })} disabled={generate.isPending}>
+              {generate.isPending ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}{generate.isPending ? (locale === "cs" ? "Tvořím Story..." : "Creating Story...") : (locale === "cs" ? "Vytvořit denní Story" : "Create daily Story")}
+            </Button>
+          </CardContent>
+        </Card>
+        {story && <Card className="border-violet-200 bg-violet-50/30"><CardContent className="space-y-4 p-5">
+          <div><p className="text-xs uppercase tracking-wider text-violet-600">{story.sunGate} · Luna {story.moonGate}</p><h3 className="mt-1 font-serif text-2xl font-semibold">{story.headline}</h3><p className="mt-2 text-sm">{story.message}</p></div>
+          <div className="rounded-xl bg-white p-3 text-sm"><strong>{locale === "cs" ? "Dnešní krok:" : "Today's action:"}</strong> {story.practicalAction}</div>
+          <div><Label>{locale === "cs" ? "Voiceover scénář" : "Voiceover script"}</Label><p className="mt-1 rounded-xl border bg-white p-3 text-sm text-muted-foreground">{story.spokenScript}</p></div>
+          <div className="grid gap-4 md:grid-cols-2"><div className="space-y-1.5"><Label>{locale === "cs" ? "Čas publikování" : "Publish time"}</Label><Input type="datetime-local" value={scheduleAt} onChange={event => setScheduleAt(event.target.value)} /></div><div className="space-y-1.5"><Label>Instagram</Label><div className="flex flex-wrap gap-2">{instagramAccounts.map(account => <button type="button" key={account.id} onClick={() => toggleAccount(account.id)} className={`rounded-full border px-3 py-2 text-xs ${selectedAccountIds.includes(account.id) ? "border-violet-500 bg-violet-100 text-violet-800" : "bg-white"}`}>@{account.accountHandle || account.accountName}</button>)}{instagramAccounts.length === 0 && <span className="text-xs text-amber-700">{locale === "cs" ? "Nejdřív připojte Instagram v záložce Účty." : "Connect Instagram in Accounts first."}</span>}</div></div></div>
+          <div className="flex flex-wrap gap-2"><Button variant="outline" asChild><a href={story.imageUrl} target="_blank" rel="noreferrer"><ExternalLink className="mr-2 h-4 w-4" />{locale === "cs" ? "Otevřít vizuál" : "Open visual"}</a></Button><Button onClick={() => save.mutate({ title: `Velekněžka ${story.date}`, caption: story.caption, hashtags: story.hashtags.join(" "), imageUrl: story.imageUrl, imagePrompt: story.visualPrompt, postType: "story", locale, scheduledAt: new Date(scheduleAt), platforms: ["instagram"], accountIds: selectedAccountIds })} disabled={save.isPending || selectedAccountIds.length === 0}><Calendar className="mr-2 h-4 w-4" />{locale === "cs" ? "Naplánovat Story" : "Schedule Story"}</Button></div>
+        </CardContent></Card>}
+      </div>
+    </div>
+  );
+}
+
+function InfluencersTab({ locale }: { locale: Locale }) {
+  const { data: influencers = [], isLoading } = trpc.social.listAffiliateInfluencers.useQuery();
+  return <div className="space-y-5">
+    <div className="grid gap-3 md:grid-cols-3">
+      {[{ n: "1", cs: "Pozvánka a schválení", en: "Invite and approve" }, { n: "2", cs: "Kód a měřené odkazy", en: "Code and tracked links" }, { n: "3", cs: "Provize a výplata", en: "Commission and payout" }].map(item => <Card key={item.n}><CardContent className="flex items-center gap-3 p-4"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 font-bold text-violet-700">{item.n}</span><p className="text-sm font-medium">{locale === "cs" ? item.cs : item.en}</p></CardContent></Card>)}
+    </div>
+    <Card><CardHeader><CardTitle className="flex items-center gap-2"><Users className="h-5 w-5 text-violet-600" />{locale === "cs" ? "Affiliate influenceři" : "Affiliate influencers"}</CardTitle><CardDescription>{locale === "cs" ? "Připravený základ pro tvůrce s vlastním kódem, provizí a měřením." : "Foundation for creators with their own code, commission and tracking."}</CardDescription></CardHeader><CardContent>
+      {isLoading ? <Skeleton className="h-32" /> : influencers.length === 0 ? <div className="rounded-xl border border-dashed p-10 text-center"><TrendingUp className="mx-auto mb-3 h-9 w-9 text-muted-foreground" /><p className="font-medium">{locale === "cs" ? "Zatím bez aktivních influencerů" : "No active influencers yet"}</p><p className="mt-1 text-sm text-muted-foreground">{locale === "cs" ? "Datová struktura je připravená; další krok bude formulář pozvánky a schvalovací workflow." : "The data structure is ready; next comes invitations and an approval workflow."}</p></div> : <div className="overflow-x-auto"><table className="w-full min-w-[650px] text-sm"><thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="p-3">{locale === "cs" ? "Tvůrce" : "Creator"}</th><th className="p-3">{locale === "cs" ? "Kód" : "Code"}</th><th className="p-3">Tier</th><th className="p-3">{locale === "cs" ? "Celkem" : "Total"}</th><th className="p-3">{locale === "cs" ? "K výplatě" : "Pending"}</th></tr></thead><tbody>{influencers.map(person => <tr key={person.id} className="border-b last:border-0"><td className="p-3"><p className="font-medium">{person.name || person.email}</p><p className="text-xs text-muted-foreground">{person.email}</p></td><td className="p-3 font-mono">{person.affiliateCode || "—"}</td><td className="p-3"><Badge variant="secondary">{person.affiliateTier || "standard"}</Badge></td><td className="p-3">{person.totalEarned || "0"} Kč</td><td className="p-3 font-semibold">{person.pendingPayout || "0"} Kč</td></tr>)}</tbody></table></div>}
+    </CardContent></Card>
+  </div>;
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function SocialScheduler() {
@@ -766,7 +911,7 @@ export default function SocialScheduler() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="container max-w-5xl py-8 pt-24">
+      <div className="container max-w-7xl py-8 pt-24">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
@@ -779,8 +924,15 @@ export default function SocialScheduler() {
           </div>
         </div>
 
-        <Tabs defaultValue="queue">
-          <TabsList className="mb-6">
+        <Tabs defaultValue="overview">
+          <div className="sticky top-16 z-20 mb-6 overflow-x-auto rounded-xl border bg-background/95 p-1 shadow-sm backdrop-blur">
+          <TabsList className="h-auto min-w-max justify-start bg-transparent">
+            <TabsTrigger value="overview" className="gap-2">
+              <LayoutDashboard className="w-4 h-4" />{t.tabs.overview}
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="gap-2">
+              <CalendarDays className="w-4 h-4" />{t.tabs.calendar}
+            </TabsTrigger>
             <TabsTrigger value="queue" className="gap-2">
               <Calendar className="w-4 h-4" />{t.tabs.queue}
             </TabsTrigger>
@@ -790,14 +942,25 @@ export default function SocialScheduler() {
             <TabsTrigger value="ai-gen" className="gap-2">
               <Wand2 className="w-4 h-4" />{t.tabs.aiGen}
             </TabsTrigger>
+            <TabsTrigger value="priestess" className="gap-2">
+              <Crown className="w-4 h-4" />{t.tabs.priestess}
+            </TabsTrigger>
+            <TabsTrigger value="influencers" className="gap-2">
+              <Users className="w-4 h-4" />{t.tabs.influencers}
+            </TabsTrigger>
             <TabsTrigger value="accounts" className="gap-2">
               <Settings className="w-4 h-4" />{t.tabs.accounts}
             </TabsTrigger>
           </TabsList>
+          </div>
 
+          <TabsContent value="overview"><OverviewTab locale={safeLocale} /></TabsContent>
+          <TabsContent value="calendar"><CalendarTab locale={safeLocale} /></TabsContent>
           <TabsContent value="queue"><QueueTab locale={safeLocale} t={t} /></TabsContent>
           <TabsContent value="compose"><ComposeTab locale={safeLocale} t={t} /></TabsContent>
           <TabsContent value="ai-gen"><AiGeneratorTab locale={safeLocale} t={t} /></TabsContent>
+          <TabsContent value="priestess"><HighPriestessTab locale={safeLocale} /></TabsContent>
+          <TabsContent value="influencers"><InfluencersTab locale={safeLocale} /></TabsContent>
           <TabsContent value="accounts"><AccountsTab locale={safeLocale} t={t} /></TabsContent>
         </Tabs>
       </div>

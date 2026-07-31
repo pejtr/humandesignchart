@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `blueprintPdfCredits` int DEFAULT 0 NOT NULL;

@@ -19,12 +19,12 @@ export const aiRouter = router({
               (val) => JSON.stringify(val).length <= 500_000,
               "Chart data too large"
             ),
-            readingType: z.enum(["overview", "type_strategy", "profile", "authority", "incarnation_cross", "channels", "gates", "variables", "relationships", "career"]),
+            readingType: z.enum(["overview", "type_strategy", "profile", "authority", "incarnation_cross", "channels", "gates", "variables", "relationships", "career", "moon"]),
         }))
         .mutation(async ({ ctx, input }) => {
-            const { countAiReadingsByUserToday } = await import("../db");
+            const { countAiReadingsByUser } = await import("../db");
             const { canGenerateAiReading } = await import("../stripeProducts");
-            const totalReadings = await countAiReadingsByUserToday(ctx.user.id);
+            const totalReadings = await countAiReadingsByUser(ctx.user.id);
             const userForCheck = {
                 ...ctx.user,
                 subscriptionCurrentPeriodEnd: ctx.user.subscriptionCurrentPeriodEnd ? new Date(ctx.user.subscriptionCurrentPeriodEnd) : null,
@@ -34,7 +34,11 @@ export const aiRouter = router({
                 throw new TRPCError({ code: "PAYMENT_REQUIRED", message: "Free limit reached" });
             }
 
-            const chart = input.chartData;
+            const chart: Record<string, unknown> = { ...input.chartData };
+            if (input.readingType === "moon") {
+                const { getMoonReadingContext } = await import("./transit");
+                chart.currentMoon = await getMoonReadingContext();
+            }
 
             const isEn = false; // standard readings are in Czech as before (or detect via chart data if needed)
             const systemPrompt = getSystemPrompt(isEn);

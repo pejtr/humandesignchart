@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { and, eq, gt, sql } from "drizzle-orm";
 import { users, InsertUser } from "../../drizzle/schema";
 import { getDb } from "./index";
 import { ENV } from "../_core/env";
@@ -114,6 +114,23 @@ export async function consumeAiReadingCredit(userId: number) {
     }).where(eq(users.id, userId));
     // Check if any row was affected (credits were > 0)
     return (result[0] as any).affectedRows > 0;
+}
+
+export async function addBlueprintPdfCredits(userId: number, credits: number) {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    await db.update(users).set({
+        blueprintPdfCredits: sql`COALESCE(${users.blueprintPdfCredits}, 0) + ${credits}`,
+    }).where(eq(users.id, userId));
+}
+
+export async function consumeBlueprintPdfCredit(userId: number) {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    const result = await db.update(users).set({
+        blueprintPdfCredits: sql`${users.blueprintPdfCredits} - 1`,
+    }).where(and(eq(users.id, userId), gt(users.blueprintPdfCredits, 0)));
+    return ((result[0] as any)?.affectedRows ?? 0) > 0;
 }
 export async function updateUserPreferences(userId: number, preferences: Record<string, boolean>) {
     const db = await getDb();

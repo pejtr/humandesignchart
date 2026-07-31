@@ -215,7 +215,9 @@ export type LeadOSEventType =
   | "chart_created"
   | "subscription_upgraded"
   | "ai_reading_used"
-  | "chart_shared";
+  | "chart_shared"
+  | "social_content_generated"
+  | "social_content_published";
 
 export interface LeadOSEventPayload {
   event: LeadOSEventType;

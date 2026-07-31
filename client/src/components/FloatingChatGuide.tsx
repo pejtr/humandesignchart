@@ -4,7 +4,7 @@ import { AIChatBox, Message } from "./AIChatBox";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Bot, X, Maximize2, Minimize2, Sparkles } from "lucide-react";
+import { Moon, X, Maximize2, Minimize2, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import { getLoginUrl } from "@/const";
@@ -20,8 +20,8 @@ export function FloatingChatGuide() {
     const [isLoading, setIsLoading] = useState(false);
 
     const welcomeMessage = isEn
-        ? "Hi! I'm your AI Human Design guide. Ask me anything about your chart, type, strategy, or transits!"
-        : "Ahoj! Jsem tvůj AI průvodce Human Designem. Zeptej se mě na cokoliv o tvé mapě, typu, strategii nebo tranzitech!";
+        ? "Welcome. I am the High Priestess, your personal Human Design guide. Ask me about your chart, decisions, relationships or current energy."
+        : "Vítejte. Jsem Velekněžka, vaše osobní průvodkyně Human Designem. Zeptejte se mě na svou mapu, rozhodování, vztahy nebo dnešní energii.";
 
     const [messages, setMessages] = useState<Message[]>([
         { role: "assistant", content: welcomeMessage }
@@ -119,17 +119,26 @@ export function FloatingChatGuide() {
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
-                        className="fixed bottom-[4.5rem] right-4 md:bottom-4 md:right-6 z-50 lg:bottom-6 lg:right-10"
+                        className="fixed bottom-[4.5rem] right-4 md:bottom-4 md:right-20 z-50 lg:bottom-6 lg:right-24"
                     >
                         <Button
                             onClick={() => setIsOpen(true)}
-                            aria-label={isEn ? "Open AI guide" : "Otevřít AI průvodce"}
-                            title={isEn ? "Open AI guide" : "Otevřít AI průvodce"}
-                            className="relative w-14 h-14 rounded-full shadow-2xl shadow-purple-900/25 bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-700 hover:from-violet-600 hover:via-purple-700 hover:to-indigo-800 flex items-center justify-center p-0 border border-white/25 ring-4 ring-purple-500/10 transition-transform hover:scale-105"
+                            aria-label={isEn ? "Open the High Priestess AI guide" : "Otevřít Velekněžku, AI průvodkyni"}
+                            title={isEn ? "The High Priestess — personal guide" : "Velekněžka — osobní průvodkyně"}
+                            className="group relative w-16 h-16 overflow-visible rounded-full border-2 border-amber-100/90 bg-[#160b2f] p-0 text-white shadow-[0_14px_38px_rgba(76,29,149,0.28)] ring-4 ring-violet-500/10 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_18px_46px_rgba(76,29,149,0.38)]"
                         >
-                            <span className="absolute inset-1 rounded-full border border-white/25" aria-hidden="true" />
-                            <Bot className="relative w-6 h-6 text-white" />
-                            <Sparkles className="absolute right-2 top-1.5 w-3 h-3 text-violet-100" aria-hidden="true" />
+                            <span className="absolute -inset-2 -z-10 rounded-full bg-violet-500/20 blur-lg transition-opacity group-hover:bg-violet-400/35" aria-hidden="true" />
+                            <img
+                                src="/images/brand/veleknezka-master-v1.png"
+                                alt=""
+                                className="h-full w-full rounded-full object-cover object-top"
+                            />
+                            <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-white/80 bg-violet-700 shadow-md" aria-hidden="true">
+                                <Moon className="h-3.5 w-3.5 -rotate-12 text-amber-100" />
+                            </span>
+                            <span className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-full border border-violet-200/70 bg-white/95 px-3 py-1.5 text-xs font-medium text-violet-950 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block dark:bg-violet-950/95 dark:text-violet-100">
+                                {isEn ? "Ask the High Priestess" : "Zeptejte se Velekněžky"}
+                            </span>
                         </Button>
                     </motion.div>
                 )}
@@ -153,12 +162,12 @@ export function FloatingChatGuide() {
                     >
                         <div className="flex items-center justify-between p-3 border-b bg-muted/30">
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shrink-0">
-                                    <Sparkles className="w-4 h-4 text-white" />
+                                <div className="w-9 h-9 overflow-hidden rounded-full border border-amber-200/70 bg-[#160b2f] shrink-0">
+                                    <img src="/images/brand/veleknezka-master-v1.png" alt="" className="h-full w-full object-cover object-top" />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-semibold leading-none">{isEn ? "AI HD Guide" : "AI HD Průvodce"}</h3>
-                                    <p className="text-[10px] text-muted-foreground mt-0.5">{isEn ? "Online" : "Aktivní"}</p>
+                                    <h3 className="text-sm font-semibold leading-none">{isEn ? "The High Priestess" : "Velekněžka"}</h3>
+                                    <p className="text-[10px] text-muted-foreground mt-0.5">{isEn ? "Your personal guide" : "Vaše osobní průvodkyně"}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-1">
@@ -175,7 +184,7 @@ export function FloatingChatGuide() {
                             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-card">
                                 <Sparkles className="w-12 h-12 text-purple-300 mb-4" />
                                 <p className="text-sm text-muted-foreground mb-4">
-                                    {isEn ? "Please sign in to chat with your personal AI guide." : "Pro chatování s AI průvodcem se prosím přihlaste."}
+                                    {isEn ? "Please sign in to chat with your personal guide." : "Pro rozhovor s Velekněžkou se prosím přihlaste."}
                                 </p>
                                 <Button onClick={() => window.location.href = getLoginUrl()}>
                                     {isEn ? "Sign in" : "Přihlásit se"}
@@ -186,12 +195,12 @@ export function FloatingChatGuide() {
                                 messages={messages}
                                 onSendMessage={handleSendMessage}
                                 isLoading={isLoading}
-                                placeholder={isEn ? "Ask something..." : "Zeptejte se na cokoliv..."}
+                                placeholder={isEn ? "Ask the High Priestess..." : "Zeptejte se Velekněžky..."}
                                 className="border-none rounded-none shadow-none flex-1"
                                 height="100%"
                                 suggestedPrompts={isEn
                                     ? ["What varies in my design?", "Explain my profile", "How does emotional authority work?"]
-                                    : ["Jaký je dnes můj tranzit?", "Vysvětli mi můj profil", "Jak funguje emocionální autorita?"]}
+                                    : ["Jaká je dnes moje energie?", "Vysvětli mi můj profil", "Jak mám použít svou autoritu?"]}
                             />
                         )}
                     </motion.div>

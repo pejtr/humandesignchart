@@ -21,10 +21,10 @@ const PLANET_SYMBOLS: Record<string, string> = {
     "North Node": "☊", "South Node": "☋",
 };
 
-export async function calculateTransitGates() {
+export async function calculateTransitGates(at: Date = new Date()) {
     const { calculatePlanetaryPositions, dateToJD } = await import("../humandesign/ephemeris");
     const { GATE_WHEEL, PLANET_NAMES } = await import("../humandesign/constants");
-    const now = new Date();
+    const now = at;
     const jd = dateToJD(now);
     const positions = calculatePlanetaryPositions(jd);
     const transitGates: Array<{ planet: string; gate: number; line: number; longitude: number }> = [];
@@ -43,6 +43,55 @@ export async function calculateTransitGates() {
     }
 
     return { now, positions, transitGates };
+}
+
+export type MoonPhase = {
+    angle: number;
+    illumination: number;
+    waxing: boolean;
+    name: "new_moon" | "waxing_crescent" | "first_quarter" | "waxing_gibbous" | "full_moon" | "waning_gibbous" | "last_quarter" | "waning_crescent";
+    emoji: string;
+};
+
+export function calculateMoonPhase(positions: { Sun: number; Moon: number }): MoonPhase {
+    const sunLongitude = positions.Sun ?? 0;
+    const moonLongitude = positions.Moon ?? 0;
+    const angle = ((moonLongitude - sunLongitude) % 360 + 360) % 360;
+    const illumination = Math.round(((1 - Math.cos(angle * Math.PI / 180)) / 2) * 100);
+    const phases: Array<{ name: MoonPhase["name"]; emoji: string }> = [
+        { name: "new_moon", emoji: "🌑" },
+        { name: "waxing_crescent", emoji: "🌒" },
+        { name: "first_quarter", emoji: "🌓" },
+        { name: "waxing_gibbous", emoji: "🌔" },
+        { name: "full_moon", emoji: "🌕" },
+        { name: "waning_gibbous", emoji: "🌖" },
+        { name: "last_quarter", emoji: "🌗" },
+        { name: "waning_crescent", emoji: "🌘" },
+    ];
+    const phase = phases[Math.floor((angle + 22.5) / 45) % phases.length];
+    return {
+        angle: Math.round(angle * 10) / 10,
+        illumination,
+        waxing: angle < 180,
+        ...phase,
+    };
+}
+
+export async function getMoonReadingContext(at: Date = new Date()) {
+    const { now, positions, transitGates } = await calculateTransitGates(at);
+    const { GATE_DESCRIPTIONS } = await import("../data/hdContent");
+    const moon = transitGates.find((item) => item.planet === "Moon");
+    const description = moon ? GATE_DESCRIPTIONS[moon.gate] : undefined;
+    return {
+        timestamp: now.toISOString(),
+        phase: calculateMoonPhase(positions),
+        gate: moon?.gate,
+        line: moon?.line,
+        theme: description?.theme || "",
+        themeEn: description?.themeEn || "",
+        description: description?.description || "",
+        descriptionEn: description?.descriptionEn || "",
+    };
 }
 
 function findActivatedChannels(
@@ -89,6 +138,7 @@ export const transitRouter = router({
             timestamp: now.toISOString(),
             positions,
             transitGates: enrichedGates,
+            moonPhase: calculateMoonPhase(positions),
         };
     }),
 

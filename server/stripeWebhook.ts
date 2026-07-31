@@ -11,7 +11,14 @@ import { eq } from "drizzle-orm";
 import { notifyOwner } from "./_core/notification";
 import { sendLeadOSEvent } from "./leados";
 import { ENV } from "./_core/env";
-import { fulfillCreditsOrder, fulfillGiftVoucherOrder, fulfillLifetimeOrder, trackAffiliateCommission } from "./services/payment";
+import {
+  fulfillBlueprintAnnualUpgrade,
+  fulfillBlueprintOrder,
+  fulfillCreditsOrder,
+  fulfillGiftVoucherOrder,
+  fulfillLifetimeOrder,
+  trackAffiliateCommission,
+} from "./services/payment";
 import { trackConversion } from "./metaConversionsApi";
 
 export function getStripe(): Stripe | null {
@@ -193,6 +200,46 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
         contentIds: ["credits"],
         contentName: "Credit Pack",
         contentCategory: "credits",
+      });
+    } else if (plan === "blueprint") {
+      const includePartnerAddon = session.metadata?.partner_addon === "true";
+      await fulfillBlueprintOrder(
+        userId,
+        includePartnerAddon,
+        session.payment_intent as string,
+        "Stripe",
+      );
+      if (affiliateCode) {
+        await trackAffiliateCommission(affiliateCode, userId, amountCzk, session.payment_intent as string);
+      }
+      await trackConversion({
+        eventName: "Purchase",
+        email: userEmail,
+        userId,
+        value: amountCzk,
+        currency,
+        contentIds: includePartnerAddon ? ["blueprint", "blueprint_partner"] : ["blueprint"],
+        contentName: "Personal Human Design Blueprint",
+        contentCategory: "report",
+        predictedLtv: 1188,
+      });
+    } else if (plan === "blueprint_annual_upgrade") {
+      await fulfillBlueprintAnnualUpgrade(userId, session.payment_intent as string, "Stripe");
+      if (affiliateCode) {
+        await trackAffiliateCommission(affiliateCode, userId, amountCzk, session.payment_intent as string);
+      }
+      await trackConversion({
+        eventName: "Purchase",
+        email: userEmail,
+        userId,
+        value: amountCzk,
+        currency,
+        contentIds: ["blueprint_annual_upgrade"],
+        contentName: "Annual Premium after Blueprint",
+        contentCategory: "subscription",
+        predictedLtv: 1188,
+        leadOSEvent: "subscription_upgraded",
+        leadOSData: { plan: "annual", source: "blueprint_upsell" },
       });
     } else if (plan === "gift_monthly" || plan === "gift_annual") {
       const giftPlan = plan === "gift_monthly" ? "monthly" : "annual";

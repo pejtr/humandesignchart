@@ -1,18 +1,26 @@
 import { Link } from "wouter";
-import { Sparkles } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function Footer() {
   const { t, locale, localePath } = useLanguage();
   const { isAuthenticated } = useAuth();
+  const projects = [
+    { name: "Akční Letenky", domain: "AKCNI-LETENKY.COM", href: "https://www.akcni-letenky.com", image: "https://www.akcni-letenky.com/hero-bg.jpg", cs: "Inspirace pro výhodné cestování", en: "Inspiration for affordable travel" },
+    { name: "Last Minute Dovolené", domain: "LASTMINUTEDOVOLENE.CZ", href: "https://www.lastminutedovolene.cz", image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=900&h=560&fit=crop", cs: "Dovolená, která nepočká", en: "Holidays that cannot wait" },
+    { name: "Bezmasá Jídla", domain: "BEZMASAJIDLA.CZ", href: "https://www.bezmasajidla.cz", image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=900&h=560&fit=crop", cs: "Chutná inspirace bez masa", en: "Delicious meat-free inspiration" },
+    { name: "Katastr Online", domain: "KATASTR-ONLINE.CZ", href: "https://www.katastr-online.cz", image: "https://katastr-online.cz/og-image.jpg", cs: "Nemovitosti a parcely přehledně", en: "Property records made clear" },
+    { name: "Čajovny Praha", domain: "CAJOVNY-PRAHA.CZ", href: "https://www.cajovny-praha.cz", image: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/yxZoXDMoMcHuiGuf.jpg", cs: "Pražské čajovny s atmosférou", en: "Prague tea houses with atmosphere" },
+    { name: "Do Itálie", domain: "DO-ITALIE.CZ", href: "https://www.do-italie.cz", image: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=900&h=560&fit=crop", cs: "Itálie od inspirace po cestu", en: "Italy from inspiration to journey" },
+  ];
 
   return (
     <footer className={`footer-mystical bg-background/50 backdrop-blur-sm relative${isAuthenticated ? " lg:pl-14" : ""}`}>
       {/* Mystical sacred geometry decoration */}
       <div className="absolute inset-0 bg-sacred-geometry pointer-events-none opacity-50" />
       <div className="container py-12 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline mb-4 group">
@@ -72,7 +80,7 @@ export default function Footer() {
           </div>
 
           {/* Partner Sites */}
-          <div>
+          <div className="md:hidden">
             <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{locale === "cs" ? "Další projekty" : "Partner Sites"}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="relative group/tip">
@@ -141,6 +149,40 @@ export default function Footer() {
           <p className="text-xs text-muted-foreground">
             {t.footer.foundedBy}
           </p>
+        </div>
+      </div>
+
+      <div className="relative z-10 hidden border-t border-amber-200/60 bg-gradient-to-b from-amber-50/70 to-stone-50/80 py-7 md:block">
+        <div className="mx-auto max-w-screen-2xl px-4 lg:px-8">
+          <p className="mb-4 text-center text-[10px] font-semibold uppercase tracking-[0.32em] text-amber-800/65">
+            {locale === "cs" ? "Naše další projekty" : "Our other projects"}
+          </p>
+          <div className="flex gap-4 overflow-x-auto pb-2 [scrollbar-width:thin]">
+            {projects.map(project => (
+              <a
+                key={project.href}
+                href={project.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative h-40 min-w-[260px] flex-1 overflow-hidden rounded-2xl border border-white/50 bg-slate-900 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+              >
+                <img src={project.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/5" />
+                <span className="absolute left-4 top-3 rounded-full border border-white/20 bg-black/25 px-2.5 py-1 text-[9px] font-semibold tracking-wider text-white/85 backdrop-blur-md">
+                  {project.domain}
+                </span>
+                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 text-white">
+                  <div className="min-w-0">
+                    <h3 className="truncate font-serif text-lg font-semibold leading-tight">{project.name}</h3>
+                    <p className="mt-1 truncate text-[11px] text-white/75">{locale === "cs" ? project.cs : project.en}</p>
+                  </div>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/40 bg-white/10 backdrop-blur-md transition group-hover:bg-white group-hover:text-slate-900">
+                    <ArrowUpRight className="h-4 w-4" />
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </footer>

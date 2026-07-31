@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -11,18 +11,23 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
-import { Check, Sparkles, Gift, CreditCard, Zap, Star, Crown, Lock } from "lucide-react";
+import { Check, Sparkles, Gift, CreditCard, Zap, Star, Crown, Lock, Moon, FileText, Heart } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useMetaPixel } from "@/hooks/useMetaPixel";
+
+type CheckoutPlan = "monthly" | "annual" | "lifetime" | "credits" | "blueprint" | "blueprint_annual_upgrade" | "gift_monthly" | "gift_annual";
 
 export default function Pricing() {
   const { t, locale } = useLanguage();
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const p = t.pricing;
+  const { viewContent, initiateCheckout } = useMetaPixel();
 
   const [giftForm, setGiftForm] = useState({
     recipientEmail: "",
@@ -31,6 +36,17 @@ export default function Pricing() {
     personalMessage: "",
   });
   const [voucherCode, setVoucherCode] = useState("");
+  const [includePartnerAddon, setIncludePartnerAddon] = useState(false);
+
+  useEffect(() => {
+    viewContent({
+      content_name: "Personal Human Design Blueprint",
+      content_category: "report",
+      content_ids: ["blueprint"],
+      content_type: "product",
+      value: 390,
+    });
+  }, [viewContent]);
 
   // Set page title
   const isEn = locale === "en";
@@ -55,7 +71,7 @@ export default function Pricing() {
   const createCheckout = trpc.subscription.createCheckout.useMutation({
     onSuccess: (data) => {
       if (data.url) {
-        window.open(data.url, "_blank");
+        window.location.assign(data.url);
         toast.info(locale === "cs" ? "Přesměrování na platební bránu..." : "Redirecting to checkout...");
       }
     },
@@ -77,16 +93,34 @@ export default function Pricing() {
     },
   });
 
-  const handleCheckout = (plan: "monthly" | "annual" | "credits" | "gift_monthly" | "gift_annual") => {
+  const handleCheckout = (plan: CheckoutPlan) => {
     if (!user) {
       window.location.href = getLoginUrl();
       return;
     }
     const isGift = plan.startsWith("gift_");
+    const values: Record<CheckoutPlan, number> = {
+      monthly: 188,
+      annual: 1188,
+      lifetime: 2888,
+      credits: 77,
+      blueprint: includePartnerAddon ? 580 : 390,
+      blueprint_annual_upgrade: 798,
+      gift_monthly: 188,
+      gift_annual: 1188,
+    };
+    initiateCheckout(values[plan], {
+      content_name: plan === "blueprint" ? "Personal Human Design Blueprint" : plan,
+      content_category: plan === "blueprint" ? "report" : "subscription",
+      content_ids: plan === "blueprint" && includePartnerAddon ? ["blueprint", "blueprint_partner"] : [plan],
+      content_type: "product",
+      num_items: plan === "blueprint" && includePartnerAddon ? 2 : 1,
+    });
     createCheckout.mutate({
       plan,
       locale,
       origin: window.location.origin,
+      includePartnerAddon: plan === "blueprint" && includePartnerAddon,
       ...(isGift ? {
         recipientEmail: giftForm.recipientEmail || undefined,
         recipientName: giftForm.recipientName || undefined,
@@ -110,12 +144,12 @@ export default function Pricing() {
   const freeReadingsLeft = subStatus?.freeReadingsLeft ?? 1;
 
   const freeFeatures = isCzech ? [
-    "5 bezplatných AI výkladů",
+    "1 kompletní AI výklad zdarma",
     "Neomezené výpočty mapy",
     "Přístup do encyklopedie",
     "Základní bodygraph",
   ] : [
-    "5 free AI readings",
+    "1 complete AI reading for free",
     "Unlimited chart calculations",
     "Encyclopedia access",
     "Basic bodygraph",
@@ -142,12 +176,12 @@ export default function Pricing() {
   const faqItems = isCzech ? [
     { q: "Mohu zrušit kdykoli?", a: "Ano, předplatné můžete zrušit kdykoli. Přístup si zachováte do konce fakturačního období." },
     { q: "Jaké platební metody jsou přijímány?", a: "Přijímáme všechny hlavní kreditní a debetní karty přes Stripe. Vaše platba je bezpečná a šifrovaná." },
-    { q: "Je k dispozici zkušební verze?", a: "Ano — každý nový uživatel dostane 5 bezplatných AI výkladů, aby si mohl vyzkoušet kvalitu před upgradem." },
+    { q: "Je k dispozici zkušební verze?", a: "Ano — každý nový uživatel dostane jeden kompletní AI výklad, aby si mohl kvalitu vyzkoušet před nákupem." },
     { q: "Jak fungují dárkové poukazy?", a: "Po nákupu obdržíte unikátní kód poukazu e-mailem. Příjemce zadá kód na našem webu a aktivuje si Premium přístup." },
   ] : [
     { q: "Can I cancel anytime?", a: "Yes, you can cancel your subscription at any time. You will retain access until the end of the billing period." },
     { q: "What payment methods are accepted?", a: "We accept all major credit and debit cards via Stripe. Your payment is secure and encrypted." },
-    { q: "Is there a free trial?", a: "Yes — every new user gets 5 free AI readings to experience the quality before upgrading." },
+    { q: "Is there a free trial?", a: "Yes — every new user gets one complete AI reading to experience the quality before purchasing." },
     { q: "How do gift vouchers work?", a: "After purchase, you receive a unique voucher code by email. The recipient enters the code on our site to activate their Premium access." },
   ];
 
@@ -222,6 +256,98 @@ export default function Pricing() {
 
           {/* Plans Tab */}
           <TabsContent value="plans">
+            <Card id="blueprint" className="mb-12 overflow-hidden border-violet-300/70 bg-gradient-to-br from-[#fbf8ff] via-white to-amber-50/70 shadow-xl shadow-violet-950/5 dark:border-violet-700/50 dark:from-violet-950/30 dark:via-background dark:to-amber-950/10">
+              <div className="grid lg:grid-cols-[0.72fr_1.28fr]">
+                <div className="relative min-h-[320px] overflow-hidden bg-[#160b2f]">
+                  <img
+                    src="/images/brand/veleknezka-master-v1.png"
+                    alt={isCzech ? "Velekněžka, průvodkyně osobním Human Design Blueprintem" : "The High Priestess, guide to your personal Human Design Blueprint"}
+                    className="absolute inset-0 h-full w-full object-cover object-top opacity-90"
+                    loading="eager"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#160b2f] via-transparent to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+                    <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-amber-200">
+                      <Moon className="h-4 w-4" /> {isCzech ? "Velekněžka vás provede" : "Guided by the High Priestess"}
+                    </div>
+                    <p className="font-serif text-2xl leading-tight">
+                      {isCzech ? "Vaše mapa. Vaše rozhodování. Váš další krok." : "Your chart. Your decisions. Your next step."}
+                    </p>
+                  </div>
+                </div>
+
+                <CardContent className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+                  <div className="mb-4 flex flex-wrap items-center gap-2">
+                    <Badge className="border-0 bg-violet-700 text-white">{isCzech ? "Nejlepší první krok" : "Best first step"}</Badge>
+                    <Badge variant="outline" className="border-amber-400/60 text-amber-800 dark:text-amber-300">
+                      {isCzech ? "Jednorázově · bez předplatného" : "One-time · no subscription"}
+                    </Badge>
+                  </div>
+                  <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+                    {isCzech ? "Osobní Human Design Blueprint" : "Personal Human Design Blueprint"}
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-muted-foreground">
+                    {isCzech
+                      ? "Praktický osobní report, který propojí váš typ, autoritu, profil, centra, Lunu a aktuální tranzity do srozumitelného návodu pro každodenní rozhodování."
+                      : "A practical personal report connecting your type, authority, profile, centers, Moon and current transits into clear guidance for everyday decisions."}
+                  </p>
+
+                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                    {[
+                      { icon: FileText, text: isCzech ? "1 prémiový PDF report" : "1 premium PDF report" },
+                      { icon: Sparkles, text: isCzech ? "5 navazujících AI výkladů" : "5 follow-up AI readings" },
+                      { icon: Moon, text: isCzech ? "Luna a energie období" : "Moon and current energy" },
+                      { icon: Zap, text: isCzech ? "Praktické kroky pro práci a vztahy" : "Practical steps for work and relationships" },
+                    ].map(({ icon: Icon, text }) => (
+                      <div key={text} className="flex items-center gap-2 text-sm">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+                          <Icon className="h-4 w-4" />
+                        </span>
+                        <span>{text}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50/70 p-4 transition-colors hover:bg-rose-50 dark:border-rose-900/50 dark:bg-rose-950/20">
+                    <Checkbox
+                      checked={includePartnerAddon}
+                      onCheckedChange={(checked) => setIncludePartnerAddon(checked === true)}
+                      aria-label={isCzech ? "Přidat partnerský Blueprint" : "Add Partner Blueprint"}
+                      className="mt-0.5"
+                    />
+                    <span className="flex-1">
+                      <span className="flex flex-wrap items-center gap-2 font-medium">
+                        <Heart className="h-4 w-4 text-rose-500" />
+                        {isCzech ? "Přidat partnerský Blueprint" : "Add Partner Blueprint"}
+                        <Badge variant="outline" className="border-rose-300 text-rose-700 dark:text-rose-300">+ {isCzech ? "190 Kč" : "€7.90"}</Badge>
+                      </span>
+                      <span className="mt-1 block text-xs text-muted-foreground">
+                        {isCzech ? "Druhý PDF report a dalších 5 AI výkladů pro partnera nebo dítě." : "A second PDF report and 5 more AI readings for a partner or child."}
+                      </span>
+                    </span>
+                  </label>
+
+                  <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <div className="text-3xl font-bold">{isCzech ? (includePartnerAddon ? "580 Kč" : "390 Kč") : (includePartnerAddon ? "€23.80" : "€15.90")}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {isCzech ? "Do 48 hodin lze cenu Blueprintu započíst do ročního Premium." : "Apply the Blueprint price toward Annual Premium within 48 hours."}
+                      </div>
+                    </div>
+                    <Button
+                      size="lg"
+                      className="min-w-56 bg-gradient-to-r from-violet-700 to-purple-600 text-white shadow-lg shadow-violet-700/20 hover:from-violet-800 hover:to-purple-700"
+                      disabled={createCheckout.isPending}
+                      onClick={() => handleCheckout("blueprint")}
+                    >
+                      <Moon className="mr-2 h-4 w-4" />
+                      {isCzech ? "Odemknout můj Blueprint" : "Unlock my Blueprint"}
+                    </Button>
+                  </div>
+                </CardContent>
+              </div>
+            </Card>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-6">
               {/* Free Plan */}
               <Card className="border-border/50 bg-card/50">
@@ -354,7 +480,7 @@ export default function Pricing() {
                   <Button
                     className="w-full mt-4 bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/30 shadow-lg border-none"
                     disabled={createCheckout.isPending || (user && user.subscriptionPlan === "lifetime")}
-                    onClick={() => handleCheckout("lifetime" as any)}
+                    onClick={() => handleCheckout("lifetime")}
                   >
                     {user && user.subscriptionPlan === "lifetime" ? p.currentPlan : (isCzech ? "Získat Doživotně" : "Get Lifetime")}
                   </Button>

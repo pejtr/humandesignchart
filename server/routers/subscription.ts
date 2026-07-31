@@ -1,6 +1,12 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "../_core/trpc";
-import { countAiReadingsByUserToday, updateUserSubscription } from "../db";
+import {
+    consumeBlueprintPdfCredit,
+    countAiReadingsByUser,
+    hasRecentCreditTransaction,
+    updateUserSubscription,
+} from "../db";
 import { getStripe } from "../stripeWebhook";
 import { isPremiumUser, canGenerateAiReading, FREE_TIER } from "../stripeProducts";
 import { ENV } from "../_core/env";
@@ -8,7 +14,7 @@ import { ENV } from "../_core/env";
 export const subscriptionRouter = router({
     status: protectedProcedure.query(async ({ ctx }) => {
         const user = ctx.user;
-        const totalReadings = await countAiReadingsByUserToday(user.id);
+        const totalReadings = await countAiReadingsByUser(user.id);
         const premium = isPremiumUser(user);
         return {
             isPremium: premium,
@@ -16,6 +22,7 @@ export const subscriptionRouter = router({
             status: user.subscriptionStatus,
             currentPeriodEnd: user.subscriptionCurrentPeriodEnd,
             aiReadingCredits: user.aiReadingCredits,
+            blueprintPdfCredits: user.blueprintPdfCredits,
             totalReadings,
             freeReadingsLeft: premium ? null : Math.max(0, FREE_TIER.AI_READINGS_LIMIT - totalReadings),
             canGenerateReading: canGenerateAiReading(user, totalReadings).allowed,
@@ -24,9 +31,10 @@ export const subscriptionRouter = router({
     }),
     createCheckout: protectedProcedure
         .input(z.object({
-            plan: z.enum(["monthly", "annual", "lifetime", "credits", "gift_monthly", "gift_annual"]),
+            plan: z.enum(["monthly", "annual", "lifetime", "credits", "blueprint", "blueprint_annual_upgrade", "gift_monthly", "gift_annual"]),
             locale: z.string().default("cs"),
             origin: z.string(),
+            includePartnerAddon: z.boolean().default(false),
             recipientEmail: z.string().email().optional(),
             recipientName: z.string().optional(),
             senderName: z.string().optional(),
@@ -39,6 +47,16 @@ export const subscriptionRouter = router({
             const isGift = input.plan.startsWith("gift_");
             const isSubscription = input.plan === "monthly" || input.plan === "annual";
             const isCzech = input.locale === "cs";
+            if (input.plan === "blueprint_annual_upgrade") {
+                const eligibleSince = new Date(Date.now() - 48 * 60 * 60 * 1000);
+                const eligible = await hasRecentCreditTransaction(user.id, "blueprint_purchase", eligibleSince);
+                if (!eligible) {
+                    throw new TRPCError({
+                        code: "FORBIDDEN",
+                        message: "Zvýhodněný doplatek je dostupný 48 hodin po nákupu Blueprintu.",
+                    });
+                }
+            }
             let customerId = user.stripeCustomerId;
             if (!customerId) {
                 const customer = await stripe.customers.create({ email: user.email || undefined, name: user.name || undefined, metadata: { user_id: user.id.toString() } });
@@ -50,29 +68,39 @@ export const subscriptionRouter = router({
                 annual: { czk: 118800, eur: 4700, name: "Human Design Premium - Rocni" },
                 lifetime: { czk: 288800, eur: 11500, name: "Human Design Premium - Dozivotne" },
                 credits: { czk: 7700, eur: 299, name: "Human Design AI Credits (5x)" },
+                blueprint: { czk: 39000, eur: 1590, name: "Osobni Human Design Blueprint" },
+                blueprint_annual_upgrade: { czk: 79800, eur: 3190, name: "Rocni Premium - doplatek po Blueprintu" },
                 gift_monthly: { czk: 18800, eur: 749, name: "Darkovy poukaz - Premium Mesic" },
                 gift_annual: { czk: 118800, eur: 4700, name: "Darkovy poukaz - Premium Rok" },
             }[input.plan];
             const currency = isCzech ? "czk" : "eur";
             const unitAmount = isCzech ? priceData.czk : priceData.eur;
-            const metadata: Record<string, string> = { user_id: user.id.toString(), customer_email: user.email || "", customer_name: user.name || "", plan: input.plan };
+            const partnerAddonAmount = isCzech ? 19000 : 790;
+            const metadata: Record<string, string> = {
+                user_id: user.id.toString(),
+                customer_email: user.email || "",
+                customer_name: user.name || "",
+                plan: input.plan,
+                partner_addon: input.plan === "blueprint" && input.includePartnerAddon ? "true" : "false",
+            };
             if (isGift) {
                 if (input.recipientEmail) metadata.recipient_email = input.recipientEmail;
                 if (input.recipientName) metadata.recipient_name = input.recipientName;
                 if (input.senderName) metadata.sender_name = input.senderName;
                 if (input.personalMessage) metadata.personal_message = input.personalMessage.slice(0, 500);
             }
-            const successUrl = `${input.origin}/${input.locale}/payment/success?plan=${input.plan}`;
+            const successUrl = `${input.origin}/${input.locale}/payment/success?plan=${input.plan}&session_id={CHECKOUT_SESSION_ID}`;
             const cancelUrl = `${input.origin}/${input.locale}/payment/cancel`;
 
             if (!isSubscription && isCzech && ENV.comgateMerchantId) {
                 const { createComgateCheckoutSession } = await import("../_core/comgate");
                 
                 const rawMeta: any = {
-                    u: user.id,
-                    p: input.plan,
-                    email: user.email,
-                    name: user.name,
+                        u: user.id,
+                        p: input.plan,
+                        email: user.email,
+                        name: user.name,
+                        partner: input.plan === "blueprint" && input.includePartnerAddon ? 1 : 0,
                 };
                 if (input.recipientEmail) rawMeta.recEmail = input.recipientEmail;
                 if (input.recipientName) rawMeta.recName = input.recipientName;
@@ -82,7 +110,7 @@ export const subscriptionRouter = router({
 
                 try {
                     const comgateRes = await createComgateCheckoutSession({
-                        price: unitAmount,
+                        price: unitAmount + (input.plan === "blueprint" && input.includePartnerAddon ? partnerAddonAmount : 0),
                         currency: "CZK",
                         label: priceData.name,
                         refId: refId,
@@ -124,6 +152,27 @@ export const subscriptionRouter = router({
                 });
                 return { url: session.url };
             } else {
+                const lineItems: any[] = [{
+                    price_data: {
+                        currency,
+                        unit_amount: unitAmount,
+                        product_data: { name: priceData.name, metadata: { plan: input.plan } },
+                    },
+                    quantity: 1,
+                }];
+                if (input.plan === "blueprint" && input.includePartnerAddon) {
+                    lineItems.push({
+                        price_data: {
+                            currency,
+                            unit_amount: partnerAddonAmount,
+                            product_data: {
+                                name: isCzech ? "Partnerský Blueprint doplněk" : "Partner Blueprint add-on",
+                                metadata: { plan: "blueprint_partner" },
+                            },
+                        },
+                        quantity: 1,
+                    });
+                }
                 const session = await stripe.checkout.sessions.create({
                     mode: "payment",
                     customer: customerId,
@@ -131,20 +180,22 @@ export const subscriptionRouter = router({
                     metadata,
                     allow_promotion_codes: true,
                     payment_method_types: (ENV.stripeEnablePaypal ? ["card", "paypal"] : ["card"]) as any,
-                    line_items: [{
-                        price_data: {
-                            currency,
-                            unit_amount: unitAmount,
-                            product_data: { name: priceData.name },
-                        },
-                        quantity: 1,
-                    }],
+                    line_items: lineItems,
                     success_url: successUrl,
                     cancel_url: cancelUrl,
                 });
                 return { url: session.url };
             }
         }),
+
+    consumeBlueprintPdf: protectedProcedure.mutation(async ({ ctx }) => {
+        if (isPremiumUser(ctx.user)) return { consumed: false, isPremium: true };
+        const consumed = await consumeBlueprintPdfCredit(ctx.user.id);
+        if (!consumed) {
+            throw new TRPCError({ code: "PAYMENT_REQUIRED", message: "Blueprint PDF kredit není k dispozici." });
+        }
+        return { consumed: true, isPremium: false };
+    }),
 
     cancel: protectedProcedure.mutation(async ({ ctx }) => {
         const stripe = getStripe();

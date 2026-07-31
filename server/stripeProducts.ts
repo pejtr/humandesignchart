@@ -38,6 +38,27 @@ export const STRIPE_PRODUCTS = {
     pricesEur: 299,  // 2.99 EUR in cents
     metadata: { plan: "credits", credits: "5" },
   },
+  BLUEPRINT: {
+    name: "Osobní Human Design Blueprint / Personal Human Design Blueprint",
+    description: "Osobní PDF report a 5 navazujících AI výkladů | Personal PDF report and 5 follow-up AI readings",
+    pricesCzk: 39000,
+    pricesEur: 1590,
+    metadata: { plan: "blueprint" },
+  },
+  BLUEPRINT_PARTNER_ADDON: {
+    name: "Partnerský Blueprint doplněk / Partner Blueprint add-on",
+    description: "Druhý PDF report a 5 AI výkladů pro partnerskou mapu | Second PDF report and 5 AI readings for a partner chart",
+    pricesCzk: 19000,
+    pricesEur: 790,
+    metadata: { plan: "blueprint_partner" },
+  },
+  BLUEPRINT_ANNUAL_UPGRADE: {
+    name: "Roční Premium po Blueprintu / Annual Premium after Blueprint",
+    description: "Roční Premium se započtením ceny Blueprintu | Annual Premium with the Blueprint price credited",
+    pricesCzk: 79800,
+    pricesEur: 3190,
+    metadata: { plan: "blueprint_annual_upgrade" },
+  },
   GIFT_MONTHLY: {
     name: "Dárkový poukaz — Premium Měsíc / Gift Voucher Monthly",
     description: "Dárkový poukaz na 1 měsíc Premium | Gift voucher for 1 month Premium",
@@ -58,7 +79,7 @@ export type StripePlanKey = keyof typeof STRIPE_PRODUCTS;
 
 /** Free tier limits */
 export const FREE_TIER = {
-  AI_READINGS_LIMIT: 3,  // 3 free AI readings per user (daily)
+  AI_READINGS_LIMIT: 1,  // one complete free reading demonstrates value without replacing the paid product
   SAVED_CHARTS_LIMIT: 3, // 3 saved charts for free users
 } as const;
 

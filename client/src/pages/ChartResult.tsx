@@ -34,6 +34,7 @@ import { SacredGeometry } from "@/components/SacredGeometry";
 import { TiltCard } from "@/components/TiltCard";
 import { SocialShareButtons } from "@/components/SocialShareButtons";
 import { GeneKeysSequence } from "@/components/GeneKeysSequence";
+import { ChartInsightsVisuals } from "@/components/ChartInsightsVisuals";
 
 // ─── ShareReadingButton ─────────────────────────────────────────────────────
 function ShareReadingButton({ readingId }: { readingId: number }) {
@@ -79,31 +80,24 @@ interface DetailModalState {
 }
 
 function AiReadingProgress({ locale }: { locale: string }) {
-  const [progress, setProgress] = useState(8);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 94) return 94;
-        const diff = 95 - prev;
-        const inc = Math.max(1, Math.floor(diff / 6));
-        return prev + inc;
-      });
-    }, 350);
+    const timer = setInterval(() => setElapsedSeconds(prev => prev + 1), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const getStage = (p: number) => {
+  const getStage = (seconds: number) => {
     if (locale === "cs") {
-      if (p < 25) return "⚡ Analýza bran a definic...";
-      if (p < 60) return "🧠 Výpočet profilu a autority...";
-      if (p < 88) return "✨ Formulování osobního výkladu...";
-      return "🔮 Dokončování výkladu...";
+      if (seconds < 5) return "Analýza bran a definic…";
+      if (seconds < 15) return "Skládám osobní souvislosti…";
+      if (seconds < 30) return "Formuluji praktické doporučení…";
+      return "Výklad se dokončuje, můžete mezitím procházet mapu…";
     }
-    if (p < 25) return "⚡ Analyzing gates & definitions...";
-    if (p < 60) return "🧠 Calculating profile & authority...";
-    if (p < 88) return "✨ Formatting personalized reading...";
-    return "🔮 Finalizing blueprint...";
+    if (seconds < 5) return "Analyzing gates and definitions…";
+    if (seconds < 15) return "Connecting your personal patterns…";
+    if (seconds < 30) return "Writing practical guidance…";
+    return "Finishing your reading; you can explore the chart meanwhile…";
   };
 
   return (
@@ -111,16 +105,13 @@ function AiReadingProgress({ locale }: { locale: string }) {
       <div className="flex items-center justify-between text-xs font-semibold text-primary">
         <span className="flex items-center gap-1.5">
           <Loader2 className="w-3.5 h-3.5 animate-spin text-primary shrink-0" />
-          {getStage(progress)}
+          {getStage(elapsedSeconds)}
         </span>
-        <span className="font-mono text-sm font-bold text-primary">{progress}%</span>
+        <span className="font-mono text-xs text-muted-foreground">{elapsedSeconds}s</span>
       </div>
 
-      <div className="w-full h-3 bg-primary/10 rounded-full overflow-hidden p-0.5 border border-primary/20 shadow-inner">
-        <div
-          className="h-full bg-gradient-to-r from-purple-600 via-indigo-600 to-violet-500 rounded-full transition-all duration-300 ease-out shadow-sm"
-          style={{ width: `${progress}%` }}
-        />
+      <div className="w-full h-2 bg-primary/10 rounded-full overflow-hidden border border-primary/20">
+        <div className="h-full w-1/3 bg-gradient-to-r from-purple-600 via-indigo-500 to-violet-400 rounded-full animate-pulse" />
       </div>
     </div>
   );
@@ -154,8 +145,12 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
   const aiSectionRef = useRef<HTMLDivElement>(null);
   const bodygraphRef = useRef<HTMLDivElement>(null);
   const streamAbortRef = useRef<AbortController | null>(null);
+  const autoSaveAttemptedRef = useRef(false);
+  const autoSaveModeRef = useRef(false);
   const { shouldShow: showOnboarding, triggerOnboarding, markSeen: markOnboardingSeen } = useOnboarding();
   const { data: subStatus } = trpc.subscription.status.useQuery(undefined, { enabled: isAuthenticated });
+  const utils = trpc.useUtils();
+  const consumeBlueprintPdf = trpc.subscription.consumeBlueprintPdf.useMutation();
 
   // Fetch HD static content via tRPC
   const hdContentQuery = trpc.content.getHdContent.useQuery();
@@ -285,10 +280,60 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
   const saveMutation = trpc.chart.save.useMutation({
     onSuccess: (data) => {
       setSavedChartId(data.id);
-      toast.success(t.chart.savedToCollection);
+      sessionStorage.removeItem("chartResult");
+      sessionStorage.removeItem("chartMeta");
+      if (autoSaveModeRef.current) {
+        toast.success(locale === "cs" ? "Mapa byla automaticky uložena" : "Chart saved automatically");
+        navigate(localePath(`/chart/${data.id}`), { replace: true });
+      } else {
+        toast.success(t.chart.savedToCollection);
+      }
+      autoSaveModeRef.current = false;
     },
-    onError: (err) => toast.error(err.message),
+    onError: (err) => {
+      autoSaveModeRef.current = false;
+      toast.error(err.message);
+    },
   });
+
+  const buildSavePayload = (
+    category: "self" | "family" | "friend" | "client" | "celebrity" | "other",
+  ) => {
+    if (!chart) return null;
+    const meta = chartMeta || {
+      name: (chart as any).name || "Moje mapa",
+      birthDate: (chart as any).birthDate || "",
+      birthTime: (chart as any).birthTime || "",
+      birthPlace: (chart as any).birthPlace || "",
+    };
+    return {
+      name: meta.name || "Moje mapa",
+      birthDate: meta.birthDate || (chart as any).birthDate || "",
+      birthTime: meta.birthTime || (chart as any).birthTime || "",
+      birthPlace: meta.birthPlace || (chart as any).birthPlace || "",
+      latitude: String(meta.latitude || "0"),
+      longitude: String(meta.longitude || "0"),
+      timezone: meta.timezone || (chart as any).timezone || "Europe/Prague",
+      category,
+      chartData: chart as any,
+    };
+  };
+
+  useEffect(() => {
+    if (
+      !isNewChart || !isAuthenticated || !chart || !chartMeta || savedChartId ||
+      saveMutation.isPending || autoSaveAttemptedRef.current
+    ) return;
+
+    const category = (["self", "family", "friend", "client", "celebrity", "other"].includes(chartMeta.category)
+      ? chartMeta.category
+      : "self") as "self" | "family" | "friend" | "client" | "celebrity" | "other";
+    const payload = buildSavePayload(category);
+    if (!payload) return;
+    autoSaveAttemptedRef.current = true;
+    autoSaveModeRef.current = true;
+    saveMutation.mutate(payload);
+  }, [isNewChart, isAuthenticated, chart, chartMeta, savedChartId]);
 
   // Keep old mutation as fallback but prefer streaming
   const aiMutation = trpc.ai.generateReading.useMutation({
@@ -315,24 +360,10 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
   };
 
   const confirmSave = () => {
-    if (!chart) return;
-    const meta = chartMeta || {
-      name: (chart as any).name || "Moje mapa",
-      birthDate: (chart as any).birthDate || "",
-      birthTime: (chart as any).birthTime || "",
-      birthPlace: (chart as any).birthPlace || "",
-    };
-    saveMutation.mutate({
-      name: meta.name || "Moje mapa",
-      birthDate: meta.birthDate || (chart as any).birthDate || "",
-      birthTime: meta.birthTime || (chart as any).birthTime || "",
-      birthPlace: meta.birthPlace || (chart as any).birthPlace || "",
-      latitude: String(meta.latitude || "0"),
-      longitude: String(meta.longitude || "0"),
-      timezone: meta.timezone || (chart as any).timezone || "Europe/Prague",
-      category: saveCategory,
-      chartData: chart as any,
-    });
+    const payload = buildSavePayload(saveCategory);
+    if (!payload) return;
+    autoSaveModeRef.current = false;
+    saveMutation.mutate(payload);
     setShowSaveDialog(false);
   };
 
@@ -374,15 +405,38 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
     }
     setAiStreaming(true);
 
-    const params = new URLSearchParams({
-      chartData: encodeURIComponent(JSON.stringify(chart)),
-      readingType: type,
-      chartId: String(savedChartId || 0),
-    });
+    const chartSnapshot = {
+      type: chart?.type,
+      profile: chart?.profile,
+      profileName: chart?.profileName,
+      authority: chart?.authority,
+      definition: chart?.definition,
+      strategy: chart?.strategy,
+      signature: chart?.signature,
+      notSelf: chart?.notSelf,
+      aura: chart?.aura,
+      centers: chart?.centers,
+      channels: chart?.channels,
+      activatedGates: chart?.activatedGates,
+      personalityActivations: chart?.personalityActivations,
+      designActivations: chart?.designActivations,
+      incarnationCross: chart?.incarnationCross,
+      variables: chart?.variables,
+    };
 
     let accumulated = "";
 
-    fetch(`/api/ai/stream?${params}`, { signal: abort.signal })
+    fetch("/api/ai/stream", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chartData: chartSnapshot,
+        readingType: type,
+        chartId: savedChartId || 0,
+        locale,
+      }),
+      signal: abort.signal,
+    })
       .then(async (res) => {
         if (res.status === 402) {
           setAiStreaming(false);
@@ -397,11 +451,13 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
         }
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
+        let pendingLine = "";
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n");
+          pendingLine += decoder.decode(value, { stream: true });
+          const lines = pendingLine.split("\n");
+          pendingLine = lines.pop() ?? "";
           for (const line of lines) {
             if (!line.startsWith("data: ")) continue;
             try {
@@ -416,7 +472,9 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
               }
               if (data.error) {
                 setAiStreaming(false);
-                toast.error("AI výklad selhal");
+                toast.error(data.error === "timeout"
+                  ? (locale === "cs" ? "Výklad trvá příliš dlouho. Zkuste to prosím znovu." : "The reading timed out. Please try again.")
+                  : (locale === "cs" ? "AI výklad se nepodařilo dokončit" : "AI reading could not be completed"));
               }
             } catch { /* skip */ }
           }
@@ -433,9 +491,10 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
       });
   };
 
-  // Auto-start overview AI reading on chart load so user doesn't wait
+  // Wait for auto-save so the reading is attached to a real chart and the two
+  // expensive operations never compete for the first render.
   useEffect(() => {
-    if (chart && isAuthenticated && !aiReading && !aiStreaming && !aiMutation.isPending && !dailyTransitLoading && !personalizedTransitMutation.isPending) {
+    if (chart && isAuthenticated && savedChartId && !aiReading && !aiStreaming && !aiMutation.isPending && !dailyTransitLoading && !personalizedTransitMutation.isPending) {
       const cachedOverview = getCachedReading("overview");
       if (cachedOverview) {
         setAiReadingType("overview");
@@ -444,7 +503,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
         handleAiReading("overview");
       }
     }
-  }, [chart, isAuthenticated]);
+  }, [chart, isAuthenticated, savedChartId]);
 
 
 
@@ -620,9 +679,12 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                   </Button>
                 )}
                 <Button variant="outline" size="sm" onClick={async () => {
-                  if (!subStatus?.isPremium) {
+                  const canUseBlueprintPdf = (subStatus?.blueprintPdfCredits ?? 0) > 0;
+                  if (!subStatus?.isPremium && !canUseBlueprintPdf) {
                     setShowPaywall(true);
-                    toast.info(locale === "cs" ? "PDF report je dostupný pro Premium uživatele" : "PDF report is available for Premium users");
+                    toast.info(locale === "cs"
+                      ? "PDF report získáte v osobním Blueprintu nebo v Premium"
+                      : "Get the PDF report with a personal Blueprint or Premium");
                     return;
                   }
                   setGeneratingPdf(true);
@@ -630,6 +692,11 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                   await new Promise(r => setTimeout(r, 100));
                   try {
                     await generateChartPDF(chart, chartMeta?.name || "Chart", hdData, bodygraphRef);
+                    if (!subStatus?.isPremium) {
+                      await consumeBlueprintPdf.mutateAsync();
+                      await utils.subscription.status.invalidate();
+                      toast.success(locale === "cs" ? "Blueprint PDF byl stažen" : "Blueprint PDF downloaded");
+                    }
                   } catch (e) {
                     console.error(e);
                     toast.error("PDF generování selhalo");
@@ -638,7 +705,10 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                 }} disabled={generatingPdf}>
                   {generatingPdf ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Download className="w-4 h-4 mr-1" />}
                   {generatingPdf ? t.chart.generatingPdf : t.chart.downloadPdf}
-                  {!subStatus?.isPremium && <span className="ml-1 text-xs opacity-60">👑</span>}
+                   {!subStatus?.isPremium && (subStatus?.blueprintPdfCredits ?? 0) > 0 && (
+                     <span className="ml-1 text-xs text-primary">{subStatus?.blueprintPdfCredits}×</span>
+                   )}
+                   {!subStatus?.isPremium && (subStatus?.blueprintPdfCredits ?? 0) === 0 && <span className="ml-1 text-xs opacity-60">🌙</span>}
                 </Button>
               </div>
             </div>
@@ -774,6 +844,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                             { key: "relationships", label: "❤️ Vztahy" },
                             { key: "channels", label: "⚡ Kanály" },
                             { key: "daily_transit", label: "🌟 Denní výklad" },
+                            { key: "moon", label: locale === "cs" ? "🌙 Výklad Luny" : "🌙 Moon reading" },
                           ].map(item => (
                             <Button
                               key={item.key}
@@ -868,6 +939,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                                 { key: "relationships", label: "❤️ Vztahy", primary: false },
                                 { key: "channels", label: "⚡ Kanály", primary: false },
                                 { key: "daily_transit", label: "🌟 Denní výklad", primary: false },
+                                { key: "moon", label: locale === "cs" ? "🌙 Výklad Luny" : "🌙 Moon reading", primary: false },
                               ].map(item => (
                                 <Button
                                   key={item.key}
@@ -900,6 +972,17 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                     </div>
                   )}
                 </div>
+
+                <ChartInsightsVisuals
+                  chart={chart}
+                  locale={locale}
+                  moon={transitQuery.data ? {
+                    phase: transitQuery.data.moonPhase,
+                    ...transitQuery.data.transitGates
+                      .filter((gate) => gate.planet === "Moon")
+                      .map((gate) => ({ gate: gate.gate, line: gate.line, theme: gate.theme, themeEn: gate.themeEn }))[0],
+                  } : undefined}
+                />
 
                 {/* ─── Type & Strategy Card ─── */}
                 <Card className="bg-card border-border/50 shadow-sm overflow-hidden">

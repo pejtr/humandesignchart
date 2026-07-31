@@ -27,6 +27,28 @@ const requireUser = t.middleware(async opts => {
 
 export const protectedProcedure = t.procedure.use(requireUser);
 
+/** Internal tools shared by administrators and moderators. */
+export const staffProcedure = t.procedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    const role = String(ctx.user?.role ?? "").toLowerCase();
+
+    if (!ctx.user || !["admin", "moderator"].includes(role)) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Tato funkce je dostupná pouze administrátorům a moderátorům.",
+      });
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        user: ctx.user,
+      },
+    });
+  }),
+);
+
 export const adminProcedure = t.procedure.use(
   t.middleware(async opts => {
     const { ctx, next } = opts;

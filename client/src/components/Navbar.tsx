@@ -106,12 +106,14 @@ export default function Navbar() {
     { href: "/blog", label: "Blog", icon: BookOpen },
   ];
 
-  // Keep the three highest-value actions visible between tablet and desktop.
+  // Keep the highest-value actions visible between tablet and desktop.
   // The labels collapse to icons first, then expand to short/full labels as space allows.
   const compactPrimaryLinks = [
     { ...primaryLinks[0], compactLabel: locale === "cs" ? "Mapa" : "Chart" },
     { ...primaryLinks[1], compactLabel: locale === "cs" ? "Tranzit" : "Transit" },
     { ...primaryLinks[2], compactLabel: locale === "cs" ? "Porovnání" : "Compare" },
+    { ...primaryLinks[3], compactLabel: "Blog" },
+    { href: "/pricing", label: locale === "cs" ? "Ceník" : "Pricing", compactLabel: locale === "cs" ? "Ceník" : "Pricing", icon: CreditCard },
   ];
 
   const toolsLinks = [

@@ -4,6 +4,7 @@
  */
 import {
   addAiReadingCredits,
+  addBlueprintPdfCredits,
   createGiftVoucher,
   getUserByAffiliateCode,
   createAffiliateConversion,
@@ -48,6 +49,57 @@ export async function fulfillCreditsOrder(userId: number, quantity: number, sour
     });
   } catch { /* non-critical */ }
   console.log(`[${source}] Added ${quantity} credits to user ${userId}`);
+}
+
+export async function fulfillBlueprintOrder(
+  userId: number,
+  includePartnerAddon: boolean,
+  paymentRef: string,
+  source: string,
+) {
+  const pdfCredits = includePartnerAddon ? 2 : 1;
+  const aiCredits = includePartnerAddon ? 10 : 5;
+  await Promise.all([
+    addBlueprintPdfCredits(userId, pdfCredits),
+    addAiReadingCredits(userId, aiCredits),
+  ]);
+  await logCreditTransaction(userId, aiCredits, "blueprint_purchase", {
+    includePartnerAddon,
+    pdfCredits,
+    paymentRef,
+    source,
+  });
+
+  try {
+    const user = await getUserById(userId);
+    await notifyOwner({
+      title: `🌙 Zakoupen osobní Blueprint [${source}]`,
+      content: `${user?.name || "zákazník"} (${user?.email || "neznámý"}) zakoupil Blueprint${includePartnerAddon ? " + partnerský doplněk" : ""}.\nUser ID: ${userId}`,
+    });
+  } catch { /* non-critical */ }
+}
+
+export async function fulfillBlueprintAnnualUpgrade(
+  userId: number,
+  paymentRef: string,
+  source: string,
+) {
+  const periodEnd = new Date();
+  periodEnd.setFullYear(periodEnd.getFullYear() + 1);
+  await updateUserSubscription(userId, {
+    subscriptionStatus: "active",
+    subscriptionPlan: "annual",
+    subscriptionCurrentPeriodEnd: periodEnd,
+  });
+  await logCreditTransaction(userId, 0, "blueprint_annual_upgrade", { paymentRef, source });
+
+  try {
+    const user = await getUserById(userId);
+    await notifyOwner({
+      title: `👑 Blueprint převeden na roční Premium [${source}]`,
+      content: `${user?.name || "zákazník"} (${user?.email || "neznámý"}) doplatil roční Premium.\nUser ID: ${userId}`,
+    });
+  } catch { /* non-critical */ }
 }
 
 export async function fulfillGiftVoucherOrder(

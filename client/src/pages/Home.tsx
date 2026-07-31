@@ -15,7 +15,7 @@ import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import {
   Compass, Brain, Users, Star, BarChart3,
   FileText, Zap, ArrowRight, CheckCircle2, Eye, Lightbulb,
-  Heart, Shield, Leaf, ChevronLeft, ChevronRight,
+  Heart, Shield, Leaf, ChevronLeft, ChevronRight, Moon, Sparkles,
 } from "lucide-react";
 
 // ─── Animated Chart Counter (count-up on scroll into view) ────────────────────────────────────
@@ -481,11 +481,13 @@ export default function Home() {
             opacity: 0.85,
           }}
         />
+        <div className="hero-color-breathe absolute inset-0 z-[1] pointer-events-none" aria-hidden="true" />
         {/* Decorative sacred circle — always visible including mobile */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 1 }}>
-          <div className="w-[280px] h-[280px] md:w-[500px] md:h-[500px] rounded-full border-2 border-purple-300/40 animate-[spin_60s_linear_infinite]" />
-          <div className="absolute w-[220px] h-[220px] md:w-[400px] md:h-[400px] rounded-full border border-purple-200/30 animate-[spin_45s_linear_infinite_reverse]" />
-          <div className="absolute w-[160px] h-[160px] md:w-[300px] md:h-[300px] rounded-full border border-amber-200/25" />
+          <div className="hero-sacred-pulse-1 w-[280px] h-[280px] md:w-[500px] md:h-[500px] rounded-full border-2 border-purple-300/40" />
+          <div className="hero-sacred-pulse-2 absolute w-[220px] h-[220px] md:w-[400px] md:h-[400px] rounded-full border border-purple-200/35" />
+          <div className="hero-sacred-pulse-3 absolute w-[160px] h-[160px] md:w-[300px] md:h-[300px] rounded-full border border-amber-200/35" />
+          <div className="hero-heartbeat absolute h-20 w-20 rounded-full bg-white/35 blur-2xl" />
         </div>
 
         {/* Animated orbs — responsive for mobile */}
@@ -553,7 +555,39 @@ export default function Home() {
             </motion.div>
           </div>
         </motion.div>
-      </section>      <div className="mystical-divider" />
+      </section>
+
+      <section className="relative overflow-hidden border-y border-violet-100 bg-gradient-to-r from-[#f8f3ff] via-white to-[#fff9eb] py-10 dark:border-violet-900/50 dark:from-violet-950/30 dark:via-background dark:to-amber-950/20">
+        <div className="container relative z-10 flex max-w-5xl flex-col items-center gap-6 md:flex-row md:gap-9">
+          <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border-2 border-amber-200 bg-[#160b2f] shadow-xl shadow-violet-900/15 ring-8 ring-violet-500/10 md:h-36 md:w-36">
+            <img src="/images/brand/veleknezka-master-v1.png" alt="" className="h-full w-full object-cover object-top" />
+            <span className="absolute bottom-1 right-2 flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-violet-700 text-amber-100 shadow-lg">
+              <Moon className="h-4 w-4 -rotate-12" />
+            </span>
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <div className="mb-2 flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-violet-700 md:justify-start dark:text-violet-300">
+              <Sparkles className="h-4 w-4" /> {isCs ? "Velekněžka Human Design" : "The Human Design High Priestess"}
+            </div>
+            <h2 className="font-serif text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+              {isCs ? "Vaše osobní průvodkyně mapou i každodenním rozhodováním" : "Your personal guide through your chart and everyday decisions"}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+              {isCs
+                ? "Velekněžka propojuje vaši mapu, Lunu a aktuální tranzity do praktických odpovědí. Bez robotického tónu — jako klidná průvodkyně, která zná váš kontext."
+                : "The High Priestess connects your chart, the Moon and current transits into practical answers — with a calm, personal voice that remembers your context."}
+            </p>
+          </div>
+          <Button asChild className="shrink-0 bg-violet-700 text-white hover:bg-violet-800">
+            <Link href={localePath("/pricing") + "#blueprint"}>
+              {isCs ? "Poznat svůj Blueprint" : "Discover my Blueprint"}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      </section>
+
+      <div className="mystical-divider" />
 
       {/* ── 5 Types Section ─────────────────────────────────────────────────── */}
       <section className="py-20 bg-gradient-to-b from-white to-purple-50/40 bg-sacred-geometry overflow-hidden" style={{ contentVisibility: "auto", containIntrinsicSize: "800px" }}>

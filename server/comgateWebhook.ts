@@ -1,6 +1,13 @@
 import { Request, Response } from "express";
 import { checkComgateStatus } from "./_core/comgate";
-import { fulfillCreditsOrder, fulfillGiftVoucherOrder, fulfillLifetimeOrder, trackAffiliateCommission } from "./services/payment";
+import {
+    fulfillBlueprintAnnualUpgrade,
+    fulfillBlueprintOrder,
+    fulfillCreditsOrder,
+    fulfillGiftVoucherOrder,
+    fulfillLifetimeOrder,
+    trackAffiliateCommission,
+} from "./services/payment";
 
 export async function handleComgateWebhook(req: Request, res: Response) {
     try {
@@ -40,6 +47,10 @@ export async function handleComgateWebhook(req: Request, res: Response) {
 
         if (plan === "credits") {
             await fulfillCreditsOrder(userId, 5, "Comgate");
+        } else if (plan === "blueprint") {
+            await fulfillBlueprintOrder(userId, metadata.partner === "1", transId, "Comgate");
+        } else if (plan === "blueprint_annual_upgrade") {
+            await fulfillBlueprintAnnualUpgrade(userId, transId, "Comgate");
         } else if (plan === "gift_monthly" || plan === "gift_annual") {
             const giftPlan = plan === "gift_monthly" ? "monthly" : "annual";
             await fulfillGiftVoucherOrder(userId, giftPlan, {

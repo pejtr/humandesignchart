@@ -179,6 +179,7 @@ STRIPE_SECRET_KEY         # Stripe API key
 STRIPE_WEBHOOK_SECRET     # Stripe webhook signing secret
 LEADOS_API_KEY            # LeadOS CRM API key
 LEADOS_WEBHOOK_SECRET     # LeadOS webhook signing secret
+VITE_SEZNAM_SEM_ID        # Sklik Seznam Event Measurement ID (loaded only after marketing consent)
 ```
 
 ---

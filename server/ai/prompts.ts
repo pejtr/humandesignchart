@@ -45,6 +45,25 @@ export function getReadingPrompt(chart: any, readingType: string, isEn: boolean)
         relationships: `Based on this chart (Type: ${chart.type}, Profile: ${chart.profile}, Authority: ${chart.authority}, Definition: ${chart.definition}), provide relationship guidance. What type of partners are most compatible? How does their definition affect partnerships? What electromagnetic connections should they look for?`,
 
         career: `Based on this chart (Type: ${chart.type}, Profile: ${chart.profile}, Authority: ${chart.authority}, Defined channels: ${(chart.channels as any[])?.map((c: any) => `${c.gate1}-${c.gate2}`).join(", ")}), provide career guidance. What types of work environments suit them? What roles align with their design? How should they approach career decisions using their authority?`,
+
+        moon: (() => {
+            const moon = chart.currentMoon || {};
+            const phaseNames: Record<string, { cs: string; en: string }> = {
+                new_moon: { cs: "nov", en: "new moon" },
+                waxing_crescent: { cs: "dorůstající srpek", en: "waxing crescent" },
+                first_quarter: { cs: "první čtvrť", en: "first quarter" },
+                waxing_gibbous: { cs: "dorůstající Luna", en: "waxing gibbous" },
+                full_moon: { cs: "úplněk", en: "full moon" },
+                waning_gibbous: { cs: "ubývající Luna", en: "waning gibbous" },
+                last_quarter: { cs: "poslední čtvrť", en: "last quarter" },
+                waning_crescent: { cs: "ubývající srpek", en: "waning crescent" },
+            };
+            const phase = phaseNames[moon.phase?.name] || { cs: "aktuální fáze", en: "current phase" };
+            if (isEn) {
+                return `Create a practical personal Moon transit reading for this Human Design chart. Current lunar phase: ${moon.phase?.emoji || ""} ${phase.en}, illumination ${moon.phase?.illumination ?? "unknown"}%, ${moon.phase?.waxing ? "waxing" : "waning"}. The transiting Moon is in Gate ${moon.gate ?? "unknown"}.${moon.line ?? ""}; theme: ${moon.themeEn || "unknown"}; description: ${moon.descriptionEn || ""}. Natal chart: Type ${chart.type}, Profile ${chart.profile}, Authority ${chart.authority}, active gates ${(chart.activatedGates || []).join(", ")}. Structure the answer as: What the phase emphasizes | Moon gate theme | Interaction with the natal design | 3 practical reflection prompts or actions. Treat astrology and Human Design as reflective frameworks, not scientifically proven causal claims. Do not make medical, financial, or deterministic predictions. Max 450 words.`;
+            }
+            return `Vytvoř praktický osobní výklad tranzitu Luny pro tuto Human Design mapu. Aktuální lunární fáze: ${moon.phase?.emoji || ""} ${phase.cs}, osvětlení ${moon.phase?.illumination ?? "neznámé"} %, Luna ${moon.phase?.waxing ? "dorůstá" : "ubývá"}. Tranzitní Luna je v bráně ${moon.gate ?? "neznámé"}.${moon.line ?? ""}; téma: ${moon.theme || "neznámé"}; popis: ${moon.description || ""}. Nativní mapa: typ ${chart.type}, profil ${chart.profile}, autorita ${chart.authority}, aktivní brány ${(chart.activatedGates || []).join(", ")}. Odpověď strukturuj: Co zdůrazňuje fáze | Téma lunární brány | Propojení s nativní mapou | 3 praktické otázky nebo kroky. Astrologii a Human Design podávej jako nástroje sebereflexe, ne jako vědecky prokázanou příčinu. Nedělej zdravotní, finanční ani osudové předpovědi. Max 450 slov.`;
+        })(),
     };
 
     return prompts[readingType] || prompts.overview;

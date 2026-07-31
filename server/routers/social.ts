@@ -4,19 +4,126 @@
  * queue management, and the publish engine called by the cron job.
  */
 import { z } from "zod";
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, staffProcedure } from "../_core/trpc";
 import { getDb } from "../db";
-import { socialAccounts, socialPosts, socialPostAccounts } from "../../drizzle/schema";
+import { socialAccounts, socialPosts, socialPostAccounts, users } from "../../drizzle/schema";
 import type { SocialAccount, SocialPostAccount } from "../../drizzle/schema";
 import { eq, and, desc, lte, inArray } from "drizzle-orm";
 import { generateImage } from "../_core/imageGeneration";
 import { invokeLLM } from "../_core/llm";
 import { storagePut } from "../storage";
+import { Resvg } from "@resvg/resvg-js";
+import { calculateTransitGates } from "./transit";
+import { GATE_DESCRIPTIONS } from "../data/hdContent";
+import { ENV } from "../_core/env";
+import { sendLeadOSEvent } from "../leados";
+
+const socialPostTypeSchema = z.enum([
+  "hd_type", "quote", "infographic", "transit", "iching", "promo",
+  "custom", "tiktok_script", "story",
+]);
+
+const highPriestessCopySchema = z.object({
+  headline: z.string().min(3).max(70),
+  message: z.string().min(20).max(190),
+  practicalAction: z.string().min(10).max(120),
+  spokenScript: z.string().min(40).max(700),
+  caption: z.string().min(40).max(1200),
+  hashtags: z.array(z.string().min(2).max(50)).min(3).max(6),
+  visualDirection: z.string().min(10).max(500),
+});
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function randomSuffix() {
   return Math.random().toString(36).slice(2, 8);
+}
+
+function xmlEscape(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function wrapStoryText(value: string, maxChars: number): string[] {
+  const words = value.trim().split(/\s+/);
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word;
+    if (candidate.length > maxChars && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+async function renderHighPriestessStory(input: {
+  backgroundUrl: string;
+  dateLabel: string;
+  headline: string;
+  message: string;
+  practicalAction: string;
+  ctaUrl: string;
+  userId: number;
+}): Promise<string> {
+  const backgroundResponse = await fetch(input.backgroundUrl);
+  if (!backgroundResponse.ok) throw new Error("Generated story background could not be loaded");
+  const background = Buffer.from(await backgroundResponse.arrayBuffer());
+  const mimeType = backgroundResponse.headers.get("content-type") || "image/png";
+  const dataUrl = `data:${mimeType};base64,${background.toString("base64")}`;
+  const headlineLines = wrapStoryText(input.headline, 24).slice(0, 3);
+  const messageLines = wrapStoryText(input.message, 39).slice(0, 5);
+  const actionLines = wrapStoryText(input.practicalAction, 45).slice(0, 3);
+
+  const headlineSvg = headlineLines.map((line, index) =>
+    `<tspan x="80" dy="${index === 0 ? 0 : 72}">${xmlEscape(line)}</tspan>`
+  ).join("");
+  const messageSvg = messageLines.map((line, index) =>
+    `<tspan x="80" dy="${index === 0 ? 0 : 48}">${xmlEscape(line)}</tspan>`
+  ).join("");
+  const actionSvg = actionLines.map((line, index) =>
+    `<tspan x="122" dy="${index === 0 ? 0 : 40}">${xmlEscape(line)}</tspan>`
+  ).join("");
+
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+      <defs>
+        <linearGradient id="topShade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#160528" stop-opacity="0.88"/>
+          <stop offset="1" stop-color="#160528" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="bottomShade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#160528" stop-opacity="0"/>
+          <stop offset="0.34" stop-color="#160528" stop-opacity="0.72"/>
+          <stop offset="1" stop-color="#0d0318" stop-opacity="0.97"/>
+        </linearGradient>
+      </defs>
+      <image href="${dataUrl}" width="1080" height="1920" preserveAspectRatio="xMidYMid slice"/>
+      <rect width="1080" height="620" fill="url(#topShade)"/>
+      <rect y="890" width="1080" height="1030" fill="url(#bottomShade)"/>
+      <text x="80" y="104" fill="#ead8ff" font-family="Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="4">AI VELEKNĚŽKA · DENNÍ POSELSTVÍ</text>
+      <text x="80" y="154" fill="#d7b76c" font-family="Arial, sans-serif" font-size="27">${xmlEscape(input.dateLabel)}</text>
+      <text x="80" y="1030" fill="#ffffff" font-family="Georgia, serif" font-size="62" font-weight="700">${headlineSvg}</text>
+      <text x="80" y="1280" fill="#f5effa" font-family="Arial, sans-serif" font-size="35">${messageSvg}</text>
+      <rect x="80" y="1530" width="920" height="190" rx="34" fill="#ffffff" fill-opacity="0.13" stroke="#d7b76c" stroke-opacity="0.7"/>
+      <text x="122" y="1588" fill="#d7b76c" font-family="Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="2">DNEŠNÍ KROK</text>
+      <text x="122" y="1640" fill="#ffffff" font-family="Arial, sans-serif" font-size="30">${actionSvg}</text>
+      <rect x="80" y="1770" width="920" height="88" rx="44" fill="#7c2bd4"/>
+      <text x="540" y="1826" fill="#ffffff" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="700">Vytvořte si mapu zdarma · humandesignmapa.cz</text>
+    </svg>`;
+
+  const png = new Resvg(svg, { fitTo: { mode: "width", value: 1080 } }).render().asPng();
+  const key = `social-posts/${input.userId}/veleknezka-${Date.now()}-${randomSuffix()}.png`;
+  const { url } = await storagePut(key, png, "image/png");
+  return url;
 }
 
 async function publishToFacebook(
@@ -50,13 +157,18 @@ async function publishToInstagram(
   accessToken: string,
   igAccountId: string,
   caption: string,
-  imageUrl?: string | null
+  imageUrl?: string | null,
+  isStory = false,
 ): Promise<string> {
   if (!imageUrl) throw new Error("Instagram requires an image");
   const createRes = await fetch(`https://graph.facebook.com/v19.0/${igAccountId}/media`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ image_url: imageUrl, caption, access_token: accessToken }),
+    body: JSON.stringify({
+      image_url: imageUrl,
+      ...(isStory ? { media_type: "STORIES" } : { caption }),
+      access_token: accessToken,
+    }),
   });
   const createData = await createRes.json() as { id?: string; error?: { message: string } };
   if (!createRes.ok || createData.error) throw new Error(createData.error?.message ?? "IG container creation failed");
@@ -193,11 +305,14 @@ async function publishPost(postId: number, userId: number) {
 
       switch (account.platform) {
         case "facebook":
+          if (post.postType === "story") {
+            throw new Error("Automatické Stories jsou zatím podporované pouze pro Instagram");
+          }
           platformPostId = await publishToFacebook(
             account.accessToken,
             account.pageId ?? account.accountId,
             caption,
-            post.imageUrl
+            post.imageUrl,
           );
           break;
         case "instagram":
@@ -205,7 +320,8 @@ async function publishPost(postId: number, userId: number) {
             account.accessToken,
             account.pageId ?? account.accountId,
             caption,
-            post.imageUrl
+            post.imageUrl,
+            post.postType === "story",
           );
           break;
         case "linkedin":
@@ -258,6 +374,16 @@ async function publishPost(postId: number, userId: number) {
   }).where(eq(socialPosts.id, postId));
 
   if (allFailed) throw new Error(errors.join("; "));
+  sendLeadOSEvent({
+    event: "social_content_published",
+    data: {
+      userId,
+      postId: post.id,
+      postType: post.postType,
+      platforms: Object.keys(platformPostIds),
+      campaign: post.postType === "story" ? "veleknezka_daily" : "organic_social",
+    },
+  });
   return { success: true, platformPostIds, errors };
 }
 
@@ -289,7 +415,7 @@ export const socialRouter = router({
 
   // ── Account Management ──────────────────────────────────────────────────────
 
-  listAccounts: protectedProcedure.query(async ({ ctx }) => {
+  listAccounts: staffProcedure.query(async ({ ctx }) => {
     const db = await getDb();
     if (!db) return [];
     const accounts = await db
@@ -310,7 +436,7 @@ export const socialRouter = router({
     }));
   }),
 
-  saveAccount: protectedProcedure
+  saveAccount: staffProcedure
     .input(z.object({
       platform: z.enum(["facebook", "instagram", "linkedin", "pinterest", "tiktok"]),
       accountId: z.string(),
@@ -369,7 +495,7 @@ export const socialRouter = router({
       }
     }),
 
-  disconnectAccount: protectedProcedure
+  disconnectAccount: staffProcedure
     .input(z.object({ accountId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
@@ -382,7 +508,7 @@ export const socialRouter = router({
 
   // ── Post Management ─────────────────────────────────────────────────────────
 
-  listPosts: protectedProcedure
+  listPosts: staffProcedure
     .input(z.object({
       status: z.enum(["draft", "scheduled", "published", "failed", "all"]).default("all"),
       limit: z.number().min(1).max(100).default(50),
@@ -402,14 +528,14 @@ export const socialRouter = router({
         .limit(input.limit);
     }),
 
-  savePost: protectedProcedure
+  savePost: staffProcedure
     .input(z.object({
       id: z.number().optional(),
       title: z.string().optional(),
       caption: z.string(),
       imageUrl: z.string().optional(),
       imagePrompt: z.string().optional(),
-      postType: z.enum(["hd_type", "quote", "infographic", "transit", "iching", "promo", "custom", "tiktok_script"]).default("custom"),
+      postType: socialPostTypeSchema.default("custom"),
       locale: z.enum(["cs", "en"]).default("cs"),
       hashtags: z.string().optional(),
       scheduledAt: z.date().optional(),
@@ -466,7 +592,7 @@ export const socialRouter = router({
       }
     }),
 
-  deletePost: protectedProcedure
+  deletePost: staffProcedure
     .input(z.object({ postId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
@@ -483,9 +609,9 @@ export const socialRouter = router({
 
   // ── AI Content Generation ────────────────────────────────────────────────────
 
-  generateCaption: protectedProcedure
+  generateCaption: staffProcedure
     .input(z.object({
-      postType: z.enum(["hd_type", "quote", "infographic", "transit", "iching", "promo", "custom", "tiktok_script"]),
+      postType: socialPostTypeSchema,
       topic: z.string().max(500),
       locale: z.enum(["cs", "en"]).default("cs"),
       tone: z.enum(["inspirational", "educational", "playful", "mystical"]).default("inspirational"),
@@ -507,9 +633,9 @@ export const socialRouter = router({
       return { caption };
     }),
 
-  generatePostImage: protectedProcedure
+  generatePostImage: staffProcedure
     .input(z.object({
-      postType: z.enum(["hd_type", "quote", "infographic", "transit", "iching", "promo", "custom", "tiktok_script"]),
+      postType: socialPostTypeSchema,
       topic: z.string().max(500),
       style: z.enum(["dark_cosmic", "light_minimal", "golden_mystical"]).default("dark_cosmic"),
       locale: z.enum(["cs", "en"]).default("cs"),
@@ -529,6 +655,7 @@ export const socialRouter = router({
         transit: `Daily Human Design transit visualization: ${input.topic}. Planetary symbols, ${styleDesc}. Astrological wheel with Human Design gates highlighted. Aspect ratio: ${input.aspectRatio}.`,
         iching: `I-Ching hexagram visualization: ${input.topic}. Chinese character, hexagram lines, ${styleDesc}. Ancient wisdom meets modern design. Aspect ratio: ${input.aspectRatio}.`,
         promo: `Promotional post for Human Design app: ${input.topic}. ${styleDesc}. App feature highlight. Aspect ratio: ${input.aspectRatio}.`,
+        story: `Vertical Instagram Story for Human Design: ${input.topic}. ${styleDesc}. Keep the centre readable and leave generous negative space for exact text overlay. No text, no letters, no logo. Aspect ratio: 9:16.`,
         tiktok_script: `Cinematic visualization for TikTok/Shorts: ${input.topic}. ${styleDesc}. Dramatic lighting, portrait format 9:16. Concept for educational Human Design content. Aspect ratio: ${input.aspectRatio}.`,
         custom: `${input.topic}. ${styleDesc}. Human Design themed. Aspect ratio: ${input.aspectRatio}.`,
       };
@@ -546,15 +673,144 @@ export const socialRouter = router({
       return { imageUrl: s3Url, prompt };
     }),
 
+  generateHighPriestessStory: staffProcedure
+    .input(z.object({
+      locale: z.enum(["cs", "en"]).default("cs"),
+      publishDate: z.date().optional(),
+      theme: z.string().trim().max(300).optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const publishDate = input.publishDate ?? new Date();
+      const { transitGates } = await calculateTransitGates(publishDate);
+      const sun = transitGates.find(gate => gate.planet === "Sun") ?? transitGates[0];
+      const moon = transitGates.find(gate => gate.planet === "Moon") ?? transitGates[1];
+      const sunDescription = GATE_DESCRIPTIONS[sun.gate];
+      const moonDescription = GATE_DESCRIPTIONS[moon.gate];
+      const isCs = input.locale === "cs";
+      const dateKey = publishDate.toISOString().slice(0, 10);
+      const dateLabel = publishDate.toLocaleDateString(isCs ? "cs-CZ" : "en-US", {
+        day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Prague",
+      });
+      const ctaUrl = `https://www.humandesignmapa.cz/${input.locale}/calculate?utm_source=instagram&utm_medium=organic_social&utm_campaign=veleknezka_daily&utm_content=${dateKey}-gate-${sun.gate}`;
+      const language = isCs ? "Czech" : "English";
+
+      const response = await invokeLLM({
+        messages: [
+          {
+            role: "system",
+            content: `You are the editorial voice of Velekněžka, a clearly disclosed AI guide for Human Design Mapa. Write in ${language}. Her voice is calm, precise, warm and practical. She never predicts the future, promises outcomes, diagnoses health, or presents Human Design as science. Treat transits as prompts for self-reflection. Avoid fear, pressure, vague spiritual clichés and manipulative urgency. The story must be useful even if the viewer does not buy.`,
+          },
+          {
+            role: "user",
+            content: `Create one vertical daily Story for ${dateLabel}.
+Primary transit: Sun Gate ${sun.gate}.${sun.line}, theme: ${isCs ? sunDescription?.theme : sunDescription?.themeEn}, description: ${isCs ? sunDescription?.description : sunDescription?.descriptionEn}.
+Supporting transit: Moon Gate ${moon.gate}.${moon.line}, theme: ${isCs ? moonDescription?.theme : moonDescription?.themeEn}.
+Optional editorial theme: ${input.theme || "none"}.
+
+Requirements:
+- headline: short hook, max 7 words
+- message: 1-2 short sentences, max 170 characters
+- practicalAction: one concrete reflection or action for today
+- spokenScript: natural 20-30 second voiceover, 55-80 words
+- caption: helpful caption ending with a soft invitation to create a free chart
+- hashtags: 3-6 specific hashtags without duplicates
+- visualDirection: one concise direction for the recurring avatar scene; no text in the generated background`,
+          },
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "high_priestess_daily_story",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                headline: { type: "string" },
+                message: { type: "string" },
+                practicalAction: { type: "string" },
+                spokenScript: { type: "string" },
+                caption: { type: "string" },
+                hashtags: { type: "array", items: { type: "string" } },
+                visualDirection: { type: "string" },
+              },
+              required: ["headline", "message", "practicalAction", "spokenScript", "caption", "hashtags", "visualDirection"],
+              additionalProperties: false,
+            },
+          },
+        },
+      });
+
+      const raw = response.choices[0]?.message?.content;
+      if (typeof raw !== "string") throw new Error("AI did not return story copy");
+      const copy = highPriestessCopySchema.parse(JSON.parse(raw));
+      const visualPrompt = `Use the supplied master portrait as the identity reference. Preserve the same woman's facial identity, age, chestnut-violet hair, amethyst pendant and violet-gold brand clothing. Create a vertical 9:16 premium editorial scene for a Human Design daily Story. ${copy.visualDirection}. Theme the atmosphere around Sun Gate ${sun.gate}.${sun.line}. Keep her face unobstructed, realistic and trustworthy. Leave generous clean space in the upper third and lower half for a later text overlay. No text, no letters, no logo, no watermark, no tarot border, no extra people, no glowing eyes.`;
+      const generated = await generateImage({
+        prompt: visualPrompt,
+        originalImages: [{ url: ENV.highPriestessReferenceUrl, mimeType: "image/png" }],
+      });
+      if (!generated.url) throw new Error("Story visual generation returned no image");
+      const imageUrl = await renderHighPriestessStory({
+        backgroundUrl: generated.url,
+        dateLabel,
+        headline: copy.headline,
+        message: copy.message,
+        practicalAction: copy.practicalAction,
+        ctaUrl,
+        userId: ctx.user.id,
+      });
+
+      sendLeadOSEvent({
+        event: "social_content_generated",
+        data: {
+          userId: ctx.user.id,
+          campaign: "veleknezka_daily",
+          contentDate: dateKey,
+          sunGate: `${sun.gate}.${sun.line}`,
+          locale: input.locale,
+        },
+      });
+
+      return {
+        ...copy,
+        imageUrl,
+        backgroundUrl: generated.url,
+        ctaUrl,
+        date: dateKey,
+        dateLabel,
+        sunGate: `${sun.gate}.${sun.line}`,
+        moonGate: `${moon.gate}.${moon.line}`,
+        visualPrompt,
+      };
+    }),
+
+  listAffiliateInfluencers: staffProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+    return db.select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      affiliateCode: users.affiliateCode,
+      affiliateTier: users.affiliateTier,
+      totalEarned: users.affiliateTotalEarned,
+      pendingPayout: users.affiliatePendingPayout,
+      createdAt: users.createdAt,
+    })
+      .from(users)
+      .where(eq(users.isAffiliate, 1))
+      .orderBy(desc(users.affiliateTotalEarned))
+      .limit(100);
+  }),
+
   // ── Publish Engine ───────────────────────────────────────────────────────────
 
-  publishNow: protectedProcedure
+  publishNow: staffProcedure
     .input(z.object({ postId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       return publishPost(input.postId, ctx.user.id);
     }),
 
-  publishDuePosts: protectedProcedure
+  publishDuePosts: staffProcedure
     .mutation(async ({ ctx }) => {
       if (ctx.user.role !== "admin") throw new Error("Forbidden");
       const result = await publishScheduledPosts();
