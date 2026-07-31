@@ -6,21 +6,52 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { toast } from "sonner";
-import { Check, Sparkles, Gift, CreditCard, Zap, Star, Crown, Lock, Moon, FileText, Heart } from "lucide-react";
+import {
+  Check,
+  Sparkles,
+  Gift,
+  CreditCard,
+  Zap,
+  Star,
+  Crown,
+  Lock,
+  Moon,
+  FileText,
+  Heart,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
 
-type CheckoutPlan = "monthly" | "annual" | "lifetime" | "credits" | "blueprint" | "blueprint_annual_upgrade" | "gift_monthly" | "gift_annual";
+type CheckoutPlan =
+  | "monthly"
+  | "annual"
+  | "lifetime"
+  | "credits"
+  | "blueprint"
+  | "blueprint_annual_upgrade"
+  | "gift_monthly"
+  | "gift_annual";
 
 export default function Pricing() {
   const { t, locale } = useLanguage();
@@ -50,32 +81,44 @@ export default function Pricing() {
 
   // Set page title
   const isEn = locale === "en";
-  useSEO(isEn ? {
-    title: "✨ Pricing — Human Design Premium 🔮",
-    description: "Upgrade to Human Design Premium for unlimited AI readings, PDF reports, and all tools.",
-    ogImage: OG_IMAGES.pricing,
-    keywords: "human design premium, human design subscription, human design AI reading",
-    locale: "en_US",
-  } : {
-    title: "✨ Ceník — Human Design Premium 🔮",
-    description: "Upgradujte na Human Design Premium pro neomezené AI výklady, PDF reporty a všechny nástroje.",
-    ogImage: OG_IMAGES.pricing,
-    keywords: "human design premium, human design předplatné, human design AI výklad",
-    locale: "cs_CZ",
-  });
+  useSEO(
+    isEn
+      ? {
+          title: "✨ Pricing — Human Design Premium 🔮",
+          description:
+            "Upgrade to Human Design Premium for unlimited AI readings, PDF reports, and all tools.",
+          ogImage: OG_IMAGES.pricing,
+          keywords:
+            "human design premium, human design subscription, human design AI reading",
+          locale: "en_US",
+        }
+      : {
+          title: "✨ Ceník — Human Design Premium 🔮",
+          description:
+            "Upgradujte na Human Design Premium pro neomezené AI výklady, PDF reporty a všechny nástroje.",
+          ogImage: OG_IMAGES.pricing,
+          keywords:
+            "human design premium, human design předplatné, human design AI výklad",
+          locale: "cs_CZ",
+        }
+  );
 
   const { data: subStatus } = trpc.subscription.status.useQuery(undefined, {
     enabled: !!user,
   });
 
   const createCheckout = trpc.subscription.createCheckout.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       if (data.url) {
         window.location.assign(data.url);
-        toast.info(locale === "cs" ? "Přesměrování na platební bránu..." : "Redirecting to checkout...");
+        toast.info(
+          locale === "cs"
+            ? "Přesměrování na platební bránu..."
+            : "Redirecting to checkout..."
+        );
       }
     },
-    onError: (err) => {
+    onError: err => {
       toast.error(err.message);
     },
   });
@@ -85,7 +128,7 @@ export default function Pricing() {
       toast.success(p.voucherSuccess);
       setVoucherCode("");
     },
-    onError: (err) => {
+    onError: err => {
       const msg = err.message;
       if (msg === "already_redeemed") toast.error(p.voucherAlreadyUsed);
       else if (msg === "expired") toast.error(p.voucherExpired);
@@ -110,9 +153,13 @@ export default function Pricing() {
       gift_annual: 1188,
     };
     initiateCheckout(values[plan], {
-      content_name: plan === "blueprint" ? "Personal Human Design Blueprint" : plan,
+      content_name:
+        plan === "blueprint" ? "Personal Human Design Blueprint" : plan,
       content_category: plan === "blueprint" ? "report" : "subscription",
-      content_ids: plan === "blueprint" && includePartnerAddon ? ["blueprint", "blueprint_partner"] : [plan],
+      content_ids:
+        plan === "blueprint" && includePartnerAddon
+          ? ["blueprint", "blueprint_partner"]
+          : [plan],
       content_type: "product",
       num_items: plan === "blueprint" && includePartnerAddon ? 2 : 1,
     });
@@ -121,12 +168,14 @@ export default function Pricing() {
       locale,
       origin: window.location.origin,
       includePartnerAddon: plan === "blueprint" && includePartnerAddon,
-      ...(isGift ? {
-        recipientEmail: giftForm.recipientEmail || undefined,
-        recipientName: giftForm.recipientName || undefined,
-        senderName: giftForm.senderName || undefined,
-        personalMessage: giftForm.personalMessage || undefined,
-      } : {}),
+      ...(isGift
+        ? {
+            recipientEmail: giftForm.recipientEmail || undefined,
+            recipientName: giftForm.recipientName || undefined,
+            senderName: giftForm.senderName || undefined,
+            personalMessage: giftForm.personalMessage || undefined,
+          }
+        : {}),
     });
   };
 
@@ -143,47 +192,77 @@ export default function Pricing() {
   const isPremium = subStatus?.isPremium;
   const freeReadingsLeft = subStatus?.freeReadingsLeft ?? 1;
 
-  const freeFeatures = isCzech ? [
-    "1 kompletní AI výklad zdarma",
-    "Neomezené výpočty mapy",
-    "Přístup do encyklopedie",
-    "Základní bodygraph",
-  ] : [
-    "1 complete AI reading for free",
-    "Unlimited chart calculations",
-    "Encyclopedia access",
-    "Basic bodygraph",
-  ];
+  const freeFeatures = isCzech
+    ? [
+        "1 kompletní AI výklad zdarma",
+        "Neomezené výpočty mapy",
+        "Přístup do encyklopedie",
+        "Základní bodygraph",
+      ]
+    : [
+        "1 complete AI reading for free",
+        "Unlimited chart calculations",
+        "Encyclopedia access",
+        "Basic bodygraph",
+      ];
 
-  const premiumFeatures = isCzech ? [
-    "Neomezené AI výklady",
-    "Stažení PDF reportu mapy",
-    "Všechny nástroje (tranzity, návratové mapy, srovnání)",
-    "I Ching věštírna",
-    "Rozšířená databáze celebrit",
-    "Prioritní podpora",
-    "Denní & týdenní tranzity na email (lze vypnout)",
-  ] : [
-    "Unlimited AI readings",
-    "PDF chart report download",
-    "All tools (transits, return charts, comparison)",
-    "I Ching oracle",
-    "Extended celebrities database",
-    "Priority support",
-    "Daily & weekly transits by email (can be disabled)",
-  ];
+  const premiumFeatures = isCzech
+    ? [
+        "Neomezené AI výklady",
+        "Stažení PDF reportu mapy",
+        "Všechny nástroje (tranzity, návratové mapy, srovnání)",
+        "I Ching věštírna",
+        "Rozšířená databáze celebrit",
+        "Prioritní podpora",
+        "Denní & týdenní tranzity na email (lze vypnout)",
+      ]
+    : [
+        "Unlimited AI readings",
+        "PDF chart report download",
+        "All tools (transits, return charts, comparison)",
+        "I Ching oracle",
+        "Extended celebrities database",
+        "Priority support",
+        "Daily & weekly transits by email (can be disabled)",
+      ];
 
-  const faqItems = isCzech ? [
-    { q: "Mohu zrušit kdykoli?", a: "Ano, předplatné můžete zrušit kdykoli. Přístup si zachováte do konce fakturačního období." },
-    { q: "Jaké platební metody jsou přijímány?", a: "Přijímáme všechny hlavní kreditní a debetní karty přes Stripe. Vaše platba je bezpečná a šifrovaná." },
-    { q: "Je k dispozici zkušební verze?", a: "Ano — každý nový uživatel dostane jeden kompletní AI výklad, aby si mohl kvalitu vyzkoušet před nákupem." },
-    { q: "Jak fungují dárkové poukazy?", a: "Po nákupu obdržíte unikátní kód poukazu e-mailem. Příjemce zadá kód na našem webu a aktivuje si Premium přístup." },
-  ] : [
-    { q: "Can I cancel anytime?", a: "Yes, you can cancel your subscription at any time. You will retain access until the end of the billing period." },
-    { q: "What payment methods are accepted?", a: "We accept all major credit and debit cards via Stripe. Your payment is secure and encrypted." },
-    { q: "Is there a free trial?", a: "Yes — every new user gets one complete AI reading to experience the quality before purchasing." },
-    { q: "How do gift vouchers work?", a: "After purchase, you receive a unique voucher code by email. The recipient enters the code on our site to activate their Premium access." },
-  ];
+  const faqItems = isCzech
+    ? [
+        {
+          q: "Mohu zrušit kdykoli?",
+          a: "Ano, předplatné můžete zrušit kdykoli. Přístup si zachováte do konce fakturačního období.",
+        },
+        {
+          q: "Jaké platební metody jsou přijímány?",
+          a: "Přijímáme všechny hlavní kreditní a debetní karty přes Stripe. Vaše platba je bezpečná a šifrovaná.",
+        },
+        {
+          q: "Je k dispozici zkušební verze?",
+          a: "Ano — každý nový uživatel dostane jeden kompletní AI výklad, aby si mohl kvalitu vyzkoušet před nákupem.",
+        },
+        {
+          q: "Jak fungují dárkové poukazy?",
+          a: "Po nákupu obdržíte unikátní kód poukazu e-mailem. Příjemce zadá kód na našem webu a aktivuje si Premium přístup.",
+        },
+      ]
+    : [
+        {
+          q: "Can I cancel anytime?",
+          a: "Yes, you can cancel your subscription at any time. You will retain access until the end of the billing period.",
+        },
+        {
+          q: "What payment methods are accepted?",
+          a: "We accept all major credit and debit cards via Stripe. Your payment is secure and encrypted.",
+        },
+        {
+          q: "Is there a free trial?",
+          a: "Yes — every new user gets one complete AI reading to experience the quality before purchasing.",
+        },
+        {
+          q: "How do gift vouchers work?",
+          a: "After purchase, you receive a unique voucher code by email. The recipient enters the code on our site to activate their Premium access.",
+        },
+      ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -193,21 +272,107 @@ export default function Pricing() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent pointer-events-none" />
         {/* Sacred Geometry Background */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-[0.04]" viewBox="0 0 400 400" fill="none">
-            <circle cx="200" cy="200" r="180" stroke="currentColor" strokeWidth="0.5" className="text-purple-300" />
-            <circle cx="200" cy="200" r="140" stroke="currentColor" strokeWidth="0.5" className="text-purple-300" />
-            <circle cx="200" cy="200" r="100" stroke="currentColor" strokeWidth="0.5" className="text-purple-300" />
-            <circle cx="200" cy="200" r="60" stroke="currentColor" strokeWidth="0.5" className="text-purple-300" />
+          <svg
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-[0.04]"
+            viewBox="0 0 400 400"
+            fill="none"
+          >
+            <circle
+              cx="200"
+              cy="200"
+              r="180"
+              stroke="currentColor"
+              strokeWidth="0.5"
+              className="text-purple-300"
+            />
+            <circle
+              cx="200"
+              cy="200"
+              r="140"
+              stroke="currentColor"
+              strokeWidth="0.5"
+              className="text-purple-300"
+            />
+            <circle
+              cx="200"
+              cy="200"
+              r="100"
+              stroke="currentColor"
+              strokeWidth="0.5"
+              className="text-purple-300"
+            />
+            <circle
+              cx="200"
+              cy="200"
+              r="60"
+              stroke="currentColor"
+              strokeWidth="0.5"
+              className="text-purple-300"
+            />
             {/* Flower of Life petals */}
-            <circle cx="200" cy="140" r="60" stroke="currentColor" strokeWidth="0.3" className="text-violet-300" />
-            <circle cx="252" cy="170" r="60" stroke="currentColor" strokeWidth="0.3" className="text-violet-300" />
-            <circle cx="252" cy="230" r="60" stroke="currentColor" strokeWidth="0.3" className="text-violet-300" />
-            <circle cx="200" cy="260" r="60" stroke="currentColor" strokeWidth="0.3" className="text-violet-300" />
-            <circle cx="148" cy="230" r="60" stroke="currentColor" strokeWidth="0.3" className="text-violet-300" />
-            <circle cx="148" cy="170" r="60" stroke="currentColor" strokeWidth="0.3" className="text-violet-300" />
+            <circle
+              cx="200"
+              cy="140"
+              r="60"
+              stroke="currentColor"
+              strokeWidth="0.3"
+              className="text-violet-300"
+            />
+            <circle
+              cx="252"
+              cy="170"
+              r="60"
+              stroke="currentColor"
+              strokeWidth="0.3"
+              className="text-violet-300"
+            />
+            <circle
+              cx="252"
+              cy="230"
+              r="60"
+              stroke="currentColor"
+              strokeWidth="0.3"
+              className="text-violet-300"
+            />
+            <circle
+              cx="200"
+              cy="260"
+              r="60"
+              stroke="currentColor"
+              strokeWidth="0.3"
+              className="text-violet-300"
+            />
+            <circle
+              cx="148"
+              cy="230"
+              r="60"
+              stroke="currentColor"
+              strokeWidth="0.3"
+              className="text-violet-300"
+            />
+            <circle
+              cx="148"
+              cy="170"
+              r="60"
+              stroke="currentColor"
+              strokeWidth="0.3"
+              className="text-violet-300"
+            />
             {/* Triangle */}
-            <polygon points="200,50 350,310 50,310" stroke="currentColor" strokeWidth="0.4" fill="none" className="text-amber-300" />
-            <polygon points="200,350 50,90 350,90" stroke="currentColor" strokeWidth="0.4" fill="none" className="text-amber-300" />
+            <polygon
+              points="200,50 350,310 50,310"
+              stroke="currentColor"
+              strokeWidth="0.4"
+              fill="none"
+              className="text-amber-300"
+            />
+            <polygon
+              points="200,350 50,90 350,90"
+              stroke="currentColor"
+              strokeWidth="0.4"
+              fill="none"
+              className="text-amber-300"
+            />
           </svg>
         </div>
         <div className="container max-w-4xl text-center relative z-10">
@@ -256,35 +421,54 @@ export default function Pricing() {
 
           {/* Plans Tab */}
           <TabsContent value="plans">
-            <Card id="blueprint" className="mb-12 overflow-hidden border-violet-300/70 bg-gradient-to-br from-[#fbf8ff] via-white to-amber-50/70 shadow-xl shadow-violet-950/5 dark:border-violet-700/50 dark:from-violet-950/30 dark:via-background dark:to-amber-950/10">
+            <Card
+              id="blueprint"
+              className="mb-12 overflow-hidden border-violet-300/70 bg-gradient-to-br from-[#fbf8ff] via-white to-amber-50/70 shadow-xl shadow-violet-950/5 dark:border-violet-700/50 dark:from-violet-950/30 dark:via-background dark:to-amber-950/10"
+            >
               <div className="grid lg:grid-cols-[0.72fr_1.28fr]">
                 <div className="relative min-h-[320px] overflow-hidden bg-[#160b2f]">
                   <img
                     src="/images/brand/veleknezka-master-v1.png"
-                    alt={isCzech ? "Velekněžka, průvodkyně osobním Human Design Blueprintem" : "The High Priestess, guide to your personal Human Design Blueprint"}
+                    alt={
+                      isCzech
+                        ? "Marie, průvodkyně osobním Human Design Blueprintem"
+                        : "Marie, guide to your personal Human Design Blueprint"
+                    }
                     className="absolute inset-0 h-full w-full object-cover object-top opacity-90"
                     loading="eager"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#160b2f] via-transparent to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-6 text-white">
                     <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-amber-200">
-                      <Moon className="h-4 w-4" /> {isCzech ? "Velekněžka vás provede" : "Guided by the High Priestess"}
+                      <Moon className="h-4 w-4" />{" "}
+                      {isCzech ? "Marie vás provede" : "Guided by Marie"}
                     </div>
                     <p className="font-serif text-2xl leading-tight">
-                      {isCzech ? "Vaše mapa. Vaše rozhodování. Váš další krok." : "Your chart. Your decisions. Your next step."}
+                      {isCzech
+                        ? "Vaše mapa. Vaše rozhodování. Váš další krok."
+                        : "Your chart. Your decisions. Your next step."}
                     </p>
                   </div>
                 </div>
 
                 <CardContent className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
                   <div className="mb-4 flex flex-wrap items-center gap-2">
-                    <Badge className="border-0 bg-violet-700 text-white">{isCzech ? "Nejlepší první krok" : "Best first step"}</Badge>
-                    <Badge variant="outline" className="border-amber-400/60 text-amber-800 dark:text-amber-300">
-                      {isCzech ? "Jednorázově · bez předplatného" : "One-time · no subscription"}
+                    <Badge className="border-0 bg-violet-700 text-white">
+                      {isCzech ? "Nejlepší první krok" : "Best first step"}
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="border-amber-400/60 text-amber-800 dark:text-amber-300"
+                    >
+                      {isCzech
+                        ? "Jednorázově · bez předplatného"
+                        : "One-time · no subscription"}
                     </Badge>
                   </div>
                   <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-                    {isCzech ? "Osobní Human Design Blueprint" : "Personal Human Design Blueprint"}
+                    {isCzech
+                      ? "Osobní Human Design Blueprint"
+                      : "Personal Human Design Blueprint"}
                   </h2>
                   <p className="mt-3 max-w-2xl text-muted-foreground">
                     {isCzech
@@ -294,12 +478,35 @@ export default function Pricing() {
 
                   <div className="mt-6 grid gap-3 sm:grid-cols-2">
                     {[
-                      { icon: FileText, text: isCzech ? "1 prémiový PDF report" : "1 premium PDF report" },
-                      { icon: Sparkles, text: isCzech ? "5 navazujících AI výkladů" : "5 follow-up AI readings" },
-                      { icon: Moon, text: isCzech ? "Luna a energie období" : "Moon and current energy" },
-                      { icon: Zap, text: isCzech ? "Praktické kroky pro práci a vztahy" : "Practical steps for work and relationships" },
+                      {
+                        icon: FileText,
+                        text: isCzech
+                          ? "1 prémiový PDF report"
+                          : "1 premium PDF report",
+                      },
+                      {
+                        icon: Sparkles,
+                        text: isCzech
+                          ? "5 navazujících AI výkladů"
+                          : "5 follow-up AI readings",
+                      },
+                      {
+                        icon: Moon,
+                        text: isCzech
+                          ? "Luna a energie období"
+                          : "Moon and current energy",
+                      },
+                      {
+                        icon: Zap,
+                        text: isCzech
+                          ? "Praktické kroky pro práci a vztahy"
+                          : "Practical steps for work and relationships",
+                      },
                     ].map(({ icon: Icon, text }) => (
-                      <div key={text} className="flex items-center gap-2 text-sm">
+                      <div
+                        key={text}
+                        className="flex items-center gap-2 text-sm"
+                      >
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
                           <Icon className="h-4 w-4" />
                         </span>
@@ -311,27 +518,52 @@ export default function Pricing() {
                   <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50/70 p-4 transition-colors hover:bg-rose-50 dark:border-rose-900/50 dark:bg-rose-950/20">
                     <Checkbox
                       checked={includePartnerAddon}
-                      onCheckedChange={(checked) => setIncludePartnerAddon(checked === true)}
-                      aria-label={isCzech ? "Přidat partnerský Blueprint" : "Add Partner Blueprint"}
+                      onCheckedChange={checked =>
+                        setIncludePartnerAddon(checked === true)
+                      }
+                      aria-label={
+                        isCzech
+                          ? "Přidat partnerský Blueprint"
+                          : "Add Partner Blueprint"
+                      }
                       className="mt-0.5"
                     />
                     <span className="flex-1">
                       <span className="flex flex-wrap items-center gap-2 font-medium">
                         <Heart className="h-4 w-4 text-rose-500" />
-                        {isCzech ? "Přidat partnerský Blueprint" : "Add Partner Blueprint"}
-                        <Badge variant="outline" className="border-rose-300 text-rose-700 dark:text-rose-300">+ {isCzech ? "190 Kč" : "€7.90"}</Badge>
+                        {isCzech
+                          ? "Přidat partnerský Blueprint"
+                          : "Add Partner Blueprint"}
+                        <Badge
+                          variant="outline"
+                          className="border-rose-300 text-rose-700 dark:text-rose-300"
+                        >
+                          + {isCzech ? "190 Kč" : "€7.90"}
+                        </Badge>
                       </span>
                       <span className="mt-1 block text-xs text-muted-foreground">
-                        {isCzech ? "Druhý PDF report a dalších 5 AI výkladů pro partnera nebo dítě." : "A second PDF report and 5 more AI readings for a partner or child."}
+                        {isCzech
+                          ? "Druhý PDF report a dalších 5 AI výkladů pro partnera nebo dítě."
+                          : "A second PDF report and 5 more AI readings for a partner or child."}
                       </span>
                     </span>
                   </label>
 
                   <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <div className="text-3xl font-bold">{isCzech ? (includePartnerAddon ? "580 Kč" : "390 Kč") : (includePartnerAddon ? "€23.80" : "€15.90")}</div>
+                      <div className="text-3xl font-bold">
+                        {isCzech
+                          ? includePartnerAddon
+                            ? "580 Kč"
+                            : "390 Kč"
+                          : includePartnerAddon
+                            ? "€23.80"
+                            : "€15.90"}
+                      </div>
                       <div className="text-xs text-muted-foreground">
-                        {isCzech ? "Do 48 hodin lze cenu Blueprintu započíst do ročního Premium." : "Apply the Blueprint price toward Annual Premium within 48 hours."}
+                        {isCzech
+                          ? "Do 48 hodin lze cenu Blueprintu započíst do ročního Premium."
+                          : "Apply the Blueprint price toward Annual Premium within 48 hours."}
                       </div>
                     </div>
                     <Button
@@ -341,7 +573,9 @@ export default function Pricing() {
                       onClick={() => handleCheckout("blueprint")}
                     >
                       <Moon className="mr-2 h-4 w-4" />
-                      {isCzech ? "Odemknout můj Blueprint" : "Unlock my Blueprint"}
+                      {isCzech
+                        ? "Odemknout můj Blueprint"
+                        : "Unlock my Blueprint"}
                     </Button>
                   </div>
                 </CardContent>
@@ -353,10 +587,16 @@ export default function Pricing() {
               <Card className="border-border/50 bg-card/50">
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between mb-2">
-                    <Badge variant="outline" className="text-muted-foreground">{p.freePlan}</Badge>
+                    <Badge variant="outline" className="text-muted-foreground">
+                      {p.freePlan}
+                    </Badge>
                   </div>
-                  <CardTitle className="text-2xl">0 {isCzech ? "Kč" : "€"}</CardTitle>
-                  <CardDescription>{isCzech ? "Navždy zdarma" : "Forever free"}</CardDescription>
+                  <CardTitle className="text-2xl">
+                    0 {isCzech ? "Kč" : "€"}
+                  </CardTitle>
+                  <CardDescription>
+                    {isCzech ? "Navždy zdarma" : "Forever free"}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {freeFeatures.map((f, i) => (
@@ -369,9 +609,15 @@ export default function Pricing() {
                     variant="outline"
                     className="w-full mt-4"
                     disabled={!user || isPremium === false}
-                    onClick={() => !user && (window.location.href = getLoginUrl())}
+                    onClick={() =>
+                      !user && (window.location.href = getLoginUrl())
+                    }
                   >
-                    {!user ? p.startFree : (isCzech ? "Váš aktuální plán" : "Your current plan")}
+                    {!user
+                      ? p.startFree
+                      : isCzech
+                        ? "Váš aktuální plán"
+                        : "Your current plan"}
                   </Button>
                 </CardContent>
               </Card>
@@ -386,13 +632,19 @@ export default function Pricing() {
                 </div>
                 <CardHeader className="pb-4 pt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <Badge className="bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30">{p.monthlyPlan}</Badge>
+                    <Badge className="bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30">
+                      {p.monthlyPlan}
+                    </Badge>
                   </div>
                   <CardTitle className="text-2xl">
                     {isCzech ? "188 Kč" : "€7.49"}
-                    <span className="text-sm font-normal text-muted-foreground ml-1">{p.perMonth}</span>
+                    <span className="text-sm font-normal text-muted-foreground ml-1">
+                      {p.perMonth}
+                    </span>
                   </CardTitle>
-                  <CardDescription>{isCzech ? "Zrušte kdykoli" : "Cancel anytime"}</CardDescription>
+                  <CardDescription>
+                    {isCzech ? "Zrušte kdykoli" : "Cancel anytime"}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {premiumFeatures.map((f, i) => (
@@ -421,15 +673,25 @@ export default function Pricing() {
                 </div>
                 <CardHeader className="pb-4 pt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <Badge className="bg-violet-500/20 text-violet-300 border-violet-500/30">{p.annualPlan}</Badge>
-                    <Badge variant="outline" className="text-green-400 border-green-500/30 text-xs">Ušetříte 47 %</Badge>
+                    <Badge className="bg-violet-500/20 text-violet-300 border-violet-500/30">
+                      {p.annualPlan}
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="text-green-400 border-green-500/30 text-xs"
+                    >
+                      Ušetříte 47 %
+                    </Badge>
                   </div>
                   <CardTitle className="text-2xl">
                     {isCzech ? "1 188 Kč" : "€47"}
-                    <span className="text-sm font-normal text-muted-foreground ml-1">{p.perYear}</span>
+                    <span className="text-sm font-normal text-muted-foreground ml-1">
+                      {p.perYear}
+                    </span>
                   </CardTitle>
                   <CardDescription>
-                    {isCzech ? "≈ 99 Kč/měsíc · " : "≈ €3.91/month · "}{p.billedAnnually}
+                    {isCzech ? "≈ 99 Kč/měsíc · " : "≈ €3.91/month · "}
+                    {p.billedAnnually}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -479,10 +741,17 @@ export default function Pricing() {
                   ))}
                   <Button
                     className="w-full mt-4 bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/30 shadow-lg border-none"
-                    disabled={createCheckout.isPending || (user && user.subscriptionPlan === "lifetime")}
+                    disabled={
+                      createCheckout.isPending ||
+                      (user && user.subscriptionPlan === "lifetime")
+                    }
                     onClick={() => handleCheckout("lifetime")}
                   >
-                    {user && user.subscriptionPlan === "lifetime" ? p.currentPlan : (isCzech ? "Získat Doživotně" : "Get Lifetime")}
+                    {user && user.subscriptionPlan === "lifetime"
+                      ? p.currentPlan
+                      : isCzech
+                        ? "Získat Doživotně"
+                        : "Get Lifetime"}
                   </Button>
                 </CardContent>
               </Card>
@@ -498,11 +767,16 @@ export default function Pricing() {
                   <div>
                     <div className="font-semibold flex items-center gap-2">
                       {p.creditPack}
-                      <Badge variant="outline" className="text-amber-400 border-amber-500/30 text-xs">
+                      <Badge
+                        variant="outline"
+                        className="text-amber-400 border-amber-500/30 text-xs"
+                      >
                         {isCzech ? "77 Kč" : "€2.99"}
                       </Badge>
                     </div>
-                    <div className="text-sm text-muted-foreground">{p.creditPackDesc}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {p.creditPackDesc}
+                    </div>
                   </div>
                 </div>
                 <Button
@@ -523,9 +797,17 @@ export default function Pricing() {
               </h2>
               <Accordion type="single" collapsible className="space-y-2">
                 {faqItems.map((item, i) => (
-                  <AccordionItem key={i} value={`faq-${i}`} className="border border-border/50 rounded-lg px-4">
-                    <AccordionTrigger className="text-sm font-medium">{item.q}</AccordionTrigger>
-                    <AccordionContent className="text-sm text-muted-foreground">{item.a}</AccordionContent>
+                  <AccordionItem
+                    key={i}
+                    value={`faq-${i}`}
+                    className="border border-border/50 rounded-lg px-4"
+                  >
+                    <AccordionTrigger className="text-sm font-medium">
+                      {item.q}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-muted-foreground">
+                      {item.a}
+                    </AccordionContent>
                   </AccordionItem>
                 ))}
               </Accordion>
@@ -550,37 +832,71 @@ export default function Pricing() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label className="text-sm mb-1 block">{p.recipientEmail}</Label>
+                      <Label className="text-sm mb-1 block">
+                        {p.recipientEmail}
+                      </Label>
                       <Input
                         type="email"
                         placeholder="jan@example.cz"
                         value={giftForm.recipientEmail}
-                        onChange={e => setGiftForm(f => ({ ...f, recipientEmail: e.target.value }))}
+                        onChange={e =>
+                          setGiftForm(f => ({
+                            ...f,
+                            recipientEmail: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                     <div>
-                      <Label className="text-sm mb-1 block">{p.recipientName}</Label>
+                      <Label className="text-sm mb-1 block">
+                        {p.recipientName}
+                      </Label>
                       <Input
-                        placeholder={isCzech ? "Jméno příjemce" : "Recipient name"}
+                        placeholder={
+                          isCzech ? "Jméno příjemce" : "Recipient name"
+                        }
                         value={giftForm.recipientName}
-                        onChange={e => setGiftForm(f => ({ ...f, recipientName: e.target.value }))}
+                        onChange={e =>
+                          setGiftForm(f => ({
+                            ...f,
+                            recipientName: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                     <div>
-                      <Label className="text-sm mb-1 block">{p.senderName}</Label>
+                      <Label className="text-sm mb-1 block">
+                        {p.senderName}
+                      </Label>
                       <Input
                         placeholder={isCzech ? "Vaše jméno" : "Your name"}
                         value={giftForm.senderName}
-                        onChange={e => setGiftForm(f => ({ ...f, senderName: e.target.value }))}
+                        onChange={e =>
+                          setGiftForm(f => ({
+                            ...f,
+                            senderName: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                   </div>
                   <div>
-                    <Label className="text-sm mb-1 block">{p.personalMessage}</Label>
+                    <Label className="text-sm mb-1 block">
+                      {p.personalMessage}
+                    </Label>
                     <Textarea
-                      placeholder={isCzech ? "Napište osobní zprávu..." : "Write a personal message..."}
+                      placeholder={
+                        isCzech
+                          ? "Napište osobní zprávu..."
+                          : "Write a personal message..."
+                      }
                       value={giftForm.personalMessage}
-                      onChange={e => setGiftForm(f => ({ ...f, personalMessage: e.target.value }))}
+                      onChange={e =>
+                        setGiftForm(f => ({
+                          ...f,
+                          personalMessage: e.target.value,
+                        }))
+                      }
                       rows={3}
                     />
                   </div>
@@ -593,7 +909,9 @@ export default function Pricing() {
                     >
                       <Gift className="w-4 h-4 mr-2" />
                       {p.giftMonthly}
-                      <span className="ml-auto text-xs opacity-70">{isCzech ? "188 Kč" : "€7.49"}</span>
+                      <span className="ml-auto text-xs opacity-70">
+                        {isCzech ? "188 Kč" : "€7.49"}
+                      </span>
                     </Button>
                     <Button
                       className="bg-pink-600 hover:bg-pink-700 text-white"
@@ -602,7 +920,9 @@ export default function Pricing() {
                     >
                       <Gift className="w-4 h-4 mr-2" />
                       {p.giftAnnual}
-                      <span className="ml-auto text-xs opacity-70">{isCzech ? "1 188 Kč" : "€47"}</span>
+                      <span className="ml-auto text-xs opacity-70">
+                        {isCzech ? "1 188 Kč" : "€47"}
+                      </span>
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground text-center">
@@ -627,18 +947,24 @@ export default function Pricing() {
                     <div>
                       <CardTitle>{p.redeemVoucher}</CardTitle>
                       <CardDescription>
-                        {isCzech ? "Zadejte kód poukazu pro aktivaci Premium" : "Enter your voucher code to activate Premium"}
+                        {isCzech
+                          ? "Zadejte kód poukazu pro aktivaci Premium"
+                          : "Enter your voucher code to activate Premium"}
                       </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label className="text-sm mb-1 block">{p.voucherCode}</Label>
+                    <Label className="text-sm mb-1 block">
+                      {p.voucherCode}
+                    </Label>
                     <Input
                       placeholder="HD-XXXX-XXXX-XXXX-XXXX"
                       value={voucherCode}
-                      onChange={e => setVoucherCode(e.target.value.toUpperCase())}
+                      onChange={e =>
+                        setVoucherCode(e.target.value.toUpperCase())
+                      }
                       className="font-mono tracking-wider"
                     />
                   </div>
@@ -648,7 +974,9 @@ export default function Pricing() {
                     onClick={handleRedeem}
                   >
                     {redeemVoucher.isPending
-                      ? (isCzech ? "Uplatňuji..." : "Redeeming...")
+                      ? isCzech
+                        ? "Uplatňuji..."
+                        : "Redeeming..."
                       : p.redeemCode}
                   </Button>
                   {!user && (

@@ -40,8 +40,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: 'Cormorant Garamond', ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
 }
 
 :root {
@@ -63,7 +63,7 @@
   --accent-foreground: oklch(0.25 0.03 280);
   --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.90 0.01 280);
+  --border: oklch(0.9 0.01 280);
   --input: oklch(0.92 0.01 280);
   --ring: oklch(0.55 0.22 300);
   --chart-1: oklch(0.55 0.22 300);
@@ -77,7 +77,7 @@
   --sidebar-primary-foreground: oklch(0.99 0 0);
   --sidebar-accent: oklch(0.94 0.02 300);
   --sidebar-accent-foreground: oklch(0.25 0.03 280);
-  --sidebar-border: oklch(0.90 0.01 280);
+  --sidebar-border: oklch(0.9 0.01 280);
   --sidebar-ring: oklch(0.55 0.22 300);
 
   /* HD-specific colors */
@@ -205,35 +205,54 @@
 
   /* Soft gradient backgrounds for light theme */
   .bg-cosmic {
-    background: linear-gradient(135deg, oklch(0.97 0.01 300), oklch(0.99 0.005 280), oklch(0.96 0.015 260));
+    background: linear-gradient(
+      135deg,
+      oklch(0.97 0.01 300),
+      oklch(0.99 0.005 280),
+      oklch(0.96 0.015 260)
+    );
   }
 
   .bg-cosmic-card {
     background: oklch(1 0 0);
-    border: 1px solid oklch(0.90 0.01 280);
-    box-shadow: 0 1px 3px oklch(0 0 0 / 4%), 0 4px 12px oklch(0 0 0 / 3%);
+    border: 1px solid oklch(0.9 0.01 280);
+    box-shadow:
+      0 1px 3px oklch(0 0 0 / 4%),
+      0 4px 12px oklch(0 0 0 / 3%);
   }
 
   .text-gradient-gold {
-    background: linear-gradient(135deg, oklch(0.65 0.18 80), oklch(0.55 0.2 60));
+    background: linear-gradient(
+      135deg,
+      oklch(0.65 0.18 80),
+      oklch(0.55 0.2 60)
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .text-gradient-purple {
-    background: linear-gradient(135deg, oklch(0.55 0.22 300), oklch(0.45 0.25 280));
+    background: linear-gradient(
+      135deg,
+      oklch(0.55 0.22 300),
+      oklch(0.45 0.25 280)
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .glow-purple {
-    box-shadow: 0 4px 20px oklch(0.55 0.22 300 / 15%), 0 0 40px oklch(0.55 0.22 300 / 8%);
+    box-shadow:
+      0 4px 20px oklch(0.55 0.22 300 / 15%),
+      0 0 40px oklch(0.55 0.22 300 / 8%);
   }
 
   .glow-gold {
-    box-shadow: 0 4px 20px oklch(0.7 0.15 80 / 15%), 0 0 40px oklch(0.7 0.15 80 / 8%);
+    box-shadow:
+      0 4px 20px oklch(0.7 0.15 80 / 15%),
+      0 0 40px oklch(0.7 0.15 80 / 8%);
   }
 
   /* Smooth page transitions */
@@ -243,7 +262,9 @@
 
   /* Subtle hover lift for cards */
   .hover-lift {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
   .hover-lift:hover {
@@ -263,13 +284,20 @@
   }
 
   .gradient-border::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, oklch(0.55 0.22 300), oklch(0.45 0.25 280), oklch(0.7 0.15 80));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    background: linear-gradient(
+      135deg,
+      oklch(0.55 0.22 300),
+      oklch(0.45 0.25 280),
+      oklch(0.7 0.15 80)
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
@@ -277,8 +305,11 @@
 
   /* Subtle decorative dots for light theme */
   .bg-dots {
-    background-image:
-      radial-gradient(circle at 1px 1px, oklch(0.55 0.22 300 / 6%) 1px, transparent 0);
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      oklch(0.55 0.22 300 / 6%) 1px,
+      transparent 0
+    );
     background-size: 32px 32px;
   }
 
@@ -293,7 +324,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: oklch(0.80 0.02 300);
+    background: oklch(0.8 0.02 300);
     border-radius: 3px;
   }
 
@@ -329,14 +360,15 @@
 }
 
 @keyframes pulseGlow {
-
   0%,
   100% {
     box-shadow: 0 2px 10px oklch(0.55 0.22 300 / 12%);
   }
 
   50% {
-    box-shadow: 0 4px 25px oklch(0.55 0.22 300 / 25%), 0 0 40px oklch(0.55 0.22 300 / 10%);
+    box-shadow:
+      0 4px 25px oklch(0.55 0.22 300 / 25%),
+      0 0 40px oklch(0.55 0.22 300 / 10%);
   }
 }
 
@@ -400,7 +432,6 @@
 }
 
 @keyframes orbPulse {
-
   0%,
   100% {
     opacity: 0.55;
@@ -412,23 +443,32 @@
 }
 
 .hero-orb-1 {
-  animation: orbFloat1 18s ease-in-out infinite, orbPulse 6s ease-in-out infinite;
+  animation:
+    orbFloat1 18s ease-in-out infinite,
+    orbPulse 6s ease-in-out infinite;
 }
 
 .hero-orb-2 {
-  animation: orbFloat2 22s ease-in-out infinite, orbPulse 8s ease-in-out 2s infinite;
+  animation:
+    orbFloat2 22s ease-in-out infinite,
+    orbPulse 8s ease-in-out 2s infinite;
 }
 
 .hero-orb-3 {
-  animation: orbFloat3 28s linear infinite, orbPulse 10s ease-in-out 4s infinite;
+  animation:
+    orbFloat3 28s linear infinite,
+    orbPulse 10s ease-in-out 4s infinite;
 }
 
 .hero-orb-4 {
-  animation: orbFloat1 15s ease-in-out 3s infinite reverse, orbPulse 7s ease-in-out 1s infinite;
+  animation:
+    orbFloat1 15s ease-in-out 3s infinite reverse,
+    orbPulse 7s ease-in-out 1s infinite;
 }
 
 @keyframes heroColorBreathe {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.34;
     transform: scale(0.98);
   }
@@ -439,15 +479,20 @@
 }
 
 @keyframes heroSacredPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.42;
     transform: scale(0.96) rotate(0deg);
-    box-shadow: 0 0 18px rgba(139, 92, 246, 0.08), inset 0 0 20px rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 0 18px rgba(139, 92, 246, 0.08),
+      inset 0 0 20px rgba(255, 255, 255, 0.08);
   }
   50% {
     opacity: 0.9;
     transform: scale(1.035) rotate(180deg);
-    box-shadow: 0 0 48px rgba(139, 92, 246, 0.22), inset 0 0 34px rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 0 48px rgba(139, 92, 246, 0.22),
+      inset 0 0 34px rgba(255, 255, 255, 0.2);
   }
   100% {
     transform: scale(0.96) rotate(360deg);
@@ -455,29 +500,184 @@
 }
 
 @keyframes heroHeartbeat {
-  0%, 44%, 100% { opacity: 0.2; transform: scale(0.75); }
-  50% { opacity: 0.58; transform: scale(1.25); }
-  58% { opacity: 0.32; transform: scale(0.95); }
-  66% { opacity: 0.52; transform: scale(1.13); }
+  0%,
+  44%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.75);
+  }
+  50% {
+    opacity: 0.58;
+    transform: scale(1.25);
+  }
+  58% {
+    opacity: 0.32;
+    transform: scale(0.95);
+  }
+  66% {
+    opacity: 0.52;
+    transform: scale(1.13);
+  }
 }
 
 .hero-color-breathe {
   background:
-    radial-gradient(circle at 34% 32%, rgba(139, 92, 246, 0.36), transparent 38%),
-    radial-gradient(circle at 68% 66%, rgba(250, 204, 21, 0.28), transparent 42%),
+    radial-gradient(
+      circle at 34% 32%,
+      rgba(139, 92, 246, 0.36),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 68% 66%,
+      rgba(250, 204, 21, 0.28),
+      transparent 42%
+    ),
     radial-gradient(circle at 58% 38%, rgba(45, 212, 191, 0.2), transparent 34%);
   animation: heroColorBreathe 8s ease-in-out infinite;
   transform-origin: center;
   will-change: transform, opacity;
 }
 
-.hero-sacred-pulse-1 { animation: heroSacredPulse 18s ease-in-out infinite; }
-.hero-sacred-pulse-2 { animation: heroSacredPulse 14s ease-in-out 1.5s infinite reverse; }
-.hero-sacred-pulse-3 { animation: heroSacredPulse 10s ease-in-out 0.75s infinite; }
-.hero-heartbeat { animation: heroHeartbeat 5.5s ease-in-out infinite; }
+.hero-sacred-pulse-1 {
+  animation: heroSacredPulse 18s ease-in-out infinite;
+}
+.hero-sacred-pulse-2 {
+  animation: heroSacredPulse 14s ease-in-out 1.5s infinite reverse;
+}
+.hero-sacred-pulse-3 {
+  animation: heroSacredPulse 10s ease-in-out 0.75s infinite;
+}
+.hero-heartbeat {
+  animation: heroHeartbeat 5.5s ease-in-out infinite;
+}
+
+/* Nexus field: living network rendered with composited CSS layers. */
+.hero-nexus-field {
+  overflow: hidden;
+  perspective: 900px;
+  mix-blend-mode: multiply;
+}
+.hero-nexus-aurora,
+.hero-nexus-mesh,
+.hero-nexus-ring,
+.hero-nexus-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  will-change: transform, opacity;
+}
+.hero-nexus-aurora {
+  width: min(92vw, 980px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 40deg,
+    transparent 0 9%,
+    rgba(139, 92, 246, 0.22) 14%,
+    transparent 24% 41%,
+    rgba(20, 184, 166, 0.18) 48%,
+    transparent 59% 76%,
+    rgba(245, 158, 11, 0.17) 84%,
+    transparent 94%
+  );
+  filter: blur(20px);
+  animation: nexusOrbit 34s linear infinite;
+}
+.hero-nexus-mesh {
+  width: min(82vw, 820px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(
+      from 0deg,
+      rgba(124, 58, 237, 0.16) 0 1deg,
+      transparent 1deg 18deg
+    ),
+    repeating-radial-gradient(
+      circle,
+      transparent 0 54px,
+      rgba(124, 58, 237, 0.12) 55px 56px
+    );
+  -webkit-mask-image: radial-gradient(circle, #000 0 53%, transparent 76%);
+  mask-image: radial-gradient(circle, #000 0 53%, transparent 76%);
+  animation:
+    nexusOrbit 46s linear infinite reverse,
+    nexusBreathe 7s ease-in-out infinite;
+}
+.hero-nexus-ring {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(124, 58, 237, 0.28);
+  box-shadow:
+    0 0 40px rgba(124, 58, 237, 0.12),
+    inset 0 0 34px rgba(250, 204, 21, 0.08);
+}
+.hero-nexus-ring-outer {
+  width: min(66vw, 650px);
+  animation: nexusTilt 16s ease-in-out infinite;
+}
+.hero-nexus-ring-inner {
+  width: min(42vw, 410px);
+  border-color: rgba(13, 148, 136, 0.25);
+  animation: nexusTilt 12s ease-in-out 1s infinite reverse;
+}
+.hero-nexus-core {
+  width: 110px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.88),
+    rgba(196, 181, 253, 0.3) 35%,
+    transparent 70%
+  );
+  filter: blur(5px);
+  animation: nexusCore 4.8s ease-in-out infinite;
+}
+@keyframes nexusOrbit {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.96);
+  }
+  50% {
+    opacity: 0.92;
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg) scale(0.96);
+  }
+}
+@keyframes nexusBreathe {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+@keyframes nexusTilt {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotateX(62deg) rotateZ(-8deg) scale(0.92);
+    opacity: 0.42;
+  }
+  50% {
+    transform: translate(-50%, -50%) rotateX(54deg) rotateZ(12deg) scale(1.08);
+    opacity: 0.82;
+  }
+}
+@keyframes nexusCore {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(0.72);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.25);
+    opacity: 0.8;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
-
   .hero-orb-1,
   .hero-orb-2,
   .hero-orb-3,
@@ -487,6 +687,10 @@
   .hero-sacred-pulse-2,
   .hero-sacred-pulse-3,
   .hero-heartbeat,
+  .hero-nexus-aurora,
+  .hero-nexus-mesh,
+  .hero-nexus-ring,
+  .hero-nexus-core,
   .animate-ambient-pan {
     animation: none;
   }
@@ -521,26 +725,44 @@
   will-change: transform;
 }
 
-
 /* ── Mystical Design System ─────────────────────────────────────────────── */
 
 /* Sacred geometry background pattern */
 .bg-sacred-geometry {
   background-image:
-    radial-gradient(circle at 50% 50%, oklch(0.55 0.22 300 / 3%) 0%, transparent 50%),
-    radial-gradient(circle at 20% 80%, oklch(0.7 0.15 80 / 4%) 0%, transparent 40%),
-    radial-gradient(circle at 80% 20%, oklch(0.55 0.18 200 / 3%) 0%, transparent 40%);
+    radial-gradient(
+      circle at 50% 50%,
+      oklch(0.55 0.22 300 / 3%) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 20% 80%,
+      oklch(0.7 0.15 80 / 4%) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      oklch(0.55 0.18 200 / 3%) 0%,
+      transparent 40%
+    );
 }
 
 /* Mystical section divider — golden line with center diamond */
 .mystical-divider {
   position: relative;
   height: 1px;
-  background: linear-gradient(90deg, transparent, oklch(0.7 0.15 80 / 30%), oklch(0.55 0.22 300 / 40%), oklch(0.7 0.15 80 / 30%), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(0.7 0.15 80 / 30%),
+    oklch(0.55 0.22 300 / 40%),
+    oklch(0.7 0.15 80 / 30%),
+    transparent
+  );
 }
 
 .mystical-divider::after {
-  content: '◇';
+  content: "◇";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -568,10 +790,15 @@
 }
 
 .btn-mystical::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 30%, oklch(1 0 0 / 15%) 50%, transparent 70%);
+  background: linear-gradient(
+    90deg,
+    transparent 30%,
+    oklch(1 0 0 / 15%) 50%,
+    transparent 70%
+  );
   background-size: 200% 100%;
   animation: shimmer 3s ease-in-out infinite;
   pointer-events: none;
@@ -579,7 +806,9 @@
 
 /* Ethereal glow for cards on hover */
 .card-mystical {
-  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+  transition:
+    box-shadow 0.4s ease,
+    border-color 0.4s ease;
 }
 
 .card-mystical:hover {
@@ -592,7 +821,6 @@
 
 /* Mystical star sparkle decoration */
 @keyframes sparkle {
-
   0%,
   100% {
     opacity: 0;
@@ -611,27 +839,42 @@
 
 /* Golden accent line under headings */
 .heading-mystical::after {
-  content: '';
+  content: "";
   display: block;
   width: 60px;
   height: 2px;
   margin-top: 12px;
-  background: linear-gradient(90deg, oklch(0.7 0.15 80), oklch(0.55 0.22 300), transparent);
+  background: linear-gradient(
+    90deg,
+    oklch(0.7 0.15 80),
+    oklch(0.55 0.22 300),
+    transparent
+  );
   border-radius: 1px;
 }
 
 /* Navbar mystical bottom glow */
 .navbar-mystical {
-  border-bottom: 1px solid oklch(0.90 0.01 280);
-  box-shadow: 0 1px 0 0 oklch(0.7 0.15 80 / 8%), 0 4px 12px oklch(0.55 0.22 300 / 3%);
+  border-bottom: 1px solid oklch(0.9 0.01 280);
+  box-shadow:
+    0 1px 0 0 oklch(0.7 0.15 80 / 8%),
+    0 4px 12px oklch(0.55 0.22 300 / 3%);
 }
 
 /* Footer mystical top border */
 .footer-mystical {
   border-top: 1px solid oklch(0.7 0.15 80 / 20%);
   background:
-    linear-gradient(180deg, oklch(0.97 0.01 300 / 50%) 0%, oklch(0.99 0.002 280) 100%),
-    radial-gradient(ellipse at 50% 0%, oklch(0.55 0.22 300 / 5%) 0%, transparent 60%);
+    linear-gradient(
+      180deg,
+      oklch(0.97 0.01 300 / 50%) 0%,
+      oklch(0.99 0.002 280) 100%
+    ),
+    radial-gradient(
+      ellipse at 50% 0%,
+      oklch(0.55 0.22 300 / 5%) 0%,
+      transparent 60%
+    );
 }
 
 /* Seamless partner-project loop under the desktop footer. */
@@ -707,28 +950,50 @@
 /* Ethereal section background */
 .bg-ethereal {
   background:
-    radial-gradient(ellipse at 30% 20%, oklch(0.55 0.22 300 / 4%) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 80%, oklch(0.7 0.15 80 / 3%) 0%, transparent 50%),
+    radial-gradient(
+      ellipse at 30% 20%,
+      oklch(0.55 0.22 300 / 4%) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 70% 80%,
+      oklch(0.7 0.15 80 / 3%) 0%,
+      transparent 50%
+    ),
     oklch(0.99 0.002 280);
 }
 
 /* Dark mode overrides for mystical utilities */
 .dark .navbar-mystical {
   border-bottom: 1px solid oklch(0.28 0.03 280);
-  box-shadow: 0 1px 0 0 oklch(0.72 0.18 300 / 10%), 0 4px 12px oklch(0.13 0.02 280 / 40%);
+  box-shadow:
+    0 1px 0 0 oklch(0.72 0.18 300 / 10%),
+    0 4px 12px oklch(0.13 0.02 280 / 40%);
 }
 
 .dark .footer-mystical {
   border-top: 1px solid oklch(0.72 0.18 300 / 20%);
   background:
     linear-gradient(180deg, oklch(0.15 0.02 280) 0%, oklch(0.13 0.02 280) 100%),
-    radial-gradient(ellipse at 50% 0%, oklch(0.72 0.18 300 / 8%) 0%, transparent 60%);
+    radial-gradient(
+      ellipse at 50% 0%,
+      oklch(0.72 0.18 300 / 8%) 0%,
+      transparent 60%
+    );
 }
 
 .dark .bg-ethereal {
   background:
-    radial-gradient(ellipse at 30% 20%, oklch(0.72 0.18 300 / 6%) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 80%, oklch(0.75 0.15 80 / 4%) 0%, transparent 50%),
+    radial-gradient(
+      ellipse at 30% 20%,
+      oklch(0.72 0.18 300 / 6%) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 70% 80%,
+      oklch(0.75 0.15 80 / 4%) 0%,
+      transparent 50%
+    ),
     oklch(0.13 0.02 280);
 }
 
@@ -752,7 +1017,6 @@
 
 /* Sacred Geometry Pulse Animations */
 @keyframes sacredRingPulse1 {
-
   0%,
   100% {
     stroke-opacity: 0.12;
@@ -764,19 +1028,17 @@
 }
 
 @keyframes sacredRingPulse2 {
-
   0%,
   100% {
     stroke-opacity: 0.08;
   }
 
   50% {
-    stroke-opacity: 0.40;
+    stroke-opacity: 0.4;
   }
 }
 
 @keyframes sacredRingPulse3 {
-
   0%,
   100% {
     stroke-opacity: 0.05;
@@ -788,10 +1050,9 @@
 }
 
 @keyframes sacredCrossLinePulse {
-
   0%,
   100% {
-    stroke-opacity: 0.10;
+    stroke-opacity: 0.1;
   }
 
   50% {
@@ -800,7 +1061,6 @@
 }
 
 @keyframes sacredGlowBreathe {
-
   0%,
   100% {
     opacity: 0.03;
@@ -865,7 +1125,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .sacred-ring-1,
   .sacred-ring-2,
   .sacred-ring-3,
@@ -879,7 +1138,6 @@
 
 /* ─── Notification Bell wiggle ───────────────────────────────────────────── */
 @keyframes wiggle {
-
   0%,
   100% {
     transform: rotate(0deg);
@@ -914,58 +1172,70 @@
 @keyframes ambientGlow {
   0% {
     opacity: 0.35;
-    box-shadow: inset 0 0 40px 8px rgba(139, 92, 246, 0.25), inset 0 0 80px 20px rgba(139, 92, 246, 0.08);
+    box-shadow:
+      inset 0 0 40px 8px rgba(139, 92, 246, 0.25),
+      inset 0 0 80px 20px rgba(139, 92, 246, 0.08);
   }
 
   25% {
     opacity: 0.55;
-    box-shadow: inset 0 0 50px 12px rgba(192, 132, 252, 0.30), inset 0 0 100px 30px rgba(251, 191, 36, 0.06);
+    box-shadow:
+      inset 0 0 50px 12px rgba(192, 132, 252, 0.3),
+      inset 0 0 100px 30px rgba(251, 191, 36, 0.06);
   }
 
   50% {
     opacity: 0.45;
-    box-shadow: inset 0 0 60px 15px rgba(99, 102, 241, 0.28), inset 0 0 120px 40px rgba(139, 92, 246, 0.10);
+    box-shadow:
+      inset 0 0 60px 15px rgba(99, 102, 241, 0.28),
+      inset 0 0 120px 40px rgba(139, 92, 246, 0.1);
   }
 
   75% {
     opacity: 0.55;
-    box-shadow: inset 0 0 50px 12px rgba(167, 139, 250, 0.32), inset 0 0 100px 30px rgba(251, 191, 36, 0.07);
+    box-shadow:
+      inset 0 0 50px 12px rgba(167, 139, 250, 0.32),
+      inset 0 0 100px 30px rgba(251, 191, 36, 0.07);
   }
 
   100% {
     opacity: 0.35;
-    box-shadow: inset 0 0 40px 8px rgba(139, 92, 246, 0.25), inset 0 0 80px 20px rgba(139, 92, 246, 0.08);
+    box-shadow:
+      inset 0 0 40px 8px rgba(139, 92, 246, 0.25),
+      inset 0 0 80px 20px rgba(139, 92, 246, 0.08);
   }
 }
 
 @keyframes ambientBorderPulse {
   0% {
-    border-color: rgba(139, 92, 246, 0.20);
+    border-color: rgba(139, 92, 246, 0.2);
   }
 
   33% {
-    border-color: rgba(192, 132, 252, 0.40);
+    border-color: rgba(192, 132, 252, 0.4);
   }
 
   66% {
-    border-color: rgba(251, 191, 36, 0.20);
+    border-color: rgba(251, 191, 36, 0.2);
   }
 
   100% {
-    border-color: rgba(139, 92, 246, 0.20);
+    border-color: rgba(139, 92, 246, 0.2);
   }
 }
 
 @media (max-width: 639px) {
   body::before {
-    content: '';
+    content: "";
     position: fixed;
     inset: 0;
     z-index: 9999;
     pointer-events: none;
-    border: 2px solid rgba(139, 92, 246, 0.20);
+    border: 2px solid rgba(139, 92, 246, 0.2);
     border-radius: 0;
-    animation: ambientGlow 6s ease-in-out infinite, ambientBorderPulse 8s ease-in-out infinite;
+    animation:
+      ambientGlow 6s ease-in-out infinite,
+      ambientBorderPulse 8s ease-in-out infinite;
   }
 }
 

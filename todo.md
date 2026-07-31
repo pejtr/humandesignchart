@@ -1,12 +1,25 @@
 # Human Design App - TODO
 
+> Poslední aktualizace: 31. 7. 2026. Exekuční priority P0–P3 jsou udržované v [README.md](README.md#prioritní-todo). Tento soubor zůstává detailním produktovým backlogem.
+
+## Aktuální release
+
+- [x] Marie jako lidská AI průvodkyně napříč webem a plánovačem
+- [x] Odlišná editorial fotografie Marie na landing page
+- [x] Živé Nexus hero pozadí s podporou omezení pohybu
+- [x] Automatický nekonečný pás dalších projektů bez scrollbaru
+- [x] Opravené náhledy Katastr Online a Čajovny Praha
+- [ ] Produkční vizuální QA po Railway deploymentu
+
 ## Core Infrastructure
+
 - [x] Database schema (users, charts, aiReadings, celebrities)
 - [x] Design system (dark cosmic theme, fonts, colors)
 - [x] Global layout with Navbar and Footer
 - [x] Route setup with lazy loading
 
 ## Chart Calculation Engine
+
 - [x] Astronomia ephemeris integration for planetary positions
 - [x] Gate calculation from planetary longitude (I Ching wheel mapping)
 - [x] Line, Color, Tone, Base calculation
@@ -22,6 +35,7 @@
 - [x] Verified against reference data (Ra Uru Hu, Einstein)
 
 ## Interactive Bodygraph Visualization
+
 - [x] SVG Bodygraph with all 9 centers (proper shapes)
 - [x] All 36 channels rendered
 - [x] All 64 gates with activation indicators
@@ -32,18 +46,21 @@
 - [x] Responsive design for mobile and desktop
 
 ## Birth Data Input & Chart Generation
+
 - [x] Birth date, time, and location input form
 - [x] Location search via Nominatim geocoding
 - [x] Timezone estimation from longitude
 - [x] Chart generation and display
 
 ## Landing Page
+
 - [x] Hero section with premium design
 - [x] Features showcase grid
 - [x] Five types section
 - [x] CTA for chart generation
 
 ## Chart Results Page
+
 - [x] Full Bodygraph visualization
 - [x] Type, Strategy, Authority, Profile display
 - [x] Definition type display
@@ -57,6 +74,7 @@
 - [x] Gate detail modal with I Ching hexagram
 
 ## Detailed HD Content Descriptions
+
 - [x] Content data file created (shared/hdContent.ts)
 - [x] Integrate content into chart results page
 - [x] Gate detail view with I Ching hexagram
@@ -67,6 +85,7 @@
 - [x] Authority detail view
 
 ## User Dashboard & Chart Management
+
 - [x] User authentication (Manus OAuth)
 - [x] Dashboard with saved charts overview
 - [x] Save charts with name and category
@@ -75,6 +94,7 @@
 - [x] Chart organization by category
 
 ## LLM-Powered Interpretations
+
 - [x] AI chart analysis with 9 reading types
 - [x] Deep insights about type, strategy, profile
 - [x] Gate and channel analysis
@@ -84,23 +104,27 @@
 - [x] AI readings saved to database
 
 ## Chart Comparison / Composite Charts
+
 - [x] Two-chart input forms
 - [x] Side-by-side Bodygraph display
 - [x] Electromagnetic connections detection
 - [x] Side-by-side comparison table
 
 ## Transit Features
+
 - [x] Current planetary transits calculation
 - [x] Transit gates display with planet symbols
 - [x] Transit overlay on user's natal chart
 - [ ] Daily transit notifications
 
 ## PDF Report Export
+
 - [x] Professional PDF layout with chart data
 - [ ] Bodygraph visualization in PDF
 - [x] Detailed element descriptions
 
 ## Advanced Features
+
 - [x] Celebrity chart database (20 celebrities)
 - [x] I Ching Oracle with all 64 hexagrams
 - [x] Return charts (Saturn, Chiron, Uranus, Solar) - ReturnChart page
@@ -108,6 +132,7 @@
 - [x] Multi-language support (i18n with /cs/ and /en/ subpath routing)
 
 ## Premium UI & Polish
+
 - [x] Dark cosmic premium theme
 - [x] Responsive design (mobile + desktop)
 - [x] Loading states
@@ -116,6 +141,7 @@
 - [x] Improved Bodygraph visual quality (unique center colors, glow effects, transit rendering)
 
 ## Czech Language Localization
+
 - [x] Create Czech translation file for all UI strings
 - [x] Translate Navbar, Footer, and layout components
 - [x] Translate Home/Landing page
@@ -130,15 +156,18 @@
 - [x] Translate AI reading prompts to generate Czech responses
 
 ## PDF Export
+
 - [x] Client-side PDF generation with jsPDF
 - [x] PDF layout with chart data (type, profile, authority, centers, channels, gates, variables)
 - [x] Download button on ChartResult page
 
 ## Transit Overlay
+
 - [x] Transit overlay on user's natal chart in Bodygraph
 - [x] Transit page with user chart selection and Bodygraph overlay
 
 ## Tests
+
 - [x] Calculator tests (9 tests - Ra Uru Hu, Einstein, types, planets, profiles, variables, design date, centers, cross)
 - [x] Auth logout test
 - [x] Transit calculation tests (3 tests)
@@ -147,6 +176,7 @@
 - [x] Transit line calculation bug fix (clamped to 1-6)
 
 ## Light Theme Redesign
+
 - [x] Switch entire theme from dark to light/white background
 - [x] Update CSS variables in index.css for light theme
 - [x] Update Navbar for light theme
@@ -156,14 +186,17 @@
 - [x] Update cosmic-card, cosmic bg classes for light theme
 
 ## Types Graphic Integration
+
 - [x] Upload types graphic to S3 (5 types version generated)
 - [x] Integrate graphic into Home page types section
 
 ## Czech Language Polish
+
 - [x] Review and improve all Czech translations for natural language
 - [x] Ensure humandesign.cz-style Czech terminology throughout
 
 ## Loading Animation Enhancement
+
 - [x] Make loading animation bigger and thematic with moving HD Bodygraph/mandala pattern (HDLoader)
 - [x] Create SVG type aura icons (TypeAuraIcon component)
 - [x] Use type icons on Celebrities page
@@ -171,6 +204,7 @@
 - [x] Add celebrity photo thumbnails from Wikipedia
 
 ## Premium HD Features Implementation
+
 - [x] Research top HD apps for feature list
 - [x] Return charts (Solar Return, Saturn Return, Chiron Return, Uranus Opposition)
 - [ ] Composite/Partnership charts (electromagnetic connections, compatibility)
@@ -181,6 +215,7 @@
 - [x] Environment guidance based on Variables (VariablesAnalysis page)
 
 ## Oprava angličtiny v ChartResult
+
 - [x] Přeložit popisy typů v hdContent.ts do češtiny (TYPE_DESCRIPTIONS)
 - [x] Přeložit popisy profilů v hdContent.ts do češtiny (PROFILE_DESCRIPTIONS)
 - [x] Přeložit popisy autorit v hdContent.ts do češtiny (AUTHORITY_DESCRIPTIONS)
@@ -191,6 +226,7 @@
 - [x] Přidat tlačítko pro stažení AI rozboru (.txt)
 
 ## Footer Partner Links
+
 - [x] Přidat sekci "Další projekty" do footeru s odkazy: cajovny-praha.cz, katastr-online.cz, akcni-letenky.com
 - [x] Přidat do footeru další projekty: do-italie.cz, amulets.cz, ohorai.com
 - [x] Přeložit názvy inkarnačního kříže do češtiny (Levý/Pravý Úhlový Kříž, Juxtapoziční Kříž) v ChartResult i PDF
@@ -200,16 +236,19 @@
 - [x] Opravit PDF — přepsáno na HTML print přístup (správná čeština, zalamování textu)
 
 ## Inkarnační Kříž — Detailní stránka s AI
+
 - [ ] Server procedure pro AI výklad inkarnačního kříže (životní poslání, témata, výzvy, praktické rady)
 - [ ] Stránka IncarnationCrossDetail s krásným UI a AI čtením
 - [ ] Propojit z ChartResult — kliknutí na kříž otevře detailní stránku
 - [ ] Přidat do navigace
 
 ## UI Redesign & AI Fix
+
 - [x] Odstranit "Ahoj!" oslovení z AI výkladů (server/routers.ts)
 - [x] Přepracovat Home stránku dle referenčního designu (hero, 5 ikon výhod, 5 typů s aurami, statistiky populace)
 
 ## Sdílení mapy & OG meta
+
 - [x] DB tabulka shared_charts (token, chartData, expiresAt)
 - [x] Server procedure: createShareToken, getSharedChart
 - [x] Tlačítko "Sdílet mapu" na ChartResult stránce
@@ -217,6 +256,7 @@
 - [x] OG meta description v češtině v index.html
 
 ## Velká implementace — všechna vylepšení
+
 - [x] SEO: Dedikované stránky pro 5 typů (/types/generator, /types/manifesting-generator, /types/projector, /types/manifestor, /types/reflector) s CTA nahoru
 - [x] SEO: JSON-LD structured data
 - [x] SEO: sitemap.xml + robots.txt
@@ -227,6 +267,7 @@
 - [ ] Onboarding flow pro nové uživatele
 
 ## SEO & Share Tests
+
 - [x] Share link creation test (token generation)
 - [x] Share link retrieval test (create + get)
 - [x] Non-existent share token returns null
@@ -234,6 +275,7 @@
 - [x] Robots.txt endpoint test (correct directives)
 
 ## Blog sekce — SEO články
+
 - [x] Blog data model (static articles in shared/blogArticles.ts)
 - [x] Server tRPC procedures for blog (list, getBySlug)
 - [x] Blog list page (/blog) with article cards, categories, reading time
@@ -244,18 +286,21 @@
 - [x] Blog tests (list, detail, SEO)
 
 ## Mobilní hamburger menu
+
 - [x] Hamburger tlačítko v Navbar (viditelné pouze na mobile)
 - [x] Slide-in drawer menu s kompletní navigací
 - [x] Zavření menu kliknutím mimo nebo na křížek
 - [x] Animace otevření/zavření
 
 ## Onboarding flow po výpočtu mapy
+
 - [x] Onboarding modal/overlay po přesměrování na ChartResult
 - [x] 3 kroky: "Váš typ", "Vaše autorita", "AI výklad"
 - [x] Přeskočit / Další tlačítka
 - [x] Uložit do localStorage (nezobrazovat znovu)
 
 ## Inkarnační kříž — detailní stránka s AI
+
 - [ ] Stránka /cross/:crossName s detailní analýzou
 - [ ] 4 brány kříže s popisem
 - [ ] AI-generovaný výklad životního poslání
@@ -263,14 +308,17 @@
 - [ ] Přidat do navigace/sitemapy
 
 ## Hero pozadí animace
+
 - [x] CSS keyframe animace pro barevné orby (pohyb, pulzování, rotace)
 - [x] Plynná smyčka bez trhání
 - [x] Respektovat prefers-reduced-motion
 
 ## Bug fix — AI výklad selector
+
 - [x] Po spuštění AI výkladu zůstanou tlačítka výběru typu výkladu vždy viditelná
 
 ## Streaming AI výkladu + uložení + hodnocení
+
 - [x] Streaming AI výkladu (token po tokenu) přes SSE endpoint
 - [x] Uložení AI výkladu k uložené mapě v dashboardu (auto-save po dokončení streamu)
 - [x] Hodnocení výkladu palcem nahoru/dolů
@@ -278,6 +326,7 @@
 - [x] Abort controller pro přerušení streamu při změně typu výkladu
 
 ## Dashboard — Moje výklady + sdílení
+
 - [x] Server procedure: getAllReadingsByUser (všechny výklady uživatele s info o mapě)
 - [x] Server procedure: getReadingsByChart (výklady pro konkrétní mapu)
 - [x] Záložka "Moje výklady" v dashboardu (seznam výkladů s typem, datem, hodnocením)
@@ -286,6 +335,7 @@
 - [x] Vylepšený dashboard — záložky "Moje mapy" a "Moje výklady"
 
 ## Denní tranzit na dashboardu
+
 - [ ] Server procedure: getDailyTransit (aktuální planetární pozice + aktivované brány)
 - [ ] Server procedure: getPersonalizedTransit (porovnání tranzitů s uživatelovou mapou)
 - [ ] AI interpretace denního tranzitu pro konkrétní typ/profil uživatele
@@ -298,22 +348,26 @@
 - [ ] Testy pro personalizovaný tranzit
 
 ## Blog — navigace a náhledové obrázky
+
 - [ ] Blog jako samostatné tlačítko v hlavní navigaci (vedle Encyklopedie)
 - [ ] Odstranit Blog z "Prozkoumat" dropdown menu
 - [ ] Přidat náhledové obrázky (coverImage) ke každému článku v blogArticles.ts
 - [ ] Zobrazit náhledové obrázky v kartičkách na Blog stránce
 
 ## Blog — navigace a náhledové obrázky
+
 - [x] Blog přesunut jako samostatné tlačítko v hlavní navigaci
 - [x] Unsplash cover obrázky přidány ke všem 10 článkům
 - [x] Blog list stránka zobrazuje obrázky (featured + grid)
 - [x] BlogArticle stránka zobrazuje cover obrázek v záhlaví
 
 ## AI Guide stránka — redesign
+
 - [x] Spirituální pozadí s ambientní animací (orby, částice, sacred geometry)
 - [x] Levý panel s profilem uživatele (typ, strategie, autorita, profil, definice, centra, kanály)
 
 ## i18n Infrastructure & English Localization
+
 - [x] Create English translation file (shared/i18n/en.ts)
 - [x] Update useTranslation hook with language detection from URL
 - [x] Create LanguageContext provider
@@ -330,34 +384,41 @@
 - [x] English AI Guide prompts (SSE + askGuide procedure)
 
 ## Blog Articles — English Translation (30 articles)
+
 - [x] Translate all 10 existing Czech blog articles to English
 - [x] Add 20 new English blog articles with long-tail SEO keywords
 - [x] Add bilingual blog routing (/cs/blog vs /en/blog)
 - [x] English blog articles in blogArticles.ts with lang field
 
 ## AI Guide — English Prompts
+
 - [x] Translate all 9 AI reading type prompts to English
 - [x] Language-aware prompt selection (EN/CS based on locale)
 - [x] English system prompt for AI guide chat
 
 ## AI Guide Page — Visual Enhancement
+
 - [x] Spiritual background with ambient animation (orbs, particles, mandala rings, star particles)
 - [x] Left panel with user HD profile data (type, strategy, authority, profile, centers, channels)
 - [x] Responsive layout: profile panel + chat area
 
 ## Cover Images for EN Blog Articles
+
 - [x] Add Unsplash cover images to all 30 English blog articles (included in generation)
 
 ## PWA Support
+
 - [x] PWA manifest.json with app metadata and icons
 - [x] Service Worker for offline caching
 - [x] Web app installable on mobile devices
 
 ## Encyclopedia & Dashboard — English Translation
+
 - [x] Translate Encyclopedia page to English (locale-aware)
 - [x] Translate Dashboard page to English (locale-aware)
 
 ## Session 3 — Remaining Page Translations & TWA
+
 - [x] Translate DailyTransit page to English
 - [x] Translate ChartComparison page to English
 - [x] Translate Celebrities page to English
@@ -368,6 +429,7 @@
 - [ ] Write Google Search Console setup guide with sitemap submission instructions
 
 ## Incarnation Cross Detail Page
+
 - [x] IncarnationCross page with bilingual support (EN/CS)
 - [x] Display 4 gates of the cross with descriptions and gate names
 - [x] AI-generated reading (streaming SSE) for the specific cross
@@ -377,6 +439,7 @@
 - [x] Download AI reading as .txt file
 
 ## Mobile Navigation — Full-Screen Hamburger Menu
+
 - [x] Full-screen slide-in drawer on mobile (slide from right, 300ms cubic-bezier)
 - [x] Include ALL nav items: Free Chart, Encyclopedia, AI Guide, Blog, Tools (6 items), Explore (3 items)
 - [x] Language switcher inside mobile menu header
@@ -387,11 +450,13 @@
 - [x] Auth section in footer (user info + dashboard + sign out / sign in)
 
 ## SEO Fix — Homepage Meta Tags
+
 - [x] Reduce keywords to 3-8 focused keywords (4 keywords now)
 - [x] Fix title length to 30-60 characters (47 chars EN, 49 chars CS)
 - [x] Shorten description to 50-160 characters (114 chars EN, 103 chars CS)
 
 ## SEO — Per-page Meta & Sitemap & OG Image
+
 - [x] Add per-page SEO meta to Encyclopedia page (EN + CS)
 - [x] Add per-page SEO meta to Celebrities page (EN + CS)
 - [x] Add per-page SEO meta to IChing page (EN + CS)
@@ -401,23 +466,29 @@
 - [x] Add og:image and twitter:image meta tags to index.html
 
 ## SEO — AiGuide & IncarnationCross Pages
+
 - [ ] Add locale-aware document.title + meta description to AiGuide page (EN + CS)
 - [ ] Add locale-aware document.title + meta description to IncarnationCross page (EN + CS)
 
 ## Blog — Czech Cover Images
+
 - [ ] Add Unsplash cover images to all 10 Czech blog articles in blogArticles.ts
 
 ## Footer — Partner Projects
+
 - [ ] Add "Další projekty" section to footer with links: Akční letenky, Do Itálie, Katastr Online, Čajovny Praha, Bezmasá Jídla
 
 ## Dynamic OG Image for Shared Charts
+
 - [ ] Server endpoint: generate per-chart OG image (SVG/HTML → PNG) with type, name, bodygraph
 - [ ] Update SharedChart page to use dynamic og:image meta tag
 
 ## Footer — Remove Amulets.cz
+
 - [ ] Remove Amulets.cz from footer partner links
 
 ## Dynamic Locale-Aware SEO Branding
+
 - [ ] CS title: "BODY DESIGN – Mapa vašeho Já | Odemkněte svůj potenciál"
 - [ ] EN title: "Free Human Design Chart Calculator & AI Reading"
 - [ ] Update index.html static fallback title (EN default)
@@ -426,6 +497,7 @@
 - [ ] Update OG title, twitter:title, and description for CS locale
 
 ## Dynamic Locale-Aware SEO Branding
+
 - [x] CS homepage title: "✨ HUMAN DESIGN – Mapa vašeho Já | Odemkněte svůj potenciál! 🔮"
 - [x] EN homepage title: "✨ Free Human Design Chart Calculator & AI Reading 🔮"
 - [x] Update index.html static fallback (EN default with emoji)
@@ -434,6 +506,7 @@
 - [x] Update og:title, twitter:title in index.html with emoji
 
 ## Monetization — Stripe + Freemium + PDF + Gift Vouchers
+
 - [x] Stripe integration setup (webdev_add_feature stripe)
 - [x] Create Stripe products: Premium Monthly (149 CZK), Premium Annual (990 CZK), Credit Pack (49 CZK)
 - [x] Database schema: subscriptions table, gift_vouchers table, aiReadingCredits on users
@@ -451,6 +524,7 @@
 - [x] Navbar Pricing link (CreditCard icon)
 
 ## Payment UX — Success/Cancel Pages & Upgrade CTAs
+
 - [x] Payment success page (/payment/success) with confirmation and next-step CTAs
 - [x] Payment cancel page (/payment/cancel) with retry option and FAQ
 - [x] Add success_url and cancel_url to Stripe checkout pointing to new pages
@@ -458,26 +532,31 @@
 - [x] Annual plan urgency countdown timer on Pricing page (amber pulse, resets weekly)
 
 ## Email + Navbar Credits + Stripe Guide
+
 - [x] Owner notification after successful payment/subscription/gift voucher (via notifyOwner)
 - [x] Credit pack quick-buy button in Navbar (Zap icon, shown only to logged-in non-premium users)
 - [x] Stripe sandbox activation banner on Pricing page (visible to owner only, links to claim URL)
 - [x] isOwner flag in subscription.status procedure (compares user.openId with ENV.ownerOpenId)
 
 ## Navbar & Mobile Menu Polish
+
 - [x] Localize credit pack Navbar button (CS: "5 výkladů za 49 Kč", EN: "5 readings – €1.99") — already done in previous session
 - [x] Add subscription status badge to mobile hamburger menu (👑 Premium / Free plan)
 - [x] Add upgrade CTA button in mobile drawer footer for non-premium users ("Upgradovat na Premium")
 
 ## Navbar Compact Fix
+
 - [x] Remove username text from desktop navbar auth area (icon-only avatar)
 - [x] Ensure all nav items fit on one line without overflow (reduced to 3 primary + 2 dropdowns + Pricing)
 
 ## Bug Fixes — Navbar & Stripe Banner
+
 - [x] Remove orange Stripe sandbox banner from Pricing page — moved to Dashboard (owner-only)
 - [x] Fix Navbar overflow: reduced primary links, credit pack moved to user dropdown, Blog in Explore dropdown
 - [x] Pricing stays at 149 Kč/měs subscription (user confirmed)
 
 ## Referral Program — "Pozvi příteľe, získej výklad zdarma"
+
 - [x] DB schema: referrals table (id, referrerId, referredUserId, code, status, createdAt)
 - [x] DB schema: add referralCode column to users table
 - [x] Server procedure: getReferralInfo (user's code, link, stats)
@@ -491,33 +570,39 @@
 - [x] Tests for referral procedures (8 tests, all passing)
 
 ## Referral Widget — Social Sharing Buttons
+
 - [x] Add Facebook share button to ReferralWidget
 - [x] Add WhatsApp share button to ReferralWidget
 - [x] Add Telegram share button to ReferralWidget
 - [x] Bilingual share text (CS/EN)
 
 ## Credits Badge in Navbar
+
 - [x] Expose aiReadingCredits via tRPC subscription/credits procedure (reused existing subscription.status)
 - [x] Show credits badge next to user avatar in Navbar (logged-in only, desktop + mobile drawer)
 - [x] Clicking badge links to Dashboard subscription tab
 - [x] Bilingual tooltip (CS/EN)
 
 ## UX Enhancements — Credits Badge & Onboarding
+
 - [x] Pulse/glow animation on credits badge when count increases (ring + scale + spin icon)
 - [x] Welcome modal for new users on first visit (3-step: gift credit, how to start, daily rewards)
 - [x] Toast warning when only 1 credit remains after starting an AI reading (ChartResult + bilingual)
 
 ## Blog Improvements — SEO & Content
+
 - [x] Audit all blog articles for grammatical errors — fixed 27 occurrences of "v Human Design" → "v Human Designu" (Czech locative)
 - [x] Authority article already existed in DB with correct content; grammar now fixed
 - [x] Implement JSON-LD structured data: enhanced Article schema + BreadcrumbList (image, keywords, wordCount, inLanguage, url, publisher logo)
 
 ## Internal Linking — SEO
+
 - [x] Markdown renderer in BlogArticle.tsx supports [text](/path) internal links and [text](https://...) external links
 - [x] Add internal links to all CS blog articles (blogArticles.ts) — 53 internal links across 11 articles
 - [x] Add internal links to all EN blog articles (blogArticlesEn.ts) — 76 internal links across 27 articles
 
 ## SEO — Canonical URLs & Open Graph
+
 - [x] Canonical URL updated to humandesignchart.app (was human-design.manus.space)
 - [x] hreflang: CS → humandesignmapa.cz, EN → humandesignchart.app
 - [x] Sitemap.xml base URL updated to humandesignchart.app
@@ -528,12 +613,15 @@
 - [x] schema.org WebApplication URL updated to humandesignchart.app
 
 ## Homepage Types Section
+
 - [x] Replace sliding carousel with static 5-card grid (image + description together per card)
 
 ## Homepage Types Grid Fix
+
 - [x] Fix desktop grid: 5 cards side by side — changed to grid-cols-2 mobile / md:grid-cols-5 desktop, square aspect ratio
 
 ## Klein Flow Gamification — Full Implementation
+
 - [x] Fix calculator form translations: manual coordinates section now bilingual (CS/EN)
 - [x] DB schema: added lastLoginDate, currentStreak, longestStreak, totalCreditsEarned, lastDailyRewardAt, isAffiliate, affiliateCode, affiliateTier, affiliateTotalEarned, affiliatePendingPayout to users
 - [x] DB schema: new affiliateConversions table (affiliateUserId, convertedUserId, subscriptionId, amount, commissionRate, status, paidAt)
@@ -555,14 +643,16 @@
 - [x] Tests: 17 gamification tests (streak, daily reward, levels, affiliate tiers) — 128 total passing
 
 ## Stripe Webhook Verification
+
 - [x] Audit existing webhook handler at /api/stripe/webhook — all events correctly handled
 - [x] checkout.session.completed: grants Premium (via subscription.created), credits, gift vouchers
 - [x] Add affiliate trackConversion on Premium purchase (Bronze 20%, Silver 22%, Gold 25%)
 - [x] Self-referral prevention: affiliate cannot earn commission on own purchase
-- [x] Test event handling: evt_test_ prefix returns {verified: true} immediately
+- [x] Test event handling: evt*test* prefix returns {verified: true} immediately
 - [x] Webhook tests: 19 tests covering commissions, tiers, voucher codes, self-referral — 147 total passing
 
 ## Related Articles Sidebar — BlogArticle
+
 - [x] Smart scoring: same category (+3 pts) + shared tags (+1 pt each), top 4 shown
 - [x] Thumbnail image (64×64 rounded) with lazy loading and scale-on-hover animation
 - [x] Fallback icon tile for articles without coverImage (uses coverColor gradient)
@@ -571,6 +661,7 @@
 - [x] Divider lines between cards, header with BookOpen icon
 
 ## SEO — AiGuide & IncarnationCross Pages
+
 - [x] AiGuide: unique document.title (CS + EN)
 - [x] AiGuide: meta description (CS + EN)
 - [x] AiGuide: Open Graph tags (og:title, og:description, og:type, og:url, og:image, og:locale)
@@ -587,23 +678,27 @@
 - [x] IncarnationCross: cleanup on unmount
 
 ## Encyclopedia — Bilingual Support (EN/CS)
+
 - [x] Add nameEn, descriptionEn, themeEn, giftKeywordEn, shadowKeywordEn to all 64 gates in hdContent.ts
 - [x] Add nameEn, descriptionEn, themeEn to all 36 channels in hdContent.ts
 - [x] Encyclopedia.tsx renders EN fields when locale is EN (gate cards, channel cards, detail dialogs)
 - [x] I-Ching Oracle: all 64 hexagrams translated to Czech (nameCz, meaningCz, judgmentCz, imageCz)
 
 ## UX Improvements — Mobile & Transit
+
 - [x] Mobile "Related articles" horizontal scroll strip below article body in BlogArticle.tsx (premium design: gradient bg, fade edges, category badges, excerpt, CTA card)
 - [ ] Share button on Daily Transit widget (copy text + social share links)
 - [x] Skeleton loader for Daily Transit AI reading generation
 
 ## Social Media Scheduler — Backend Fix
+
 - [x] Fix social.ts TypeScript errors (32 errors — corrupted syntax at line 195, missing closing brace in publishPost return)
 - [x] Correctly export publishScheduledPosts as standalone async function before socialRouter
 - [x] Simplify publishDuePosts router procedure to call publishScheduledPosts() (no duplicate logic)
 - [x] TypeScript clean (0 errors), 147 tests passing
 
 ## Blog Section — Homepage Update
+
 - [x] Expand blog section from 3 to 6 articles with cover images (Unsplash)
 - [x] Add featured flag to first article
 - [x] Add cover, featured fields to blogPosts array in Home.tsx
@@ -611,11 +706,13 @@
 - [x] EN articles: what-is-human-design, 5-types, strategy, authority, profiles, relationships
 
 ## UX Improvements — Batch 2
+
 - [x] Share button on Daily Transit widget (copy text + WhatsApp/Telegram/Facebook share)
 - [x] Blog editorial layout on Home.tsx (first article as large featured card, rest in compact grid)
 - [x] Skeleton loader for Daily Transit AI reading generation
 
 ## SEO — Primary Domain Update
+
 - [x] Update canonical URLs: CS → humandesignmapa.cz, EN → humandesignchart.app
 - [x] Update sitemap.xml base URLs for both locales
 - [x] Update hreflang alternates
@@ -623,6 +720,7 @@
 - [x] Update robots.txt sitemap reference
 
 ## Newsletter Popup — Weekly HD Horoscope
+
 - [x] DB table: newsletter_subscribers (email, locale, subscribedAt, source)
 - [x] tRPC procedure: newsletter.subscribe (public, validates email, prevents duplicates)
 - [x] Frontend component: NewsletterPopup (elegant modal, 30s delay, shown once via localStorage)
@@ -630,20 +728,24 @@
 - [x] Integration with existing notification system for owner alerts on new subscribers
 
 ## Blog Cover Images — Spiritual Premium Upgrade
+
 - [x] Generate 6 spiritual/premium cover images (sacred geometry, cosmic, ethereal)
 - [x] Upload to webdev static assets and update blog article coverImage URLs (all CS + EN articles updated)
 
 ## UX Improvements — Batch 3
+
 - [x] Animated chart counter on hero section (real count from DB, counting animation on scroll)
 - [x] Blog article series with progress bar (link related articles, show reading progress)
 - [x] Social share buttons in blog article detail (premium design, WhatsApp/Facebook/X/copy link)
 
 ## UX Improvements — Batch 4
+
 - [x] Exit-intent popup with 10% discount on first AI reading (mouseleave detection, shown once)
 - [x] Breadcrumb navigation for blog articles and subpages (SEO + user orientation)
 - [x] Testimonials carousel on homepage (social proof, mystical design with sacred geometry)
 
 ## Mystical Design System — Global Upgrade
+
 - [x] Global CSS: add mystical textures, sacred geometry patterns, ethereal gradients
 - [x] Navbar: subtle mystical accent (golden line, star motif)
 - [x] Footer: mystical gradient background with sacred geometry
@@ -653,18 +755,21 @@
 - [x] Buttons: mystical gradient with subtle shimmer
 
 ## Pricing Page — Redesign
+
 - [x] Add Navbar and Footer to Pricing page
 - [x] Sacred geometry SVG background decoration
 - [x] Update price to 88 CZK for premium monthly
 - [x] Mystical gradient hero section
 
 ## UX Improvements — Batch 5
+
 - [x] Mobile hamburger menu (full navigation on phones, animated open/close) — already existed in Navbar.tsx
 - [x] FAQ section under pricing page (bilingual accordion with 4 questions about cancellation, payment, trial, gift vouchers)
 - [x] Testimonials carousel auto-scroll (5s interval, pause on hover, enhanced card hover effects, scale/glow animations)
 - [x] Navbar icon/logo upgrade: custom HD bodygraph SVG logo (purple gradient), new icons (Orbit, Layers, Eye, Flame, Gem, Crown), "Premium" label
 
 ## Dark/Light Mode Toggle
+
 - [x] Enable switchable theme in ThemeProvider (App.tsx)
 - [x] Add theme toggle button in Navbar desktop section (Sun/Moon icons with hover animation)
 - [x] Add theme toggle button in mobile drawer header
@@ -674,20 +779,24 @@
 - [x] Theme preference persisted in localStorage
 
 ## UX Enhancements — Batch 6
+
 - [x] Page transition animations (fade + translateY between routes, 250ms ease-out, pauses during content swap)
 - [x] Dark mode contrast fixes on Pricing, Blog, and Encyclopedia pages (dual-mode text colors, gradient headings, info boxes)
 - [x] Theme toggle "System" option (3-state cycle: light → dark → system, Monitor icon, OS media query listener)
 
 ## UX Enhancements — Batch 7
+
 - [x] Floating scroll-to-top button (purple, appears after 400px scroll, smooth animation)
 - [x] Skeleton loading placeholders (CardSkeleton, HeroSkeleton, ChartSkeleton, ArticleSkeleton, ListSkeleton)
 - [x] GDPR cookie consent banner (3 categories: necessary/analytics/marketing, settings panel, localStorage, 1.5s delay)
 
 ## Visual Upgrades — Batch 7
+
 - [x] Premium spiritual AI thumbnails for all 6 blog articles (cosmic bodygraph, 5 silhouettes, compass, crystal heart, galaxy profiles, DNA helix)
 - [x] "How it works" section: replaced icons with large AI graphics (golden lotus, DNA helix, star gate portal)
 
 ## UX Enhancements — Batch 8
+
 - [x] Hero sacred circle visible on mobile (3 concentric rings, responsive sizing, slow rotation animation)
 - [x] Hero particle animation (canvas-based floating purple dots with glow, IntersectionObserver for performance)
 - [x] Hero orbs responsive on mobile (use min() for viewport-relative sizing)
@@ -695,11 +804,13 @@
 - [x] Steps section: overflow-hidden to prevent horizontal scroll on mobile
 
 ## UX Enhancements — Batch 9
+
 - [x] Parallax scrolling on hero (background-attachment: fixed, content fades/moves on scroll via framer-motion useScroll)
 - [x] Count-up animation for statistics (IntersectionObserver triggers 2.2s count-up when scrolled into view)
 - [x] Fixed bottom navigation bar on mobile (Home, Mapa, AI Guide, Blog, Profil — hidden on desktop, active indicator)
 
 ## UX Enhancements — Batch 10
+
 - [ ] Fix duplicate key bug in MobileBottomNav (use id instead of href as key)
 - [ ] TiltCard 3D hover micro-interactions on blog/type cards with hermeticism glare (sacred geometry glow)
 - [ ] Progressive image loading with blur placeholder (ProgressiveImage component)
@@ -707,6 +818,7 @@
 - [ ] Hermeticism visual elements throughout: sacred geometry patterns, Metatron's cube, golden spiral accents
 
 ## SEO & Open Graph — Batch 11
+
 - [x] Shared useSEO hook (client/src/hooks/useSEO.ts) — centralized meta tag management
 - [x] Premium AI-generated OG images (1200×630px): Homepage, Calculator, Blog, Pricing, AI Guide
 - [x] Homepage — useSEO with new OG image, extended keywords (cs/en)
@@ -718,6 +830,7 @@
 - [x] index.html — default OG/Twitter images updated to new premium homepage image
 
 ## Inkarnační Kříž — AI Výklad
+
 - [ ] Gate data (64 bran s názvy, klíčovými slovy, hexagramy)
 - [ ] Cross lookup tabulka (64×64 kombinace → název kříže)
 - [ ] Backend tRPC procedura: getCrossReading (4 brány → AI streaming výklad)
@@ -726,6 +839,7 @@
 - [ ] SEO meta tagy pro stránku kříže
 
 ## Inkarnační Kříž — Detailní stránka (Batch 12)
+
 - [x] Sacred Geometry SVG diagram kříže s Flower of Life, Metatron's Cube motivy a 4 uzly bran
 - [x] GateDetailCard — rozšiřitelné karty bran s I-Ching hexagramem, darem, stínem, centrem, okruhem
 - [x] HowToLiveSection — sekce "Jak žít svůj kříž" s 3 kategoriemi tipů dle typu kříže
@@ -735,6 +849,7 @@
 - [x] TiltCard 3D hover micro-interactions na blog compact kartách v Home.tsx
 
 ## Composite Chart & Správa osob (Batch 13)
+
 - [x] Dialog pro uložení mapy s výběrem kategorie vztahu (já/rodina/přátelé/klient/celebrita/jiné)
 - [x] Tlačítko "Composite" v ChartResult po uložení mapy (navigace na /composite?chartId=X)
 - [x] Server endpoint composite.analyze — elektromagnetická spojení, sdílené kanály, kompatibilita center, skóre
@@ -748,13 +863,14 @@
 - [x] Server-side LeadOS API helper (server/leados.ts) s HMAC-SHA256 webhook verifikací
 - [x] tRPC router (server/routers/leados.ts) — admin-only procedury: getAnalytics, getLeads, updateLead, getOrders, getEmailSequences, sendEmail
 - [x] Webhook endpoint /api/leados/webhook s raw body a signature verifikací
-- [x] Automatická synchronizace nových uživatelů jako leads při OAuth registraci (server/_core/oauth.ts)
+- [x] Automatická synchronizace nových uživatelů jako leads při OAuth registraci (server/\_core/oauth.ts)
 - [x] Admin CRM panel (client/src/pages/AdminCRM.tsx) — přehled statistik, leads management, objednávky, email odesílání
 - [x] Route /admin/crm přidána do App.tsx (admin-only, redirect pro non-admin)
 - [x] Vitest testy pro LeadOS webhook verifikaci (6 testů, všechny prošly)
 - [x] LeadOS API klíč nastaven přes webdev_request_secrets
 
 ## AI Průvodce & Z-index opravy (2026-05-30)
+
 - [ ] Opravit mobilní layout AI průvodce — padding-bottom pro spodní nav (h-16 = 64px)
 - [ ] Přidat tlačítko minimalizace/šipky zpět do hlavičky AI průvodce
 - [ ] Přidat DB tabulku chatConversations + chatMessages pro persistentní paměť
@@ -765,6 +881,7 @@
 - [ ] Opravit AI průvodce — odpovědi max 2 odstavce
 
 ## roleTag Feature — Rolové štítky na mapách (2026-05-30)
+
 - [x] drizzle/schema.ts — přidán roleTag enum sloupec do tabulky charts (partner/partnerka/manžel/manželka/šéf/šéfová/kolega/přítel/přítelkyně/rodič/dítě/sourozenec/kamarád/klient/mentor/jiné)
 - [x] DB migrace 0010_rich_war_machine.sql aplikována (pnpm db:push)
 - [x] server/routers.ts — chart.update procedura přijímá roleTag (nullable enum)
@@ -775,20 +892,23 @@
 - [x] App.tsx — route /:locale/role-compatibility přidána
 
 ## AiGuide Mobile Fix (2026-05-30)
+
 - [x] Opravit mobilní layout AI průvodce — pb-20 md:pb-4 pro spodní nav clearance
 - [x] Přidat tlačítko minimalizace/chevron-down do hlavičky AI průvodce
 - [x] Minimalizovatelný chat body (messages + input) přes isChatMinimized state
 
 ## Czech OG Tags (2026-05-30)
+
 - [x] index.html — og:title, og:description, og:locale přepnuty na češtinu
 - [x] index.html — přidán og:url, og:site_name, twitter:site
 - [x] index.html — česká klíčová slova v meta keywords
 
 ## LeadOS CRM Full Integration — MCP + REST Events (2026-05-30)
+
 - [x] DB schema — přidat crmStatus, crmNote, crmUpdatedAt do users tabulky
 - [x] DB migrace — pnpm db:push (migrace 0011_superb_swarm.sql aplikována)
 - [x] server/leados.ts — přidat sendLeadOSEvent() funkci pro REST eventy
-- [x] server/_core/oauth.ts — event new_user po registraci
+- [x] server/\_core/oauth.ts — event new_user po registraci
 - [x] server/routers.ts chart.save — event chart_created po uložení mapy
 - [x] server/stripeWebhook.ts — event subscription_upgraded po platbě
 - [x] server/leadosWebhook.ts — handler lead_status_changed (sync CRM status do HDM DB)
@@ -798,11 +918,12 @@
 - [x] Vitest testy pro LeadOS integraci (13 test fileů, 162 testů, všechny prošly)
 
 ## Real-time Vizuální Notifikace (2026-05-31)
+
 - [x] DB schema — tabulka user_notifications (id, userId, type, title, message, data JSON, isRead, createdAt)
 - [x] DB migrace — pnpm db:push (migrace 0012_amazing_infant_terrible.sql aplikována)
 - [x] server/db.notifications.ts — createNotification(), getUserNotifications(), markNotificationRead(), markAllNotificationsRead()
 - [x] server/routers.ts — tRPC procedury: notifications.getAll, notifications.markRead, notifications.markAllRead, notifications.getUnreadCount
-- [x] server/_core/index.ts — SSE endpoint GET /api/notifications/stream (per-user channel, heartbeat 30s)
+- [x] server/\_core/index.ts — SSE endpoint GET /api/notifications/stream (per-user channel, heartbeat 30s)
 - [x] server/notificationBroadcast.ts — in-memory SSE broadcaster (Map<userId, Set<Response>>)
 - [x] server/leadosWebhook.ts — při lead_status_changed uložit notifikaci do DB + broadcast SSE
 - [x] server/leadosWebhook.ts — při new_campaign broadcast SSE pro všechny připojené uživatele
@@ -814,6 +935,7 @@
 - [x] Vitest testy pro notification DB helpers a SSE broadcaster (14 test fileů, 177 testů, všechny prošly)
 
 ## Notifikační Preference v Profilu (2026-05-31)
+
 - [ ] DB schema — přidat notificationPrefs JSON sloupec do users tabulky
 - [ ] DB migrace — pnpm db:push
 - [ ] shared/notificationTypes.ts — sdílené konstanty typů notifikací a výchozí preference
@@ -840,9 +962,11 @@
 - [x] TypeScript 0 chyb, 177 testů prošlo
 
 ## AiGuide — Navrhované otázky
+
 - [x] Přidat "Jaký je můj denní tranzit?" jako první navrhovanou otázku v sekci Navrhované otázky (CS + EN: "What is my daily transit today?")
 
 ## Bezpečnost — Prompt Injection Prevention (2026-06-03)
+
 - [ ] Vytvořit server/security/promptSanitizer.ts — sanitizační helper (strip injection patterns, max length)
 - [ ] Vytvořit in-memory rate limiter (max 30 LLM volání / hodinu / uživatel)
 - [ ] Přidat max() limity na všechny LLM vstupy v routers.ts (question max 1000, topic max 500, history max 20 zpráv × 2000 znaků)
@@ -850,6 +974,7 @@
 - [ ] Napsat vitest testy pro sanitizační helper a rate limiter
 
 ## Bezpečnost — Prompt Injection Prevention
+
 - [x] Vytvořit `server/security/promptSanitizer.ts` — sanitizační helper + rate limiter
 - [x] Přidat max() limity na Zod vstupy v `askGuide` (question max 1000, history msg max 2000, history max 20)
 - [x] Přidat rate limiting na `askGuide` (max 30 volání/hodinu/uživatel)
@@ -860,6 +985,7 @@
 - [x] Celkem 202 testů — všechny prošly
 
 ## AuthSidebar — postranní navigace pro přihlášené
+
 - [x] Vytvořit AuthSidebar komponentu (56px, ikony + tooltip, zachovává stávající design)
 - [x] Integrovat do App.tsx — zobrazuje se pouze přihlášeným uživatelům na lg+ obrazovkách
 - [x] Přidat lg:pl-14 offset na obsah stránky pro přihlášené uživatele
@@ -868,12 +994,14 @@
 - [x] HD Guru jako název AI průvodce v sidebaru
 
 ## HD Guru — Přepínač profilu v chatu (2026-06-03)
+
 - [ ] Přidat dropdown selector profilu nad chat input v AiGuide — zobrazí všechny charty z Moje mapa
 - [ ] Předat vybrané chartId do askGuide mutace
 - [ ] Upravit askGuide na serveru — pokud je předáno chartId, načíst ten konkrétní chart místo primárního
 - [ ] Vizuálně zobrazit aktuálně vybraný profil (jméno + typ) v hlavičce chatu
 
 ## HD Guru — Persistentní historie chatu (2026-06-03)
+
 - [ ] DB schema — tabulka chat_conversations (id, userId, chartId, locale, createdAt, updatedAt)
 - [ ] DB schema — tabulka chat_messages (id, conversationId, role, content, createdAt)
 - [ ] DB migrace — pnpm db:push
@@ -885,16 +1013,17 @@
 - [ ] AiGuide.tsx — přepínač profilu (dropdown všech chartů z Moje mapa)
 - [ ] Vitest testy pro chat DB helpers
 
-
 ## Claude Code Tasks — June 2026
 
 ### Smooth Animations on Chart Result Loading
+
 - [ ] Implementovat plynulé animace (fade-in, slide-up) při načítání výsledků na ChartResult stránce
 - [ ] Přidat skeleton loadery pro všechny sekce (bodygraph, type info, gates table, AI section)
 - [ ] Animace by měly být smooth a bez trhání (60fps)
 - [ ] Testovat na mobilních zařízeních (iPhone, Android)
 
 ### Social Sharing Buttons — README & Implementation
+
 - [ ] Doplnit README.md sekcí "Social Sharing" s detailem jak funguje sdílení výsledků
 - [ ] Implementovat sdílení výsledků na: Facebook, WhatsApp, Telegram, X (Twitter), LinkedIn
 - [ ] Přidat share button do ChartResult stránky (vedle "Stáhnout PDF")
@@ -903,6 +1032,7 @@
 - [ ] Testy pro share procedury
 
 ### Mobile UX Review & Fixes
+
 - [ ] Zkontrolovat všechny stránky na mobilních zařízeních (iPhone SE, Pixel 4, iPad)
 - [ ] Opravit vizuální nedostatky (padding, font size, button size, spacing)
 - [ ] Zajistit že všechny formuláře jsou mobilní-friendly (input fields, dropdowns, date pickers)

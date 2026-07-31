@@ -8,20 +8,53 @@ import { useParams } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Calendar, Clock, Wand2, Send, Trash2, Edit, CheckCircle,
-  XCircle, Plus, Facebook, Linkedin, Instagram,
-  Copy, ExternalLink, Zap, Share2, Settings, RefreshCw,
-  LayoutDashboard, CalendarDays, Crown, Users, Image as ImageIcon,
-  TrendingUp, AlertTriangle, Radio
+  Calendar,
+  Clock,
+  Wand2,
+  Send,
+  Trash2,
+  Edit,
+  CheckCircle,
+  XCircle,
+  Plus,
+  Facebook,
+  Linkedin,
+  Instagram,
+  Copy,
+  ExternalLink,
+  Zap,
+  Share2,
+  Settings,
+  RefreshCw,
+  LayoutDashboard,
+  CalendarDays,
+  Crown,
+  Users,
+  Image as ImageIcon,
+  TrendingUp,
+  AlertTriangle,
+  Radio,
 } from "lucide-react";
 
 type Locale = "cs" | "en";
@@ -30,11 +63,26 @@ const T = {
   cs: {
     title: "Plánovač sociálních sítí",
     subtitle: "Plánujte a automatizujte příspěvky na sociálních sítích",
-    tabs: { overview: "Přehled", calendar: "Kalendář", queue: "Fronta", compose: "Nový příspěvek", priestess: "Velekněžka", aiGen: "AI knihovna", influencers: "Influenceři", accounts: "Účty" },
+    tabs: {
+      overview: "Přehled",
+      calendar: "Kalendář",
+      queue: "Fronta",
+      compose: "Nový příspěvek",
+      priestess: "Marie",
+      aiGen: "AI knihovna",
+      influencers: "Influenceři",
+      accounts: "Účty",
+    },
     queue: {
       empty: "Fronta je prázdná",
       emptyDesc: "Vytvořte nový příspěvek nebo vygenerujte obsah pomocí AI.",
-      status: { draft: "Koncept", scheduled: "Naplánováno", published: "Publikováno", failed: "Chyba", publishing: "Publikuji..." },
+      status: {
+        draft: "Koncept",
+        scheduled: "Naplánováno",
+        published: "Publikováno",
+        failed: "Chyba",
+        publishing: "Publikuji...",
+      },
       publishNow: "Publikovat nyní",
       delete: "Smazat",
     },
@@ -55,8 +103,13 @@ const T = {
       schedule: "Naplánovat",
       generateCaption: "AI caption",
       postTypes: {
-        hd_type: "Typ HD", quote: "Citát", infographic: "Infografika",
-        transit: "Tranzit", iching: "I-Ťing", promo: "Promo", custom: "Vlastní",
+        hd_type: "Typ HD",
+        quote: "Citát",
+        infographic: "Infografika",
+        transit: "Tranzit",
+        iching: "I-Ťing",
+        promo: "Promo",
+        custom: "Vlastní",
         tiktok_script: "TikTok Scénář",
         story: "Story",
       },
@@ -67,7 +120,11 @@ const T = {
       topic: "Téma",
       topicPlaceholder: "např. Generator typ, Brána 1, Denní tranzit...",
       style: "Styl",
-      styles: { dark_cosmic: "Tmavý kosmický", light_minimal: "Světlý minimalistický", golden_mystical: "Zlatý mystický" },
+      styles: {
+        dark_cosmic: "Tmavý kosmický",
+        light_minimal: "Světlý minimalistický",
+        golden_mystical: "Zlatý mystický",
+      },
       postType: "Typ obsahu",
       generate: "Generovat obrázek",
       generating: "Generuji...",
@@ -93,11 +150,26 @@ const T = {
   en: {
     title: "Social Media Scheduler",
     subtitle: "Plan and automate your social media posts",
-    tabs: { overview: "Overview", calendar: "Calendar", queue: "Queue", compose: "New Post", priestess: "High Priestess", aiGen: "AI Library", influencers: "Influencers", accounts: "Accounts" },
+    tabs: {
+      overview: "Overview",
+      calendar: "Calendar",
+      queue: "Queue",
+      compose: "New Post",
+      priestess: "Marie",
+      aiGen: "AI Library",
+      influencers: "Influencers",
+      accounts: "Accounts",
+    },
     queue: {
       empty: "Queue is empty",
       emptyDesc: "Create a new post or generate content with AI.",
-      status: { draft: "Draft", scheduled: "Scheduled", published: "Published", failed: "Failed", publishing: "Publishing..." },
+      status: {
+        draft: "Draft",
+        scheduled: "Scheduled",
+        published: "Published",
+        failed: "Failed",
+        publishing: "Publishing...",
+      },
       publishNow: "Publish Now",
       delete: "Delete",
     },
@@ -118,8 +190,13 @@ const T = {
       schedule: "Schedule",
       generateCaption: "AI caption",
       postTypes: {
-        hd_type: "HD Type", quote: "Quote", infographic: "Infographic",
-        transit: "Transit", iching: "I-Ching", promo: "Promo", custom: "Custom",
+        hd_type: "HD Type",
+        quote: "Quote",
+        infographic: "Infographic",
+        transit: "Transit",
+        iching: "I-Ching",
+        promo: "Promo",
+        custom: "Custom",
         tiktok_script: "TikTok Script",
         story: "Story",
       },
@@ -130,7 +207,11 @@ const T = {
       topic: "Topic",
       topicPlaceholder: "e.g. Generator type, Gate 1, Daily transit...",
       style: "Style",
-      styles: { dark_cosmic: "Dark Cosmic", light_minimal: "Light Minimal", golden_mystical: "Golden Mystical" },
+      styles: {
+        dark_cosmic: "Dark Cosmic",
+        light_minimal: "Light Minimal",
+        golden_mystical: "Golden Mystical",
+      },
       postType: "Content type",
       generate: "Generate Image",
       generating: "Generating...",
@@ -143,7 +224,8 @@ const T = {
       connect: "Connect Account",
       disconnect: "Disconnect",
       noAccounts: "No connected accounts",
-      noAccountsDesc: "Connect your social media accounts for automated publishing.",
+      noAccountsDesc:
+        "Connect your social media accounts for automated publishing.",
       platform: "Platform",
       accountName: "Account name",
       accessToken: "Access Token",
@@ -155,7 +237,10 @@ const T = {
   },
 };
 
-const PLATFORM_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+const PLATFORM_ICONS: Record<
+  string,
+  React.ComponentType<{ className?: string }>
+> = {
   facebook: Facebook,
   instagram: Instagram,
   linkedin: Linkedin,
@@ -175,14 +260,19 @@ const PLATFORM_COLORS: Record<string, string> = {
 function QueueTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
   const utils = trpc.useUtils();
 
-  const { data: posts, isLoading } = trpc.social.listPosts.useQuery({ status: "all", limit: 100 });
+  const { data: posts, isLoading } = trpc.social.listPosts.useQuery({
+    status: "all",
+    limit: 100,
+  });
 
   const publishNow = trpc.social.publishNow.useMutation({
     onSuccess: () => {
-      toast.success(locale === "cs" ? "Příspěvek publikován!" : "Post published!");
+      toast.success(
+        locale === "cs" ? "Příspěvek publikován!" : "Post published!"
+      );
       utils.social.listPosts.invalidate();
     },
-    onError: (e) => toast.error(e.message),
+    onError: e => toast.error(e.message),
   });
 
   const deletePost = trpc.social.deletePost.useMutation({
@@ -190,22 +280,28 @@ function QueueTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
       toast.success(locale === "cs" ? "Příspěvek smazán" : "Post deleted");
       utils.social.listPosts.invalidate();
     },
-    onError: (e) => toast.error(e.message),
+    onError: e => toast.error(e.message),
   });
 
-  if (isLoading) return (
-    <div className="space-y-3">
-      {[1, 2, 3].map(i => <Skeleton key={i} className="h-24 w-full" />)}
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map(i => (
+          <Skeleton key={i} className="h-24 w-full" />
+        ))}
+      </div>
+    );
 
-  if (!posts || posts.length === 0) return (
-    <div className="text-center py-16">
-      <Share2 className="w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-40" />
-      <p className="font-medium text-muted-foreground">{t.queue.empty}</p>
-      <p className="text-sm text-muted-foreground mt-1">{t.queue.emptyDesc}</p>
-    </div>
-  );
+  if (!posts || posts.length === 0)
+    return (
+      <div className="text-center py-16">
+        <Share2 className="w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-40" />
+        <p className="font-medium text-muted-foreground">{t.queue.empty}</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          {t.queue.emptyDesc}
+        </p>
+      </div>
+    );
 
   const grouped = {
     scheduled: posts.filter(p => p.status === "scheduled"),
@@ -231,57 +327,87 @@ function QueueTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
             <div className="flex items-center gap-2 mb-3">
               {statusIcons[status]}
               <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                {t.queue.status[status as keyof typeof t.queue.status]} ({group.length})
+                {t.queue.status[status as keyof typeof t.queue.status]} (
+                {group.length})
               </span>
             </div>
             <div className="space-y-2">
               {group.map(post => {
-                const platforms: string[] = Array.isArray(post.platforms) ? post.platforms as string[] : [];
+                const platforms: string[] = Array.isArray(post.platforms)
+                  ? (post.platforms as string[])
+                  : [];
                 return (
                   <Card key={post.id} className="overflow-hidden">
                     <CardContent className="p-4">
                       <div className="flex gap-4">
                         {post.imageUrl && (
-                          <img src={post.imageUrl} alt="" className="w-16 h-16 rounded-lg object-cover shrink-0" />
+                          <img
+                            src={post.imageUrl}
+                            alt=""
+                            className="w-16 h-16 rounded-lg object-cover shrink-0"
+                          />
                         )}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-1">
-                            <p className="text-sm font-medium truncate">{post.title || post.caption.slice(0, 60)}</p>
+                            <p className="text-sm font-medium truncate">
+                              {post.title || post.caption.slice(0, 60)}
+                            </p>
                             <div className="flex gap-1 shrink-0">
                               {platforms.map((p: any) => {
                                 const Icon = PLATFORM_ICONS[p] ?? Share2;
-                                return <Icon key={p} className="w-4 h-4 text-muted-foreground" />;
+                                return (
+                                  <Icon
+                                    key={p}
+                                    className="w-4 h-4 text-muted-foreground"
+                                  />
+                                );
                               })}
                             </div>
                           </div>
-                          <p className="text-xs text-muted-foreground line-clamp-2">{post.caption}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            {post.caption}
+                          </p>
                           {post.scheduledAt && (
                             <div className="flex items-center gap-1 mt-1.5">
                               <Clock className="w-3 h-3 text-muted-foreground" />
                               <span className="text-xs text-muted-foreground">
-                                {new Date(post.scheduledAt).toLocaleString(locale === "cs" ? "cs-CZ" : "en-US")}
+                                {new Date(post.scheduledAt).toLocaleString(
+                                  locale === "cs" ? "cs-CZ" : "en-US"
+                                )}
                               </span>
                             </div>
                           )}
                           {post.errorMessage && (
-                            <p className="text-xs text-red-500 mt-1">{post.errorMessage}</p>
+                            <p className="text-xs text-red-500 mt-1">
+                              {post.errorMessage}
+                            </p>
                           )}
                         </div>
                         <div className="flex flex-col gap-1 shrink-0">
                           {(status === "scheduled" || status === "draft") && (
                             <Button
-                              size="sm" variant="outline" className="text-xs h-7 px-2"
-                              onClick={() => publishNow.mutate({ postId: post.id })}
+                              size="sm"
+                              variant="outline"
+                              className="text-xs h-7 px-2"
+                              onClick={() =>
+                                publishNow.mutate({ postId: post.id })
+                              }
                               disabled={publishNow.isPending}
                             >
                               <Send className="w-3 h-3 mr-1" />
                               {t.queue.publishNow}
                             </Button>
                           )}
-                          {(status === "draft" || status === "scheduled" || status === "failed") && (
+                          {(status === "draft" ||
+                            status === "scheduled" ||
+                            status === "failed") && (
                             <Button
-                              size="sm" variant="ghost" className="text-xs h-7 px-2 text-red-500 hover:text-red-600"
-                              onClick={() => deletePost.mutate({ postId: post.id })}
+                              size="sm"
+                              variant="ghost"
+                              className="text-xs h-7 px-2 text-red-500 hover:text-red-600"
+                              onClick={() =>
+                                deletePost.mutate({ postId: post.id })
+                              }
                             >
                               <Trash2 className="w-3 h-3 mr-1" />
                               {t.queue.delete}
@@ -310,7 +436,17 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
   const [title, setTitle] = useState("");
   const [hashtags, setHashtags] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [postType, setPostType] = useState<"hd_type" | "quote" | "infographic" | "transit" | "iching" | "promo" | "custom" | "tiktok_script" | "story">("custom");
+  const [postType, setPostType] = useState<
+    | "hd_type"
+    | "quote"
+    | "infographic"
+    | "transit"
+    | "iching"
+    | "promo"
+    | "custom"
+    | "tiktok_script"
+    | "story"
+  >("custom");
   const [postLocale, setPostLocale] = useState<"cs" | "en">(locale);
   const [scheduledAt, setScheduledAt] = useState("");
   const [selectedAccounts, setSelectedAccounts] = useState<number[]>([]);
@@ -319,17 +455,28 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
 
   const savePost = trpc.social.savePost.useMutation({
     onSuccess: () => {
-      toast.success(scheduledAt
-        ? (locale === "cs" ? "Příspěvek naplánován!" : "Post scheduled!")
-        : (locale === "cs" ? "Koncept uložen" : "Draft saved"));
+      toast.success(
+        scheduledAt
+          ? locale === "cs"
+            ? "Příspěvek naplánován!"
+            : "Post scheduled!"
+          : locale === "cs"
+            ? "Koncept uložen"
+            : "Draft saved"
+      );
       utils.social.listPosts.invalidate();
-      setCaption(""); setTitle(""); setHashtags(""); setImageUrl(""); setScheduledAt(""); setSelectedAccounts([]);
+      setCaption("");
+      setTitle("");
+      setHashtags("");
+      setImageUrl("");
+      setScheduledAt("");
+      setSelectedAccounts([]);
     },
-    onError: (e) => toast.error(e.message),
+    onError: e => toast.error(e.message),
   });
 
   const generateCaption = trpc.social.generateCaption.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       const parts = data.caption.split(/\n\n#/);
       if (parts.length > 1) {
         setCaption(parts[0].trim());
@@ -338,23 +485,34 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
         setCaption(data.caption);
       }
     },
-    onError: (e) => toast.error(e.message),
+    onError: e => toast.error(e.message),
   });
 
   const toggleAccount = (id: number) => {
-    setSelectedAccounts(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]);
+    setSelectedAccounts(prev =>
+      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+    );
   };
 
   const handleSave = (asDraft: boolean) => {
     if (!caption.trim()) {
-      toast.error(locale === "cs" ? "Vyplňte text příspěvku" : "Enter post caption");
+      toast.error(
+        locale === "cs" ? "Vyplňte text příspěvku" : "Enter post caption"
+      );
       return;
     }
     if (selectedAccounts.length === 0) {
-      toast.error(locale === "cs" ? "Vyberte alespoň jeden účet" : "Select at least one account");
+      toast.error(
+        locale === "cs"
+          ? "Vyberte alespoň jeden účet"
+          : "Select at least one account"
+      );
       return;
     }
-    const platforms = accounts?.filter(a => selectedAccounts.includes(a.id)).map(a => a.platform) ?? [];
+    const platforms =
+      accounts
+        ?.filter(a => selectedAccounts.includes(a.id))
+        .map(a => a.platform) ?? [];
     savePost.mutate({
       title: title || undefined,
       caption,
@@ -362,7 +520,7 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
       imageUrl: imageUrl || undefined,
       postType,
       locale: postLocale,
-      scheduledAt: (!asDraft && scheduledAt) ? new Date(scheduledAt) : undefined,
+      scheduledAt: !asDraft && scheduledAt ? new Date(scheduledAt) : undefined,
       platforms,
       accountIds: selectedAccounts,
     });
@@ -373,15 +531,26 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label>{t.compose.postTitle}</Label>
-          <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Interní název..." />
+          <Input
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            placeholder="Interní název..."
+          />
         </div>
         <div className="space-y-1.5">
           <Label>{t.compose.postType}</Label>
-          <Select value={postType} onValueChange={v => setPostType(v as typeof postType)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+          <Select
+            value={postType}
+            onValueChange={v => setPostType(v as typeof postType)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {Object.entries(t.compose.postTypes).map(([k, v]) => (
-                <SelectItem key={k} value={k}>{v}</SelectItem>
+                <SelectItem key={k} value={k}>
+                  {v}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -392,8 +561,17 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
         <div className="flex items-center justify-between">
           <Label>{t.compose.caption}</Label>
           <Button
-            size="sm" variant="outline" className="h-7 text-xs gap-1"
-            onClick={() => generateCaption.mutate({ postType, topic: caption || "Human Design", locale: postLocale, tone: "inspirational" })}
+            size="sm"
+            variant="outline"
+            className="h-7 text-xs gap-1"
+            onClick={() =>
+              generateCaption.mutate({
+                postType,
+                topic: caption || "Human Design",
+                locale: postLocale,
+                tone: "inspirational",
+              })
+            }
             disabled={generateCaption.isPending}
           >
             <Wand2 className="w-3 h-3" />
@@ -401,30 +579,55 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
           </Button>
         </div>
         <Textarea
-          value={caption} onChange={e => setCaption(e.target.value)}
-          placeholder={t.compose.captionPlaceholder} rows={5} className="resize-none"
+          value={caption}
+          onChange={e => setCaption(e.target.value)}
+          placeholder={t.compose.captionPlaceholder}
+          rows={5}
+          className="resize-none"
         />
-        <p className="text-xs text-muted-foreground text-right">{caption.length} znaků</p>
+        <p className="text-xs text-muted-foreground text-right">
+          {caption.length} znaků
+        </p>
       </div>
 
       <div className="space-y-1.5">
         <Label>{t.compose.hashtags}</Label>
-        <Input value={hashtags} onChange={e => setHashtags(e.target.value)} placeholder={t.compose.hashtagsPlaceholder} />
+        <Input
+          value={hashtags}
+          onChange={e => setHashtags(e.target.value)}
+          placeholder={t.compose.hashtagsPlaceholder}
+        />
       </div>
 
       <div className="space-y-1.5">
         <Label>{t.compose.imageUrl}</Label>
         <div className="flex gap-2">
-          <Input value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder={t.compose.imageUrlPlaceholder} className="flex-1" />
-          {imageUrl && <img src={imageUrl} alt="" className="w-10 h-10 rounded object-cover border" />}
+          <Input
+            value={imageUrl}
+            onChange={e => setImageUrl(e.target.value)}
+            placeholder={t.compose.imageUrlPlaceholder}
+            className="flex-1"
+          />
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt=""
+              className="w-10 h-10 rounded object-cover border"
+            />
+          )}
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label>{t.compose.locale}</Label>
-          <Select value={postLocale} onValueChange={v => setPostLocale(v as "cs" | "en")}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+          <Select
+            value={postLocale}
+            onValueChange={v => setPostLocale(v as "cs" | "en")}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="cs">🇨🇿 Čeština</SelectItem>
               <SelectItem value="en">🇬🇧 English</SelectItem>
@@ -433,14 +636,20 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
         </div>
         <div className="space-y-1.5">
           <Label>{t.compose.scheduleAt}</Label>
-          <Input type="datetime-local" value={scheduledAt} onChange={e => setScheduledAt(e.target.value)} />
+          <Input
+            type="datetime-local"
+            value={scheduledAt}
+            onChange={e => setScheduledAt(e.target.value)}
+          />
         </div>
       </div>
 
       <div className="space-y-2">
         <Label>{t.compose.accounts}</Label>
         {!accounts || accounts.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t.compose.noAccounts}</p>
+          <p className="text-sm text-muted-foreground">
+            {t.compose.noAccounts}
+          </p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {accounts.map(acc => {
@@ -463,11 +672,18 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
       </div>
 
       <div className="flex gap-3 pt-2">
-        <Button variant="outline" onClick={() => handleSave(true)} disabled={savePost.isPending}>
+        <Button
+          variant="outline"
+          onClick={() => handleSave(true)}
+          disabled={savePost.isPending}
+        >
           <Edit className="w-4 h-4 mr-2" />
           {t.compose.saveDraft}
         </Button>
-        <Button onClick={() => handleSave(false)} disabled={savePost.isPending || !scheduledAt}>
+        <Button
+          onClick={() => handleSave(false)}
+          disabled={savePost.isPending || !scheduledAt}
+        >
           <Calendar className="w-4 h-4 mr-2" />
           {t.compose.schedule}
         </Button>
@@ -480,17 +696,33 @@ function ComposeTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
 
 function AiGeneratorTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
   const [topic, setTopic] = useState("");
-  const [style, setStyle] = useState<"dark_cosmic" | "light_minimal" | "golden_mystical">("dark_cosmic");
-  const [postType, setPostType] = useState<"hd_type" | "quote" | "infographic" | "transit" | "iching" | "promo" | "custom" | "tiktok_script" | "story">("hd_type");
+  const [style, setStyle] = useState<
+    "dark_cosmic" | "light_minimal" | "golden_mystical"
+  >("dark_cosmic");
+  const [postType, setPostType] = useState<
+    | "hd_type"
+    | "quote"
+    | "infographic"
+    | "transit"
+    | "iching"
+    | "promo"
+    | "custom"
+    | "tiktok_script"
+    | "story"
+  >("hd_type");
   const [aspectRatio, setAspectRatio] = useState<"1:1" | "4:5" | "9:16">("1:1");
-  const [generatedImages, setGeneratedImages] = useState<{ imageUrl: string; prompt: string }[]>([]);
+  const [generatedImages, setGeneratedImages] = useState<
+    { imageUrl: string; prompt: string }[]
+  >([]);
 
   const generateImage = trpc.social.generatePostImage.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       setGeneratedImages(prev => [data, ...prev]);
-      toast.success(locale === "cs" ? "Obrázek vygenerován!" : "Image generated!");
+      toast.success(
+        locale === "cs" ? "Obrázek vygenerován!" : "Image generated!"
+      );
     },
-    onError: (e) => toast.error(e.message),
+    onError: e => toast.error(e.message),
   });
 
   const copyUrl = (url: string) => {
@@ -512,30 +744,49 @@ function AiGeneratorTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>{t.aiGen.postType}</Label>
-              <Select value={postType} onValueChange={v => setPostType(v as typeof postType)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={postType}
+                onValueChange={v => setPostType(v as typeof postType)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {Object.entries(t.compose.postTypes).map(([k, v]) => (
-                    <SelectItem key={k} value={k}>{v}</SelectItem>
+                    <SelectItem key={k} value={k}>
+                      {v}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
               <Label>{t.aiGen.style}</Label>
-              <Select value={style} onValueChange={v => setStyle(v as typeof style)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={style}
+                onValueChange={v => setStyle(v as typeof style)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {Object.entries(t.aiGen.styles).map(([k, v]) => (
-                    <SelectItem key={k} value={k}>{v}</SelectItem>
+                    <SelectItem key={k} value={k}>
+                      {v}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
               <Label>{t.aiGen.aspectRatio}</Label>
-              <Select value={aspectRatio} onValueChange={v => setAspectRatio(v as typeof aspectRatio)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={aspectRatio}
+                onValueChange={v => setAspectRatio(v as typeof aspectRatio)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="1:1">1:1 (Square)</SelectItem>
                   <SelectItem value="4:5">4:5 (Portrait)</SelectItem>
@@ -546,17 +797,35 @@ function AiGeneratorTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
           </div>
           <div className="space-y-1.5">
             <Label>{t.aiGen.topic}</Label>
-            <Input value={topic} onChange={e => setTopic(e.target.value)} placeholder={t.aiGen.topicPlaceholder} />
+            <Input
+              value={topic}
+              onChange={e => setTopic(e.target.value)}
+              placeholder={t.aiGen.topicPlaceholder}
+            />
           </div>
           <Button
             className="w-full"
-            onClick={() => generateImage.mutate({ postType, topic: topic || "Human Design", style, locale, aspectRatio })}
+            onClick={() =>
+              generateImage.mutate({
+                postType,
+                topic: topic || "Human Design",
+                style,
+                locale,
+                aspectRatio,
+              })
+            }
             disabled={generateImage.isPending}
           >
             {generateImage.isPending ? (
-              <><RefreshCw className="w-4 h-4 mr-2 animate-spin" />{t.aiGen.generating}</>
+              <>
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                {t.aiGen.generating}
+              </>
             ) : (
-              <><Zap className="w-4 h-4 mr-2" />{t.aiGen.generate}</>
+              <>
+                <Zap className="w-4 h-4 mr-2" />
+                {t.aiGen.generate}
+              </>
             )}
           </Button>
         </CardContent>
@@ -566,21 +835,39 @@ function AiGeneratorTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
         <div className="grid grid-cols-2 gap-4">
           {generatedImages.map((img, i) => (
             <Card key={i} className="overflow-hidden group">
-              <div className={`relative ${aspectRatio === "9:16" ? "aspect-[9/16]" : aspectRatio === "4:5" ? "aspect-[4/5]" : "aspect-square"}`}>
-                <img src={img.imageUrl} alt="" className="w-full h-full object-cover" />
+              <div
+                className={`relative ${aspectRatio === "9:16" ? "aspect-[9/16]" : aspectRatio === "4:5" ? "aspect-[4/5]" : "aspect-square"}`}
+              >
+                <img
+                  src={img.imageUrl}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <Button size="sm" variant="secondary" onClick={() => copyUrl(img.imageUrl)}>
-                    <Copy className="w-3 h-3 mr-1" />{t.aiGen.useImage}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => copyUrl(img.imageUrl)}
+                  >
+                    <Copy className="w-3 h-3 mr-1" />
+                    {t.aiGen.useImage}
                   </Button>
-                  <a href={img.imageUrl} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={img.imageUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Button size="sm" variant="outline">
-                      <ExternalLink className="w-3 h-3 mr-1" />{t.aiGen.download}
+                      <ExternalLink className="w-3 h-3 mr-1" />
+                      {t.aiGen.download}
                     </Button>
                   </a>
                 </div>
               </div>
               <CardContent className="p-3">
-                <p className="text-xs text-muted-foreground line-clamp-2">{img.prompt}</p>
+                <p className="text-xs text-muted-foreground line-clamp-2">
+                  {img.prompt}
+                </p>
               </CardContent>
             </Card>
           ))}
@@ -596,7 +883,9 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
   const utils = trpc.useUtils();
 
   const [showForm, setShowForm] = useState(false);
-  const [platform, setPlatform] = useState<"facebook" | "instagram" | "linkedin" | "pinterest" | "tiktok">("instagram");
+  const [platform, setPlatform] = useState<
+    "facebook" | "instagram" | "linkedin" | "pinterest" | "tiktok"
+  >("instagram");
   const [accountName, setAccountName] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [accountId, setAccountId] = useState("");
@@ -610,9 +899,13 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
       toast.success(locale === "cs" ? "Účet připojen!" : "Account connected!");
       utils.social.listAccounts.invalidate();
       setShowForm(false);
-      setAccessToken(""); setAccountId(""); setAccountName(""); setPageId(""); setPageName("");
+      setAccessToken("");
+      setAccountId("");
+      setAccountName("");
+      setPageId("");
+      setPageName("");
     },
-    onError: (e) => toast.error(e.message),
+    onError: e => toast.error(e.message),
   });
 
   const disconnectAccount = trpc.social.disconnectAccount.useMutation({
@@ -620,25 +913,30 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
       toast.success(locale === "cs" ? "Účet odpojen" : "Account disconnected");
       utils.social.listAccounts.invalidate();
     },
-    onError: (e) => toast.error(e.message),
+    onError: e => toast.error(e.message),
   });
 
   const PLATFORM_INSTRUCTIONS: Record<string, string> = {
-    facebook: locale === "cs"
-      ? "Získejte Page Access Token z Meta for Developers → Tools → Graph API Explorer. Vyberte svou stránku a zkopírujte token."
-      : "Get your Page Access Token from Meta for Developers → Tools → Graph API Explorer. Select your page and copy the token.",
-    instagram: locale === "cs"
-      ? "Instagram vyžaduje Facebook Page Access Token s oprávněním instagram_basic a instagram_content_publish. Účet musí být Business nebo Creator."
-      : "Instagram requires a Facebook Page Access Token with instagram_basic and instagram_content_publish permissions. Account must be Business or Creator.",
-    linkedin: locale === "cs"
-      ? "Získejte Access Token z LinkedIn Developer Portal → OAuth 2.0 Tools. Potřebujete oprávnění w_member_social."
-      : "Get your Access Token from LinkedIn Developer Portal → OAuth 2.0 Tools. You need the w_member_social permission.",
-    pinterest: locale === "cs"
-      ? "Vygenerujte Access Token z Pinterest Developer Portal. Zadejte ho níže společně s Board ID."
-      : "Generate an Access Token from the Pinterest Developer Portal. Enter it below with the Board ID.",
-    tiktok: locale === "cs"
-      ? "Pro TikTok použijte Access Token z TikTok For Developers portálu."
-      : "For TikTok, use the Access Token from TikTok For Developers portal.",
+    facebook:
+      locale === "cs"
+        ? "Získejte Page Access Token z Meta for Developers → Tools → Graph API Explorer. Vyberte svou stránku a zkopírujte token."
+        : "Get your Page Access Token from Meta for Developers → Tools → Graph API Explorer. Select your page and copy the token.",
+    instagram:
+      locale === "cs"
+        ? "Instagram vyžaduje Facebook Page Access Token s oprávněním instagram_basic a instagram_content_publish. Účet musí být Business nebo Creator."
+        : "Instagram requires a Facebook Page Access Token with instagram_basic and instagram_content_publish permissions. Account must be Business or Creator.",
+    linkedin:
+      locale === "cs"
+        ? "Získejte Access Token z LinkedIn Developer Portal → OAuth 2.0 Tools. Potřebujete oprávnění w_member_social."
+        : "Get your Access Token from LinkedIn Developer Portal → OAuth 2.0 Tools. You need the w_member_social permission.",
+    pinterest:
+      locale === "cs"
+        ? "Vygenerujte Access Token z Pinterest Developer Portal. Zadejte ho níže společně s Board ID."
+        : "Generate an Access Token from the Pinterest Developer Portal. Enter it below with the Board ID.",
+    tiktok:
+      locale === "cs"
+        ? "Pro TikTok použijte Access Token z TikTok For Developers portálu."
+        : "For TikTok, use the Access Token from TikTok For Developers portal.",
   };
 
   return (
@@ -647,7 +945,9 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
         <div>
           <h3 className="font-semibold">{t.accounts.title}</h3>
           <p className="text-sm text-muted-foreground">
-            {locale === "cs" ? "Spravujte připojené sociální sítě" : "Manage connected social media accounts"}
+            {locale === "cs"
+              ? "Spravujte připojené sociální sítě"
+              : "Manage connected social media accounts"}
           </p>
         </div>
         <Button onClick={() => setShowForm(!showForm)} size="sm">
@@ -661,8 +961,13 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
           <CardContent className="pt-5 space-y-4">
             <div className="space-y-1.5">
               <Label>{t.accounts.platform}</Label>
-              <Select value={platform} onValueChange={v => setPlatform(v as typeof platform)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={platform}
+                onValueChange={v => setPlatform(v as typeof platform)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="facebook">Facebook</SelectItem>
                   <SelectItem value="instagram">Instagram</SelectItem>
@@ -671,28 +976,52 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
                   <SelectItem value="tiktok">TikTok</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground mt-1">{PLATFORM_INSTRUCTIONS[platform]}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {PLATFORM_INSTRUCTIONS[platform]}
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>{t.accounts.accountName}</Label>
-                <Input value={accountName} onChange={e => setAccountName(e.target.value)} placeholder="Můj Instagram" />
+                <Input
+                  value={accountName}
+                  onChange={e => setAccountName(e.target.value)}
+                  placeholder="Můj Instagram"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Account / User ID</Label>
-                <Input value={accountId} onChange={e => setAccountId(e.target.value)} placeholder="123456789" />
+                <Input
+                  value={accountId}
+                  onChange={e => setAccountId(e.target.value)}
+                  placeholder="123456789"
+                />
               </div>
             </div>
-            {(platform === "facebook" || platform === "instagram" || platform === "pinterest") && (
+            {(platform === "facebook" ||
+              platform === "instagram" ||
+              platform === "pinterest") && (
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>{platform === "pinterest" ? "Board ID" : t.accounts.pageId}</Label>
-                  <Input value={pageId} onChange={e => setPageId(e.target.value)} placeholder={platform === "pinterest" ? "Zadejte Board ID" : "Page ID"} />
+                  <Label>
+                    {platform === "pinterest" ? "Board ID" : t.accounts.pageId}
+                  </Label>
+                  <Input
+                    value={pageId}
+                    onChange={e => setPageId(e.target.value)}
+                    placeholder={
+                      platform === "pinterest" ? "Zadejte Board ID" : "Page ID"
+                    }
+                  />
                 </div>
                 {(platform === "facebook" || platform === "instagram") && (
                   <div className="space-y-1.5">
                     <Label>Page Name</Label>
-                    <Input value={pageName} onChange={e => setPageName(e.target.value)} placeholder="Název stránky" />
+                    <Input
+                      value={pageName}
+                      onChange={e => setPageName(e.target.value)}
+                      placeholder="Název stránky"
+                    />
                   </div>
                 )}
               </div>
@@ -700,31 +1029,56 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
             <div className="space-y-1.5">
               <Label>{t.accounts.accessToken}</Label>
               <Input
-                type="password" value={accessToken}
+                type="password"
+                value={accessToken}
                 onChange={e => setAccessToken(e.target.value)}
                 placeholder="EAABwzLixnjYBO..."
               />
             </div>
             <div className="flex gap-2">
               <Button
-                onClick={() => saveAccount.mutate({ platform, accountName, accountId, accessToken, pageId: pageId || undefined, pageName: pageName || undefined })}
-                disabled={saveAccount.isPending || !accountName || !accountId || !accessToken}
+                onClick={() =>
+                  saveAccount.mutate({
+                    platform,
+                    accountName,
+                    accountId,
+                    accessToken,
+                    pageId: pageId || undefined,
+                    pageName: pageName || undefined,
+                  })
+                }
+                disabled={
+                  saveAccount.isPending ||
+                  !accountName ||
+                  !accountId ||
+                  !accessToken
+                }
               >
                 {t.accounts.save}
               </Button>
-              <Button variant="ghost" onClick={() => setShowForm(false)}>{t.accounts.cancel}</Button>
+              <Button variant="ghost" onClick={() => setShowForm(false)}>
+                {t.accounts.cancel}
+              </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
       {isLoading ? (
-        <div className="space-y-2">{[1, 2].map(i => <Skeleton key={i} className="h-16 w-full" />)}</div>
+        <div className="space-y-2">
+          {[1, 2].map(i => (
+            <Skeleton key={i} className="h-16 w-full" />
+          ))}
+        </div>
       ) : !accounts || accounts.length === 0 ? (
         <div className="text-center py-12 border border-dashed rounded-xl">
           <Settings className="w-10 h-10 mx-auto text-muted-foreground mb-3 opacity-40" />
-          <p className="font-medium text-muted-foreground">{t.accounts.noAccounts}</p>
-          <p className="text-sm text-muted-foreground mt-1">{t.accounts.noAccountsDesc}</p>
+          <p className="font-medium text-muted-foreground">
+            {t.accounts.noAccounts}
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {t.accounts.noAccountsDesc}
+          </p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -733,20 +1087,32 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
             return (
               <Card key={acc.id}>
                 <CardContent className="p-4 flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-full ${PLATFORM_COLORS[acc.platform] ?? "bg-muted"} flex items-center justify-center shrink-0`}>
+                  <div
+                    className={`w-10 h-10 rounded-full ${PLATFORM_COLORS[acc.platform] ?? "bg-muted"} flex items-center justify-center shrink-0`}
+                  >
                     <Icon className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm">{acc.accountName}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{acc.platform}{acc.pageName ? ` · ${acc.pageName}` : ""}</p>
+                    <p className="text-xs text-muted-foreground capitalize">
+                      {acc.platform}
+                      {acc.pageName ? ` · ${acc.pageName}` : ""}
+                    </p>
                   </div>
-                  <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 dark:bg-green-950/20 shrink-0">
+                  <Badge
+                    variant="outline"
+                    className="text-green-600 border-green-300 bg-green-50 dark:bg-green-950/20 shrink-0"
+                  >
                     <CheckCircle className="w-3 h-3 mr-1" />
                     {t.accounts.connected}
                   </Badge>
                   <Button
-                    size="sm" variant="ghost" className="text-red-500 hover:text-red-600 shrink-0"
-                    onClick={() => disconnectAccount.mutate({ accountId: acc.id })}
+                    size="sm"
+                    variant="ghost"
+                    className="text-red-500 hover:text-red-600 shrink-0"
+                    onClick={() =>
+                      disconnectAccount.mutate({ accountId: acc.id })
+                    }
                   >
                     {t.accounts.disconnect}
                   </Button>
@@ -761,9 +1127,19 @@ function AccountsTab({ locale, t }: { locale: Locale; t: typeof T.cs }) {
 }
 
 function OverviewTab({ locale }: { locale: Locale }) {
-  const { data: posts = [], isLoading } = trpc.social.listPosts.useQuery({ status: "all", limit: 100 });
+  const { data: posts = [], isLoading } = trpc.social.listPosts.useQuery({
+    status: "all",
+    limit: 100,
+  });
   const { data: accounts = [] } = trpc.social.listAccounts.useQuery();
-  if (isLoading) return <div className="grid gap-4 md:grid-cols-4">{[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-28" />)}</div>;
+  if (isLoading)
+    return (
+      <div className="grid gap-4 md:grid-cols-4">
+        {[1, 2, 3, 4].map(i => (
+          <Skeleton key={i} className="h-28" />
+        ))}
+      </div>
+    );
   const counts = {
     scheduled: posts.filter(p => p.status === "scheduled").length,
     published: posts.filter(p => p.status === "published").length,
@@ -771,45 +1147,142 @@ function OverviewTab({ locale }: { locale: Locale }) {
     failed: posts.filter(p => p.status === "failed").length,
   };
   const kpis = [
-    { label: locale === "cs" ? "Naplánováno" : "Scheduled", value: counts.scheduled, icon: CalendarDays, color: "text-blue-600 bg-blue-50" },
-    { label: locale === "cs" ? "Publikováno" : "Published", value: counts.published, icon: CheckCircle, color: "text-emerald-600 bg-emerald-50" },
-    { label: locale === "cs" ? "Koncepty" : "Drafts", value: counts.drafts, icon: Edit, color: "text-violet-600 bg-violet-50" },
-    { label: locale === "cs" ? "Vyžaduje pozornost" : "Needs attention", value: counts.failed, icon: AlertTriangle, color: "text-rose-600 bg-rose-50" },
+    {
+      label: locale === "cs" ? "Naplánováno" : "Scheduled",
+      value: counts.scheduled,
+      icon: CalendarDays,
+      color: "text-blue-600 bg-blue-50",
+    },
+    {
+      label: locale === "cs" ? "Publikováno" : "Published",
+      value: counts.published,
+      icon: CheckCircle,
+      color: "text-emerald-600 bg-emerald-50",
+    },
+    {
+      label: locale === "cs" ? "Koncepty" : "Drafts",
+      value: counts.drafts,
+      icon: Edit,
+      color: "text-violet-600 bg-violet-50",
+    },
+    {
+      label: locale === "cs" ? "Vyžaduje pozornost" : "Needs attention",
+      value: counts.failed,
+      icon: AlertTriangle,
+      color: "text-rose-600 bg-rose-50",
+    },
   ];
   const upcoming = posts
     .filter(p => p.status === "scheduled" && p.scheduledAt)
-    .sort((a, b) => new Date(a.scheduledAt!).getTime() - new Date(b.scheduledAt!).getTime())
+    .sort(
+      (a, b) =>
+        new Date(a.scheduledAt!).getTime() - new Date(b.scheduledAt!).getTime()
+    )
     .slice(0, 5);
   return (
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {kpis.map(({ label, value, icon: Icon, color }) => (
-          <Card key={label} className="border-border/60 shadow-sm"><CardContent className="flex items-center gap-4 p-5">
-            <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${color}`}><Icon className="h-5 w-5" /></div>
-            <div><p className="text-2xl font-bold">{value}</p><p className="text-xs text-muted-foreground">{label}</p></div>
-          </CardContent></Card>
+          <Card key={label} className="border-border/60 shadow-sm">
+            <CardContent className="flex items-center gap-4 p-5">
+              <div
+                className={`flex h-11 w-11 items-center justify-center rounded-xl ${color}`}
+              >
+                <Icon className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{value}</p>
+                <p className="text-xs text-muted-foreground">{label}</p>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
       <div className="grid gap-5 lg:grid-cols-[1.4fr_0.8fr]">
         <Card>
-          <CardHeader><CardTitle className="text-lg">{locale === "cs" ? "Nejbližší obsah" : "Upcoming content"}</CardTitle><CardDescription>{locale === "cs" ? "Co čeká na publikování" : "What is next in your publishing queue"}</CardDescription></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-lg">
+              {locale === "cs" ? "Nejbližší obsah" : "Upcoming content"}
+            </CardTitle>
+            <CardDescription>
+              {locale === "cs"
+                ? "Co čeká na publikování"
+                : "What is next in your publishing queue"}
+            </CardDescription>
+          </CardHeader>
           <CardContent className="space-y-3">
-            {upcoming.length === 0 ? <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">{locale === "cs" ? "Zatím není nic naplánováno." : "Nothing scheduled yet."}</p> : upcoming.map(post => (
-              <div key={post.id} className="flex items-center gap-3 rounded-xl border p-3">
-                {post.imageUrl ? <img src={post.imageUrl} alt="" className="h-12 w-12 rounded-lg object-cover" /> : <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted"><ImageIcon className="h-5 w-5" /></div>}
-                <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{post.title || post.caption}</p><p className="text-xs text-muted-foreground">{new Date(post.scheduledAt!).toLocaleString(locale === "cs" ? "cs-CZ" : "en-US")}</p></div>
-                <Badge variant="secondary">{post.postType}</Badge>
-              </div>
-            ))}
+            {upcoming.length === 0 ? (
+              <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+                {locale === "cs"
+                  ? "Zatím není nic naplánováno."
+                  : "Nothing scheduled yet."}
+              </p>
+            ) : (
+              upcoming.map(post => (
+                <div
+                  key={post.id}
+                  className="flex items-center gap-3 rounded-xl border p-3"
+                >
+                  {post.imageUrl ? (
+                    <img
+                      src={post.imageUrl}
+                      alt=""
+                      className="h-12 w-12 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
+                      <ImageIcon className="h-5 w-5" />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold">
+                      {post.title || post.caption}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(post.scheduledAt!).toLocaleString(
+                        locale === "cs" ? "cs-CZ" : "en-US"
+                      )}
+                    </p>
+                  </div>
+                  <Badge variant="secondary">{post.postType}</Badge>
+                </div>
+              ))
+            )}
           </CardContent>
         </Card>
         <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-white">
-          <CardHeader><CardTitle className="flex items-center gap-2 text-lg"><Radio className="h-5 w-5 text-violet-600" />{locale === "cs" ? "Publikační připravenost" : "Publishing readiness"}</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Radio className="h-5 w-5 text-violet-600" />
+              {locale === "cs"
+                ? "Publikační připravenost"
+                : "Publishing readiness"}
+            </CardTitle>
+          </CardHeader>
           <CardContent className="space-y-4 text-sm">
-            <div className="flex items-center justify-between"><span>{locale === "cs" ? "Připojené účty" : "Connected accounts"}</span><strong>{accounts.length}</strong></div>
-            <div className="flex items-center justify-between"><span>Instagram</span><strong>{accounts.filter(a => a.platform === "instagram").length}</strong></div>
-            <div className="flex items-center justify-between"><span>{locale === "cs" ? "Příspěvky bez chyby" : "Healthy posts"}</span><strong>{Math.max(posts.length - counts.failed, 0)}</strong></div>
-            <p className="rounded-lg bg-white/80 p-3 text-xs text-muted-foreground">{locale === "cs" ? "Vygenerovaný obsah se nejdřív uloží jako koncept nebo plán. Nic se nepublikuje bez vašeho potvrzení." : "Generated content is first saved as a draft or scheduled item. Nothing publishes without your confirmation."}</p>
+            <div className="flex items-center justify-between">
+              <span>
+                {locale === "cs" ? "Připojené účty" : "Connected accounts"}
+              </span>
+              <strong>{accounts.length}</strong>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Instagram</span>
+              <strong>
+                {accounts.filter(a => a.platform === "instagram").length}
+              </strong>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>
+                {locale === "cs" ? "Příspěvky bez chyby" : "Healthy posts"}
+              </span>
+              <strong>{Math.max(posts.length - counts.failed, 0)}</strong>
+            </div>
+            <p className="rounded-lg bg-white/80 p-3 text-xs text-muted-foreground">
+              {locale === "cs"
+                ? "Vygenerovaný obsah se nejdřív uloží jako koncept nebo plán. Nic se nepublikuje bez vašeho potvrzení."
+                : "Generated content is first saved as a draft or scheduled item. Nothing publishes without your confirmation."}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -818,7 +1291,10 @@ function OverviewTab({ locale }: { locale: Locale }) {
 }
 
 function CalendarTab({ locale }: { locale: Locale }) {
-  const { data: posts = [] } = trpc.social.listPosts.useQuery({ status: "all", limit: 100 });
+  const { data: posts = [] } = trpc.social.listPosts.useQuery({
+    status: "all",
+    limit: 100,
+  });
   const days = Array.from({ length: 7 }, (_, index) => {
     const date = new Date();
     date.setHours(0, 0, 0, 0);
@@ -827,15 +1303,65 @@ function CalendarTab({ locale }: { locale: Locale }) {
   });
   return (
     <Card className="overflow-hidden">
-      <CardHeader><CardTitle>{locale === "cs" ? "Obsahový kalendář · 7 dní" : "Content calendar · 7 days"}</CardTitle><CardDescription>{locale === "cs" ? "Rychlý přehled plánované komunikace napříč kanály" : "A quick view of scheduled communication across channels"}</CardDescription></CardHeader>
+      <CardHeader>
+        <CardTitle>
+          {locale === "cs"
+            ? "Obsahový kalendář · 7 dní"
+            : "Content calendar · 7 days"}
+        </CardTitle>
+        <CardDescription>
+          {locale === "cs"
+            ? "Rychlý přehled plánované komunikace napříč kanály"
+            : "A quick view of scheduled communication across channels"}
+        </CardDescription>
+      </CardHeader>
       <CardContent className="overflow-x-auto pb-5">
         <div className="grid min-w-[900px] grid-cols-7 gap-2">
           {days.map(day => {
-            const dayPosts = posts.filter(post => post.scheduledAt && new Date(post.scheduledAt).toDateString() === day.toDateString());
-            return <div key={day.toISOString()} className="min-h-64 rounded-xl border bg-muted/10 p-2">
-              <div className="mb-3 border-b pb-2 text-center"><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{day.toLocaleDateString(locale === "cs" ? "cs-CZ" : "en-US", { weekday: "short" })}</p><p className="font-semibold">{day.getDate()}. {day.getMonth() + 1}.</p></div>
-              <div className="space-y-2">{dayPosts.map(post => <div key={post.id} className="rounded-lg border border-violet-100 bg-white p-2 shadow-sm"><p className="line-clamp-2 text-xs font-medium">{post.title || post.caption}</p><p className="mt-1 text-[10px] text-muted-foreground">{new Date(post.scheduledAt!).toLocaleTimeString(locale === "cs" ? "cs-CZ" : "en-US", { hour: "2-digit", minute: "2-digit" })}</p><Badge className="mt-2 text-[9px]" variant="secondary">{post.postType}</Badge></div>)}</div>
-            </div>;
+            const dayPosts = posts.filter(
+              post =>
+                post.scheduledAt &&
+                new Date(post.scheduledAt).toDateString() === day.toDateString()
+            );
+            return (
+              <div
+                key={day.toISOString()}
+                className="min-h-64 rounded-xl border bg-muted/10 p-2"
+              >
+                <div className="mb-3 border-b pb-2 text-center">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    {day.toLocaleDateString(
+                      locale === "cs" ? "cs-CZ" : "en-US",
+                      { weekday: "short" }
+                    )}
+                  </p>
+                  <p className="font-semibold">
+                    {day.getDate()}. {day.getMonth() + 1}.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  {dayPosts.map(post => (
+                    <div
+                      key={post.id}
+                      className="rounded-lg border border-violet-100 bg-white p-2 shadow-sm"
+                    >
+                      <p className="line-clamp-2 text-xs font-medium">
+                        {post.title || post.caption}
+                      </p>
+                      <p className="mt-1 text-[10px] text-muted-foreground">
+                        {new Date(post.scheduledAt!).toLocaleTimeString(
+                          locale === "cs" ? "cs-CZ" : "en-US",
+                          { hour: "2-digit", minute: "2-digit" }
+                        )}
+                      </p>
+                      <Badge className="mt-2 text-[9px]" variant="secondary">
+                        {post.postType}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
           })}
         </div>
       </CardContent>
@@ -847,58 +1373,321 @@ function HighPriestessTab({ locale }: { locale: Locale }) {
   const utils = trpc.useUtils();
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [theme, setTheme] = useState("");
-  const [scheduleAt, setScheduleAt] = useState(() => `${new Date().toISOString().slice(0, 10)}T09:00`);
+  const [scheduleAt, setScheduleAt] = useState(
+    () => `${new Date().toISOString().slice(0, 10)}T09:00`
+  );
   const [selectedAccountIds, setSelectedAccountIds] = useState<number[]>([]);
   const { data: accounts = [] } = trpc.social.listAccounts.useQuery();
-  const instagramAccounts = accounts.filter(account => account.platform === "instagram");
-  const generate = trpc.social.generateHighPriestessStory.useMutation({ onError: error => toast.error(error.message) });
+  const instagramAccounts = accounts.filter(
+    account => account.platform === "instagram"
+  );
+  const generate = trpc.social.generateHighPriestessStory.useMutation({
+    onError: error => toast.error(error.message),
+  });
   const save = trpc.social.savePost.useMutation({
-    onSuccess: () => { toast.success(locale === "cs" ? "Story byla přidána do plánu." : "Story added to the schedule."); utils.social.listPosts.invalidate(); },
+    onSuccess: () => {
+      toast.success(
+        locale === "cs"
+          ? "Story byla přidána do plánu."
+          : "Story added to the schedule."
+      );
+      utils.social.listPosts.invalidate();
+    },
     onError: error => toast.error(error.message),
   });
   const story = generate.data;
-  const toggleAccount = (id: number) => setSelectedAccountIds(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);
+  const toggleAccount = (id: number) =>
+    setSelectedAccountIds(current =>
+      current.includes(id)
+        ? current.filter(item => item !== id)
+        : [...current, id]
+    );
   return (
     <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
       <Card className="overflow-hidden border-violet-200">
         <div className="aspect-[9/16] bg-slate-950">
-          <img src={story?.imageUrl || "/images/brand/veleknezka-master-v1.png"} alt="AI průvodkyně Velekněžka" className="h-full w-full object-cover" />
+          <img
+            src={story?.imageUrl || "/images/brand/veleknezka-master-v1.png"}
+            alt="AI průvodkyně Marie"
+            className="h-full w-full object-cover"
+          />
         </div>
-        <CardContent className="p-4"><p className="text-xs text-muted-foreground">{locale === "cs" ? "Velekněžka je transparentně označená AI průvodkyně. Jednotný master portrét drží vizuální identitu napříč Stories." : "The High Priestess is a clearly disclosed AI guide. The master portrait keeps her identity consistent across Stories."}</p></CardContent>
+        <CardContent className="p-4">
+          <p className="text-xs text-muted-foreground">
+            {locale === "cs"
+              ? "Marie je transparentně označená AI průvodkyně. Jednotný master portrét drží vizuální identitu napříč Stories."
+              : "Marie is a clearly disclosed AI guide. The master portrait keeps her identity consistent across Stories."}
+          </p>
+        </CardContent>
       </Card>
       <div className="space-y-5">
         <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><Crown className="h-5 w-5 text-violet-600" />{locale === "cs" ? "Studio denního poselství" : "Daily message studio"}</CardTitle><CardDescription>{locale === "cs" ? "Tranzity → praktické poselství → branded Story → plán" : "Transits → practical message → branded Story → schedule"}</CardDescription></CardHeader>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-violet-600" />
+              {locale === "cs"
+                ? "Studio denního poselství"
+                : "Daily message studio"}
+            </CardTitle>
+            <CardDescription>
+              {locale === "cs"
+                ? "Tranzity → praktické poselství → branded Story → plán"
+                : "Transits → practical message → branded Story → schedule"}
+            </CardDescription>
+          </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-1.5"><Label>{locale === "cs" ? "Datum" : "Date"}</Label><Input type="date" value={date} onChange={event => { setDate(event.target.value); setScheduleAt(`${event.target.value}T09:00`); }} /></div>
-            <div className="space-y-1.5"><Label>{locale === "cs" ? "Volitelné téma" : "Optional theme"}</Label><Input value={theme} onChange={event => setTheme(event.target.value)} placeholder={locale === "cs" ? "např. rozhodování bez tlaku" : "e.g. decisions without pressure"} /></div>
-            <Button className="md:col-span-2" onClick={() => generate.mutate({ locale, publishDate: new Date(`${date}T12:00:00`), theme: theme || undefined })} disabled={generate.isPending}>
-              {generate.isPending ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}{generate.isPending ? (locale === "cs" ? "Tvořím Story..." : "Creating Story...") : (locale === "cs" ? "Vytvořit denní Story" : "Create daily Story")}
+            <div className="space-y-1.5">
+              <Label>{locale === "cs" ? "Datum" : "Date"}</Label>
+              <Input
+                type="date"
+                value={date}
+                onChange={event => {
+                  setDate(event.target.value);
+                  setScheduleAt(`${event.target.value}T09:00`);
+                }}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>
+                {locale === "cs" ? "Volitelné téma" : "Optional theme"}
+              </Label>
+              <Input
+                value={theme}
+                onChange={event => setTheme(event.target.value)}
+                placeholder={
+                  locale === "cs"
+                    ? "např. rozhodování bez tlaku"
+                    : "e.g. decisions without pressure"
+                }
+              />
+            </div>
+            <Button
+              className="md:col-span-2"
+              onClick={() =>
+                generate.mutate({
+                  locale,
+                  publishDate: new Date(`${date}T12:00:00`),
+                  theme: theme || undefined,
+                })
+              }
+              disabled={generate.isPending}
+            >
+              {generate.isPending ? (
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="mr-2 h-4 w-4" />
+              )}
+              {generate.isPending
+                ? locale === "cs"
+                  ? "Tvořím Story..."
+                  : "Creating Story..."
+                : locale === "cs"
+                  ? "Vytvořit denní Story"
+                  : "Create daily Story"}
             </Button>
           </CardContent>
         </Card>
-        {story && <Card className="border-violet-200 bg-violet-50/30"><CardContent className="space-y-4 p-5">
-          <div><p className="text-xs uppercase tracking-wider text-violet-600">{story.sunGate} · Luna {story.moonGate}</p><h3 className="mt-1 font-serif text-2xl font-semibold">{story.headline}</h3><p className="mt-2 text-sm">{story.message}</p></div>
-          <div className="rounded-xl bg-white p-3 text-sm"><strong>{locale === "cs" ? "Dnešní krok:" : "Today's action:"}</strong> {story.practicalAction}</div>
-          <div><Label>{locale === "cs" ? "Voiceover scénář" : "Voiceover script"}</Label><p className="mt-1 rounded-xl border bg-white p-3 text-sm text-muted-foreground">{story.spokenScript}</p></div>
-          <div className="grid gap-4 md:grid-cols-2"><div className="space-y-1.5"><Label>{locale === "cs" ? "Čas publikování" : "Publish time"}</Label><Input type="datetime-local" value={scheduleAt} onChange={event => setScheduleAt(event.target.value)} /></div><div className="space-y-1.5"><Label>Instagram</Label><div className="flex flex-wrap gap-2">{instagramAccounts.map(account => <button type="button" key={account.id} onClick={() => toggleAccount(account.id)} className={`rounded-full border px-3 py-2 text-xs ${selectedAccountIds.includes(account.id) ? "border-violet-500 bg-violet-100 text-violet-800" : "bg-white"}`}>@{account.accountHandle || account.accountName}</button>)}{instagramAccounts.length === 0 && <span className="text-xs text-amber-700">{locale === "cs" ? "Nejdřív připojte Instagram v záložce Účty." : "Connect Instagram in Accounts first."}</span>}</div></div></div>
-          <div className="flex flex-wrap gap-2"><Button variant="outline" asChild><a href={story.imageUrl} target="_blank" rel="noreferrer"><ExternalLink className="mr-2 h-4 w-4" />{locale === "cs" ? "Otevřít vizuál" : "Open visual"}</a></Button><Button onClick={() => save.mutate({ title: `Velekněžka ${story.date}`, caption: story.caption, hashtags: story.hashtags.join(" "), imageUrl: story.imageUrl, imagePrompt: story.visualPrompt, postType: "story", locale, scheduledAt: new Date(scheduleAt), platforms: ["instagram"], accountIds: selectedAccountIds })} disabled={save.isPending || selectedAccountIds.length === 0}><Calendar className="mr-2 h-4 w-4" />{locale === "cs" ? "Naplánovat Story" : "Schedule Story"}</Button></div>
-        </CardContent></Card>}
+        {story && (
+          <Card className="border-violet-200 bg-violet-50/30">
+            <CardContent className="space-y-4 p-5">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-violet-600">
+                  {story.sunGate} · Luna {story.moonGate}
+                </p>
+                <h3 className="mt-1 font-serif text-2xl font-semibold">
+                  {story.headline}
+                </h3>
+                <p className="mt-2 text-sm">{story.message}</p>
+              </div>
+              <div className="rounded-xl bg-white p-3 text-sm">
+                <strong>
+                  {locale === "cs" ? "Dnešní krok:" : "Today's action:"}
+                </strong>{" "}
+                {story.practicalAction}
+              </div>
+              <div>
+                <Label>
+                  {locale === "cs" ? "Voiceover scénář" : "Voiceover script"}
+                </Label>
+                <p className="mt-1 rounded-xl border bg-white p-3 text-sm text-muted-foreground">
+                  {story.spokenScript}
+                </p>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label>
+                    {locale === "cs" ? "Čas publikování" : "Publish time"}
+                  </Label>
+                  <Input
+                    type="datetime-local"
+                    value={scheduleAt}
+                    onChange={event => setScheduleAt(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Instagram</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {instagramAccounts.map(account => (
+                      <button
+                        type="button"
+                        key={account.id}
+                        onClick={() => toggleAccount(account.id)}
+                        className={`rounded-full border px-3 py-2 text-xs ${selectedAccountIds.includes(account.id) ? "border-violet-500 bg-violet-100 text-violet-800" : "bg-white"}`}
+                      >
+                        @{account.accountHandle || account.accountName}
+                      </button>
+                    ))}
+                    {instagramAccounts.length === 0 && (
+                      <span className="text-xs text-amber-700">
+                        {locale === "cs"
+                          ? "Nejdřív připojte Instagram v záložce Účty."
+                          : "Connect Instagram in Accounts first."}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" asChild>
+                  <a href={story.imageUrl} target="_blank" rel="noreferrer">
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    {locale === "cs" ? "Otevřít vizuál" : "Open visual"}
+                  </a>
+                </Button>
+                <Button
+                  onClick={() =>
+                    save.mutate({
+                      title: `Marie ${story.date}`,
+                      caption: story.caption,
+                      hashtags: story.hashtags.join(" "),
+                      imageUrl: story.imageUrl,
+                      imagePrompt: story.visualPrompt,
+                      postType: "story",
+                      locale,
+                      scheduledAt: new Date(scheduleAt),
+                      platforms: ["instagram"],
+                      accountIds: selectedAccountIds,
+                    })
+                  }
+                  disabled={save.isPending || selectedAccountIds.length === 0}
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  {locale === "cs" ? "Naplánovat Story" : "Schedule Story"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
 }
 
 function InfluencersTab({ locale }: { locale: Locale }) {
-  const { data: influencers = [], isLoading } = trpc.social.listAffiliateInfluencers.useQuery();
-  return <div className="space-y-5">
-    <div className="grid gap-3 md:grid-cols-3">
-      {[{ n: "1", cs: "Pozvánka a schválení", en: "Invite and approve" }, { n: "2", cs: "Kód a měřené odkazy", en: "Code and tracked links" }, { n: "3", cs: "Provize a výplata", en: "Commission and payout" }].map(item => <Card key={item.n}><CardContent className="flex items-center gap-3 p-4"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 font-bold text-violet-700">{item.n}</span><p className="text-sm font-medium">{locale === "cs" ? item.cs : item.en}</p></CardContent></Card>)}
+  const { data: influencers = [], isLoading } =
+    trpc.social.listAffiliateInfluencers.useQuery();
+  return (
+    <div className="space-y-5">
+      <div className="grid gap-3 md:grid-cols-3">
+        {[
+          { n: "1", cs: "Pozvánka a schválení", en: "Invite and approve" },
+          { n: "2", cs: "Kód a měřené odkazy", en: "Code and tracked links" },
+          { n: "3", cs: "Provize a výplata", en: "Commission and payout" },
+        ].map(item => (
+          <Card key={item.n}>
+            <CardContent className="flex items-center gap-3 p-4">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 font-bold text-violet-700">
+                {item.n}
+              </span>
+              <p className="text-sm font-medium">
+                {locale === "cs" ? item.cs : item.en}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-violet-600" />
+            {locale === "cs"
+              ? "Affiliate influenceři"
+              : "Affiliate influencers"}
+          </CardTitle>
+          <CardDescription>
+            {locale === "cs"
+              ? "Připravený základ pro tvůrce s vlastním kódem, provizí a měřením."
+              : "Foundation for creators with their own code, commission and tracking."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <Skeleton className="h-32" />
+          ) : influencers.length === 0 ? (
+            <div className="rounded-xl border border-dashed p-10 text-center">
+              <TrendingUp className="mx-auto mb-3 h-9 w-9 text-muted-foreground" />
+              <p className="font-medium">
+                {locale === "cs"
+                  ? "Zatím bez aktivních influencerů"
+                  : "No active influencers yet"}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {locale === "cs"
+                  ? "Datová struktura je připravená; další krok bude formulář pozvánky a schvalovací workflow."
+                  : "The data structure is ready; next comes invitations and an approval workflow."}
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[650px] text-sm">
+                <thead>
+                  <tr className="border-b text-left text-xs text-muted-foreground">
+                    <th className="p-3">
+                      {locale === "cs" ? "Tvůrce" : "Creator"}
+                    </th>
+                    <th className="p-3">{locale === "cs" ? "Kód" : "Code"}</th>
+                    <th className="p-3">Tier</th>
+                    <th className="p-3">
+                      {locale === "cs" ? "Celkem" : "Total"}
+                    </th>
+                    <th className="p-3">
+                      {locale === "cs" ? "K výplatě" : "Pending"}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {influencers.map(person => (
+                    <tr key={person.id} className="border-b last:border-0">
+                      <td className="p-3">
+                        <p className="font-medium">
+                          {person.name || person.email}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {person.email}
+                        </p>
+                      </td>
+                      <td className="p-3 font-mono">
+                        {person.affiliateCode || "—"}
+                      </td>
+                      <td className="p-3">
+                        <Badge variant="secondary">
+                          {person.affiliateTier || "standard"}
+                        </Badge>
+                      </td>
+                      <td className="p-3">{person.totalEarned || "0"} Kč</td>
+                      <td className="p-3 font-semibold">
+                        {person.pendingPayout || "0"} Kč
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
-    <Card><CardHeader><CardTitle className="flex items-center gap-2"><Users className="h-5 w-5 text-violet-600" />{locale === "cs" ? "Affiliate influenceři" : "Affiliate influencers"}</CardTitle><CardDescription>{locale === "cs" ? "Připravený základ pro tvůrce s vlastním kódem, provizí a měřením." : "Foundation for creators with their own code, commission and tracking."}</CardDescription></CardHeader><CardContent>
-      {isLoading ? <Skeleton className="h-32" /> : influencers.length === 0 ? <div className="rounded-xl border border-dashed p-10 text-center"><TrendingUp className="mx-auto mb-3 h-9 w-9 text-muted-foreground" /><p className="font-medium">{locale === "cs" ? "Zatím bez aktivních influencerů" : "No active influencers yet"}</p><p className="mt-1 text-sm text-muted-foreground">{locale === "cs" ? "Datová struktura je připravená; další krok bude formulář pozvánky a schvalovací workflow." : "The data structure is ready; next comes invitations and an approval workflow."}</p></div> : <div className="overflow-x-auto"><table className="w-full min-w-[650px] text-sm"><thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="p-3">{locale === "cs" ? "Tvůrce" : "Creator"}</th><th className="p-3">{locale === "cs" ? "Kód" : "Code"}</th><th className="p-3">Tier</th><th className="p-3">{locale === "cs" ? "Celkem" : "Total"}</th><th className="p-3">{locale === "cs" ? "K výplatě" : "Pending"}</th></tr></thead><tbody>{influencers.map(person => <tr key={person.id} className="border-b last:border-0"><td className="p-3"><p className="font-medium">{person.name || person.email}</p><p className="text-xs text-muted-foreground">{person.email}</p></td><td className="p-3 font-mono">{person.affiliateCode || "—"}</td><td className="p-3"><Badge variant="secondary">{person.affiliateTier || "standard"}</Badge></td><td className="p-3">{person.totalEarned || "0"} Kč</td><td className="p-3 font-semibold">{person.pendingPayout || "0"} Kč</td></tr>)}</tbody></table></div>}
-    </CardContent></Card>
-  </div>;
+  );
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
@@ -926,42 +1715,66 @@ export default function SocialScheduler() {
 
         <Tabs defaultValue="overview">
           <div className="sticky top-16 z-20 mb-6 overflow-x-auto rounded-xl border bg-background/95 p-1 shadow-sm backdrop-blur">
-          <TabsList className="h-auto min-w-max justify-start bg-transparent">
-            <TabsTrigger value="overview" className="gap-2">
-              <LayoutDashboard className="w-4 h-4" />{t.tabs.overview}
-            </TabsTrigger>
-            <TabsTrigger value="calendar" className="gap-2">
-              <CalendarDays className="w-4 h-4" />{t.tabs.calendar}
-            </TabsTrigger>
-            <TabsTrigger value="queue" className="gap-2">
-              <Calendar className="w-4 h-4" />{t.tabs.queue}
-            </TabsTrigger>
-            <TabsTrigger value="compose" className="gap-2">
-              <Plus className="w-4 h-4" />{t.tabs.compose}
-            </TabsTrigger>
-            <TabsTrigger value="ai-gen" className="gap-2">
-              <Wand2 className="w-4 h-4" />{t.tabs.aiGen}
-            </TabsTrigger>
-            <TabsTrigger value="priestess" className="gap-2">
-              <Crown className="w-4 h-4" />{t.tabs.priestess}
-            </TabsTrigger>
-            <TabsTrigger value="influencers" className="gap-2">
-              <Users className="w-4 h-4" />{t.tabs.influencers}
-            </TabsTrigger>
-            <TabsTrigger value="accounts" className="gap-2">
-              <Settings className="w-4 h-4" />{t.tabs.accounts}
-            </TabsTrigger>
-          </TabsList>
+            <TabsList className="h-auto min-w-max justify-start bg-transparent">
+              <TabsTrigger value="overview" className="gap-2">
+                <LayoutDashboard className="w-4 h-4" />
+                {t.tabs.overview}
+              </TabsTrigger>
+              <TabsTrigger value="calendar" className="gap-2">
+                <CalendarDays className="w-4 h-4" />
+                {t.tabs.calendar}
+              </TabsTrigger>
+              <TabsTrigger value="queue" className="gap-2">
+                <Calendar className="w-4 h-4" />
+                {t.tabs.queue}
+              </TabsTrigger>
+              <TabsTrigger value="compose" className="gap-2">
+                <Plus className="w-4 h-4" />
+                {t.tabs.compose}
+              </TabsTrigger>
+              <TabsTrigger value="ai-gen" className="gap-2">
+                <Wand2 className="w-4 h-4" />
+                {t.tabs.aiGen}
+              </TabsTrigger>
+              <TabsTrigger value="priestess" className="gap-2">
+                <Crown className="w-4 h-4" />
+                {t.tabs.priestess}
+              </TabsTrigger>
+              <TabsTrigger value="influencers" className="gap-2">
+                <Users className="w-4 h-4" />
+                {t.tabs.influencers}
+              </TabsTrigger>
+              <TabsTrigger value="accounts" className="gap-2">
+                <Settings className="w-4 h-4" />
+                {t.tabs.accounts}
+              </TabsTrigger>
+            </TabsList>
           </div>
 
-          <TabsContent value="overview"><OverviewTab locale={safeLocale} /></TabsContent>
-          <TabsContent value="calendar"><CalendarTab locale={safeLocale} /></TabsContent>
-          <TabsContent value="queue"><QueueTab locale={safeLocale} t={t} /></TabsContent>
-          <TabsContent value="compose"><ComposeTab locale={safeLocale} t={t} /></TabsContent>
-          <TabsContent value="ai-gen"><AiGeneratorTab locale={safeLocale} t={t} /></TabsContent>
-          <TabsContent value="priestess"><HighPriestessTab locale={safeLocale} /></TabsContent>
-          <TabsContent value="influencers"><InfluencersTab locale={safeLocale} /></TabsContent>
-          <TabsContent value="accounts"><AccountsTab locale={safeLocale} t={t} /></TabsContent>
+          <TabsContent value="overview">
+            <OverviewTab locale={safeLocale} />
+          </TabsContent>
+          <TabsContent value="calendar">
+            <CalendarTab locale={safeLocale} />
+          </TabsContent>
+          <TabsContent value="queue">
+            <QueueTab locale={safeLocale} t={t} />
+          </TabsContent>
+          <TabsContent value="compose">
+            <ComposeTab locale={safeLocale} t={t} />
+          </TabsContent>
+          <TabsContent value="ai-gen">
+            <AiGeneratorTab locale={safeLocale} t={t} />
+          </TabsContent>
+          <TabsContent value="priestess">
+            <HighPriestessTab locale={safeLocale} />
+          </TabsContent>
+          <TabsContent value="influencers">
+            <InfluencersTab locale={safeLocale} />
+          </TabsContent>
+          <TabsContent value="accounts">
+            <AccountsTab locale={safeLocale} t={t} />
+          </TabsContent>
         </Tabs>
       </div>
     </div>

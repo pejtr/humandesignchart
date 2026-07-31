@@ -9,13 +9,30 @@ import Footer from "@/components/Footer";
 import { ParticleField } from "@/components/ParticleField";
 import { TiltCard } from "@/components/TiltCard";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
-const SocialProof = lazy(() => import("@/components/SocialProof").then(m => ({ default: m.SocialProof })));
+const SocialProof = lazy(() =>
+  import("@/components/SocialProof").then(m => ({ default: m.SocialProof }))
+);
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import {
-  Compass, Brain, Users, Star, BarChart3,
-  FileText, Zap, ArrowRight, CheckCircle2, Eye, Lightbulb,
-  Heart, Shield, Leaf, ChevronLeft, ChevronRight, Moon, Sparkles,
+  Compass,
+  Brain,
+  Users,
+  Star,
+  BarChart3,
+  FileText,
+  Zap,
+  ArrowRight,
+  CheckCircle2,
+  Eye,
+  Lightbulb,
+  Heart,
+  Shield,
+  Leaf,
+  ChevronLeft,
+  ChevronRight,
+  Moon,
+  Sparkles,
 } from "lucide-react";
 
 // ─── Animated Chart Counter (count-up on scroll into view) ────────────────────────────────────
@@ -59,15 +76,25 @@ function ChartCounter({ isCs }: { isCs: boolean }) {
   const formatted = displayCount.toLocaleString(isCs ? "cs-CZ" : "en-US");
 
   return (
-    <div ref={counterRef} className="flex items-center gap-3 px-4 py-2.5 rounded-full border bg-white/80 dark:bg-card/80 shadow-sm" style={{ borderColor: '#d4af37' }}>
-      <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: '#fef3c7', border: '2px solid #d4af37' }}>
-        <BarChart3 className="w-4 h-4" style={{ color: '#92400e' }} />
+    <div
+      ref={counterRef}
+      className="flex items-center gap-3 px-4 py-2.5 rounded-full border bg-white/80 dark:bg-card/80 shadow-sm"
+      style={{ borderColor: "#d4af37" }}
+    >
+      <div
+        className="w-9 h-9 rounded-full flex items-center justify-center"
+        style={{ background: "#fef3c7", border: "2px solid #d4af37" }}
+      >
+        <BarChart3 className="w-4 h-4" style={{ color: "#92400e" }} />
       </div>
       <div className="text-left">
-        <p className="text-sm font-semibold leading-none tabular-nums" style={{ color: '#1a1a1a' }}>
+        <p
+          className="text-sm font-semibold leading-none tabular-nums"
+          style={{ color: "#1a1a1a" }}
+        >
           {formatted}+
         </p>
-        <p className="text-xs" style={{ color: '#777' }}>
+        <p className="text-xs" style={{ color: "#777" }}>
           {isCs ? "vygenerovaných map" : "charts generated"}
         </p>
       </div>
@@ -101,56 +128,71 @@ function getTypesData(isCs: boolean) {
       name: "Generator",
       displayName: isCs ? "GENERÁTOR" : "GENERATOR",
       role: isCs ? "Budovatel a tvůrce." : "Builder and creator.",
-      strategy: isCs ? "Strategie: Reagovat na život." : "Strategy: To Respond to life.",
+      strategy: isCs
+        ? "Strategie: Reagovat na život."
+        : "Strategy: To Respond to life.",
       pct: "37%",
       label: isCs ? "populace" : "of population",
       color: "bg-amber-50 border-amber-200",
       pctColor: "text-orange-500",
-      imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/IxAVlaOWqHGkhytp.webp",
+      imgUrl:
+        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/IxAVlaOWqHGkhytp.webp",
     },
     {
       name: "Manifesting Generator",
       displayName: isCs ? "MANIFESTUJÍCÍ\nGENERÁTOR" : "MANIFESTING\nGENERATOR",
       role: isCs ? "Rychlý tvůrce a iniciátor." : "Fast creator and initiator.",
-      strategy: isCs ? "Strategie: Reagovat a informovat." : "Strategy: Respond, then Inform.",
+      strategy: isCs
+        ? "Strategie: Reagovat a informovat."
+        : "Strategy: Respond, then Inform.",
       pct: "33%",
       label: isCs ? "populace" : "of population",
       color: "bg-red-50 border-red-200",
       pctColor: "text-red-500",
-      imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/qWsAFzAtJmYBPSzE.webp",
+      imgUrl:
+        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/qWsAFzAtJmYBPSzE.webp",
     },
     {
       name: "Projector",
       displayName: isCs ? "PROJEKTOR" : "PROJECTOR",
       role: isCs ? "Průvodce a vizionář." : "Guide and visionary.",
-      strategy: isCs ? "Strategie: Čekat na pozvání." : "Strategy: Wait for the Invitation.",
+      strategy: isCs
+        ? "Strategie: Čekat na pozvání."
+        : "Strategy: Wait for the Invitation.",
       pct: "20%",
       label: isCs ? "populace" : "of population",
       color: "bg-violet-50 border-violet-200",
       pctColor: "text-violet-500",
-      imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/uyvogIBNHAiNkHXh.webp",
+      imgUrl:
+        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/uyvogIBNHAiNkHXh.webp",
     },
     {
       name: "Manifestor",
       displayName: "MANIFESTOR",
       role: isCs ? "Iniciátor a katalyzátor." : "Initiator and catalyst.",
-      strategy: isCs ? "Strategie: Informovat před akcí." : "Strategy: To Inform before acting.",
+      strategy: isCs
+        ? "Strategie: Informovat před akcí."
+        : "Strategy: To Inform before acting.",
       pct: "9%",
       label: isCs ? "populace" : "of population",
       color: "bg-emerald-50 border-emerald-200",
       pctColor: "text-emerald-500",
-      imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/rMbULSgMTGcVzRZZ.webp",
+      imgUrl:
+        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/rMbULSgMTGcVzRZZ.webp",
     },
     {
       name: "Reflector",
       displayName: isCs ? "REFLEKTOR" : "REFLECTOR",
       role: isCs ? "Zrcadlo a pozorovatel." : "Mirror and observer.",
-      strategy: isCs ? "Strategie: Čekat na lunární cyklus." : "Strategy: Wait a Lunar Cycle.",
+      strategy: isCs
+        ? "Strategie: Čekat na lunární cyklus."
+        : "Strategy: Wait a Lunar Cycle.",
       pct: "1%",
       label: isCs ? "populace" : "of population",
       color: "bg-slate-50 border-slate-200",
       pctColor: "text-slate-500",
-      imgUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/UWRWlEUvFOKUinyN.webp",
+      imgUrl:
+        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/UWRWlEUvFOKUinyN.webp",
     },
   ];
 }
@@ -158,17 +200,57 @@ function getTypesData(isCs: boolean) {
 function getTestimonials(isCs: boolean) {
   if (isCs) {
     return [
-      { name: "Jana K.", text: "Konečně jsem pochopila, proč mi některé věci nejdou tak snadno jako ostatním. Human Design mi dal odpovědi, které jsem hledala roky.", initials: "JK", color: "#e8d5b7" },
-      { name: "Martin S.", text: "Byl jsem skeptik, ale po přečtení svého profilu jsem zůstával bez dechu. Přesně vystihuje moje silné stránky i výzvy.", initials: "MS", color: "#d4e8e2" },
-      { name: "Petra N.", text: "AI rozbor byl neskutečně podrobný a osobní. Doporučuji každému, kdo chce lépe poznat sám sebe.", initials: "PN", color: "#ddd4e8" },
-      { name: "Tomáš H.", text: "Díky strategii Manifestora jsem začal informovat lidi před svými akcemi a vztahy se dramaticky zlepšily.", initials: "TH", color: "#e8e4d4" },
+      {
+        name: "Jana K.",
+        text: "Konečně jsem pochopila, proč mi některé věci nejdou tak snadno jako ostatním. Human Design mi dal odpovědi, které jsem hledala roky.",
+        initials: "JK",
+        color: "#e8d5b7",
+      },
+      {
+        name: "Martin S.",
+        text: "Byl jsem skeptik, ale po přečtení svého profilu jsem zůstával bez dechu. Přesně vystihuje moje silné stránky i výzvy.",
+        initials: "MS",
+        color: "#d4e8e2",
+      },
+      {
+        name: "Petra N.",
+        text: "AI rozbor byl neskutečně podrobný a osobní. Doporučuji každému, kdo chce lépe poznat sám sebe.",
+        initials: "PN",
+        color: "#ddd4e8",
+      },
+      {
+        name: "Tomáš H.",
+        text: "Díky strategii Manifestora jsem začal informovat lidi před svými akcemi a vztahy se dramaticky zlepšily.",
+        initials: "TH",
+        color: "#e8e4d4",
+      },
     ];
   }
   return [
-    { name: "Sarah K.", text: "I finally understood why some things don't come as easily to me as they do to others. Human Design gave me answers I'd been searching for years.", initials: "SK", color: "#e8d5b7" },
-    { name: "Michael S.", text: "I was a skeptic, but after reading my profile I was speechless. It perfectly captures my strengths and challenges.", initials: "MS", color: "#d4e8e2" },
-    { name: "Emma N.", text: "The AI reading was incredibly detailed and personal. I recommend it to anyone who wants to understand themselves better.", initials: "EN", color: "#ddd4e8" },
-    { name: "Thomas H.", text: "Thanks to my Manifestor strategy, I started informing people before taking action and my relationships improved dramatically.", initials: "TH", color: "#e8e4d4" },
+    {
+      name: "Sarah K.",
+      text: "I finally understood why some things don't come as easily to me as they do to others. Human Design gave me answers I'd been searching for years.",
+      initials: "SK",
+      color: "#e8d5b7",
+    },
+    {
+      name: "Michael S.",
+      text: "I was a skeptic, but after reading my profile I was speechless. It perfectly captures my strengths and challenges.",
+      initials: "MS",
+      color: "#d4e8e2",
+    },
+    {
+      name: "Emma N.",
+      text: "The AI reading was incredibly detailed and personal. I recommend it to anyone who wants to understand themselves better.",
+      initials: "EN",
+      color: "#ddd4e8",
+    },
+    {
+      name: "Thomas H.",
+      text: "Thanks to my Manifestor strategy, I started informing people before taking action and my relationships improved dramatically.",
+      initials: "TH",
+      color: "#e8e4d4",
+    },
   ];
 }
 
@@ -183,7 +265,7 @@ function TestimonialsSection({ isCs }: { isCs: boolean }) {
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
-      setActive((prev) => (prev + 1) % count);
+      setActive(prev => (prev + 1) % count);
     }, 5000);
     return () => clearInterval(interval);
   }, [isPaused, count]);
@@ -192,10 +274,35 @@ function TestimonialsSection({ isCs }: { isCs: boolean }) {
     <section className="py-20 relative overflow-hidden bg-gradient-to-b from-purple-950/5 via-background to-background">
       {/* Sacred geometry background */}
       <div className="absolute inset-0 pointer-events-none">
-        <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-[0.03]" viewBox="0 0 400 400" fill="none">
-          <circle cx="200" cy="200" r="180" stroke="currentColor" strokeWidth="0.5" className="text-purple-400" />
-          <circle cx="200" cy="200" r="120" stroke="currentColor" strokeWidth="0.5" className="text-purple-400" />
-          <circle cx="200" cy="200" r="60" stroke="currentColor" strokeWidth="0.5" className="text-purple-400" />
+        <svg
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-[0.03]"
+          viewBox="0 0 400 400"
+          fill="none"
+        >
+          <circle
+            cx="200"
+            cy="200"
+            r="180"
+            stroke="currentColor"
+            strokeWidth="0.5"
+            className="text-purple-400"
+          />
+          <circle
+            cx="200"
+            cy="200"
+            r="120"
+            stroke="currentColor"
+            strokeWidth="0.5"
+            className="text-purple-400"
+          />
+          <circle
+            cx="200"
+            cy="200"
+            r="60"
+            stroke="currentColor"
+            strokeWidth="0.5"
+            className="text-purple-400"
+          />
         </svg>
       </div>
       <div className="container relative z-10">
@@ -219,7 +326,7 @@ function TestimonialsSection({ isCs }: { isCs: boolean }) {
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          {visible.map((idx) => {
+          {visible.map(idx => {
             const tm = testimonials[idx];
             return (
               <motion.div
@@ -231,18 +338,25 @@ function TestimonialsSection({ isCs }: { isCs: boolean }) {
               >
                 <div className="flex gap-1 mb-3">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400 group-hover:scale-110 transition-transform" />
+                    <Star
+                      key={i}
+                      className="w-3.5 h-3.5 fill-amber-400 text-amber-400 group-hover:scale-110 transition-transform"
+                    />
                   ))}
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4 italic flex-1 group-hover:text-foreground/80 transition-colors">"{tm.text}"</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4 italic flex-1 group-hover:text-foreground/80 transition-colors">
+                  "{tm.text}"
+                </p>
                 <div className="flex items-center gap-3 pt-3 border-t border-border/30">
                   <div
                     className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs group-hover:ring-2 group-hover:ring-purple-400/30 transition-all"
-                    style={{ background: tm.color, color: '#555' }}
+                    style={{ background: tm.color, color: "#555" }}
                   >
                     {tm.initials}
                   </div>
-                  <p className="text-sm font-semibold text-foreground">{tm.name}</p>
+                  <p className="text-sm font-semibold text-foreground">
+                    {tm.name}
+                  </p>
                 </div>
               </motion.div>
             );
@@ -260,7 +374,7 @@ function TestimonialsSection({ isCs }: { isCs: boolean }) {
               <button
                 key={i}
                 onClick={() => setActive(i)}
-                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === active ? 'bg-purple-500 scale-125' : 'bg-muted-foreground/30 hover:bg-purple-400/50'}`}
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === active ? "bg-purple-500 scale-125" : "bg-muted-foreground/30 hover:bg-purple-400/50"}`}
               />
             ))}
           </div>
@@ -275,8 +389,12 @@ function TestimonialsSection({ isCs }: { isCs: boolean }) {
         <div className="flex justify-center mt-4">
           <span className="text-xs text-muted-foreground/50">
             {isPaused
-              ? (isCs ? "⏸ Pozastaveno" : "⏸ Paused")
-              : (isCs ? "▶ Automatické přepínání" : "▶ Auto-scrolling")}
+              ? isCs
+                ? "⏸ Pozastaveno"
+                : "⏸ Paused"
+              : isCs
+                ? "▶ Automatické přepínání"
+                : "▶ Auto-scrolling"}
           </span>
         </div>
       </div>
@@ -307,103 +425,115 @@ export default function Home() {
     }
   }, []);
 
-  useSEO(isCs ? {
-    title: "✨ HUMAN DESIGN CZ – Mapa Vašeho Já | Kalkulátor & AI Výklad Zdarma 🔮",
-    description: "🌟 Vypočítejte si svou Human Design mapu zdarma. Přesný kalkulátor, test typu (Generátor, Projektor, Manifestor), denní tranzity a osobitý AI výklad v češtině.",
-    ogImage: OG_IMAGES.homepage,
-    keywords: "human design mapa, human design cz, human design kalkulačka, human design zdarma, human design test zdarma, human design typy, bodygraph kalkulátor, human design denní tranzit",
-    locale: "cs_CZ",
-    jsonLd: {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "WebSite",
-          "@id": "https://www.humandesignmapa.cz/#website",
-          "url": "https://www.humandesignmapa.cz",
-          "name": "Human Design Mapa CZ",
-          "description": "Kalkulátor Human Design mapy zdarma, test osobnosti a AI výklad v češtině.",
-          "inLanguage": ["cs", "en"]
-        },
-        {
-          "@type": "FAQPage",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "Jak vypočítat Human Design mapu zdarma?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Zadejte přesný datum, čas a místo narození do našeho kalkulátoru. Mapa se vygeneruje zdarma za několik sekund."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Co obsahuje bezplatný AI výklad Human Design?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Bezplatný AI výklad obsahuje váš energetický typ (Generátor, Projektor, Manifestor, Reflektor), profil, autoritu, definovaná centra a životní poslání."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Jak funguje denní tranzit Human Design?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Denní tranzit ukazuje aktuální pozice planet a jaké brány a dráhy aktivují ve vaší osobní mapě dnešní den."
-              }
-            }
-          ]
+  useSEO(
+    isCs
+      ? {
+          title:
+            "✨ HUMAN DESIGN CZ – Mapa Vašeho Já | Kalkulátor & AI Výklad Zdarma 🔮",
+          description:
+            "🌟 Vypočítejte si svou Human Design mapu zdarma. Přesný kalkulátor, test typu (Generátor, Projektor, Manifestor), denní tranzity a osobitý AI výklad v češtině.",
+          ogImage: OG_IMAGES.homepage,
+          keywords:
+            "human design mapa, human design cz, human design kalkulačka, human design zdarma, human design test zdarma, human design typy, bodygraph kalkulátor, human design denní tranzit",
+          locale: "cs_CZ",
+          jsonLd: {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebSite",
+                "@id": "https://www.humandesignmapa.cz/#website",
+                url: "https://www.humandesignmapa.cz",
+                name: "Human Design Mapa CZ",
+                description:
+                  "Kalkulátor Human Design mapy zdarma, test osobnosti a AI výklad v češtině.",
+                inLanguage: ["cs", "en"],
+              },
+              {
+                "@type": "FAQPage",
+                mainEntity: [
+                  {
+                    "@type": "Question",
+                    name: "Jak vypočítat Human Design mapu zdarma?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Zadejte přesný datum, čas a místo narození do našeho kalkulátoru. Mapa se vygeneruje zdarma za několik sekund.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Co obsahuje bezplatný AI výklad Human Design?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Bezplatný AI výklad obsahuje váš energetický typ (Generátor, Projektor, Manifestor, Reflektor), profil, autoritu, definovaná centra a životní poslání.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Jak funguje denní tranzit Human Design?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Denní tranzit ukazuje aktuální pozice planet a jaké brány a dráhy aktivují ve vaší osobní mapě dnešní den.",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
         }
-      ]
-    }
-  } : {
-    title: "✨ Free Human Design Chart Calculator & AI Reading 🔮 | Free Bodygraph",
-    description: "Calculate your free Human Design chart calculator & bodygraph. Get instant free Human Design readings, daily transit today & personality test interpretation. Available in 6 languages.",
-    ogImage: OG_IMAGES.homepage,
-    keywords: "human design calculator free, free human design chart, human design chart calculator, free human design reading, human design map, human design test free, human design transit today, human design chart, human design free, free human design chart reading",
-    locale: "en_US",
-    jsonLd: {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "WebSite",
-          "@id": "https://www.humandesignchart.app/#website",
-          "url": "https://www.humandesignchart.app",
-          "name": "Human Design Chart Calculator",
-          "description": "Free Human Design chart calculator, bodygraph generator and AI readings.",
-          "inLanguage": ["en", "cs"]
-        },
-        {
-          "@type": "FAQPage",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "How to calculate a free Human Design chart?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Enter your date, time, and place of birth into our free Human Design chart calculator to get your instant bodygraph."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "What is included in a free Human Design reading?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Your free Human Design reading includes your energy type, strategy, inner authority, profile, defined centers, and channels."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "What is Human Design transit today?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Daily Human Design transits track today's planetary movements and show which gates are activated in your chart."
-              }
-            }
-          ]
+      : {
+          title:
+            "✨ Free Human Design Chart Calculator & AI Reading 🔮 | Free Bodygraph",
+          description:
+            "Calculate your free Human Design chart calculator & bodygraph. Get instant free Human Design readings, daily transit today & personality test interpretation. Available in 6 languages.",
+          ogImage: OG_IMAGES.homepage,
+          keywords:
+            "human design calculator free, free human design chart, human design chart calculator, free human design reading, human design map, human design test free, human design transit today, human design chart, human design free, free human design chart reading",
+          locale: "en_US",
+          jsonLd: {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebSite",
+                "@id": "https://www.humandesignchart.app/#website",
+                url: "https://www.humandesignchart.app",
+                name: "Human Design Chart Calculator",
+                description:
+                  "Free Human Design chart calculator, bodygraph generator and AI readings.",
+                inLanguage: ["en", "cs"],
+              },
+              {
+                "@type": "FAQPage",
+                mainEntity: [
+                  {
+                    "@type": "Question",
+                    name: "How to calculate a free Human Design chart?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Enter your date, time, and place of birth into our free Human Design chart calculator to get your instant bodygraph.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "What is included in a free Human Design reading?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Your free Human Design reading includes your energy type, strategy, inner authority, profile, defined centers, and channels.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "What is Human Design transit today?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Daily Human Design transits track today's planetary movements and show which gates are activated in your chart.",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
         }
-      ]
-    }
-  });
+  );
   const typesData = getTypesData(isCs);
 
   const features = [
@@ -416,50 +546,234 @@ export default function Home() {
   ];
 
   const benefits = isCs
-    ? ["Pochopte své dary", "Zlepšete své vztahy", "Dělejte správná rozhodnutí", "Najděte svůj účel"]
-    : ["Understand your gifts", "Improve your relationships", "Make the right decisions", "Find your purpose"];
+    ? [
+        "Pochopte své dary",
+        "Zlepšete své vztahy",
+        "Dělejte správná rozhodnutí",
+        "Najděte svůj účel",
+      ]
+    : [
+        "Understand your gifts",
+        "Improve your relationships",
+        "Make the right decisions",
+        "Find your purpose",
+      ];
 
   const steps = isCs
     ? [
-      { step: "1", title: "Vygenerujte si mapu", desc: "Zadejte datum, čas a místo narození. Vaše mapa se vygeneruje během několika sekund.", cta: "Získat mapu zdarma" },
-      { step: "2", title: "Prozkoumejte svůj design", desc: "Prozkoumejte svůj typ, profil, autoritu, centra, brány a dráhy. Každý detail má svůj význam.", cta: "Začít prozkoumávat" },
-      { step: "3", title: "Získejte Hloubkový rozbor", desc: "Nechte si vygenerovat personalizovaný rozbor, využívající přesné algoritmické výpočty přímo o vás.", cta: "Vyzkoušet Hloubkový rozbor" },
-    ]
+        {
+          step: "1",
+          title: "Vygenerujte si mapu",
+          desc: "Zadejte datum, čas a místo narození. Vaše mapa se vygeneruje během několika sekund.",
+          cta: "Získat mapu zdarma",
+        },
+        {
+          step: "2",
+          title: "Prozkoumejte svůj design",
+          desc: "Prozkoumejte svůj typ, profil, autoritu, centra, brány a dráhy. Každý detail má svůj význam.",
+          cta: "Začít prozkoumávat",
+        },
+        {
+          step: "3",
+          title: "Získejte Hloubkový rozbor",
+          desc: "Nechte si vygenerovat personalizovaný rozbor, využívající přesné algoritmické výpočty přímo o vás.",
+          cta: "Vyzkoušet Hloubkový rozbor",
+        },
+      ]
     : [
-      { step: "1", title: "Generate your chart", desc: "Enter your date, time, and place of birth. Your chart will be generated in seconds.", cta: "Get your free chart" },
-      { step: "2", title: "Explore your design", desc: "Explore your type, profile, authority, centers, gates, and channels. Every detail has meaning.", cta: "Start exploring" },
-      { step: "3", title: "Get a comprehensive reading", desc: "Get a personalized reading based on your unique design using advanced algorithms.", cta: "Try comprehensive reading" },
-    ];
+        {
+          step: "1",
+          title: "Generate your chart",
+          desc: "Enter your date, time, and place of birth. Your chart will be generated in seconds.",
+          cta: "Get your free chart",
+        },
+        {
+          step: "2",
+          title: "Explore your design",
+          desc: "Explore your type, profile, authority, centers, gates, and channels. Every detail has meaning.",
+          cta: "Start exploring",
+        },
+        {
+          step: "3",
+          title: "Get a comprehensive reading",
+          desc: "Get a personalized reading based on your unique design using advanced algorithms.",
+          cta: "Try comprehensive reading",
+        },
+      ];
 
   const howItWorks = isCs
     ? [
-      { image: "/images/how-gifts.png", title: "1. Pochopte své dary", desc: "Zjistěte svůj typ, profil a autoritu. Poznejte, jak přirozeně fungujete a co vás skutečně naplňuje." },
-      { image: "/images/how-relationships.png", title: "2. Zlepšete své vztahy", desc: "Porovnejte mapy s blízkými. Pochopte dynamiku vašich vztahů a jak spolu lépe fungovat." },
-      { image: "/images/how-purpose.png", title: "3. Najděte svůj účel", desc: "Prozkoumejte svůj inkarnační kříž a brány. Objevte své životní poslání a směr." },
-    ]
+        {
+          image: "/images/how-gifts.png",
+          title: "1. Pochopte své dary",
+          desc: "Zjistěte svůj typ, profil a autoritu. Poznejte, jak přirozeně fungujete a co vás skutečně naplňuje.",
+        },
+        {
+          image: "/images/how-relationships.png",
+          title: "2. Zlepšete své vztahy",
+          desc: "Porovnejte mapy s blízkými. Pochopte dynamiku vašich vztahů a jak spolu lépe fungovat.",
+        },
+        {
+          image: "/images/how-purpose.png",
+          title: "3. Najděte svůj účel",
+          desc: "Prozkoumejte svůj inkarnační kříž a brány. Objevte své životní poslání a směr.",
+        },
+      ]
     : [
-      { image: "/images/how-gifts.png", title: "1. Understand your gifts", desc: "Discover your type, profile, and authority. Learn how you naturally operate and what truly fulfills you." },
-      { image: "/images/how-relationships.png", title: "2. Improve your relationships", desc: "Compare charts with loved ones. Understand the dynamics of your relationships and how to work better together." },
-      { image: "/images/how-purpose.png", title: "3. Find your purpose", desc: "Explore your incarnation cross and gates. Discover your life mission and direction." },
-    ];
+        {
+          image: "/images/how-gifts.png",
+          title: "1. Understand your gifts",
+          desc: "Discover your type, profile, and authority. Learn how you naturally operate and what truly fulfills you.",
+        },
+        {
+          image: "/images/how-relationships.png",
+          title: "2. Improve your relationships",
+          desc: "Compare charts with loved ones. Understand the dynamics of your relationships and how to work better together.",
+        },
+        {
+          image: "/images/how-purpose.png",
+          title: "3. Find your purpose",
+          desc: "Explore your incarnation cross and gates. Discover your life mission and direction.",
+        },
+      ];
 
   const blogPosts = isCs
     ? [
-      { slug: "co-je-human-design", title: "Co je Human Design?", excerpt: "Kompletní průvodce pro začátečníky — zjistěte, jak systém funguje a jak vám může pomoci.", cat: "Základy HD", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/images/blog_what_is_hd.png", featured: true },
-      { slug: "5-typu-human-design", title: "5 typů v Human Designu", excerpt: "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.", cat: "Typy", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/images/blog_5_types.png", featured: false },
-      { slug: "strategie-v-human-design", title: "Strategie: Klíč ke správným rozhodnutím", excerpt: "Reagovat, informovat, čekat na pozvání — naučte se svou strategii.", cat: "Strategie", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/images/blog_strategy.png", featured: false },
-      { slug: "autorita-v-human-design", title: "Autorita: Jak dělat správná rozhodnutí", excerpt: "Emocionální, sakrální, slezinná — každý typ má svůj vnitřní kompas rozhodování.", cat: "Autorita", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/images/blog_authority.png", featured: false },
-      { slug: "profily-v-human-design", title: "12 profilů v Human Designu", excerpt: "Váš profil odhaluje vaši životní roli a způsob, jakým se učíte a rostete.", cat: "Profily", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/images/blog_profiles.png", featured: false },
-      { slug: "human-design-a-vztahy", title: "Human Design a vztahy", excerpt: "Jak porozumět partnerské dynamice a zlepšit komunikaci s blízkými.", cat: "Vztahy", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/images/blog_relationships.png", featured: false },
-    ]
+        {
+          slug: "co-je-human-design",
+          title: "Co je Human Design?",
+          excerpt:
+            "Kompletní průvodce pro začátečníky — zjistěte, jak systém funguje a jak vám může pomoci.",
+          cat: "Základy HD",
+          catStyle: "bg-amber-100 text-amber-800 border-amber-200",
+          time: 8,
+          cover: "/images/blog_what_is_hd.png",
+          featured: true,
+        },
+        {
+          slug: "5-typu-human-design",
+          title: "5 typů v Human Designu",
+          excerpt:
+            "Poznejte všech 5 typů — Generátor, Projektor, Manifestor, MG a Reflektor.",
+          cat: "Typy",
+          catStyle: "bg-violet-100 text-violet-800 border-violet-200",
+          time: 10,
+          cover: "/images/blog_5_types.png",
+          featured: false,
+        },
+        {
+          slug: "strategie-v-human-design",
+          title: "Strategie: Klíč ke správným rozhodnutím",
+          excerpt:
+            "Reagovat, informovat, čekat na pozvání — naučte se svou strategii.",
+          cat: "Strategie",
+          catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200",
+          time: 7,
+          cover: "/images/blog_strategy.png",
+          featured: false,
+        },
+        {
+          slug: "autorita-v-human-design",
+          title: "Autorita: Jak dělat správná rozhodnutí",
+          excerpt:
+            "Emocionální, sakrální, slezinná — každý typ má svůj vnitřní kompas rozhodování.",
+          cat: "Autorita",
+          catStyle: "bg-rose-100 text-rose-800 border-rose-200",
+          time: 9,
+          cover: "/images/blog_authority.png",
+          featured: false,
+        },
+        {
+          slug: "profily-v-human-design",
+          title: "12 profilů v Human Designu",
+          excerpt:
+            "Váš profil odhaluje vaši životní roli a způsob, jakým se učíte a rostete.",
+          cat: "Profily",
+          catStyle: "bg-sky-100 text-sky-800 border-sky-200",
+          time: 11,
+          cover: "/images/blog_profiles.png",
+          featured: false,
+        },
+        {
+          slug: "human-design-a-vztahy",
+          title: "Human Design a vztahy",
+          excerpt:
+            "Jak porozumět partnerské dynamice a zlepšit komunikaci s blízkými.",
+          cat: "Vztahy",
+          catStyle: "bg-pink-100 text-pink-800 border-pink-200",
+          time: 8,
+          cover: "/images/blog_relationships.png",
+          featured: false,
+        },
+      ]
     : [
-      { slug: "what-is-human-design", title: "What is Human Design?", excerpt: "A complete beginner's guide — learn how the system works and how it can help you.", cat: "HD Basics", catStyle: "bg-amber-100 text-amber-800 border-amber-200", time: 8, cover: "/images/blog_what_is_hd.png", featured: true },
-      { slug: "5-types-human-design", title: "5 Human Design Types", excerpt: "Discover all 5 types — Generator, Projector, Manifestor, MG, and Reflector.", cat: "Types", catStyle: "bg-violet-100 text-violet-800 border-violet-200", time: 10, cover: "/images/blog_5_types.png", featured: false },
-      { slug: "human-design-strategy", title: "Strategy: The Key to Right Decisions", excerpt: "Respond, inform, wait for the invitation — learn your unique strategy.", cat: "Strategy", catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200", time: 7, cover: "/images/blog_strategy.png", featured: false },
-      { slug: "human-design-authority", title: "Inner Authority Explained", excerpt: "Emotional, sacral, splenic — every type has its own inner compass for decisions.", cat: "Authority", catStyle: "bg-rose-100 text-rose-800 border-rose-200", time: 9, cover: "/images/blog_authority.png", featured: false },
-      { slug: "human-design-profiles", title: "12 Human Design Profiles", excerpt: "Your profile reveals your life role and the way you learn, grow, and connect.", cat: "Profiles", catStyle: "bg-sky-100 text-sky-800 border-sky-200", time: 11, cover: "/images/blog_profiles.png", featured: false },
-      { slug: "human-design-relationships", title: "Human Design & Relationships", excerpt: "Understand partnership dynamics and improve communication with loved ones.", cat: "Relationships", catStyle: "bg-pink-100 text-pink-800 border-pink-200", time: 8, cover: "/images/blog_relationships.png", featured: false },
-    ];
+        {
+          slug: "what-is-human-design",
+          title: "What is Human Design?",
+          excerpt:
+            "A complete beginner's guide — learn how the system works and how it can help you.",
+          cat: "HD Basics",
+          catStyle: "bg-amber-100 text-amber-800 border-amber-200",
+          time: 8,
+          cover: "/images/blog_what_is_hd.png",
+          featured: true,
+        },
+        {
+          slug: "5-types-human-design",
+          title: "5 Human Design Types",
+          excerpt:
+            "Discover all 5 types — Generator, Projector, Manifestor, MG, and Reflector.",
+          cat: "Types",
+          catStyle: "bg-violet-100 text-violet-800 border-violet-200",
+          time: 10,
+          cover: "/images/blog_5_types.png",
+          featured: false,
+        },
+        {
+          slug: "human-design-strategy",
+          title: "Strategy: The Key to Right Decisions",
+          excerpt:
+            "Respond, inform, wait for the invitation — learn your unique strategy.",
+          cat: "Strategy",
+          catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200",
+          time: 7,
+          cover: "/images/blog_strategy.png",
+          featured: false,
+        },
+        {
+          slug: "human-design-authority",
+          title: "Inner Authority Explained",
+          excerpt:
+            "Emotional, sacral, splenic — every type has its own inner compass for decisions.",
+          cat: "Authority",
+          catStyle: "bg-rose-100 text-rose-800 border-rose-200",
+          time: 9,
+          cover: "/images/blog_authority.png",
+          featured: false,
+        },
+        {
+          slug: "human-design-profiles",
+          title: "12 Human Design Profiles",
+          excerpt:
+            "Your profile reveals your life role and the way you learn, grow, and connect.",
+          cat: "Profiles",
+          catStyle: "bg-sky-100 text-sky-800 border-sky-200",
+          time: 11,
+          cover: "/images/blog_profiles.png",
+          featured: false,
+        },
+        {
+          slug: "human-design-relationships",
+          title: "Human Design & Relationships",
+          excerpt:
+            "Understand partnership dynamics and improve communication with loved ones.",
+          cat: "Relationships",
+          catStyle: "bg-pink-100 text-pink-800 border-pink-200",
+          time: 8,
+          cover: "/images/blog_relationships.png",
+          featured: false,
+        },
+      ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -469,21 +783,38 @@ export default function Home() {
       <section
         ref={heroRef}
         className="relative flex flex-col justify-center overflow-hidden bg-[#f5f0f8]"
-        style={{ minHeight: '55vh' }}
+        style={{ minHeight: "55vh" }}
       >
         {/* Ambient Animated Background */}
         <div
           className="absolute inset-0 z-0 animate-ambient-pan"
           style={{
-            backgroundImage: 'url(https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/WUcqCUXbXPPoyTKt.webp)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundImage:
+              "url(https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/WUcqCUXbXPPoyTKt.webp)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             opacity: 0.85,
           }}
         />
-        <div className="hero-color-breathe absolute inset-0 z-[1] pointer-events-none" aria-hidden="true" />
+        <div
+          className="hero-color-breathe absolute inset-0 z-[1] pointer-events-none"
+          aria-hidden="true"
+        />
+        <div
+          className="hero-nexus-field absolute inset-0 z-[1] pointer-events-none"
+          aria-hidden="true"
+        >
+          <div className="hero-nexus-aurora" />
+          <div className="hero-nexus-mesh" />
+          <div className="hero-nexus-ring hero-nexus-ring-outer" />
+          <div className="hero-nexus-ring hero-nexus-ring-inner" />
+          <div className="hero-nexus-core" />
+        </div>
         {/* Decorative sacred circle — always visible including mobile */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 1 }}>
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          style={{ zIndex: 1 }}
+        >
           <div className="hero-sacred-pulse-1 w-[280px] h-[280px] md:w-[500px] md:h-[500px] rounded-full border-2 border-purple-300/40" />
           <div className="hero-sacred-pulse-2 absolute w-[220px] h-[220px] md:w-[400px] md:h-[400px] rounded-full border border-purple-200/35" />
           <div className="hero-sacred-pulse-3 absolute w-[160px] h-[160px] md:w-[300px] md:h-[300px] rounded-full border border-amber-200/35" />
@@ -491,13 +822,68 @@ export default function Home() {
         </div>
 
         {/* Animated orbs — responsive for mobile */}
-        <div className="hero-orb-1 absolute pointer-events-none" style={{ width: 'min(520px, 80vw)', height: 'min(520px, 80vw)', borderRadius: '50%', background: 'radial-gradient(circle at 40% 40%, rgba(139,92,246,0.45) 0%, rgba(167,139,250,0.20) 50%, transparent 70%)', top: '-10%', left: '-15%', filter: 'blur(40px)', zIndex: 1 }} />
-        <div className="hero-orb-2 absolute pointer-events-none" style={{ width: 'min(600px, 90vw)', height: 'min(600px, 90vw)', borderRadius: '50%', background: 'radial-gradient(circle at 60% 60%, rgba(251,191,36,0.38) 0%, rgba(252,211,77,0.18) 50%, transparent 70%)', bottom: '-20%', right: '-15%', filter: 'blur(50px)', zIndex: 1 }} />
-        <div className="hero-orb-3 absolute pointer-events-none" style={{ width: 'min(380px, 60vw)', height: 'min(380px, 60vw)', borderRadius: '50%', background: 'radial-gradient(circle at 50% 50%, rgba(42,157,143,0.35) 0%, rgba(94,234,212,0.15) 50%, transparent 70%)', top: '30%', left: '55%', filter: 'blur(35px)', zIndex: 1 }} />
-        <div className="hero-orb-4 absolute pointer-events-none" style={{ width: 'min(300px, 50vw)', height: 'min(300px, 50vw)', borderRadius: '50%', background: 'radial-gradient(circle at 50% 50%, rgba(244,114,182,0.32) 0%, rgba(251,207,232,0.14) 50%, transparent 70%)', top: '10%', right: '10%', filter: 'blur(30px)', zIndex: 1 }} />
+        <div
+          className="hero-orb-1 absolute pointer-events-none"
+          style={{
+            width: "min(520px, 80vw)",
+            height: "min(520px, 80vw)",
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle at 40% 40%, rgba(139,92,246,0.45) 0%, rgba(167,139,250,0.20) 50%, transparent 70%)",
+            top: "-10%",
+            left: "-15%",
+            filter: "blur(40px)",
+            zIndex: 1,
+          }}
+        />
+        <div
+          className="hero-orb-2 absolute pointer-events-none"
+          style={{
+            width: "min(600px, 90vw)",
+            height: "min(600px, 90vw)",
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle at 60% 60%, rgba(251,191,36,0.38) 0%, rgba(252,211,77,0.18) 50%, transparent 70%)",
+            bottom: "-20%",
+            right: "-15%",
+            filter: "blur(50px)",
+            zIndex: 1,
+          }}
+        />
+        <div
+          className="hero-orb-3 absolute pointer-events-none"
+          style={{
+            width: "min(380px, 60vw)",
+            height: "min(380px, 60vw)",
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle at 50% 50%, rgba(42,157,143,0.35) 0%, rgba(94,234,212,0.15) 50%, transparent 70%)",
+            top: "30%",
+            left: "55%",
+            filter: "blur(35px)",
+            zIndex: 1,
+          }}
+        />
+        <div
+          className="hero-orb-4 absolute pointer-events-none"
+          style={{
+            width: "min(300px, 50vw)",
+            height: "min(300px, 50vw)",
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle at 50% 50%, rgba(244,114,182,0.32) 0%, rgba(251,207,232,0.14) 50%, transparent 70%)",
+            top: "10%",
+            right: "10%",
+            filter: "blur(30px)",
+            zIndex: 1,
+          }}
+        />
 
         {/* White overlay */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(255,255,255,0.35)', zIndex: 2 }} />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "rgba(255,255,255,0.35)", zIndex: 2 }}
+        />
 
         {/* Floating particle animation */}
         <ParticleField />
@@ -508,17 +894,35 @@ export default function Home() {
         >
           <div className="max-w-3xl mx-auto text-center">
             <motion.h1
-              initial="hidden" animate="visible" custom={0} variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0}
+              variants={fadeUp}
               className="font-serif text-5xl md:text-7xl font-bold leading-tight mb-6 tracking-tight"
-              style={{ color: '#1a1a1a' }}
+              style={{ color: "#1a1a1a" }}
             >
-              {isCs ? <>Objevte svou jedinečnou<br />energetickou mapu</> : <>Discover Your Unique<br />Energy Blueprint</>}
+              {isCs ? (
+                <>
+                  Objevte svou jedinečnou
+                  <br />
+                  energetickou mapu
+                </>
+              ) : (
+                <>
+                  Discover Your Unique
+                  <br />
+                  Energy Blueprint
+                </>
+              )}
             </motion.h1>
 
             <motion.p
-              initial="hidden" animate="visible" custom={1} variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={1}
+              variants={fadeUp}
               className="text-base md:text-lg leading-relaxed mb-10 max-w-xl mx-auto"
-              style={{ color: '#555' }}
+              style={{ color: "#555" }}
             >
               {isCs
                 ? "Human Design vám odhalí, jak fungujete, jak se rozhodujete a jak žít v souladu se svou přirozeností. Získejte svůj rozbor zdarma."
@@ -526,14 +930,18 @@ export default function Home() {
             </motion.p>
 
             <motion.div
-              initial="hidden" animate="visible" custom={2} variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={2}
+              variants={fadeUp}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
             >
               <Button
                 size="lg"
                 className="text-white text-base px-8 py-6 shadow-lg transition-all hover:scale-105 rounded-lg"
-                style={{ background: '#2a9d8f', border: 'none' }}
-                asChild>
+                style={{ background: "#2a9d8f", border: "none" }}
+                asChild
+              >
                 <Link href={localePath("/calculate")}>
                   {isCs ? "Vytvořit moji mapu zdarma" : "Get my free chart"}
                 </Link>
@@ -543,12 +951,22 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              initial="hidden" animate="visible" custom={3} variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={3}
+              variants={fadeUp}
               className="flex flex-wrap justify-center gap-x-8 gap-y-3"
             >
-              {benefits.map((label) => (
-                <span key={label} className="flex items-center gap-2 text-sm" style={{ color: '#444' }}>
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" style={{ color: '#2a9d8f' }} />
+              {benefits.map(label => (
+                <span
+                  key={label}
+                  className="flex items-center gap-2 text-sm"
+                  style={{ color: "#444" }}
+                >
+                  <CheckCircle2
+                    className="w-4 h-4 flex-shrink-0"
+                    style={{ color: "#2a9d8f" }}
+                  />
                   {label}
                 </span>
               ))}
@@ -559,26 +977,40 @@ export default function Home() {
 
       <section className="relative overflow-hidden border-y border-violet-100 bg-gradient-to-r from-[#f8f3ff] via-white to-[#fff9eb] py-10 dark:border-violet-900/50 dark:from-violet-950/30 dark:via-background dark:to-amber-950/20">
         <div className="container relative z-10 flex max-w-5xl flex-col items-center gap-6 md:flex-row md:gap-9">
-          <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border-2 border-amber-200 bg-[#160b2f] shadow-xl shadow-violet-900/15 ring-8 ring-violet-500/10 md:h-36 md:w-36">
-            <img src="/images/brand/veleknezka-master-v1.png" alt="" className="h-full w-full object-cover object-top" />
+          <div className="relative aspect-[16/10] w-full max-w-sm shrink-0 overflow-hidden rounded-[2rem] border border-amber-200/80 bg-[#160b2f] shadow-xl shadow-violet-900/15 ring-8 ring-violet-500/10 md:w-[38%] md:max-w-none">
+            <img
+              src="/images/brand/marie-landing-v1.webp"
+              alt={
+                isCs
+                  ? "Marie, osobní průvodkyně Human Designem"
+                  : "Marie, your personal Human Design guide"
+              }
+              className="h-full w-full object-cover object-center"
+            />
             <span className="absolute bottom-1 right-2 flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-violet-700 text-amber-100 shadow-lg">
               <Moon className="h-4 w-4 -rotate-12" />
             </span>
           </div>
           <div className="flex-1 text-center md:text-left">
             <div className="mb-2 flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-violet-700 md:justify-start dark:text-violet-300">
-              <Sparkles className="h-4 w-4" /> {isCs ? "Velekněžka Human Design" : "The Human Design High Priestess"}
+              <Sparkles className="h-4 w-4" />{" "}
+              {isCs ? "Marie · osobní průvodkyně" : "Marie · personal guide"}
             </div>
             <h2 className="font-serif text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-              {isCs ? "Vaše osobní průvodkyně mapou i každodenním rozhodováním" : "Your personal guide through your chart and everyday decisions"}
+              {isCs
+                ? "Vaše osobní průvodkyně mapou i každodenním rozhodováním"
+                : "Your personal guide through your chart and everyday decisions"}
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
               {isCs
-                ? "Velekněžka propojuje vaši mapu, Lunu a aktuální tranzity do praktických odpovědí. Bez robotického tónu — jako klidná průvodkyně, která zná váš kontext."
-                : "The High Priestess connects your chart, the Moon and current transits into practical answers — with a calm, personal voice that remembers your context."}
+                ? "Marie propojuje vaši mapu, Lunu a aktuální tranzity do praktických odpovědí. Bez robotického tónu — jako klidná průvodkyně, která zná váš kontext."
+                : "Marie connects your chart, the Moon and current transits into practical answers — with a calm, personal voice that remembers your context."}
             </p>
           </div>
-          <Button asChild className="shrink-0 bg-violet-700 text-white hover:bg-violet-800">
+          <Button
+            asChild
+            className="shrink-0 bg-violet-700 text-white hover:bg-violet-800"
+          >
             <Link href={localePath("/pricing") + "#blueprint"}>
               {isCs ? "Poznat svůj Blueprint" : "Discover my Blueprint"}
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -590,11 +1022,23 @@ export default function Home() {
       <div className="mystical-divider" />
 
       {/* ── 5 Types Section ─────────────────────────────────────────────────── */}
-      <section className="py-20 bg-gradient-to-b from-white to-purple-50/40 bg-sacred-geometry overflow-hidden" style={{ contentVisibility: "auto", containIntrinsicSize: "800px" }}>
+      <section
+        className="py-20 bg-gradient-to-b from-white to-purple-50/40 bg-sacred-geometry overflow-hidden"
+        style={{ contentVisibility: "auto", containIntrinsicSize: "800px" }}
+      >
         <div className="container">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} custom={0} variants={fadeUp} className="text-center mb-14">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            custom={0}
+            variants={fadeUp}
+            className="text-center mb-14"
+          >
             <h2 className="font-serif text-3xl md:text-5xl font-bold text-foreground">
-              {isCs ? "Pět typů lidí a jejich aura" : "Five types of people and their aura"}
+              {isCs
+                ? "Pět typů lidí a jejich aura"
+                : "Five types of people and their aura"}
             </h2>
           </motion.div>
 
@@ -607,9 +1051,14 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.45 }}
               >
-                <TiltCard className={`rounded-2xl border overflow-hidden flex flex-col ${tp.color} shadow-sm hover:shadow-md transition-shadow h-full`}>
+                <TiltCard
+                  className={`rounded-2xl border overflow-hidden flex flex-col ${tp.color} shadow-sm hover:shadow-md transition-shadow h-full`}
+                >
                   {/* Image */}
-                  <div className="w-full bg-white/60 dark:bg-card/60" style={{ height: '260px' }}>
+                  <div
+                    className="w-full bg-white/60 dark:bg-card/60"
+                    style={{ height: "260px" }}
+                  >
                     <ProgressiveImage
                       src={tp.imgUrl}
                       alt={tp.displayName}
@@ -619,16 +1068,33 @@ export default function Home() {
                   </div>
                   {/* Info */}
                   <div className="p-4 text-center flex flex-col gap-1">
-                    <p className="text-[10px] md:text-xs font-bold tracking-widest whitespace-pre-line leading-tight" style={{ color: '#555' }}>
+                    <p
+                      className="text-[10px] md:text-xs font-bold tracking-widest whitespace-pre-line leading-tight"
+                      style={{ color: "#555" }}
+                    >
                       {tp.displayName}
                     </p>
-                    <p className={`text-2xl font-bold leading-none ${tp.pctColor}`}>{tp.pct}</p>
-                    <p className="text-[10px] text-muted-foreground">{tp.label}</p>
-                    <p className="text-xs text-muted-foreground leading-snug mt-1">{tp.role}</p>
-                    <p className="text-[11px] text-muted-foreground leading-snug italic">{tp.strategy}</p>
-                    <Link href={localePath("/calculate")} className="mt-2 block">
+                    <p
+                      className={`text-2xl font-bold leading-none ${tp.pctColor}`}
+                    >
+                      {tp.pct}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {tp.label}
+                    </p>
+                    <p className="text-xs text-muted-foreground leading-snug mt-1">
+                      {tp.role}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground leading-snug italic">
+                      {tp.strategy}
+                    </p>
+                    <Link
+                      href={localePath("/calculate")}
+                      className="mt-2 block"
+                    >
                       <span className="inline-flex items-center justify-center gap-1 text-[10px] font-semibold text-primary hover:underline">
-                        {isCs ? "Zjistit svůj typ" : "Find your type"} <ArrowRight className="w-3 h-3" />
+                        {isCs ? "Zjistit svůj typ" : "Find your type"}{" "}
+                        <ArrowRight className="w-3 h-3" />
                       </span>
                     </Link>
                   </div>
@@ -642,14 +1108,28 @@ export default function Home() {
       <div className="mystical-divider" />
 
       {/* ── How to start — 3 steps ─────────────────────────────────────── */}
-      <section className="py-20 overflow-hidden" style={{ contentVisibility: "auto", containIntrinsicSize: "700px" }}>
+      <section
+        className="py-20 overflow-hidden"
+        style={{ contentVisibility: "auto", containIntrinsicSize: "700px" }}
+      >
         <div className="container">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="text-center mb-14">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            custom={0}
+            variants={fadeUp}
+            className="text-center mb-14"
+          >
             <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">
-              {isCs ? "Jak začít s poznáváním Human Designu" : "How to start exploring Human Design"}
+              {isCs
+                ? "Jak začít s poznáváním Human Designu"
+                : "How to start exploring Human Design"}
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              {isCs ? "Tři jednoduché kroky k pochopení vašeho jedinečného designu." : "Three simple steps to understanding your unique design."}
+              {isCs
+                ? "Tři jednoduché kroky k pochopení vašeho jedinečného designu."
+                : "Three simple steps to understanding your unique design."}
             </p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
@@ -667,19 +1147,36 @@ export default function Home() {
               return (
                 <motion.div
                   key={s.step}
-                  initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} custom={i} variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-50px" }}
+                  custom={i}
+                  variants={fadeUp}
                   whileHover={{ y: -6, scale: 1.02 }}
                   className="relative bg-card rounded-2xl border border-border/40 p-7 md:p-8 text-center shadow-md hover:shadow-xl transition-all group overflow-hidden"
                 >
                   {/* Gradient accent top bar */}
-                  <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${gradients[i]}`} />
+                  <div
+                    className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${gradients[i]}`}
+                  />
                   {/* Large gradient step number */}
-                  <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${gradients[i]} text-white font-serif text-2xl font-bold flex items-center justify-center mx-auto mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <div
+                    className={`w-16 h-16 rounded-full bg-gradient-to-br ${gradients[i]} text-white font-serif text-2xl font-bold flex items-center justify-center mx-auto mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                  >
                     {s.step}
                   </div>
-                  <h3 className="font-serif text-xl font-semibold mb-3 text-foreground">{s.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-5">{s.desc}</p>
-                  <Button variant="outline" size="sm" className={`border-2 font-medium transition-all ${btnStyles[i]}`} asChild>
+                  <h3 className="font-serif text-xl font-semibold mb-3 text-foreground">
+                    {s.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                    {s.desc}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`border-2 font-medium transition-all ${btnStyles[i]}`}
+                    asChild
+                  >
                     <Link href={localePath("/calculate")}>
                       {s.cta}
                       <ArrowRight className="w-4 h-4 ml-1.5" />
@@ -695,25 +1192,47 @@ export default function Home() {
       <div className="mystical-divider" />
 
       {/* ── Features Grid ────────────────────────────────────────────── */}
-      <section className="py-20 bg-muted/30 bg-sacred-geometry" style={{ contentVisibility: "auto", containIntrinsicSize: "600px" }}>
+      <section
+        className="py-20 bg-muted/30 bg-sacred-geometry"
+        style={{ contentVisibility: "auto", containIntrinsicSize: "600px" }}
+      >
         <div className="container">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="text-center mb-12">
-            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">{t.home.featuresTitle}</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">{t.home.featuresDescription}</p>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            custom={0}
+            variants={fadeUp}
+            className="text-center mb-12"
+          >
+            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">
+              {t.home.featuresTitle}
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              {t.home.featuresDescription}
+            </p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {features.map((f, i) => (
               <motion.div
                 key={f.title}
-                initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} custom={i} variants={scaleIn}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-50px" }}
+                custom={i}
+                variants={scaleIn}
                 whileHover={{ y: -4 }}
                 className="bg-card rounded-xl p-6 border border-border/50 shadow-sm transition-all hover:shadow-md hover:border-primary/30 group"
               >
                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-colors">
                   <f.icon className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
                 </div>
-                <h3 className="font-serif text-lg font-semibold mb-2 text-foreground">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
+                <h3 className="font-serif text-lg font-semibold mb-2 text-foreground">
+                  {f.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {f.description}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -723,10 +1242,19 @@ export default function Home() {
       <div className="mystical-divider" />
 
       {/* ── How it works ───────────────────────────────────────────── */}
-      <section className="py-20 bg-ethereal dark:bg-card" style={{ background: 'var(--tw-dark, #f9f7f2)', contentVisibility: "auto", containIntrinsicSize: "700px" }}>
+      <section
+        className="py-20 bg-ethereal dark:bg-card"
+        style={{
+          background: "var(--tw-dark, #f9f7f2)",
+          contentVisibility: "auto",
+          containIntrinsicSize: "700px",
+        }}
+      >
         <div className="container">
           <motion.h2
-            initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             className="font-serif text-3xl md:text-4xl font-bold text-center mb-14 text-foreground"
           >
             {isCs ? "Jak to funguje" : "How it works"}
@@ -735,14 +1263,26 @@ export default function Home() {
             {howItWorks.map(({ image, title, desc }, i) => (
               <motion.div
                 key={title}
-                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15 }}
                 className="flex flex-col items-center text-center gap-5 group"
               >
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300 ring-2 ring-purple-200/50 dark:ring-purple-500/30">
-                  <ProgressiveImage src={image} alt={title} className="w-full h-full" imgClassName="object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <ProgressiveImage
+                    src={image}
+                    alt={title}
+                    className="w-full h-full"
+                    imgClassName="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
                 </div>
-                <h3 className="font-semibold text-lg text-foreground">{title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground max-w-[260px]">{desc}</p>
+                <h3 className="font-semibold text-lg text-foreground">
+                  {title}
+                </h3>
+                <p className="text-sm leading-relaxed text-muted-foreground max-w-[260px]">
+                  {desc}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -755,15 +1295,27 @@ export default function Home() {
       <div className="mystical-divider" />
 
       {/* ── Blog Preview — Editorial Layout ──────────────────────────── */}
-      <section className="py-20" style={{ contentVisibility: "auto", containIntrinsicSize: "600px" }}>
+      <section
+        className="py-20"
+        style={{ contentVisibility: "auto", containIntrinsicSize: "600px" }}
+      >
         <div className="container">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            custom={0}
+            variants={fadeUp}
+            className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10"
+          >
             <div>
               <h2 className="font-serif text-3xl md:text-4xl font-bold mb-2">
                 {isCs ? "Z našeho blogu" : "From our blog"}
               </h2>
               <p className="text-muted-foreground max-w-lg">
-                {isCs ? "Prozkoumejte svět Human Designu s našimi články a průvodci." : "Explore the world of Human Design with our articles and guides."}
+                {isCs
+                  ? "Prozkoumejte svět Human Designu s našimi články a průvodci."
+                  : "Explore the world of Human Design with our articles and guides."}
               </p>
             </div>
             <Button variant="outline" className="rounded-full" asChild>
@@ -776,56 +1328,106 @@ export default function Home() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
             {/* Featured article — large card */}
-            {blogPosts.filter(p => p.featured).map((post) => (
-              <motion.div key={post.slug} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0} variants={scaleIn} className="lg:col-span-7">
-                <Link href={localePath(`/blog/${post.slug}`)} className="no-underline">
-                  <div className="group relative rounded-2xl overflow-hidden hover:shadow-xl transition-all h-full min-h-[320px] md:min-h-[400px] bg-card border border-border/40">
-                    <ProgressiveImage
-                      src={post.cover}
-                      alt={post.title}
-                      className="absolute inset-0 w-full h-full"
-                      imgClassName="object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)' }} />
-                    <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-[10px] uppercase tracking-wider font-semibold text-white/90 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20">{post.cat}</span>
-                        <span className="text-xs text-white/70">{post.time} min</span>
-                      </div>
-                      <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">{post.title}</h3>
-                      <p className="text-sm text-white/80 leading-relaxed line-clamp-2 max-w-lg">{post.excerpt}</p>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-
-            {/* Compact grid — remaining articles */}
-            <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-              {blogPosts.filter(p => !p.featured).slice(0, 5).map((post, i) => (
-                <motion.div key={post.slug} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i + 1} variants={scaleIn}>
-                  <Link href={localePath(`/blog/${post.slug}`)} className="no-underline">
-                    <TiltCard className="group flex gap-3.5 p-3 rounded-xl border border-border/40 bg-card hover:shadow-md hover:border-primary/20 transition-all h-full">
-                      <div className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-muted">
-                        <ProgressiveImage
-                          src={post.cover}
-                          alt={post.title}
-                          className="w-full h-full"
-                          imgClassName="object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                      </div>
-                      <div className="flex flex-col justify-center gap-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full border font-medium ${post.catStyle}`}>{post.cat}</span>
-                          <span className="text-[10px] text-muted-foreground">{post.time} min</span>
+            {blogPosts
+              .filter(p => p.featured)
+              .map(post => (
+                <motion.div
+                  key={post.slug}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  custom={0}
+                  variants={scaleIn}
+                  className="lg:col-span-7"
+                >
+                  <Link
+                    href={localePath(`/blog/${post.slug}`)}
+                    className="no-underline"
+                  >
+                    <div className="group relative rounded-2xl overflow-hidden hover:shadow-xl transition-all h-full min-h-[320px] md:min-h-[400px] bg-card border border-border/40">
+                      <ProgressiveImage
+                        src={post.cover}
+                        alt={post.title}
+                        className="absolute inset-0 w-full h-full"
+                        imgClassName="object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background:
+                            "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)",
+                        }}
+                      />
+                      <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-[10px] uppercase tracking-wider font-semibold text-white/90 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20">
+                            {post.cat}
+                          </span>
+                          <span className="text-xs text-white/70">
+                            {post.time} min
+                          </span>
                         </div>
-                        <h4 className="text-sm font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">{post.title}</h4>
-                        <p className="text-xs text-muted-foreground line-clamp-1 hidden sm:block lg:block">{post.excerpt}</p>
+                        <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">
+                          {post.title}
+                        </h3>
+                        <p className="text-sm text-white/80 leading-relaxed line-clamp-2 max-w-lg">
+                          {post.excerpt}
+                        </p>
                       </div>
-                    </TiltCard>
+                    </div>
                   </Link>
                 </motion.div>
               ))}
+
+            {/* Compact grid — remaining articles */}
+            <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+              {blogPosts
+                .filter(p => !p.featured)
+                .slice(0, 5)
+                .map((post, i) => (
+                  <motion.div
+                    key={post.slug}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    custom={i + 1}
+                    variants={scaleIn}
+                  >
+                    <Link
+                      href={localePath(`/blog/${post.slug}`)}
+                      className="no-underline"
+                    >
+                      <TiltCard className="group flex gap-3.5 p-3 rounded-xl border border-border/40 bg-card hover:shadow-md hover:border-primary/20 transition-all h-full">
+                        <div className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-muted">
+                          <ProgressiveImage
+                            src={post.cover}
+                            alt={post.title}
+                            className="w-full h-full"
+                            imgClassName="object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        </div>
+                        <div className="flex flex-col justify-center gap-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className={`text-[9px] px-1.5 py-0.5 rounded-full border font-medium ${post.catStyle}`}
+                            >
+                              {post.cat}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {post.time} min
+                            </span>
+                          </div>
+                          <h4 className="text-sm font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                            {post.title}
+                          </h4>
+                          <p className="text-xs text-muted-foreground line-clamp-1 hidden sm:block lg:block">
+                            {post.excerpt}
+                          </p>
+                        </div>
+                      </TiltCard>
+                    </Link>
+                  </motion.div>
+                ))}
             </div>
           </div>
 
@@ -842,14 +1444,19 @@ export default function Home() {
       </section>
 
       {/* ── SEO FAQ Section (Targeting GSC Keywords) ──────────────── */}
-      <section className="py-16 bg-muted/20 border-t border-border/40" style={{ contentVisibility: "auto" }}>
+      <section
+        className="py-16 bg-muted/20 border-t border-border/40"
+        style={{ contentVisibility: "auto" }}
+      >
         <div className="container max-w-4xl">
           <div className="text-center mb-10">
             <span className="text-xs uppercase tracking-widest text-primary font-semibold">
               {isCs ? "Často kladené otázky & SEO" : "FAQ & Human Design Guide"}
             </span>
             <h2 className="font-serif text-2xl md:text-3xl font-bold mt-1">
-              {isCs ? "Vše o Human Design Mapě a Kalkulátoru" : "Free Human Design Chart Calculator & Reading FAQ"}
+              {isCs
+                ? "Vše o Human Design Mapě a Kalkulátoru"
+                : "Free Human Design Chart Calculator & Reading FAQ"}
             </h2>
             <p className="text-sm text-muted-foreground mt-2 max-w-2xl mx-auto">
               {isCs
@@ -862,7 +1469,9 @@ export default function Home() {
             <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm space-y-2">
               <h3 className="font-serif font-bold text-base text-foreground flex items-center gap-2">
                 <Compass className="w-4 h-4 text-primary shrink-0" />
-                {isCs ? "Jak vypočítat Human Design mapu zdarma?" : "How to use the Free Human Design Calculator?"}
+                {isCs
+                  ? "Jak vypočítat Human Design mapu zdarma?"
+                  : "How to use the Free Human Design Calculator?"}
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {isCs
@@ -874,7 +1483,9 @@ export default function Home() {
             <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm space-y-2">
               <h3 className="font-serif font-bold text-base text-foreground flex items-center gap-2">
                 <Brain className="w-4 h-4 text-primary shrink-0" />
-                {isCs ? "Co obsahuje bezplatný AI výklad mapy?" : "What is included in the Free Human Design Reading?"}
+                {isCs
+                  ? "Co obsahuje bezplatný AI výklad mapy?"
+                  : "What is included in the Free Human Design Reading?"}
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {isCs
@@ -886,7 +1497,9 @@ export default function Home() {
             <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm space-y-2">
               <h3 className="font-serif font-bold text-base text-foreground flex items-center gap-2">
                 <Star className="w-4 h-4 text-amber-500 shrink-0" />
-                {isCs ? "Co je denní tranzit Human Design?" : "What is Human Design Transit Today?"}
+                {isCs
+                  ? "Co je denní tranzit Human Design?"
+                  : "What is Human Design Transit Today?"}
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {isCs
@@ -898,7 +1511,9 @@ export default function Home() {
             <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm space-y-2">
               <h3 className="font-serif font-bold text-base text-foreground flex items-center gap-2">
                 <Users className="w-4 h-4 text-primary shrink-0" />
-                {isCs ? "Jaké jsou Human Design typy a strategie?" : "Human Design Types & Personality Test"}
+                {isCs
+                  ? "Jaké jsou Human Design typy a strategie?"
+                  : "Human Design Types & Personality Test"}
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {isCs
@@ -918,17 +1533,35 @@ export default function Home() {
       </Suspense>
 
       {/* ── CTA Section ────────────────────────────────────────────── */}
-      <section className="py-20 relative overflow-hidden bg-sacred-geometry" style={{ contentVisibility: "auto", containIntrinsicSize: "400px" }}>
+      <section
+        className="py-20 relative overflow-hidden bg-sacred-geometry"
+        style={{ contentVisibility: "auto", containIntrinsicSize: "400px" }}
+      >
         <div className="absolute inset-0 bg-dots opacity-30 pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
         <div className="container relative z-10">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} custom={0} variants={fadeUp} className="max-w-2xl mx-auto text-center">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            custom={0}
+            variants={fadeUp}
+            className="max-w-2xl mx-auto text-center"
+          >
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
               <Zap className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">{t.home.ctaTitle}</h2>
-            <p className="text-muted-foreground mb-8">{t.home.ctaDescription}</p>
-            <Button size="lg" className="btn-mystical bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg shadow-primary/20 transition-all hover:scale-105 rounded-full" asChild>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-foreground">
+              {t.home.ctaTitle}
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              {t.home.ctaDescription}
+            </p>
+            <Button
+              size="lg"
+              className="btn-mystical bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg shadow-primary/20 transition-all hover:scale-105 rounded-full"
+              asChild
+            >
               <Link href={localePath("/calculate")}>
                 {t.home.ctaButton}
                 <ArrowRight className="w-5 h-5 ml-2" />

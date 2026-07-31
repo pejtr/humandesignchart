@@ -11,7 +11,11 @@ function ProjectDomainBadge({ domain }: { domain: string }) {
   return (
     <span className="inline-flex overflow-hidden rounded-full border border-white/25 bg-black/20 text-[9px] font-extrabold uppercase tracking-wider shadow-sm">
       <span className="px-2.5 py-1 text-white">{name}</span>
-      {extension && <span className="border-l border-white/15 bg-white/15 px-1.5 py-1 text-white/70">{extension}</span>}
+      {extension && (
+        <span className="border-l border-white/15 bg-white/15 px-1.5 py-1 text-white/70">
+          {extension}
+        </span>
+      )}
     </span>
   );
 }
@@ -20,25 +24,85 @@ export default function Footer() {
   const { t, locale, localePath } = useLanguage();
   const { isAuthenticated } = useAuth();
   const projects = [
-    { name: "Akční Letenky", domain: "AKCNI-LETENKY.COM", href: "https://www.akcni-letenky.com", image: "https://www.akcni-letenky.com/hero-bg.jpg", cs: "Inspirace pro výhodné cestování", en: "Inspiration for affordable travel" },
-    { name: "Last Minute Dovolené", domain: "LASTMINUTEDOVOLENE.CZ", href: "https://www.lastminutedovolene.cz", image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=900&h=560&fit=crop", cs: "Dovolená, která nepočká", en: "Holidays that cannot wait" },
-    { name: "Bezmasá Jídla", domain: "BEZMASAJIDLA.CZ", href: "https://www.bezmasajidla.cz", image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=900&h=560&fit=crop", cs: "Chutná inspirace bez masa", en: "Delicious meat-free inspiration" },
-    { name: "Katastr Online", domain: "KATASTR-ONLINE.CZ", href: "https://www.katastr-online.cz", image: "https://katastr-online.cz/og-image.jpg", cs: "Nemovitosti a parcely přehledně", en: "Property records made clear" },
-    { name: "Čajovny Praha", domain: "CAJOVNY-PRAHA.CZ", href: "https://www.cajovny-praha.cz", image: "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/yxZoXDMoMcHuiGuf.jpg", cs: "Pražské čajovny s atmosférou", en: "Prague tea houses with atmosphere" },
-    { name: "Do Itálie", domain: "DO-ITALIE.CZ", href: "https://www.do-italie.cz", image: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=900&h=560&fit=crop", cs: "Itálie od inspirace po cestu", en: "Italy from inspiration to journey" },
+    {
+      name: "Akční Letenky",
+      domain: "AKCNI-LETENKY.COM",
+      href: "https://www.akcni-letenky.com",
+      image: "https://www.akcni-letenky.com/hero-bg.jpg",
+      cs: "Inspirace pro výhodné cestování",
+      en: "Inspiration for affordable travel",
+    },
+    {
+      name: "Last Minute Dovolené",
+      domain: "LASTMINUTEDOVOLENE.CZ",
+      href: "https://www.lastminutedovolene.cz",
+      image:
+        "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=900&h=560&fit=crop",
+      cs: "Dovolená, která nepočká",
+      en: "Holidays that cannot wait",
+    },
+    {
+      name: "Bezmasá Jídla",
+      domain: "BEZMASAJIDLA.CZ",
+      href: "https://www.bezmasajidla.cz",
+      image:
+        "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=900&h=560&fit=crop",
+      cs: "Chutná inspirace bez masa",
+      en: "Delicious meat-free inspiration",
+    },
+    {
+      name: "Katastr Online",
+      domain: "KATASTR-ONLINE.CZ",
+      href: "https://www.katastr-online.cz",
+      image:
+        "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&h=560&fit=crop",
+      imagePosition: "center 55%",
+      cs: "Nemovitosti a parcely přehledně",
+      en: "Property records made clear",
+    },
+    {
+      name: "Čajovny Praha",
+      domain: "CAJOVNY-PRAHA.CZ",
+      href: "https://www.cajovny-praha.cz",
+      image:
+        "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=900&h=560&fit=crop",
+      imagePosition: "center 45%",
+      cs: "Pražské čajovny s atmosférou",
+      en: "Prague tea houses with atmosphere",
+    },
+    {
+      name: "Do Itálie",
+      domain: "DO-ITALIE.CZ",
+      href: "https://www.do-italie.cz",
+      image:
+        "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=900&h=560&fit=crop",
+      cs: "Itálie od inspirace po cestu",
+      en: "Italy from inspiration to journey",
+    },
   ];
 
   return (
-    <footer className={`footer-mystical bg-background/50 backdrop-blur-sm relative${isAuthenticated ? " lg:pl-14" : ""}`}>
+    <footer
+      className={`footer-mystical bg-background/50 backdrop-blur-sm relative${isAuthenticated ? " lg:pl-14" : ""}`}
+    >
       {/* Mystical sacred geometry decoration */}
       <div className="absolute inset-0 bg-sacred-geometry pointer-events-none opacity-50" />
       <div className="container py-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline mb-4 group">
+            <Link
+              href={localePath("/")}
+              className="flex items-center gap-2.5 no-underline mb-4 group"
+            >
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-sm group-hover:shadow-purple-500/20 transition-shadow">
-                <svg viewBox="0 0 24 24" className="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-4.5 h-4.5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
                   <circle cx="12" cy="4" r="2" />
                   <circle cx="12" cy="12" r="2.5" />
                   <circle cx="12" cy="20" r="2" />
@@ -61,93 +125,215 @@ export default function Footer() {
 
           {/* Features */}
           <div>
-            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{t.footer.features}</h4>
+            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">
+              {t.footer.features}
+            </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href={localePath("/calculate")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.chartCalculator}</Link></li>
-              <li><Link href={localePath("/transits")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.dailyTransits}</Link></li>
-              <li><Link href={localePath("/compare")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.chartComparison}</Link></li>
-              <li><Link href={localePath("/celebrities")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.celebrityCharts}</Link></li>
+              <li>
+                <Link
+                  href={localePath("/calculate")}
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  {t.footer.chartCalculator}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={localePath("/transits")}
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  {t.footer.dailyTransits}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={localePath("/compare")}
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  {t.footer.chartComparison}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={localePath("/celebrities")}
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  {t.footer.celebrityCharts}
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Learn */}
           <div>
-            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{t.footer.learn}</h4>
+            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">
+              {t.footer.learn}
+            </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href={localePath("/iching")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.iChingOracle}</Link></li>
-              <li><Link href={localePath("/andelska-cisla")} className="cursor-pointer hover:text-primary transition-colors">{locale === "cs" ? "Andělská čísla" : "Angel Numbers"}</Link></li>
-              <li><Link href={localePath("/blog")} className="cursor-pointer hover:text-primary transition-colors">{locale === "cs" ? "Typy a strategie" : "Types & Strategy"}</Link></li>
-              <li><Link href={localePath("/blog")} className="cursor-pointer hover:text-primary transition-colors">{locale === "cs" ? "Autorita" : "Authority"}</Link></li>
-              <li><Link href={localePath("/encyclopedia")} className="cursor-pointer hover:text-primary transition-colors">{locale === "cs" ? "Brány a dráhy" : "Gates & Channels"}</Link></li>
-              <li><Link href={localePath("/blog")} className="cursor-pointer hover:text-primary transition-colors">Blog</Link></li>
+              <li>
+                <Link
+                  href={localePath("/iching")}
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  {t.footer.iChingOracle}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={localePath("/andelska-cisla")}
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  {locale === "cs" ? "Andělská čísla" : "Angel Numbers"}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={localePath("/blog")}
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  {locale === "cs" ? "Typy a strategie" : "Types & Strategy"}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={localePath("/blog")}
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  {locale === "cs" ? "Autorita" : "Authority"}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={localePath("/encyclopedia")}
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  {locale === "cs" ? "Brány a dráhy" : "Gates & Channels"}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={localePath("/blog")}
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  Blog
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Account */}
           <div>
-            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{t.footer.accountLabel}</h4>
+            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">
+              {t.footer.accountLabel}
+            </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href={localePath("/dashboard")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.myCharts}</Link></li>
-              <li><Link href={localePath("/dashboard?tab=readings")} className="cursor-pointer hover:text-primary transition-colors">{t.footer.aiReadings}</Link></li>
+              <li>
+                <Link
+                  href={localePath("/dashboard")}
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  {t.footer.myCharts}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={localePath("/dashboard?tab=readings")}
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  {t.footer.aiReadings}
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Partner Sites */}
           <div className="md:hidden">
-            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">{locale === "cs" ? "Další projekty" : "Partner Sites"}</h4>
+            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">
+              {locale === "cs" ? "Další projekty" : "Partner Sites"}
+            </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="relative group/tip">
-                <a href="https://www.akcni-letenky.com" target="_blank" rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors">
+                <a
+                  href="https://www.akcni-letenky.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors"
+                >
                   Akční Letenky
                 </a>
                 <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-56 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Akční letenky do celého světa — tipy na levné letenky, výhodné nabídky a chybných tarifů.
+                  Akční letenky do celého světa — tipy na levné letenky, výhodné
+                  nabídky a chybných tarifů.
                 </span>
               </li>
               <li className="relative group/tip">
-                <a href="https://www.lastminutedovolene.cz" target="_blank" rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors">
+                <a
+                  href="https://www.lastminutedovolene.cz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors"
+                >
                   Last Minute Dovolené
                 </a>
                 <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-56 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Nejlepší last minute zájezdy a vyhledávač výhodných dovolených u moře.
+                  Nejlepší last minute zájezdy a vyhledávač výhodných dovolených
+                  u moře.
                 </span>
               </li>
               <li className="relative group/tip">
-                <a href="https://www.bezmasajidla.cz" target="_blank" rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors">
+                <a
+                  href="https://www.bezmasajidla.cz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors"
+                >
                   Bezmasá Jídla
                 </a>
                 <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-52 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Recepty bez masa — zdravé, chutné a jednoduché vaření pro každý den.
+                  Recepty bez masa — zdravé, chutné a jednoduché vaření pro
+                  každý den.
                 </span>
               </li>
               <li className="relative group/tip">
-                <a href="https://www.katastr-online.cz" target="_blank" rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors">
+                <a
+                  href="https://www.katastr-online.cz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors"
+                >
                   Katastr Online
                 </a>
                 <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-56 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Vyhledávání v katastru nemovitostí — parcely, vlastníci a listy vlastnictví online.
+                  Vyhledávání v katastru nemovitostí — parcely, vlastníci a
+                  listy vlastnictví online.
                 </span>
               </li>
               <li className="relative group/tip">
-                <a href="https://www.cajovny-praha.cz" target="_blank" rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors">
+                <a
+                  href="https://www.cajovny-praha.cz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors"
+                >
                   Čajovny Praha
                 </a>
                 <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-52 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Průvodce čajovnami v Praze — klidná místa pro relaxaci s výběrovým čajem.
+                  Průvodce čajovnami v Praze — klidná místa pro relaxaci s
+                  výběrovým čajem.
                 </span>
               </li>
               <li className="relative group/tip">
-                <a href="https://www.do-italie.cz" target="_blank" rel="noopener noreferrer"
-                  className="hover:text-primary transition-colors">
+                <a
+                  href="https://www.do-italie.cz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors"
+                >
                   Do Itálie
                 </a>
                 <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-56 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Průvodce cestováním po Itálii — destinace, tipy a inspirace na dovolenou.
+                  Průvodce cestováním po Itálii — destinace, tipy a inspirace na
+                  dovolenou.
                 </span>
               </li>
             </ul>
@@ -159,9 +345,7 @@ export default function Footer() {
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} {t.footer.copyright}
           </p>
-          <p className="text-xs text-muted-foreground">
-            {t.footer.foundedBy}
-          </p>
+          <p className="text-xs text-muted-foreground">{t.footer.foundedBy}</p>
         </div>
       </div>
 
@@ -170,7 +354,10 @@ export default function Footer() {
           <p className="mb-6 text-center text-[11px] font-bold uppercase tracking-[0.25em] text-[#A38A5A]">
             {locale === "cs" ? "Naše další projekty" : "Our other projects"}
           </p>
-          <div className="projects-marquee" aria-label={locale === "cs" ? "Další projekty" : "Other projects"}>
+          <div
+            className="projects-marquee"
+            aria-label={locale === "cs" ? "Další projekty" : "Other projects"}
+          >
             <div className="projects-marquee-track">
               {[0, 1].map(groupIndex => (
                 <div
@@ -187,15 +374,27 @@ export default function Footer() {
                       tabIndex={groupIndex === 1 ? -1 : undefined}
                       className="group relative flex h-44 w-[240px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-black/10 bg-slate-900 p-4 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl lg:w-[200px]"
                     >
-                      <img src={project.image} alt={project.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                      <img
+                        src={project.image}
+                        alt={project.name}
+                        loading="lazy"
+                        style={{
+                          objectPosition: project.imagePosition || "center",
+                        }}
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30 transition-colors group-hover:from-black/95" />
                       <div className="relative z-10 self-start">
                         <ProjectDomainBadge domain={project.domain} />
                       </div>
                       <div className="relative z-10 mt-auto flex items-end justify-between gap-2 text-white">
                         <div className="min-w-0 flex-1">
-                          <h3 className="truncate font-serif text-base font-bold leading-snug transition-colors group-hover:text-amber-200">{project.name}</h3>
-                          <p className="truncate text-[11px] font-light text-gray-300">{locale === "cs" ? project.cs : project.en}</p>
+                          <h3 className="truncate font-serif text-base font-bold leading-snug transition-colors group-hover:text-amber-200">
+                            {project.name}
+                          </h3>
+                          <p className="truncate text-[11px] font-light text-gray-300">
+                            {locale === "cs" ? project.cs : project.en}
+                          </p>
                         </div>
                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/15 text-white backdrop-blur-md transition-all duration-300 group-hover:bg-white group-hover:text-black">
                           <ArrowUpRight className="h-4 w-4" />
