@@ -3,6 +3,19 @@ import { ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 
+function ProjectDomainBadge({ domain }: { domain: string }) {
+  const extensionStart = domain.lastIndexOf(".");
+  const name = extensionStart > 0 ? domain.slice(0, extensionStart) : domain;
+  const extension = extensionStart > 0 ? domain.slice(extensionStart) : "";
+
+  return (
+    <span className="inline-flex overflow-hidden rounded-full border border-white/25 bg-black/20 text-[9px] font-extrabold uppercase tracking-wider shadow-sm">
+      <span className="px-2.5 py-1 text-white">{name}</span>
+      {extension && <span className="border-l border-white/15 bg-white/15 px-1.5 py-1 text-white/70">{extension}</span>}
+    </span>
+  );
+}
+
 export default function Footer() {
   const { t, locale, localePath } = useLanguage();
   const { isAuthenticated } = useAuth();
@@ -152,9 +165,9 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="relative z-10 hidden border-t border-amber-200/60 bg-gradient-to-b from-amber-50/70 to-stone-50/80 py-7 md:block">
-        <div className="mx-auto max-w-screen-2xl px-4 lg:px-8">
-          <p className="mb-4 text-center text-[10px] font-semibold uppercase tracking-[0.32em] text-amber-800/65">
+      <div className="relative z-10 hidden border-t border-amber-900/10 bg-[#FAF8F5] py-10 md:block">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <p className="mb-6 text-center text-[11px] font-bold uppercase tracking-[0.25em] text-[#A38A5A]">
             {locale === "cs" ? "Naše další projekty" : "Our other projects"}
           </p>
           <div className="projects-marquee" aria-label={locale === "cs" ? "Další projekty" : "Other projects"}>
@@ -172,19 +185,19 @@ export default function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       tabIndex={groupIndex === 1 ? -1 : undefined}
-                      className="group relative h-40 w-[280px] shrink-0 overflow-hidden rounded-2xl border border-white/50 bg-slate-900 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl lg:w-[310px]"
+                      className="group relative flex h-44 w-[240px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-black/10 bg-slate-900 p-4 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl lg:w-[200px]"
                     >
-                      <img src={project.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/5" />
-                      <span className="absolute left-4 top-3 rounded-full border border-white/20 bg-black/25 px-2.5 py-1 text-[9px] font-semibold tracking-wider text-white/85 backdrop-blur-md">
-                        {project.domain}
-                      </span>
-                      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 text-white">
-                        <div className="min-w-0">
-                          <h3 className="truncate font-serif text-lg font-semibold leading-tight">{project.name}</h3>
-                          <p className="mt-1 truncate text-[11px] text-white/75">{locale === "cs" ? project.cs : project.en}</p>
+                      <img src={project.image} alt={project.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30 transition-colors group-hover:from-black/95" />
+                      <div className="relative z-10 self-start">
+                        <ProjectDomainBadge domain={project.domain} />
+                      </div>
+                      <div className="relative z-10 mt-auto flex items-end justify-between gap-2 text-white">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="truncate font-serif text-base font-bold leading-snug transition-colors group-hover:text-amber-200">{project.name}</h3>
+                          <p className="truncate text-[11px] font-light text-gray-300">{locale === "cs" ? project.cs : project.en}</p>
                         </div>
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/40 bg-white/10 backdrop-blur-md transition group-hover:bg-white group-hover:text-slate-900">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/15 text-white backdrop-blur-md transition-all duration-300 group-hover:bg-white group-hover:text-black">
                           <ArrowUpRight className="h-4 w-4" />
                         </span>
                       </div>
