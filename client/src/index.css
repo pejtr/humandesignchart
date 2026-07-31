@@ -570,39 +570,30 @@
   width: min(92vw, 980px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: conic-gradient(
-    from 40deg,
-    transparent 0 9%,
-    rgba(139, 92, 246, 0.22) 14%,
-    transparent 24% 41%,
-    rgba(20, 184, 166, 0.18) 48%,
-    transparent 59% 76%,
-    rgba(245, 158, 11, 0.17) 84%,
-    transparent 94%
-  );
-  filter: blur(20px);
-  animation: nexusOrbit 34s linear infinite;
+  background:
+    radial-gradient(circle at 28% 32%, rgba(139, 92, 246, 0.32), transparent 34%),
+    radial-gradient(circle at 72% 38%, rgba(20, 184, 166, 0.22), transparent 32%),
+    radial-gradient(circle at 58% 76%, rgba(245, 158, 11, 0.22), transparent 36%);
+  filter: blur(32px);
+  animation: nexusGlowDrift 18s ease-in-out infinite;
 }
 .hero-nexus-mesh {
   width: min(82vw, 820px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background:
-    repeating-conic-gradient(
-      from 0deg,
-      rgba(124, 58, 237, 0.16) 0 1deg,
-      transparent 1deg 18deg
-    ),
-    repeating-radial-gradient(
-      circle,
-      transparent 0 54px,
-      rgba(124, 58, 237, 0.12) 55px 56px
-    );
+  background: repeating-radial-gradient(
+    circle,
+    transparent 0 54px,
+    rgba(124, 58, 237, 0.12) 55px 56px
+  );
   -webkit-mask-image: radial-gradient(circle, #000 0 53%, transparent 76%);
   mask-image: radial-gradient(circle, #000 0 53%, transparent 76%);
-  animation:
-    nexusOrbit 46s linear infinite reverse,
-    nexusBreathe 7s ease-in-out infinite;
+  animation: nexusBreathe 7s ease-in-out infinite;
+}
+
+@keyframes nexusGlowDrift {
+  0%, 100% { transform: translate(-50%, -50%) scale(.94) rotate(-4deg); opacity: .58; }
+  50% { transform: translate(-50%, -50%) scale(1.08) rotate(5deg); opacity: .92; }
 }
 .hero-nexus-ring {
   aspect-ratio: 1;
