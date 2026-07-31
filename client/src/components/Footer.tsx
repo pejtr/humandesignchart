@@ -65,8 +65,8 @@ export default function Footer() {
       domain: "CAJOVNY-PRAHA.CZ",
       href: "https://www.cajovny-praha.cz",
       image:
-        "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=900&h=560&fit=crop",
-      imagePosition: "center 45%",
+        "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=900&h=560&fit=crop",
+      imagePosition: "center 50%",
       cs: "Pražské čajovny s atmosférou",
       en: "Prague tea houses with atmosphere",
     },
