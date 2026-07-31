@@ -187,19 +187,48 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(
+        let refreshing = false;
+        const hadController = Boolean(navigator.serviceWorker.controller);
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!hadController || refreshing) return;
+          refreshing = true;
+          window.location.reload();
+        });
+
+        navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then(
           (reg) => {
             console.log('[SW] Registered:', reg.scope);
-            reg.addEventListener('updatefound', () => {
-              const worker = reg.installing;
-              if (!worker) return;
-              worker.addEventListener('statechange', () => {
-                if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+
+            const currentModuleSrc = document.querySelector('script[type="module"]')?.getAttribute('src');
+            const checkForUpdate = async () => {
+              reg.update().catch(() => {});
+
+              try {
+                const checkUrl = new URL(window.location.href);
+                checkUrl.searchParams.set('__app_version', Date.now().toString());
+                const response = await fetch(checkUrl, {
+                  cache: 'no-store',
+                  credentials: 'same-origin',
+                });
+                if (!response.ok) return;
+
+                const html = await response.text();
+                const nextDocument = new DOMParser().parseFromString(html, 'text/html');
+                const nextModuleSrc = nextDocument.querySelector('script[type="module"]')?.getAttribute('src');
+
+                if (currentModuleSrc && nextModuleSrc && currentModuleSrc !== nextModuleSrc) {
                   window.location.reload();
                 }
-              });
+              } catch {
+                // Stay on the current version when the network is unavailable.
+              }
+            };
+            checkForUpdate();
+
+            document.addEventListener('visibilitychange', () => {
+              if (document.visibilityState === 'visible') checkForUpdate();
             });
-            reg.update().catch(() => {});
           },
           (err) => console.warn('[SW] Registration failed:', err)
         );
