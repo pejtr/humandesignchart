@@ -1,5 +1,7 @@
 import type { Express } from "express";
-import { getChartById } from "../../db";
+import { getDb } from "../../db";
+import { charts } from "../../../drizzle/schema";
+import { eq } from "drizzle-orm";
 import type { HumanDesignChartData } from "@shared/types";
 
 export function registerPassRoutes(app: Express) {
@@ -12,11 +14,18 @@ export function registerPassRoutes(app: Express) {
         return;
       }
 
-      const chart = await getChartById(chartId);
-      if (!chart) {
+      const db = await getDb();
+      if (!db) {
+        res.status(503).send("Database unavailable");
+        return;
+      }
+
+      const chartResult = await db.select().from(charts).where(eq(charts.id, chartId)).limit(1);
+      if (chartResult.length === 0) {
         res.status(404).send("Chart not found");
         return;
       }
+      const chart = chartResult[0];
 
       const chartData = chart.chartData as unknown as HumanDesignChartData;
       const name = chart.name || "Human Design Card";
