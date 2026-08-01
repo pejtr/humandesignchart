@@ -407,6 +407,14 @@ export default function Home() {
   const { t, locale, localePath } = useLanguage();
   const isCs = locale === "cs";
 
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePos({ x, y });
+  };
+
   // Parallax scroll effect for hero
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress: heroScrollProgress } = useScroll({
@@ -779,117 +787,63 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
-      {/* ── Hero Section ─────────────────────────────────────────────────── */}
+      {/* ── Hero Section (Avanito-style Live Fluid Animated Background) ────── */}
       <section
         ref={heroRef}
-        className="relative flex flex-col justify-center overflow-hidden bg-[#f5f0f8]"
-        style={{ minHeight: "55vh" }}
+        onMouseMove={handleMouseMove}
+        className="relative flex flex-col justify-center overflow-hidden bg-[#FAF8F5] dark:bg-[#070510] transition-colors duration-500 py-20 md:py-28"
+        style={{ minHeight: "65vh" }}
       >
-        {/* Ambient Animated Background */}
-        <div
-          className="absolute inset-0 z-0 animate-ambient-pan"
-          style={{
-            backgroundImage:
-              "url(https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/WUcqCUXbXPPoyTKt.webp)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            opacity: 0.85,
-          }}
-        />
-        <div
-          className="hero-color-breathe absolute inset-0 z-[1] pointer-events-none"
-          aria-hidden="true"
-        />
-        <div
-          className="hero-nexus-field absolute inset-0 z-[1] pointer-events-none"
-          aria-hidden="true"
-        >
-          <div className="hero-nexus-aurora" />
-          <div className="hero-nexus-mesh" />
-          <div className="hero-nexus-ring hero-nexus-ring-outer" />
-          <div className="hero-nexus-ring hero-nexus-ring-inner" />
-          <div className="hero-nexus-core" />
-        </div>
-        {/* Decorative sacred circle — always visible including mobile */}
-        <div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-          style={{ zIndex: 1 }}
-        >
-          <div className="hero-sacred-pulse-1 w-[280px] h-[280px] md:w-[500px] md:h-[500px] rounded-full border-2 border-purple-300/40" />
-          <div className="hero-sacred-pulse-2 absolute w-[220px] h-[220px] md:w-[400px] md:h-[400px] rounded-full border border-purple-200/35" />
-          <div className="hero-sacred-pulse-3 absolute w-[160px] h-[160px] md:w-[300px] md:h-[300px] rounded-full border border-amber-200/35" />
-          <div className="hero-heartbeat absolute h-20 w-20 rounded-full bg-white/35 blur-2xl" />
+        {/* Avanito-Style Fluid Animated Gradient Blobs */}
+        <div className="hero-fluid-blobs" aria-hidden="true">
+          <div
+            className="hero-fluid-blob hero-fluid-blob-1"
+            style={{
+              transform: `translate(${mousePos.x * 45}px, ${mousePos.y * 45}px)`,
+            }}
+          />
+          <div
+            className="hero-fluid-blob hero-fluid-blob-2"
+            style={{
+              transform: `translate(${mousePos.x * -55}px, ${mousePos.y * -55}px)`,
+            }}
+          />
+          <div
+            className="hero-fluid-blob hero-fluid-blob-3"
+            style={{
+              transform: `translate(${mousePos.x * 40}px, ${mousePos.y * -40}px)`,
+            }}
+          />
+          <div
+            className="hero-fluid-blob hero-fluid-blob-4"
+            style={{
+              transform: `translate(${mousePos.x * -35}px, ${mousePos.y * 35}px)`,
+            }}
+          />
+          <div className="hero-fluid-blob hero-fluid-blob-center" />
         </div>
 
-        {/* Animated orbs — responsive for mobile */}
+        {/* Ambient Subtle Grid Mesh overlay */}
         <div
-          className="hero-orb-1 absolute pointer-events-none"
-          style={{
-            width: "min(520px, 80vw)",
-            height: "min(520px, 80vw)",
-            borderRadius: "50%",
-            background:
-              "radial-gradient(circle at 40% 40%, rgba(139,92,246,0.45) 0%, rgba(167,139,250,0.20) 50%, transparent 70%)",
-            top: "-10%",
-            left: "-15%",
-            filter: "blur(40px)",
-            zIndex: 1,
-          }}
-        />
-        <div
-          className="hero-orb-2 absolute pointer-events-none"
-          style={{
-            width: "min(600px, 90vw)",
-            height: "min(600px, 90vw)",
-            borderRadius: "50%",
-            background:
-              "radial-gradient(circle at 60% 60%, rgba(251,191,36,0.38) 0%, rgba(252,211,77,0.18) 50%, transparent 70%)",
-            bottom: "-20%",
-            right: "-15%",
-            filter: "blur(50px)",
-            zIndex: 1,
-          }}
-        />
-        <div
-          className="hero-orb-3 absolute pointer-events-none"
-          style={{
-            width: "min(380px, 60vw)",
-            height: "min(380px, 60vw)",
-            borderRadius: "50%",
-            background:
-              "radial-gradient(circle at 50% 50%, rgba(42,157,143,0.35) 0%, rgba(94,234,212,0.15) 50%, transparent 70%)",
-            top: "30%",
-            left: "55%",
-            filter: "blur(35px)",
-            zIndex: 1,
-          }}
-        />
-        <div
-          className="hero-orb-4 absolute pointer-events-none"
-          style={{
-            width: "min(300px, 50vw)",
-            height: "min(300px, 50vw)",
-            borderRadius: "50%",
-            background:
-              "radial-gradient(circle at 50% 50%, rgba(244,114,182,0.32) 0%, rgba(251,207,232,0.14) 50%, transparent 70%)",
-            top: "10%",
-            right: "10%",
-            filter: "blur(30px)",
-            zIndex: 1,
-          }}
+          className="absolute inset-0 bg-dots opacity-20 pointer-events-none z-[1]"
+          aria-hidden="true"
         />
 
-        {/* White overlay */}
+        {/* Decorative Sacred Geometry Circles & Pulse */}
         <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: "rgba(255,255,255,0.35)", zIndex: 2 }}
-        />
+          className="absolute inset-0 flex items-center justify-center pointer-events-none z-[2]"
+        >
+          <div className="sacred-rotate-cw w-[300px] h-[300px] md:w-[560px] md:h-[560px] rounded-full border border-purple-400/30 dark:border-purple-400/20" />
+          <div className="sacred-rotate-ccw absolute w-[230px] h-[230px] md:w-[440px] md:h-[440px] rounded-full border border-amber-300/35 dark:border-amber-300/20" />
+          <div className="sacred-glow-breathe absolute w-[160px] h-[160px] md:w-[320px] md:h-[320px] rounded-full border border-pink-400/30 dark:border-pink-400/20" />
+          <div className="absolute h-28 w-28 rounded-full bg-white/40 dark:bg-purple-500/20 blur-3xl animate-pulse" />
+        </div>
 
-        {/* Floating particle animation */}
+        {/* Floating Particle Animation */}
         <ParticleField />
 
         <motion.div
-          className="container relative z-10 py-32"
+          className="container relative z-10 py-16 md:py-24"
           style={{ y: heroY, opacity: heroOpacity }}
         >
           <div className="max-w-3xl mx-auto text-center">
