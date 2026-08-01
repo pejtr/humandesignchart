@@ -7,6 +7,7 @@ import { sdk } from "./sdk";
 import { ENV } from "./env";
 import { buildGoogleAuthUrl, exchangeGoogleCode } from "./googleAuth";
 import { syncUserAsLead, sendLeadOSEvent } from "../leados";
+import { sendMetaCapiEvent } from "../metaCapi";
 
 const STATE_MAX_AGE_MS = 10 * 60 * 1000;
 
@@ -16,9 +17,6 @@ function getQueryParam(req: Request, key: string): string | undefined {
 }
 
 // ─── Stateless CSRF state ──────────────────────────────────────────────
-// The state is a signed token instead of a cookie, so it survives regardless
-// of which host (www vs apex) the callback lands on and is immune to SameSite
-// cookie quirks. Signature uses the app's JWT secret.
 function signState(): string {
   const payload = `${Date.now()}.${randomBytes(8).toString("hex")}`;
   const sig = createHmac("sha256", ENV.cookieSecret).update(payload).digest("base64url");
@@ -40,12 +38,6 @@ function verifyState(state: string | undefined): boolean {
   return Number.isFinite(age) && age >= 0 && age <= STATE_MAX_AGE_MS;
 }
 
-/**
- * Build the OAuth redirect URI. For the production domain we always return the
- * canonical `www` host (the one registered in the Google OAuth client). The
- * apex domain has no DNS record, so using it here prevents Google from reaching
- * the callback at all.
- */
 function getRedirectUri(req: Request): string {
   const host = (req.get("host") ?? "").toLowerCase();
 
@@ -141,6 +133,23 @@ export function registerOAuthRoutes(app: Express) {
             score: 45,
           },
         });
+
+        // Send CAPI Lead event to Facebook
+        sendMetaCapiEvent({
+          eventName: "Lead",
+          eventSourceUrl: "https://www.humandesignmapa.cz/api/oauth/callback",
+          userData: {
+            email: profile.email,
+            firstName: profile.givenName || profile.name?.split(" ")[0],
+            lastName: profile.familyName || profile.name?.split(" ").slice(1).join(" "),
+            clientIpAddress: (req.headers["x-forwarded-for"] as string)?.split(",")[0] || req.ip,
+            clientUserAgent: req.headers["user-agent"],
+          },
+          customData: {
+            content_name: "User Registration",
+            content_category: "account",
+          },
+        }).catch((err) => console.error("[Meta CAPI] Dispatch error:", err));
       }
 
       const sessionToken = await sdk.createSessionToken(openId, {

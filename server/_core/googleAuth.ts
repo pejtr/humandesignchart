@@ -13,6 +13,8 @@ export type GoogleProfile = {
   sub: string;
   email: string | null;
   name: string | null;
+  givenName?: string | null;
+  familyName?: string | null;
   picture: string | null;
   emailVerified: boolean;
 };
@@ -81,6 +83,8 @@ export async function exchangeGoogleCode(opts: {
     sub,
     email: typeof claims.email === "string" ? claims.email : null,
     name: typeof claims.name === "string" ? claims.name : null,
+    givenName: typeof claims.given_name === "string" ? claims.given_name : null,
+    familyName: typeof claims.family_name === "string" ? claims.family_name : null,
     picture: typeof claims.picture === "string" ? claims.picture : null,
     emailVerified: claims.email_verified === true,
   };

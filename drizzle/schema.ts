@@ -300,6 +300,20 @@ export const users = mysqlTable("users", {
 		unique("users_affiliateCode_unique").on(table.affiliateCode),
 	]);
 
+export const pushSubscriptions = mysqlTable("pushSubscriptions", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	endpoint: text().notNull(),
+	p256dh: text().notNull(),
+	auth: text().notNull(),
+	locale: varchar({ length: 5 }).default('cs').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`(now())`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).default(sql`(now())`).onUpdateNow().notNull(),
+},
+	(table) => [
+		primaryKey({ columns: [table.id], name: "pushSubscriptions_id" }),
+	]);
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Chart = typeof charts.$inferSelect;
@@ -332,3 +346,5 @@ export type SharedChart = typeof sharedCharts.$inferSelect;
 export type InsertSharedChart = typeof sharedCharts.$inferInsert;
 export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
 export type InsertNewsletterSubscriber = typeof newsletterSubscribers.$inferInsert;
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;

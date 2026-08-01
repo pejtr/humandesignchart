@@ -88,6 +88,8 @@ async function startServer() {
   registerOAuthRoutes(app);
   registerSeoRoutes(app);
   registerOgRoutes(app);
+  const { registerPassRoutes } = await import("./routes/pass");
+  registerPassRoutes(app);
   registerAiStreamRoute(app);
   registerAiRoutes(app);
   registerNotificationRoutes(app);
