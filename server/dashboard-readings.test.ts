@@ -14,7 +14,6 @@ vi.mock("./db", () => ({
   updateChart: vi.fn(),
   deleteChart: vi.fn(),
   toggleFavorite: vi.fn(),
-  createSharedChart: vi.fn(),
   getSharedChart: vi.fn(),
 }));
 

@@ -9,7 +9,7 @@ describe("SSE Streaming Endpoint", () => {
       "./server/_core/routes/aiStream.ts",
       "utf-8"
     );
-    expect(streamContent).toContain('app.get("/api/ai/stream"');
+    expect(streamContent).toContain('app.post("/api/ai/stream"');
     expect(streamContent).toContain("text/event-stream");
     expect(streamContent).toContain("X-Accel-Buffering");
   });
@@ -32,7 +32,7 @@ describe("SSE Streaming Endpoint", () => {
       "utf-8"
     );
     expect(streamContent).toContain("stream: true");
-    expect(streamContent).toContain("max_tokens: 4096");
+    expect(streamContent).toContain("max_tokens: 1800");
   });
 
   it("should emit data: {token} SSE events", async () => {
