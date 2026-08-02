@@ -35,10 +35,11 @@ import {
   Star,
   Crown,
   Lock,
-  Moon,
-  FileText,
   Heart,
 } from "lucide-react";
+import { CheckoutOrderBump } from "@/components/CheckoutOrderBump";
+import { GiftVoucherModal } from "@/components/GiftVoucherModal";
+import { TeamDesignAudit } from "@/components/TeamDesignAudit";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
@@ -68,6 +69,7 @@ export default function Pricing() {
   });
   const [voucherCode, setVoucherCode] = useState("");
   const [includePartnerAddon, setIncludePartnerAddon] = useState(false);
+  const [showGiftModal, setShowGiftModal] = useState(false);
 
   useEffect(() => {
     viewContent({
@@ -1034,7 +1036,13 @@ export default function Pricing() {
             </Accordion>
           </div>
         </div>
+
+        <div className="container max-w-4xl mx-auto my-8">
+          <TeamDesignAudit />
+        </div>
       </div>
+
+      <GiftVoucherModal open={showGiftModal} onOpenChange={setShowGiftModal} />
       <Footer />
     </div>
   );
