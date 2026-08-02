@@ -287,6 +287,10 @@ function WelcomeModalWrapper() {
   return <WelcomeModal onClose={dismiss} />;
 }
 
+const SocialProofTicker = lazy(() => import("./components/SocialProofTicker").then(m => ({ default: m.SocialProofTicker })));
+const WelcomeBonusBanner = lazy(() => import("./components/WelcomeBonusBanner").then(m => ({ default: m.WelcomeBonusBanner })));
+const LeadMagnetExitPopup = lazy(() => import("./components/LeadMagnetExitPopup").then(m => ({ default: m.LeadMagnetExitPopup })));
+
 function App() {
   useUTM();
   useSklikPageViews();
@@ -301,6 +305,11 @@ function App() {
             <WelcomeModalWrapper />
             <NewsletterPopup />
             <ExitIntentPopup />
+            <Suspense fallback={null}>
+              <WelcomeBonusBanner />
+              <SocialProofTicker />
+              <LeadMagnetExitPopup />
+            </Suspense>
             <ScrollToTop />
             <CookieConsent />
             <AuthSidebar />

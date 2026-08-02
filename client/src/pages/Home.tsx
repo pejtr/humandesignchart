@@ -402,11 +402,14 @@ function TestimonialsSection({ isCs }: { isCs: boolean }) {
   );
 }
 
+import { FastTypeQuizModal } from "@/components/FastTypeQuizModal";
+
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const { t, locale, localePath } = useLanguage();
   const isCs = locale === "cs";
 
+  const [showQuiz, setShowQuiz] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -899,6 +902,16 @@ export default function Home() {
                 <Link href={localePath("/calculate")}>
                   {isCs ? "Vytvořit moji mapu zdarma" : "Get my free chart"}
                 </Link>
+              </Button>
+
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => setShowQuiz(true)}
+                className="text-base px-6 py-6 border-purple-300 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 rounded-lg gap-2"
+              >
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                {isCs ? "Nevíte čas? 30s Rychlotest" : "Unknown time? 30s Quiz"}
               </Button>
 
               <ChartCounter isCs={isCs} />
@@ -1525,6 +1538,7 @@ export default function Home() {
         </div>
       </section>
 
+      <FastTypeQuizModal open={showQuiz} onOpenChange={setShowQuiz} />
       <Footer />
     </div>
   );

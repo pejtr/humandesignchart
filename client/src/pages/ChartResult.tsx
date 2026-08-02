@@ -24,6 +24,7 @@ import {
   ChevronRight, Info, Hexagon, CircleDot, Globe, Share2, Copy, Check,
   User, Users, Heart, Briefcase, UserCheck, HelpCircle, GitCompare,
 } from "lucide-react";
+import { PartnerCompareInvite } from "@/components/PartnerCompareInvite";
 import { generateChartPDF } from "@/lib/pdfExport";
 import { PLANET_SYMBOLS, TYPE_COLORS, translateCrossName, CROSS_TYPE_CS } from "@/lib/hdConstants";
 import type { HumanDesignChartData } from "@shared/types";
@@ -120,7 +121,7 @@ function AiReadingProgress({ locale }: { locale: string }) {
 export default function ChartResult({ id: propId }: { id?: string } = {}) {
   const params = useParams<{ id: string }>();
   const [, navigate] = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { t, localePath, locale } = useLanguage();
 
   const [chart, setChart] = useState<HumanDesignChartData | null>(null);
@@ -788,6 +789,9 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
 
               {/* Details Column */}
               <div className="lg:col-span-2 space-y-6">
+
+                {/* Partner Compare & Viral Rewards Card */}
+                <PartnerCompareInvite referralCode={(user as any)?.referralCode} chartName={chartMeta?.name} />
 
                 {/* ─── AI Výklad — PRIMÁRNÍ SEKCE ─── */}
                 <div ref={aiSectionRef}>
