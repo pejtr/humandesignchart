@@ -25,6 +25,8 @@ import {
   User, Users, Heart, Briefcase, UserCheck, HelpCircle, GitCompare,
 } from "lucide-react";
 import { PartnerCompareInvite } from "@/components/PartnerCompareInvite";
+import { DirectMessagingShare } from "@/components/DirectMessagingShare";
+import { LockedContentBlurTeaser } from "@/components/LockedContentBlurTeaser";
 import { generateChartPDF } from "@/lib/pdfExport";
 import { PLANET_SYMBOLS, TYPE_COLORS, translateCrossName, CROSS_TYPE_CS } from "@/lib/hdConstants";
 import type { HumanDesignChartData } from "@shared/types";
@@ -813,7 +815,8 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                       </CardContent>
                     </Card>
                   ) : (aiReadingType === "daily_transit" ? dailyTransitReading : aiReading) ? (
-                    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background shadow-sm">
+                    <>
+                      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background shadow-sm">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                           <CardTitle className="font-serif text-xl flex items-center gap-2">
@@ -913,8 +916,24 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                             )}
                           </div>
                         )}
+                        {/* Direct messaging share buttons */}
+                        <div className="pt-2 border-t border-border/20 mt-3">
+                          <DirectMessagingShare shareUrl={shareUrl || window.location.href} />
+                        </div>
                       </CardContent>
                     </Card>
+                    
+                    {/* Visual Teaser for locked chapters */}
+                    {!subStatus?.isPremium && (
+                      <LockedContentBlurTeaser
+                        titleCs="Osobní rozhodovací strategie v krizi & ne-já téma"
+                        titleEn="Personal Crisis Strategy & Not-Self Theme"
+                        previewSnippetCs="Váš typ a autorita ukazují přesný energetický mechanismus, jak předcházet pocitům hořkosti a vyhoření..."
+                        previewSnippetEn="Your type and authority reveal the exact energetic blueprint to overcome bitterness and burnout..."
+                        chapterNumber={4}
+                      />
+                    )}
+                    </>
                   ) : (
                     <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-violet-50 p-6 shadow-md">
                       {/* Decorative glow */}

@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
+import { DailyWheelOfFortune } from "@/components/DailyWheelOfFortune";
 import { trpc } from "@/lib/trpc";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -217,8 +218,10 @@ export default function Dashboard() {
               </Link>
             </div>
 
-            {/* A daily value centre gives members a reason to return even when
-                they are not creating a new chart. */}
+            {/* Daily Wheel of Fortune Retention Card */}
+            <div className="mb-8">
+              <DailyWheelOfFortune />
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-4 mb-8">
               <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card">
                 <div className="absolute -right-10 -top-10 opacity-10 pointer-events-none">
