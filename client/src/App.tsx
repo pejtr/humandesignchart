@@ -296,6 +296,7 @@ const SocialProofTicker = lazy(() => import("./components/SocialProofTicker").th
 const WelcomeBonusBanner = lazy(() => import("./components/WelcomeBonusBanner").then(m => ({ default: m.WelcomeBonusBanner })));
 const SeasonalFlashSaleBanner = lazy(() => import("./components/SeasonalFlashSaleBanner").then(m => ({ default: m.SeasonalFlashSaleBanner })));
 const LeadMagnetExitPopup = lazy(() => import("./components/LeadMagnetExitPopup").then(m => ({ default: m.LeadMagnetExitPopup })));
+const SmartChatWidget = lazy(() => import("./components/SmartChatWidget").then(m => ({ default: m.SmartChatWidget })));
 
 function App() {
   useUTM();
@@ -317,6 +318,7 @@ function App() {
                 <WelcomeBonusBanner />
                 <SocialProofTicker />
                 <LeadMagnetExitPopup />
+                <SmartChatWidget />
               </Suspense>
               <ScrollToTop />
               <CookieConsent />

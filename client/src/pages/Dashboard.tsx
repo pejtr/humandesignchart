@@ -14,7 +14,7 @@ import {
   Plus, Heart, Trash2, Loader2, LayoutDashboard,
   Star, Users, Compass, BookOpen, ThumbsUp, ThumbsDown,
   Share2, ChevronDown, ChevronUp, Calendar, Sparkles, Sun, Zap, CreditCard, Crown,
-  Settings, Bell, Lock,
+  Settings, Bell, Lock, Tag,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -27,8 +27,10 @@ import { Streamdown } from "streamdown";
 import ReferralWidget from "@/components/ReferralWidget";
 import { StreakWidget } from "@/components/StreakWidget";
 import { AffiliateWidget } from "@/components/AffiliateWidget";
+import { EmotionalTracker } from "@/components/EmotionalTracker";
+import { FamilyTreeChart } from "@/components/FamilyTreeChart";
+import { TransitGateAlerts } from "@/components/TransitGateAlerts";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Tag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SacredGeometry } from "@/components/SacredGeometry";
 import { TYPE_COLORS, PLANET_SYMBOLS, PLANET_COLORS } from "@/lib/hdConstants";
@@ -43,7 +45,7 @@ const categoryIcons: Record<string, typeof Users> = {
 };
 
 const ROLE_TAGS = [
-  { value: "partner", label: "💑 Partner", color: "bg-pink-500/20 text-pink-300 border-pink-500/30" },
+  { value: "partner", label: " administrative Partner", color: "bg-pink-500/20 text-pink-300 border-pink-500/30" },
   { value: "partnerka", label: "💑 Partnerka", color: "bg-pink-500/20 text-pink-300 border-pink-500/30" },
   { value: "manzel", label: "💍 Manžel", color: "bg-rose-500/20 text-rose-300 border-rose-500/30" },
   { value: "manzelka", label: "💍 Manželka", color: "bg-rose-500/20 text-rose-300 border-rose-500/30" },
@@ -62,8 +64,6 @@ const ROLE_TAGS = [
 ] as const;
 
 type RoleTagValue = typeof ROLE_TAGS[number]["value"];
-
-const readingTypeLabelsCS: Record<string, string> = {
   overview: "Kompletní přehled",
   type_strategy: "Typ & Strategie",
   profile: "Profil",
@@ -261,6 +261,11 @@ export default function Dashboard() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Fáze 6 Retention Components */}
+              <TransitGateAlerts />
+              <EmotionalTracker />
+              <FamilyTreeChart />
 
               <Card className={`border-border/50 ${isMember ? "bg-purple-500/10 border-purple-500/25" : "bg-card"}`}>
                 <CardContent className="p-5 md:p-6 h-full flex flex-col justify-between">
