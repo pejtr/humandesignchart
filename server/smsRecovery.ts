@@ -7,13 +7,18 @@ export interface SMSRecoveryPayload {
   cartUrl?: string;
 }
 
-/** Trigger SMS / WhatsApp abandoned checkout recovery via LeadOS / Webhook */
+// Feature flag: set to false to deactivate SMS & WhatsApp recoveries
+export const SMS_WHATSAPP_ENABLED = false;
+
+/** Trigger SMS / WhatsApp abandoned checkout recovery via LeadOS / Webhook (Currently Deactivated) */
 export function triggerSMSRecovery({
   phoneNumber,
   email,
   name,
   cartUrl,
 }: SMSRecoveryPayload) {
+  // Return immediately while feature is deactivated by admin request
+  if (!SMS_WHATSAPP_ENABLED) return;
   if (!phoneNumber && !email) return;
 
   sendLeadOSEvent({
