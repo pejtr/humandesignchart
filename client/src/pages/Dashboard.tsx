@@ -30,6 +30,8 @@ import { AffiliateWidget } from "@/components/AffiliateWidget";
 import { EmotionalTracker } from "@/components/EmotionalTracker";
 import { FamilyTreeChart } from "@/components/FamilyTreeChart";
 import { TransitGateAlerts } from "@/components/TransitGateAlerts";
+import { DailyAffirmationsWidget } from "@/components/DailyAffirmationsWidget";
+import { CalendarIntegrationModal } from "@/components/CalendarIntegrationModal";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { motion, AnimatePresence } from "framer-motion";
 import { SacredGeometry } from "@/components/SacredGeometry";
@@ -264,10 +266,11 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              {/* Fáze 6 Retention Components */}
+              {/* Fáze 6 & Fáze 7 Retention Components */}
               <TransitGateAlerts />
               <EmotionalTracker />
               <FamilyTreeChart />
+              <DailyAffirmationsWidget />
 
               <Card className={`border-border/50 ${isMember ? "bg-purple-500/10 border-purple-500/25" : "bg-card"}`}>
                 <CardContent className="p-5 md:p-6 h-full flex flex-col justify-between">
