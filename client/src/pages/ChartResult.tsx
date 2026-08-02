@@ -22,12 +22,14 @@ import {
   Save, Sparkles, ArrowLeft, Brain, Compass, Star, Sun, Moon,
   Loader2, Eye, Zap, Shield, Target, FileText, Download,
   ChevronRight, Info, Hexagon, CircleDot, Globe, Share2, Copy, Check,
-  User, Users, Heart, Briefcase, UserCheck, HelpCircle, GitCompare,
+  User, Users, Heart, Briefcase, UserCheck, HelpCircle, GitCompare, Frame,
 } from "lucide-react";
 import { PartnerCompareInvite } from "@/components/PartnerCompareInvite";
 import { AudioReadingAddon } from "@/components/AudioReadingAddon";
 import { DirectMessagingShare } from "@/components/DirectMessagingShare";
 import { LockedContentBlurTeaser } from "@/components/LockedContentBlurTeaser";
+import { PosterGeneratorModal } from "@/components/PosterGeneratorModal";
+import { PartnerSynergyVisualizer } from "@/components/PartnerSynergyVisualizer";
 import { generateChartPDF } from "@/lib/pdfExport";
 import { PLANET_SYMBOLS, TYPE_COLORS, translateCrossName, CROSS_TYPE_CS } from "@/lib/hdConstants";
 import type { HumanDesignChartData } from "@shared/types";
@@ -145,6 +147,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
   const [dailyTransitLoading, setDailyTransitLoading] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showPosterModal, setShowPosterModal] = useState(false);
   const [saveCategory, setSaveCategory] = useState<"self" | "family" | "friend" | "client" | "celebrity" | "other">("self");
   const aiSectionRef = useRef<HTMLDivElement>(null);
   const bodygraphRef = useRef<HTMLDivElement>(null);
@@ -714,6 +717,11 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                    )}
                    {!subStatus?.isPremium && (subStatus?.blueprintPdfCredits ?? 0) === 0 && <span className="ml-1 text-xs opacity-60">🌙</span>}
                 </Button>
+
+                <Button variant="outline" onClick={() => setShowPosterModal(true)} className="gap-1.5 border-amber-300 dark:border-amber-800">
+                  <Frame className="w-4 h-4 text-amber-500" />
+                  {locale === "cs" ? "Plakát na zeď (A3)" : "Wall Poster (A3)"}
+                </Button>
               </div>
             </div>
 
@@ -792,6 +800,9 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
 
               {/* Details Column */}
               <div className="lg:col-span-2 space-y-6">
+
+                {/* Partner Relational Synergy Visualizer */}
+                <PartnerSynergyVisualizer person1Name={chartMeta?.name || "Vy"} />
 
                 {/* Partner Compare & Viral Rewards Card */}
                 <PartnerCompareInvite referralCode={(user as any)?.referralCode} chartName={chartMeta?.name} />
@@ -1690,6 +1701,13 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <PosterGeneratorModal
+        open={showPosterModal}
+        onOpenChange={setShowPosterModal}
+        chartName={chartMeta?.name}
+        chartType={czType}
+      />
     </div>
   );
 }
