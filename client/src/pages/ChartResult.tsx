@@ -25,6 +25,7 @@ import {
   User, Users, Heart, Briefcase, UserCheck, HelpCircle, GitCompare,
 } from "lucide-react";
 import { PartnerCompareInvite } from "@/components/PartnerCompareInvite";
+import { AudioReadingAddon } from "@/components/AudioReadingAddon";
 import { DirectMessagingShare } from "@/components/DirectMessagingShare";
 import { LockedContentBlurTeaser } from "@/components/LockedContentBlurTeaser";
 import { generateChartPDF } from "@/lib/pdfExport";
@@ -794,6 +795,9 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
 
                 {/* Partner Compare & Viral Rewards Card */}
                 <PartnerCompareInvite referralCode={(user as any)?.referralCode} chartName={chartMeta?.name} />
+
+                {/* 10-Minute Voice Audio Add-on */}
+                <AudioReadingAddon chartName={chartMeta?.name} />
 
                 {/* ─── AI Výklad — PRIMÁRNÍ SEKCE ─── */}
                 <div ref={aiSectionRef}>

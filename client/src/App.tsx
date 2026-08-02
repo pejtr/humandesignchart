@@ -4,7 +4,8 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { LanguageProvider } from "./contexts/LanguageContext";
+import { LanguageProvider, useLanguage } from "./contexts/LanguageContext";
+import { CurrencyProvider } from "./contexts/CurrencyContext";
 import Home from "./pages/Home";
 import { lazy, Suspense, useEffect } from "react";
 import HDLoader from "./components/HDLoader";
@@ -56,6 +57,7 @@ const RoleCompatibility = lazy(() => import("./pages/RoleCompatibility"));
 const CrmDashboard = lazy(() => import("./pages/CrmDashboard"));
 const HumanDesignTest = lazy(() => import("./pages/HumanDesignTest"));
 const AdminAds = lazy(() => import("./pages/AdminAds"));
+const AffiliateProgram = lazy(() => import("./pages/AffiliateProgram"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -212,6 +214,9 @@ function LocaleRoutes() {
             <Route path="/:locale/pricing">
               {() => <SafeRoute><Pricing /></SafeRoute>}
             </Route>
+            <Route path="/:locale/affiliate">
+              {() => <SafeRoute><AffiliateProgram /></SafeRoute>}
+            </Route>
             <Route path="/:locale/payment/success">
               {() => <SafeRoute><PaymentSuccess /></SafeRoute>}
             </Route>
@@ -300,24 +305,26 @@ function App() {
       <ThemeProvider defaultTheme="light" switchable>
         <TooltipProvider>
           <LanguageProvider>
-            <Toaster />
-            <ReferralApplier />
-            <WelcomeModalWrapper />
-            <NewsletterPopup />
-            <ExitIntentPopup />
-            <Suspense fallback={null}>
-              <WelcomeBonusBanner />
-              <SocialProofTicker />
-              <LeadMagnetExitPopup />
-            </Suspense>
-            <ScrollToTop />
-            <CookieConsent />
-            <AuthSidebar />
-            <MobileBottomNav />
-            <Suspense fallback={null}>
-              <FloatingChatGuide />
-            </Suspense>
-            <LocaleRoutes />
+            <CurrencyProvider>
+              <Toaster />
+              <ReferralApplier />
+              <WelcomeModalWrapper />
+              <NewsletterPopup />
+              <ExitIntentPopup />
+              <Suspense fallback={null}>
+                <WelcomeBonusBanner />
+                <SocialProofTicker />
+                <LeadMagnetExitPopup />
+              </Suspense>
+              <ScrollToTop />
+              <CookieConsent />
+              <AuthSidebar />
+              <MobileBottomNav />
+              <Suspense fallback={null}>
+                <FloatingChatGuide />
+              </Suspense>
+              <LocaleRoutes />
+            </CurrencyProvider>
           </LanguageProvider>
         </TooltipProvider>
       </ThemeProvider>

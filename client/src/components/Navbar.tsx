@@ -14,6 +14,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const DailyEnergyBar = lazy(() => import("@/components/DailyEnergyBar"));
 import { useTheme } from "@/contexts/ThemeContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { CurrencySelector } from "@/components/CurrencySelector";
 import { trpc } from "@/lib/trpc";
 import {
   DropdownMenu,
@@ -262,8 +263,9 @@ export default function Navbar() {
 
           {/* Right: Controls (Desktop + Mobile) */}
           <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0 xl:w-48">
-            {/* Desktop right section: theme toggle + language + user */}
+            {/* Desktop right section: theme toggle + currency + language + user */}
             <div className="hidden 2xl:flex items-center gap-1.5 shrink-0">
+              <CurrencySelector />
               {/* Theme toggle */}
               <Button
                 variant="ghost"
