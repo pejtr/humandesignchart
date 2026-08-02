@@ -35,6 +35,8 @@ import {
   Star,
   Crown,
   Lock,
+  Moon,
+  FileText,
   Heart,
 } from "lucide-react";
 import { CheckoutOrderBump } from "@/components/CheckoutOrderBump";
