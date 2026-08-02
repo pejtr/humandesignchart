@@ -64,6 +64,8 @@ const ROLE_TAGS = [
 ] as const;
 
 type RoleTagValue = typeof ROLE_TAGS[number]["value"];
+
+const readingTypeLabelsCS: Record<string, string> = {
   overview: "Kompletní přehled",
   type_strategy: "Typ & Strategie",
   profile: "Profil",
