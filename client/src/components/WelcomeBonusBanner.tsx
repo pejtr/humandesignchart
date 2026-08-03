@@ -45,8 +45,8 @@ export function WelcomeBonusBanner() {
           </span>
           <span>
             {isEn
-              ? "Unlock full PDF Blueprint & AI Marie with 30% discount!"
-              : "Získejte kompletní 40-stránkový rozbor s AI Marií se slevou 30 %!"}
+              ? "Unlock full PDF Blueprint with 30% discount!"
+              : "Získejte kompletní 40-stránkový rozbor se slevou 30 %!"}
           </span>
         </div>
 

@@ -47,12 +47,38 @@ export default function Blog() {
     ogImage: OG_IMAGES.blog,
     keywords: "human design blog, human design articles, human design types, human design authority, bodygraph",
     locale: "en_US",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Human Design Blog",
+      description: "Read Human Design articles in English. Types, strategies, authority, profiles, centers.",
+      url: "https://www.humandesignchart.app/en/blog",
+      inLanguage: "en-US",
+      isPartOf: {
+        "@type": "WebSite",
+        name: "Human Design Chart",
+        url: "https://www.humandesignchart.app",
+      },
+    },
   } : {
     title: "Blog o Human Design | Články, průvodci a tipy",
     description: "Čtěte články o Human Design v češtině. Typy, strategie, autorita, profily, centra — vše, co potřebujete vědět o svém designu.",
     ogImage: OG_IMAGES.blog,
     keywords: "human design blog, human design články, human design typy, human design autorita, bodygraph",
     locale: "cs_CZ",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Blog o Human Design",
+      description: "Čtěte články o Human Design v češtině. Typy, strategie, autorita, profily, centra.",
+      url: "https://www.humandesignmapa.cz/cs/blog",
+      inLanguage: "cs-CZ",
+      isPartOf: {
+        "@type": "WebSite",
+        name: "Human Design Mapa",
+        url: "https://www.humandesignmapa.cz",
+      },
+    },
   });
 
   const articles = data?.articles ?? [];

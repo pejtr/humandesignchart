@@ -15,7 +15,7 @@ export function VipClubBanner() {
       <div className="relative z-10 space-y-5 max-w-2xl">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/40">
           <Crown className="w-3.5 h-3.5 text-amber-400" />
-          {isEn ? "VIP Inner Circle Membership" : "VIP Členství v Klubu AI Marie"}
+          {isEn ? "VIP Inner Circle Membership" : "VIP Členství v Klubu Marie"}
         </div>
 
         <div className="space-y-2">
@@ -26,8 +26,8 @@ export function VipClubBanner() {
           </h3>
           <p className="text-sm text-purple-200/80 leading-relaxed">
             {isEn
-              ? "Join our VIP Inner Circle. Get unlimited family chart calculations, all PHS variables (digestion, environment, perspective), and daily personal voice notes from AI Marie."
-              : "Získejte neomezené výklady pro celou rodinu, všechny PHS proměnné (strávení, prostředí, perspektiva) a každodenní osobní audio zprávu od AI Marie přímo do telefonu."}
+              ? "Join our VIP Inner Circle. Get unlimited family chart calculations, all PHS variables (digestion, environment, perspective), and daily personal voice notes from Marie."
+              : "Získejte neomezené výklady pro celou rodinu, všechny PHS proměnné (strávení, prostředí, perspektiva) a každodenní osobní audio zprávu od Marie přímo do telefonu."}
           </p>
         </div>
 

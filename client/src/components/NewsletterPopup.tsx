@@ -112,10 +112,12 @@ export default function NewsletterPopup() {
                   <Star className="w-6 h-6 text-emerald-500" />
                 </div>
                 <p className="text-emerald-700 font-medium text-sm">
-                  {isEn ? "Welcome to the cosmic tribe!" : "Vítejte v kosmickém kmeni!"}
+                  {isEn ? "Check your inbox!" : "Zkontrolujte schránku!"}
                 </p>
                 <p className="text-gray-500 text-xs mt-1">
-                  {isEn ? "Check your inbox for the first insight." : "Zkontrolujte svou schránku pro první vhled."}
+                  {isEn
+                    ? "We've sent a confirmation link. Click it to activate your subscription."
+                    : "Odeslali jsme vám potvrzovací odkaz. Klikněte na něj pro aktivaci odběru."}
                 </p>
               </div>
             ) : (

@@ -94,6 +94,56 @@ export function registerSeoRoutes(app: Express) {
     res.send(xml);
   });
 
+  // ─── RSS Feed (blog articles) ─────────────────────────────────────────
+  app.get("/rss.xml", (req, res) => {
+    const isEnHost = req.hostname.includes("chart.app") || req.hostname.includes("default") || req.hostname.includes("localhost");
+    const csBase = "https://www.humandesignmapa.cz";
+    const enBase = "https://www.humandesignchart.app";
+    const domain = isEnHost ? enBase : csBase;
+    const lang = isEnHost ? "en" : "cs";
+    const now = new Date().toUTCString();
+
+    const articles = isEnHost ? BLOG_ARTICLES_EN : BLOG_ARTICLES;
+
+    const items = articles.map(art => {
+      const pubDate = art.publishedAt ? new Date(art.publishedAt).toUTCString() : now;
+      const lastBuild = art.updatedAt ? new Date(art.updatedAt).toUTCString() : pubDate;
+      const link = `${domain}/${lang}/blog/${art.slug}`;
+      const desc = art.metaDescription || art.excerpt || "";
+      const coverUrl = art.coverImage?.startsWith("http")
+        ? art.coverImage
+        : `${domain}${art.coverImage}`;
+      return `    <item>
+      <title><![CDATA[${art.title}]]></title>
+      <link>${link}</link>
+      <guid isPermaLink="true">${link}</guid>
+      <description><![CDATA[${desc}]]></description>
+      <pubDate>${pubDate}</pubDate>
+      <lastBuildDate>${lastBuild}</lastBuildDate>${art.coverImage ? `\n      <enclosure url="${coverUrl}" type="image/webp" length="0" />` : ""}
+    </item>`;
+    }).join("\n");
+
+    const rss = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>${isEnHost ? "Human Design Blog" : "Blog o Human Design"}</title>
+    <link>${domain}/${lang}/blog</link>
+    <description>${isEnHost
+      ? "Expert articles about Human Design: types, strategies, authority, profiles, gates, channels and more."
+      : "Odborné články o Human Design: typy, strategie, autorita, profily, brány, dráhy a další."}</description>
+    <language>${lang}</language>
+    <lastBuildDate>${now}</lastBuildDate>
+    <atom:link href="${domain}/rss.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="${domain}/${isEnHost ? "cs" : "en"}/rss.xml" rel="alternate" type="application/rss+xml" hreflang="${isEnHost ? "cs" : "en"}" />
+${items}
+  </channel>
+</rss>`;
+
+    res.set("Content-Type", "application/rss+xml; charset=utf-8");
+    res.set("Cache-Control", "public, max-age=3600");
+    res.send(rss);
+  });
+
   // ─── robots.txt ────────────────────────────────────────────────────────
   app.get("/robots.txt", (req, res) => {
     res.type("text/plain");
@@ -113,6 +163,7 @@ export function registerSeoRoutes(app: Express) {
       `Crawl-Delay: 10\n` +
       `\n` +
       `Sitemap: ${domain}/sitemap.xml\n` +
+      `RSS: ${domain}/rss.xml\n` +
       `\n` +
       `# Search engines: index all public-facing content\n` +
       `User-agent: Googlebot\n` +

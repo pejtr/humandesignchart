@@ -95,6 +95,16 @@ async function startServer() {
   registerNotificationRoutes(app);
   registerGptRoutes(app);
 
+  // Web Vitals analytics endpoint
+  app.post("/api/analytics/web-vitals", (req, res) => {
+    const { metrics, url, ua } = req.body || {};
+    if (metrics && Array.isArray(metrics)) {
+      const vitalsLog = metrics.map((m: any) => `${m.name}=${m.value?.toFixed(2)}(${m.rating})`).join(", ");
+      console.log(`[Web Vitals] ${url} — ${vitalsLog}${ua ? ` [${ua}]` : ""}`);
+    }
+    res.json({ ok: true });
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",

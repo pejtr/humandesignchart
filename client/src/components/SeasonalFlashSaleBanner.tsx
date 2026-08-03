@@ -35,7 +35,7 @@ export function SeasonalFlashSaleBanner() {
           <span>
             {isEn
               ? "New Year & Planetary Transit Sale — Claim your discounted Blueprint!"
-              : "Sezónní akce: Získejte plný rozbor s AI Marií se slevou 40 %!"}
+              : "Sezónní akce: Získejte plný rozbor s Maríí se slevou 40 %!"}
           </span>
         </div>
 

@@ -9,10 +9,10 @@ function ProjectDomainBadge({ domain }: { domain: string }) {
   const extension = extensionStart > 0 ? domain.slice(extensionStart) : "";
 
   return (
-    <span className="inline-flex overflow-hidden rounded-full border border-white/25 bg-black/20 text-[9px] font-extrabold uppercase tracking-wider shadow-sm">
-      <span className="px-2.5 py-1 text-white">{name}</span>
+    <span className="inline-flex overflow-hidden rounded-full border border-white/40 bg-white/90 text-[9px] font-extrabold uppercase tracking-wider shadow-md">
+      <span className="px-2.5 py-1 text-slate-900">{name}</span>
       {extension && (
-        <span className="border-l border-white/15 bg-white/15 px-1.5 py-1 text-white/70">
+        <span className="border-l border-slate-300 bg-amber-400 px-1.5 py-1 text-slate-900 font-bold">
           {extension}
         </span>
       )}
@@ -23,14 +23,14 @@ function ProjectDomainBadge({ domain }: { domain: string }) {
 export default function Footer() {
   const { t, locale, localePath } = useLanguage();
   const { isAuthenticated } = useAuth();
-  const projects = [
+const projects = [
     {
-      name: "Akční Letenky",
+      name: "Akčni Letenky",
       domain: "AKCNI-LETENKY.COM",
       href: "https://www.akcni-letenky.com",
       image: "https://www.akcni-letenky.com/hero-bg.jpg",
-      cs: "Inspirace pro výhodné cestování",
-      en: "Inspiration for affordable travel",
+      cs: "Sledujeme ceny letenek za vás – ušetřete tisíce",
+      en: "We track flight prices so you don't have to – save thousands",
     },
     {
       name: "Last Minute Dovolené",
@@ -38,8 +38,8 @@ export default function Footer() {
       href: "https://www.lastminutedovolene.cz",
       image:
         "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=900&h=560&fit=crop",
-      cs: "Dovolená, která nepočká",
-      en: "Holidays that cannot wait",
+      cs: "Volné termíny za hubičku – stačí si vybrat a odletět",
+      en: "Last-minute deals at unbeatable prices – just pick and fly",
     },
     {
       name: "Bezmasá Jídla",
@@ -47,8 +47,8 @@ export default function Footer() {
       href: "https://www.bezmasajidla.cz",
       image:
         "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=900&h=560&fit=crop",
-      cs: "Chutná inspirace bez masa",
-      en: "Delicious meat-free inspiration",
+      cs: "Recepty, které chutnají i masožravcům",
+      en: "Plant-based recipes even meat lovers can't resist",
     },
     {
       name: "Katastr Online",
@@ -57,8 +57,8 @@ export default function Footer() {
       image:
         "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&h=560&fit=crop",
       imagePosition: "center 55%",
-      cs: "Nemovitosti a parcely přehledně",
-      en: "Property records made clear",
+      cs: "Vše o nemovitostech na jednom místě – parcely, vlastníci, ceny",
+      en: "Everything about properties in one place – parcels, owners, prices",
     },
     {
       name: "Čajovny Praha",
@@ -67,8 +67,8 @@ export default function Footer() {
       image:
         "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=900&h=560&fit=crop",
       imagePosition: "center 50%",
-      cs: "Pražské čajovny s atmosférou",
-      en: "Prague tea houses with atmosphere",
+      cs: "Oázy klidu uprostřed Prahy – kam zajít na čaj",
+      en: "Oases of calm in the heart of Prague – where to enjoy tea",
     },
     {
       name: "Do Itálie",
@@ -76,8 +76,8 @@ export default function Footer() {
       href: "https://www.do-italie.cz",
       image:
         "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=900&h=560&fit=crop",
-      cs: "Itálie od inspirace po cestu",
-      en: "Italy from inspiration to journey",
+      cs: "Rady od místních – jak Itálii opravdu zažít",
+      en: "Local tips – how to truly experience Italy",
     },
   ];
 
@@ -372,7 +372,7 @@ export default function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       tabIndex={groupIndex === 1 ? -1 : undefined}
-                      className="group relative flex h-44 w-[240px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-black/10 bg-slate-900 p-4 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl lg:w-[200px]"
+                      className="group relative flex h-44 w-[240px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-black/5 bg-slate-100 p-4 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl lg:w-[200px]"
                     >
                       <img
                         src={project.image}
@@ -383,16 +383,16 @@ export default function Footer() {
                         }}
                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30 transition-colors group-hover:from-black/95" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent transition-colors group-hover:from-black/80" />
                       <div className="relative z-10 self-start">
                         <ProjectDomainBadge domain={project.domain} />
                       </div>
-                      <div className="relative z-10 mt-auto flex items-end justify-between gap-2 text-white">
+                      <div className="relative z-10 mt-auto flex items-end justify-between gap-2 text-white drop-shadow-lg">
                         <div className="min-w-0 flex-1">
                           <h3 className="truncate font-serif text-base font-bold leading-snug transition-colors group-hover:text-amber-200">
                             {project.name}
                           </h3>
-                          <p className="truncate text-[11px] font-light text-gray-300">
+                          <p className="truncate text-[11px] font-medium text-white/90">
                             {locale === "cs" ? project.cs : project.en}
                           </p>
                         </div>

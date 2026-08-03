@@ -229,17 +229,6 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Pricing link */}
-            <Link href={localePath("/pricing")}>
-              <Button
-                variant={isActive("/pricing") ? "secondary" : "ghost"}
-                size="sm"
-                className="text-sm px-2"
-              >
-                <Crown className="w-4 h-4 lg:mr-1.5" />
-                <span className="hidden lg:inline">{locale === "cs" ? "Premium" : "Premium"}</span>
-              </Button>
-            </Link>
           </div>
 
           {/* Compact primary nav: preserve the key actions before opening the menu. */}
@@ -263,8 +252,19 @@ export default function Navbar() {
 
           {/* Right: Controls (Desktop + Mobile) */}
           <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0 xl:w-48">
-            {/* Desktop right section: theme toggle + currency + language + user */}
+            {/* Desktop right section: premium + theme toggle + currency + language + user */}
             <div className="hidden 2xl:flex items-center gap-1.5 shrink-0">
+              <Link href={localePath("/pricing")}>
+                <Button
+                  variant={isActive("/pricing") ? "secondary" : "ghost"}
+                  size="sm"
+                  className="text-xs px-2 gap-1"
+                >
+                  <Crown className="w-3.5 h-3.5 text-amber-500" />
+                  Premium
+                </Button>
+              </Link>
+              <div className="w-px h-5 bg-border/50 mx-0.5" />
               <CurrencySelector />
               {/* Theme toggle */}
               <Button

@@ -24,6 +24,7 @@ import { useUTM } from "./hooks/useUTM";
 import { useSklikPageViews } from "./hooks/useSklik";
 import { useAuth } from "./_core/hooks/useAuth";
 import type { Locale } from "./contexts/LanguageContext";
+import { useReportWebVitals } from "./hooks/useReportWebVitals";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
 const ChartResult = lazy(() => import("./pages/ChartResult"));
@@ -47,6 +48,7 @@ const DailyTransit = lazy(() => import("./pages/DailyTransit"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const PaymentCancel = lazy(() => import("./pages/PaymentCancel"));
+const NewsletterConfirm = lazy(() => import("./pages/NewsletterConfirm"));
 const ReferralLanding = lazy(() => import("./pages/ReferralLanding"));
 const SocialScheduler = lazy(() => import("./pages/SocialScheduler"));
 const CompositeChart = lazy(() => import("./pages/CompositeChart"));
@@ -223,6 +225,9 @@ function LocaleRoutes() {
             <Route path="/:locale/payment/cancel">
               {() => <SafeRoute><PaymentCancel /></SafeRoute>}
             </Route>
+            <Route path="/:locale/newsletter/confirm">
+              {() => <SafeRoute><NewsletterConfirm /></SafeRoute>}
+            </Route>
 
             {/* Referral landing pages */}
             <Route path="/:locale/refer/:code">
@@ -292,13 +297,11 @@ function WelcomeModalWrapper() {
   return <WelcomeModal onClose={dismiss} />;
 }
 
-const SocialProofTicker = lazy(() => import("./components/SocialProofTicker").then(m => ({ default: m.SocialProofTicker })));
-const WelcomeBonusBanner = lazy(() => import("./components/WelcomeBonusBanner").then(m => ({ default: m.WelcomeBonusBanner })));
 const SeasonalFlashSaleBanner = lazy(() => import("./components/SeasonalFlashSaleBanner").then(m => ({ default: m.SeasonalFlashSaleBanner })));
 const LeadMagnetExitPopup = lazy(() => import("./components/LeadMagnetExitPopup").then(m => ({ default: m.LeadMagnetExitPopup })));
-const SmartChatWidget = lazy(() => import("./components/SmartChatWidget").then(m => ({ default: m.SmartChatWidget })));
 
 function App() {
+  useReportWebVitals();
   useUTM();
   useSklikPageViews();
   useGA4PageViews();
@@ -315,10 +318,7 @@ function App() {
               <ExitIntentPopup />
               <Suspense fallback={null}>
                 <SeasonalFlashSaleBanner />
-                <WelcomeBonusBanner />
-                <SocialProofTicker />
                 <LeadMagnetExitPopup />
-                <SmartChatWidget />
               </Suspense>
               <ScrollToTop />
               <CookieConsent />

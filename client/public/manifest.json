@@ -23,7 +23,22 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [],
+  "screenshots": [
+    {
+      "src": "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/og-homepage-TnsCURzJFMQ4a9smwqmEMU.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Human Design Chart Calculator"
+    },
+    {
+      "src": "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/icon-512_e795e720.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Human Design Chart Mobile"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Calculate Chart",

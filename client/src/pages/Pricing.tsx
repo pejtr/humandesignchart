@@ -96,6 +96,48 @@ export default function Pricing() {
           keywords:
             "human design premium, human design subscription, human design AI reading",
           locale: "en_US",
+          jsonLd: {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "FAQPage",
+                mainEntity: [
+                  {
+                    "@type": "Question",
+                    name: "Can I cancel anytime?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Yes, you can cancel your subscription at any time. You will retain access until the end of the billing period.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "What payment methods are accepted?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "We accept all major credit and debit cards via Stripe. Your payment is secure and encrypted.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Is there a free trial?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Yes — every new user gets one complete AI reading to experience the quality before purchasing.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "How do gift vouchers work?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "After purchase, you receive a unique voucher code by email. The recipient enters the code on our site to activate their Premium access.",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
         }
       : {
           title: "✨ Ceník — Human Design Premium 🔮",
@@ -105,6 +147,48 @@ export default function Pricing() {
           keywords:
             "human design premium, human design předplatné, human design AI výklad",
           locale: "cs_CZ",
+          jsonLd: {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "FAQPage",
+                mainEntity: [
+                  {
+                    "@type": "Question",
+                    name: "Mohu zrušit kdykoli?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Ano, předplatné můžete zrušit kdykoli. Přístup si zachováte do konce fakturačního období.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Jaké platební metody jsou přijímány?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Přijímáme všechny hlavní kreditní a debetní karty přes Stripe. Vaše platba je bezpečná a šifrovaná.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Je k dispozici zkušební verze?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Ano — každý nový uživatel dostane jeden kompletní AI výklad, aby si mohl kvalitu vyzkoušet před nákupem.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Jak fungují dárkové poukazy?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Po nákupu obdržíte unikátní kód poukazu e-mailem. Příjemce zadá kód na našem webu a aktivuje si Premium přístup.",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
         }
   );
 

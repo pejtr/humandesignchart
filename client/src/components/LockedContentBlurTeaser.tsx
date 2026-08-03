@@ -82,7 +82,7 @@ export function LockedContentBlurTeaser({
           >
             <Link href={localePath("/pricing")}>
               <Sparkles className="w-4 h-4 text-amber-300" />
-              {isEn ? "Unlock Full Reading" : "Odemknout plný rozbor s AI Marií"}
+              {isEn ? "Unlock Full Reading" : "Odemknout plný rozbor s Maríí"}
               <ArrowRight className="w-4 h-4 ml-auto" />
             </Link>
           </Button>

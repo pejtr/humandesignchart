@@ -150,7 +150,10 @@ export const newsletterSubscribers = mysqlTable("newsletter_subscribers", {
 	email: varchar({ length: 320 }).notNull(),
 	locale: varchar({ length: 5 }).default('cs').notNull(),
 	source: varchar({ length: 50 }).default('popup').notNull(),
+	status: mysqlEnum(['pending', 'confirmed']).default('pending').notNull(),
+	confirmToken: varchar({ length: 64 }),
 	subscribedAt: timestamp({ mode: 'string' }).default(sql`(now())`).notNull(),
+	confirmedAt: timestamp({ mode: 'string' }),
 	unsubscribedAt: timestamp({ mode: 'string' }),
 },
 	(table) => [

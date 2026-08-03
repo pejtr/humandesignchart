@@ -19,8 +19,8 @@ export function AudioReadingAddon({ chartName }: AudioReadingAddonProps) {
     if (!isPlaying) {
       toast.info(
         isEn
-          ? "Playing sample audio snippet from AI Marie..."
-          : "Přehrávám ukázku audio výkladu AI Marie..."
+          ? "Playing sample audio snippet from Marie..."
+          : "Přehrávám ukázku audio výkladu Marie..."
       );
     }
   };

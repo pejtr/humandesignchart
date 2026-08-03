@@ -23,8 +23,8 @@ export function SmartChatWidget() {
     {
       role: "assistant",
       content: isEn
-        ? "Hello! I am AI Marie. Ask me anything about your Human Design chart, relationships, or career strategy."
-        : "Dobrý den! Jsem AI Marie. Zeptejte se mě na cokoliv ohledně vaší Human Design mapy, vztahů či profesní strategie.",
+        ? "Hello! I am Marie, your Human Design guide. Ask me anything about your chart, relationships, or career strategy."
+        : "Dobrý den! Jsem Marie, vaše průvodkyně Human Designem. Zeptejte se mě na cokoliv ohledně vaší Human Design mapy, vztahů či profesní strategie.",
     },
   ]);
 
@@ -34,7 +34,7 @@ export function SmartChatWidget() {
       toast.info(
         isEn
           ? "You used all free AI credits! Upgrade to VIP for unlimited chat."
-          : "Vyčerpali jste volné kredity! Přejděte na VIP členství pro neomezený chat s AI Marií."
+           : "Vyčerpali jste volné kredity! Přejděte na VIP členství pro neomezený chat s Maríí."
       );
       return;
     }
@@ -67,7 +67,7 @@ export function SmartChatWidget() {
       >
         <Sparkles className="w-5 h-5 animate-pulse text-amber-300" />
         <span className="text-xs font-bold hidden sm:inline group-hover:inline">
-          {isEn ? "Ask AI Marie" : "Zeptat se AI Marie"}
+          {isEn ? "Ask Marie" : "Zeptat se Marie"}
         </span>
         <span className="w-5 h-5 rounded-full bg-amber-400 text-purple-950 font-extrabold text-[10px] flex items-center justify-center">
           {credits}
@@ -85,7 +85,7 @@ export function SmartChatWidget() {
           </div>
           <div>
             <CardTitle className="text-sm font-bold flex items-center gap-1.5">
-              AI Marie Asistentka
+              Marie – Průvodkyně
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             </CardTitle>
             <span className="text-[10px] text-purple-200/80">
