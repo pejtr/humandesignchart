@@ -251,7 +251,7 @@ export default function Navbar() {
           </div>
 
           {/* Right: Controls (Desktop + Mobile) */}
-          <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0 xl:w-48">
+          <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop right section: premium + theme toggle + currency + language + user */}
             <div className="hidden 2xl:flex items-center gap-1.5 shrink-0">
               <Link href={localePath("/pricing")}>
