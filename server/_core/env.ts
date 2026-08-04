@@ -16,6 +16,14 @@ export const ENV = {
   // ─── Google OAuth (sign-in) ──────────────────────────────────────────
   googleClientId: process.env.GOOGLE_CLIENT_ID ?? "",
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+  // ─── Facebook OAuth (sign-in) ────────────────────────────────────────
+  facebookClientId: process.env.FACEBOOK_CLIENT_ID ?? "",
+  facebookClientSecret: process.env.FACEBOOK_CLIENT_SECRET ?? "",
+  // ─── Apple Sign In (sign-in) ─────────────────────────────────────────
+  appleClientId: process.env.APPLE_CLIENT_ID ?? "",
+  appleTeamId: process.env.APPLE_TEAM_ID ?? "",
+  appleKeyId: process.env.APPLE_KEY_ID ?? "",
+  applePrivateKey: process.env.APPLE_PRIVATE_KEY ?? "",
   // ─── Google Ads API (read-only reporting; admin-only) ────────────────
   googleAdsDeveloperToken: process.env.GOOGLE_ADS_DEVELOPER_TOKEN ?? "",
   googleAdsClientId: process.env.GOOGLE_ADS_CLIENT_ID ?? "",

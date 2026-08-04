@@ -49,6 +49,7 @@ const Pricing = lazy(() => import("./pages/Pricing"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const PaymentCancel = lazy(() => import("./pages/PaymentCancel"));
 const NewsletterConfirm = lazy(() => import("./pages/NewsletterConfirm"));
+const Login = lazy(() => import("./pages/Login"));
 const ReferralLanding = lazy(() => import("./pages/ReferralLanding"));
 const SocialScheduler = lazy(() => import("./pages/SocialScheduler"));
 const CompositeChart = lazy(() => import("./pages/CompositeChart"));
@@ -227,6 +228,12 @@ function LocaleRoutes() {
             </Route>
             <Route path="/:locale/newsletter/confirm">
               {() => <SafeRoute><NewsletterConfirm /></SafeRoute>}
+            </Route>
+            <Route path="/login">
+              {() => <SafeRoute><Login /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/login">
+              {() => <SafeRoute><Login /></SafeRoute>}
             </Route>
 
             {/* Referral landing pages */}

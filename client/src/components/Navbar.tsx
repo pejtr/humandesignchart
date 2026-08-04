@@ -167,7 +167,7 @@ export default function Navbar() {
           </div>
 
           {/* Center: Desktop nav links */}
-          <div className="hidden 2xl:flex flex-1 items-center justify-center gap-1 2xl:gap-2 min-w-0">
+          <div className="hidden 2xl:flex flex-1 items-center justify-center gap-1 2xl:gap-2 min-w-0 overflow-hidden">
             {primaryLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <Button
