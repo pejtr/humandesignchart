@@ -42,7 +42,7 @@ export function registerSeoRoutes(app: Express) {
 
     const generateUrlNode = (locUrl: string, csAlt: string, enAlt: string, changefreq: string, priority: string, lastmod: string) => {
       const altBase = enBase; // International locales live on the EN domain
-      const altPath = enAlt.replace(enBase + "/en/", "/");
+      const altPath = enAlt.replace(enBase + "/en/", "");
       const alternates = [
         `    <xhtml:link rel="alternate" hreflang="cs" href="${csAlt}" />`,
         `    <xhtml:link rel="alternate" hreflang="en" href="${enAlt}" />`,

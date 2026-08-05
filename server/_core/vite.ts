@@ -5,6 +5,38 @@ import { nanoid } from "nanoid";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
+import { buildSeoHead } from "./seoMeta";
+
+/** Extract locale from URL path, or return "cs" as default. */
+function extractLocale(url: string): string {
+  const seg = url.split("/").filter(Boolean)[0];
+  return seg === "en" ? "en" : "cs";
+}
+
+/** Should we inject SEO meta tags for this URL? */
+function shouldInjectSeo(url: string): boolean {
+  if (url.startsWith("/api/")) return false;
+  if (url.startsWith("/assets/")) return false;
+  if (url.startsWith("/shared/")) return false;
+  if (url.startsWith("/embed/")) return false;
+  if (url === "/sitemap.xml" || url === "/robots.txt" || url === "/rss.xml") return false;
+  if (url === "/favicon.svg" || url === "/favicon.ico" || url === "/manifest.json") return false;
+  if (url.startsWith("/images/")) return false;
+  if (url.startsWith("/sw.js")) return false;
+  return true;
+}
+
+/** Inject route-specific SEO meta tags into the HTML template. */
+function injectSeo(template: string, url: string): string {
+  if (!template.includes("<!--SEO_META-->")) return template;
+  if (!shouldInjectSeo(url)) return template;
+
+  const locale = extractLocale(url);
+  const seoHead = buildSeoHead(locale, url);
+  if (!seoHead) return template;
+
+  return template.replace("<!--SEO_META-->", seoHead);
+}
 
 export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
@@ -48,8 +80,11 @@ export async function setupVite(app: Express, server: Server) {
             <meta name="twitter:title" content="Human Design Rozbor" />
             <meta name="twitter:image" content="${baseUrl}/api/og/shared/${token}" />
           `;
-          template = template.replace(/<head>/i, `<head>\n${ogHtml}`);
+          template = template.replace("<!--SEO_META-->", ogHtml);
         }
+      } else {
+        // Inject route-specific SEO meta tags
+        template = injectSeo(template, url);
       }
 
       template = template.replace(
@@ -118,8 +153,11 @@ export function serveStatic(app: Express) {
             <meta name="twitter:title" content="Human Design Rozbor" />
             <meta name="twitter:image" content="${baseUrl}/api/og/shared/${token}" />
           `;
-          template = template.replace(/<head>/i, `<head>\n${ogHtml}`);
+          template = template.replace("<!--SEO_META-->", ogHtml);
         }
+      } else {
+        // Inject route-specific SEO meta tags
+        template = injectSeo(template, url);
       }
 
       res
