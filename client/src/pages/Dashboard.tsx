@@ -14,7 +14,7 @@ import {
   Plus, Heart, Trash2, Loader2, LayoutDashboard,
   Star, Users, Compass, BookOpen, ThumbsUp, ThumbsDown,
   Share2, ChevronDown, ChevronUp, Calendar, Sparkles, Sun, Zap, CreditCard, Crown,
-  Settings, Bell, Lock, Tag,
+  Settings, Bell, Lock, Tag, Save,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -36,6 +36,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { motion, AnimatePresence } from "framer-motion";
 import { SacredGeometry } from "@/components/SacredGeometry";
 import { TYPE_COLORS, PLANET_SYMBOLS, PLANET_COLORS } from "@/lib/hdConstants";
+import { hasChartDraft } from "@/lib/chartDraft";
 
 const categoryIcons: Record<string, typeof Users> = {
   self: Star,
@@ -104,6 +105,11 @@ export default function Dashboard() {
 
   const [expandedReading, setExpandedReading] = useState<number | null>(null);
   const [roleTagOpen, setRoleTagOpen] = useState<number | null>(null);
+  const [hasRecoverableDraft, setHasRecoverableDraft] = useState(false);
+
+  useEffect(() => {
+    setHasRecoverableDraft(hasChartDraft());
+  }, []);
 
   const chartsQuery = trpc.chart.list.useQuery(undefined, { enabled: isAuthenticated });
   const readingsQuery = trpc.ai.getAllReadings.useQuery(undefined, { enabled: isAuthenticated && activeTab === "readings" });
@@ -170,7 +176,7 @@ export default function Dashboard() {
   const isMember = !!subQuery.data?.isPremium;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-clip">
       <SacredGeometry className="absolute inset-0 z-0" />
       <Navbar />
 
@@ -378,14 +384,22 @@ export default function Dashboard() {
                   <Card className="bg-card border-border/50">
                     <CardContent className="flex flex-col items-center justify-center py-16">
                       <Compass className="w-16 h-16 text-muted-foreground/30 mb-4" />
-                      <h3 className="font-serif text-xl font-semibold mb-2">{t.dashboard.noCharts}</h3>
+                      <h3 className="font-serif text-xl font-semibold mb-2">
+                        {hasRecoverableDraft
+                          ? (locale === "en" ? "Your unsaved chart is ready to recover" : "Vaše neuložená mapa je připravená k obnovení")
+                          : t.dashboard.noCharts}
+                      </h3>
                       <p className="text-muted-foreground mb-6 text-center max-w-sm">
-                        {t.dashboard.noChartsDesc}
+                        {hasRecoverableDraft
+                          ? (locale === "en" ? "The last chart is safely stored in this browser. Open it and we will retry saving it to your account." : "Poslední mapa je bezpečně uložená v tomto prohlížeči. Otevřete ji a uložení do účtu zkusíme znovu.")
+                          : t.dashboard.noChartsDesc}
                       </p>
-                      <Link href={localePath("/calculate")}>
+                      <Link href={localePath(hasRecoverableDraft ? "/chart/new" : "/calculate")}>
                         <Button className="bg-primary text-primary-foreground">
-                          <Plus className="w-4 h-4 mr-1.5" />
-                          {t.dashboard.calculateFirst}
+                          {hasRecoverableDraft ? <Save className="w-4 h-4 mr-1.5" /> : <Plus className="w-4 h-4 mr-1.5" />}
+                          {hasRecoverableDraft
+                            ? (locale === "en" ? "Recover and save chart" : "Obnovit a uložit mapu")
+                            : t.dashboard.calculateFirst}
                         </Button>
                       </Link>
                     </CardContent>

@@ -41,6 +41,7 @@ import { TiltCard } from "@/components/TiltCard";
 import { SocialShareButtons } from "@/components/SocialShareButtons";
 import { GeneKeysSequence } from "@/components/GeneKeysSequence";
 import { ChartInsightsVisuals } from "@/components/ChartInsightsVisuals";
+import { clearChartDraft, readChartDraft } from "@/lib/chartDraft";
 
 // ─── ShareReadingButton ─────────────────────────────────────────────────────
 function ShareReadingButton({ readingId }: { readingId: number }) {
@@ -234,8 +235,9 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
 
   useEffect(() => {
     if (isNewChart) {
-      const stored = sessionStorage.getItem("chartResult");
-      const meta = sessionStorage.getItem("chartMeta");
+      const draft = readChartDraft();
+      const stored = draft?.chart;
+      const meta = draft?.meta;
       if (stored) {
         const parsedChart = JSON.parse(stored);
         setChart(parsedChart);
@@ -285,10 +287,11 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
   };
 
   const saveMutation = trpc.chart.save.useMutation({
+    retry: 2,
+    retryDelay: attempt => Math.min(1000 * (2 ** attempt), 4000),
     onSuccess: (data) => {
       setSavedChartId(data.id);
-      sessionStorage.removeItem("chartResult");
-      sessionStorage.removeItem("chartMeta");
+      clearChartDraft();
       if (autoSaveModeRef.current) {
         toast.success(locale === "cs" ? "Mapa byla automaticky uložena" : "Chart saved automatically");
         navigate(localePath(`/chart/${data.id}`), { replace: true });

@@ -820,7 +820,7 @@ export default function AiGuide() {
                       onChange={e => setInput(e.target.value)}
                       placeholder={isEn ? "Ask anything about Human Design..." : "Zeptejte se na cokoliv o Human Designu..."}
                       disabled={isLoading}
-                      className="flex-1 bg-background/60 backdrop-blur-sm border-border/50"
+                      className="flex-1 bg-background border-2 border-violet-400/70 shadow-sm shadow-violet-500/10 placeholder:text-muted-foreground/80 focus-visible:border-violet-600 focus-visible:ring-2 focus-visible:ring-violet-500/25"
                     />
                     <Button type="submit" disabled={!input.trim() || isLoading} size="icon">
                       {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}

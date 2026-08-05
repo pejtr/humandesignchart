@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
+import { saveChartDraft } from "@/lib/chartDraft";
 
 export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | "test" | "typy" }) {
   const [, navigate] = useLocation();
@@ -85,10 +86,9 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
 
   const calculateMutation = trpc.chart.calculate.useMutation({
     onSuccess: (data) => {
-      sessionStorage.setItem("chartResult", JSON.stringify(data));
-      sessionStorage.setItem("chartMeta", JSON.stringify({
+      saveChartDraft(data, {
         name, birthDate, birthTime, birthPlace, latitude, longitude, timezone, category,
-      }));
+      });
       navigate(localePath("/chart/new"));
     },
     onError: (err) => {

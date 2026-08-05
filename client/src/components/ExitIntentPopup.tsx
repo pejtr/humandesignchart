@@ -106,12 +106,15 @@ export default function ExitIntentPopup() {
           </div>
 
           <div className="space-y-3">
-            <Link href={localePath("/calculate")} onClick={dismiss}>
-              <button className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all hover:scale-[1.02] shadow-lg shadow-purple-200/50">
-                {isCs ? "Vytvořit mapu zdarma" : "Create free chart"}
-              </button>
+            <Link
+              href={localePath("/calculate")}
+              onClick={dismiss}
+              className="block w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all hover:scale-[1.02] shadow-lg shadow-purple-200/50"
+            >
+              {isCs ? "Vytvořit mapu zdarma" : "Create free chart"}
             </Link>
             <button
+              type="button"
               onClick={dismiss}
               className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
             >
@@ -122,6 +125,7 @@ export default function ExitIntentPopup() {
 
         {/* Close button */}
         <button
+          type="button"
           onClick={dismiss}
           className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
         >

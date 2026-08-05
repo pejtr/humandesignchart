@@ -249,7 +249,7 @@ const projects = [
           {/* Partner Sites */}
           <div className="md:hidden">
             <h4 className="font-serif text-sm font-semibold text-foreground mb-4">
-              {locale === "cs" ? "Další projekty" : "Partner Sites"}
+              {locale === "cs" ? "Spřátelené projekty" : "Partner projects"}
             </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="relative group/tip">
@@ -377,11 +377,11 @@ const projects = [
       <div className="relative z-10 hidden border-t border-amber-900/10 bg-[#FAF8F5] py-10 md:block">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <p className="mb-6 text-center text-[11px] font-bold uppercase tracking-[0.25em] text-[#A38A5A]">
-            {locale === "cs" ? "Naše další projekty" : "Our other projects"}
+            {locale === "cs" ? "Spřátelené projekty" : "Partner projects"}
           </p>
           <div
             className="projects-marquee"
-            aria-label={locale === "cs" ? "Další projekty" : "Other projects"}
+            aria-label={locale === "cs" ? "Spřátelené projekty" : "Partner projects"}
           >
             <div className="projects-marquee-track">
               {[0, 1].map(groupIndex => (

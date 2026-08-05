@@ -111,11 +111,20 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
-  <!-- LeadOS Universal Traffic Pixel -->
+  <!-- Optimateo Universal Traffic Pixel (LeadOS-compatible ingest contract) -->
   <script>
   (function() {
     const PROJECT_KEY = "proj_hdm"; // např. proj_hdm, proj_dsr, proj_italie
-    const INGEST_URL = "https://leados.cz/api/ingest";
+    const INGEST_URL = "https://www.optimateo.com/api/ingest";
+
+    function hasTrackingConsent() {
+      try {
+        const consent = JSON.parse(localStorage.getItem("hd-cookie-consent") || "{}");
+        return Boolean(consent.analytics || consent.marketing);
+      } catch (_) {
+        return false;
+      }
+    }
 
     // Persistentní Visitor ID & Session ID
     function getCookie(name) {
@@ -141,6 +150,7 @@
     
     // Odeslání události
     function trackEvent(eventName, eventData = {}) {
+      if (!hasTrackingConsent()) return;
       const payload = {
         eventType: eventName,
         visitorId: visitorId,
@@ -163,14 +173,15 @@
         },
         body: JSON.stringify(payload),
         keepalive: true
-      }).catch(err => console.warn("[LeadOS Analytics Error]", err));
+      }).catch(err => console.warn("[Optimateo Analytics Error]", err));
     }
 
     // Automatické měření zobrazení stránky
     window.addEventListener("DOMContentLoaded", () => trackEvent("page_view"));
     
     // Expozice pro vlastní události (nákup, registraci, proklik)
-    window.losTrack = trackEvent;
+    window.optimateoTrack = trackEvent;
+    window.losTrack = trackEvent; // temporary backwards-compatible alias
   })();
   </script>
 </head>

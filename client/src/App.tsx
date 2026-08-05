@@ -126,6 +126,12 @@ function LocaleRoutes() {
       <PageTransition>
         <Suspense fallback={<PageLoader />}>
           <Switch>
+            {/* Keep the unprefixed login route before /:locale, otherwise
+                Wouter treats "login" as a locale and renders the homepage. */}
+            <Route path="/login">
+              {() => <SafeRoute><Login /></SafeRoute>}
+            </Route>
+
             {/* Locale root = home */}
             <Route path="/:locale" component={Home} />
 
@@ -228,9 +234,6 @@ function LocaleRoutes() {
             </Route>
             <Route path="/:locale/newsletter/confirm">
               {() => <SafeRoute><NewsletterConfirm /></SafeRoute>}
-            </Route>
-            <Route path="/login">
-              {() => <SafeRoute><Login /></SafeRoute>}
             </Route>
             <Route path="/:locale/login">
               {() => <SafeRoute><Login /></SafeRoute>}

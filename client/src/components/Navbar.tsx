@@ -438,7 +438,7 @@ export default function Navbar() {
         aria-hidden={!mobileOpen}
       >
         {/* Drawer header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border/50 shrink-0">
+        <div className="order-1 flex items-center justify-between px-5 py-4 border-b border-border/50 shrink-0">
           <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline" onClick={() => setMobileOpen(false)}>
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-sm">
               <svg viewBox="0 0 24 24" className="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -490,7 +490,7 @@ export default function Navbar() {
         </div>
 
         {/* Drawer content — scrollable */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="order-3 flex-1 overflow-y-auto">
           {/* Main section */}
           <div className="px-3 pt-4 pb-2">
             <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-widest px-3 pb-2">
@@ -592,7 +592,7 @@ export default function Navbar() {
         </div>
 
         {/* Drawer footer — auth */}
-        <div className="border-t border-border/50 px-3 py-3 shrink-0 bg-muted/20">
+        <div className="order-2 border-b border-border/50 px-3 py-3 shrink-0 bg-muted/20">
           {isAuthenticated ? (
             <div className="space-y-1">
               <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-background border border-border/50 mb-2">
