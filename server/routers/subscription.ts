@@ -39,6 +39,7 @@ export const subscriptionRouter = router({
             recipientName: z.string().optional(),
             senderName: z.string().optional(),
             personalMessage: z.string().optional(),
+            redditClickId: z.string().max(255).optional(),
         }))
         .mutation(async ({ ctx, input }) => {
             const stripe = getStripe();
@@ -83,6 +84,7 @@ export const subscriptionRouter = router({
                 plan: input.plan,
                 partner_addon: input.plan === "blueprint" && input.includePartnerAddon ? "true" : "false",
             };
+            if (input.redditClickId) metadata.rdt_cid = input.redditClickId;
             if (isGift) {
                 if (input.recipientEmail) metadata.recipient_email = input.recipientEmail;
                 if (input.recipientName) metadata.recipient_name = input.recipientName;

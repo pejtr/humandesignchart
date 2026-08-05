@@ -43,8 +43,15 @@ export const ENV = {
   // Legacy object-storage proxy (used only by owner-side social image tooling)
   forgeApiUrl: process.env.STORAGE_API_URL ?? "",
   forgeApiKey: process.env.STORAGE_API_KEY ?? "",
-  leadosApiKey: process.env.LEADOS_API_KEY ?? "",
-  leadosWebhookSecret: process.env.LEADOS_WEBHOOK_SECRET ?? "",
+  optimateoExternalApiUrl:
+    process.env.OPTIMATEO_EXTERNAL_API_URL ?? "https://www.optimateo.com/api/external",
+  optimateoApiKey: process.env.OPTIMATEO_API_KEY ?? process.env.LEADOS_API_KEY ?? "",
+  optimateoWebhookSecret:
+    process.env.OPTIMATEO_WEBHOOK_SECRET ?? process.env.LEADOS_WEBHOOK_SECRET ?? "",
+  // Backwards-compatible aliases for existing Railway variables.
+  leadosApiKey: process.env.OPTIMATEO_API_KEY ?? process.env.LEADOS_API_KEY ?? "",
+  leadosWebhookSecret:
+    process.env.OPTIMATEO_WEBHOOK_SECRET ?? process.env.LEADOS_WEBHOOK_SECRET ?? "",
   highPriestessReferenceUrl:
     process.env.HIGH_PRIESTESS_REFERENCE_URL ??
     "https://www.humandesignmapa.cz/images/brand/veleknezka-master-v1.png",
@@ -55,4 +62,7 @@ export const ENV = {
   metaAccessToken: process.env.META_ACCESS_TOKEN ?? "",
   metaPixelIdServer: process.env.META_PIXEL_ID ?? process.env.VITE_META_PIXEL_ID ?? "",
   metaBusinessId: process.env.META_BUSINESS_ID ?? "",
+  // Reddit Pixel + Conversions API v3
+  redditPixelId: process.env.REDDIT_PIXEL_ID ?? process.env.VITE_REDDIT_PIXEL_ID ?? "",
+  redditConversionToken: process.env.REDDIT_CONVERSION_TOKEN ?? "",
 };

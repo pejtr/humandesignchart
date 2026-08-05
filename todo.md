@@ -467,16 +467,16 @@
 
 ## SEO — AiGuide & IncarnationCross Pages
 
-- [ ] Add locale-aware document.title + meta description to AiGuide page (EN + CS)
-- [ ] Add locale-aware document.title + meta description to IncarnationCross page (EN + CS)
+- [x] Add locale-aware document.title + meta description to AiGuide page (EN + CS)
+- [x] Add locale-aware document.title + meta description to IncarnationCross page (EN + CS)
 
 ## Blog — Czech Cover Images
 
-- [ ] Add Unsplash cover images to all 10 Czech blog articles in blogArticles.ts
+- [x] Add Unsplash cover images to all 10 Czech blog articles in blogArticles.ts
 
 ## Footer — Partner Projects
 
-- [ ] Add "Další projekty" section to footer with links: Akční letenky, Do Itálie, Katastr Online, Čajovny Praha, Bezmasá Jídla
+- [x] Add "Další projekty" section to footer with links: Akční letenky, Do Itálie, Katastr Online, Čajovny Praha, Bezmasá Jídla
 
 ## Dynamic OG Image for Shared Charts
 
@@ -485,7 +485,7 @@
 
 ## Footer — Remove Amulets.cz
 
-- [ ] Remove Amulets.cz from footer partner links
+- [x] Remove Amulets.cz from footer partner links
 
 ## Dynamic Locale-Aware SEO Branding
 

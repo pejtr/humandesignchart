@@ -6,7 +6,7 @@ import { useLocation } from "wouter";
  * so they persist across the session and can be attached to conversion events.
  *
  * Supported parameters:
- *   utm_source, utm_medium, utm_campaign, utm_term, utm_content, utm_id, fbclid
+ *   utm_source, utm_medium, utm_campaign, utm_term, utm_content, utm_id, fbclid, rdt_cid
  *
  * Also captures META's fbclid param (required for Conversions API matching).
  */
@@ -20,6 +20,7 @@ export interface UtmParams {
   utm_content?: string;
   utm_id?: string;
   fbclid?: string;
+  rdt_cid?: string;
 }
 
 /** Read stored UTM params from localStorage. */
@@ -65,6 +66,7 @@ export function useUTM() {
         "utm_content",
         "utm_id",
         "fbclid",
+        "rdt_cid",
       ];
       for (const key of keys) {
         const val = url.searchParams.get(key);

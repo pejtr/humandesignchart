@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trackSklikEvent } from "@/hooks/useSklik";
 import { trackGA4Event } from "@/hooks/useGA4";
+import { trackRedditEventFromMarketingEvent } from "@/hooks/useRedditPixel";
 
 /**
  * META Pixel tracking hook.
@@ -97,13 +98,16 @@ function trackEvent(name: MetaEventName, params?: MetaEventParams) {
   if (name !== "Purchase" || typeof sklikParams.order_id === "string") {
     trackSklikEvent(name, sklikParams);
   }
+  trackRedditEventFromMarketingEvent(name, params);
   const pixelId = getPixelId();
   if (!pixelId) {
     if (import.meta.env.DEV) console.warn("[META] No pixel ID configured; Sklik event was still processed");
     return;
   }
   // Standard META event. Sklik remains independent because META may be disabled.
-  fbq()?.("track", name, params);
+  const eventId = typeof params?.order_id === "string" ? params.order_id : undefined;
+  if (eventId) fbq()?.("track", name, params, { eventID: eventId });
+  else fbq()?.("track", name, params);
   // PageView is fired with trackSingle automatically by base code; for other events use track.
   if (import.meta.env.DEV) console.log("[META] track", name, params);
 }

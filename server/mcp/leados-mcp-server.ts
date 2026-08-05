@@ -1,7 +1,7 @@
 /**
- * MCP Server — HDM ↔ LeadOS Bridge
+ * MCP Server — HDM ↔ Optimateo Bridge
  *
- * Exposes HDM data as MCP tools so LeadOS (or any MCP-compatible AI agent)
+ * Exposes HDM data as MCP tools so Optimateo (or any MCP-compatible AI agent)
  * can call them directly via stdio transport.
  *
  * Usage:
@@ -33,7 +33,7 @@ async function getConnection() {
 // ─── MCP Server setup ─────────────────────────────────────────────────────────
 
 const server = new Server(
-  { name: "hdm-leados-bridge", version: "1.0.0" },
+  { name: "hdm-optimateo-bridge", version: "1.1.0" },
   { capabilities: { tools: {} } }
 );
 
@@ -54,7 +54,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: "get_hdm_leads",
       description:
-        "Vrátí seznam nových HDM uživatelů jako potenciální leady pro LeadOS CRM. / Returns new HDM users as potential leads for LeadOS CRM.",
+        "Vrátí seznam nových HDM uživatelů jako potenciální leady pro Optimateo CRM. / Returns new HDM users as potential leads for Optimateo CRM.",
       inputSchema: {
         type: "object" as const,
         properties: {
@@ -237,7 +237,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("[HDM MCP] LeadOS bridge server running on stdio");
+  console.error("[HDM MCP] Optimateo bridge server running on stdio");
 }
 
 main().catch((err) => {

@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
+import { getRedditClickIdForCapi } from "@/hooks/useRedditPixel";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -55,6 +56,7 @@ export default function PaymentSuccess() {
       locale,
       origin: window.location.origin,
       includePartnerAddon: false,
+      redditClickId: getRedditClickIdForCapi(),
     });
   };
 

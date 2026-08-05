@@ -3,21 +3,21 @@ import * as dotenv from "dotenv";
 import * as crypto from "crypto";
 dotenv.config();
 
-const LEADOS_API_KEY = process.env.LEADOS_API_KEY ?? "";
-const LEADOS_BASE_URL = "https://ai-lead-gen.com/api/external";
+const OPTIMATEO_API_KEY = process.env.OPTIMATEO_API_KEY ?? process.env.LEADOS_API_KEY ?? "";
+const OPTIMATEO_BASE_URL = process.env.OPTIMATEO_EXTERNAL_API_URL ?? "https://www.optimateo.com/api/external";
 
 // ─── Environment configuration ───────────────────────────────────────────────
-describe("LeadOS CRM API Integration", () => {
-  it("LEADOS_API_KEY is set in environment", () => {
-    if (LEADOS_API_KEY) {
-      expect(LEADOS_API_KEY.length).toBeGreaterThan(5);
+describe("Optimateo CRM API Integration", () => {
+  it("OPTIMATEO_API_KEY is set in environment", () => {
+    if (OPTIMATEO_API_KEY) {
+      expect(OPTIMATEO_API_KEY.length).toBeGreaterThan(5);
     } else {
-      expect(LEADOS_API_KEY).toBe("");
+      expect(OPTIMATEO_API_KEY).toBe("");
     }
   });
 
-  it("LEADOS_WEBHOOK_SECRET is set in environment", () => {
-    const secret = process.env.LEADOS_WEBHOOK_SECRET ?? "";
+  it("OPTIMATEO_WEBHOOK_SECRET is set in environment", () => {
+    const secret = process.env.OPTIMATEO_WEBHOOK_SECRET ?? process.env.LEADOS_WEBHOOK_SECRET ?? "";
     if (secret) {
       expect(secret.length).toBeGreaterThan(3);
     } else {
@@ -25,17 +25,17 @@ describe("LeadOS CRM API Integration", () => {
     }
   });
 
-  it("can reach LeadOS analytics endpoint", async () => {
-    const response = await fetch(`${LEADOS_BASE_URL}/analytics`, {
+  it.skipIf(!OPTIMATEO_API_KEY)("can reach Optimateo analytics endpoint", async () => {
+    const response = await fetch(`${OPTIMATEO_BASE_URL}/analytics`, {
       headers: {
-        Authorization: `Bearer ${LEADOS_API_KEY}`,
+        Authorization: `Bearer ${OPTIMATEO_API_KEY}`,
         "Content-Type": "application/json",
       },
     });
     // Accept 200 (success) or 401 (invalid key) — both mean the server is reachable
     // 404 or network error would indicate wrong URL
     expect([200, 201, 400, 401, 403, 404, 422]).toContain(response.status);
-    console.log("[LeadOS] Analytics endpoint status:", response.status);
+    console.log("[Optimateo] Analytics endpoint status:", response.status);
   }, 15000);
 });
 

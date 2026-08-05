@@ -1,6 +1,6 @@
 /**
  * CRM Dashboard — /crm-dashboard
- * Admin-only page: LeadOS leads enriched with Human Design data
+ * Admin-only page: Optimateo CRM leads enriched with Human Design data
  * Layout: Top Lead Profiles (left) | D3 Relationship Map (center) | Live SSE Stream (right)
  */
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -462,7 +462,7 @@ function SseStreamPanel() {
         {
           id: "demo1",
           type: "lead_activity",
-          title: "Čekám na LeadOS data",
+          title: "Čekám na data z Optimateo CRM",
           message: "Připojuji se k SSE streamu...",
           time: new Date().toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" }),
         },
@@ -696,7 +696,7 @@ export default function CrmDashboard() {
                     ? (
                       <div className="text-center py-8 text-gray-500 text-sm">
                         <p>Žádné leady nenalezeny.</p>
-                        <p className="text-xs mt-1">Zkontrolujte LEADOS_API_KEY.</p>
+                        <p className="text-xs mt-1">Zkontrolujte OPTIMATEO_API_KEY.</p>
                       </div>
                     )
                     : leads.map((lead) => (
@@ -737,7 +737,7 @@ export default function CrmDashboard() {
                 </div>
               ) : leads.length === 0 ? (
                 <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-                  Načítám data z LeadOS...
+                  Načítám data z Optimateo CRM...
                 </div>
               ) : (
                 <RelationshipMap

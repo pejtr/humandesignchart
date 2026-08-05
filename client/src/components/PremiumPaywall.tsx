@@ -2,6 +2,7 @@ import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
+import { getRedditClickIdForCapi } from "@/hooks/useRedditPixel";
 import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -44,7 +45,12 @@ export default function PremiumPaywall({ variant = "inline", onClose, title, des
       window.location.href = getLoginUrl();
       return;
     }
-    createCheckout.mutate({ plan, locale, origin: window.location.origin });
+    createCheckout.mutate({
+      plan,
+      locale,
+      origin: window.location.origin,
+      redditClickId: getRedditClickIdForCapi(),
+    });
   };
 
   if (variant === "banner") {

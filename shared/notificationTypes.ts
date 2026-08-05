@@ -29,7 +29,7 @@ export const NOTIFICATION_TYPE_META: Record<
 > = {
   crm_status: {
     label: "CRM Status",
-    description: "Upozornění při změně vašeho CRM statusu v LeadOS (např. kontaktován, zájem, konverze).",
+    description: "Upozornění při změně vašeho CRM statusu v Optimateo (např. kontaktován, zájem, konverze).",
     icon: "🎯",
     color: "purple",
   },

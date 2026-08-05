@@ -34,20 +34,16 @@ export interface LeadOSWebhookPayload {
 }
 
 export function registerLeadOSWebhook(app: Express): void {
-  // Must use express.raw BEFORE express.json() for signature verification
-  app.post(
-    "/api/leados/webhook",
-    express.raw({ type: "application/json" }),
-    async (req, res) => {
-      const signature = req.headers["x-leados-signature"] as string;
+  const handler = async (req: express.Request, res: express.Response) => {
+      const signature = (req.headers["x-optimateo-signature"] ?? req.headers["x-leados-signature"]) as string;
       const rawBody = req.body instanceof Buffer ? req.body.toString("utf8") : String(req.body);
 
       // Verify signature if secret is configured
-      const webhookSecret = process.env.LEADOS_WEBHOOK_SECRET;
-      if (webhookSecret && signature) {
-        const isValid = verifyLeadOSWebhook(rawBody, signature);
+      const webhookSecret = process.env.OPTIMATEO_WEBHOOK_SECRET ?? process.env.LEADOS_WEBHOOK_SECRET;
+      if (webhookSecret) {
+        const isValid = signature ? verifyLeadOSWebhook(rawBody, signature) : false;
         if (!isValid) {
-          console.warn("[LeadOS Webhook] Invalid signature — rejecting request");
+          console.warn("[Optimateo Webhook] Invalid signature — rejecting request");
           return res.status(401).json({ error: "Invalid signature" });
         }
       }
@@ -59,7 +55,7 @@ export function registerLeadOSWebhook(app: Express): void {
         return res.status(400).json({ error: "Invalid JSON payload" });
       }
 
-      console.log(`[LeadOS Webhook] Event: ${payload.event}`, {
+      console.log(`[Optimateo Webhook] Event: ${payload.event}`, {
         id: payload.data?.id,
         email: payload.data?.email,
         timestamp: payload.timestamp,
@@ -68,13 +64,17 @@ export function registerLeadOSWebhook(app: Express): void {
       try {
         await handleLeadOSEvent(payload);
       } catch (err) {
-        console.error("[LeadOS Webhook] Handler error:", err);
-        // Return 200 to prevent LeadOS from retrying — we logged the error
+        console.error("[Optimateo Webhook] Handler error:", err);
+        // Return 200 to prevent retries after a successfully authenticated delivery.
       }
 
       return res.json({ received: true });
-    }
-  );
+  };
+
+  // Canonical Optimateo route plus a temporary legacy alias for in-flight integrations.
+  const rawJson = express.raw({ type: "application/json" });
+  app.post("/api/optimateo/webhook", rawJson, handler);
+  app.post("/api/leados/webhook", rawJson, handler);
 }
 
 async function handleLeadOSEvent(payload: LeadOSWebhookPayload): Promise<void> {

@@ -46,6 +46,7 @@ import { VipClubBanner } from "@/components/VipClubBanner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
+import { getRedditClickIdForCapi } from "@/hooks/useRedditPixel";
 
 type CheckoutPlan =
   | "monthly"
@@ -257,6 +258,7 @@ export default function Pricing() {
       locale,
       origin: window.location.origin,
       includePartnerAddon: plan === "blueprint" && includePartnerAddon,
+      redditClickId: getRedditClickIdForCapi(),
       ...(isGift
         ? {
             recipientEmail: giftForm.recipientEmail || undefined,

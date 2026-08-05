@@ -1,19 +1,21 @@
 /**
- * LeadOS CRM API Helper
+ * Optimateo CRM API Helper (legacy LeadOS-compatible contract)
  * REST API integration with Bearer token authentication
- * Base URL: https://ai-lead-gen.com/api/external
+ * Default base URL: https://www.optimateo.com/api/external
  */
 
 import crypto from "crypto";
 
-const LEADOS_BASE_URL = "https://ai-lead-gen.com/api/external";
+const OPTIMATEO_BASE_URL = (
+  process.env.OPTIMATEO_EXTERNAL_API_URL ?? "https://www.optimateo.com/api/external"
+).replace(/\/$/, "");
 
 function getApiKey(): string {
-  return process.env.LEADOS_API_KEY ?? "";
+  return process.env.OPTIMATEO_API_KEY ?? process.env.LEADOS_API_KEY ?? "";
 }
 
 function getWebhookSecret(): string {
-  return process.env.LEADOS_WEBHOOK_SECRET ?? "";
+  return process.env.OPTIMATEO_WEBHOOK_SECRET ?? process.env.LEADOS_WEBHOOK_SECRET ?? "";
 }
 
 async function leadosRequest<T = unknown>(
@@ -23,10 +25,10 @@ async function leadosRequest<T = unknown>(
 ): Promise<T> {
   const apiKey = getApiKey();
   if (!apiKey) {
-    throw new Error("LEADOS_API_KEY is not configured");
+    throw new Error("OPTIMATEO_API_KEY is not configured");
   }
 
-  const url = `${LEADOS_BASE_URL}${path}`;
+  const url = `${OPTIMATEO_BASE_URL}${path}`;
   const options: RequestInit = {
     method,
     headers: {
@@ -43,7 +45,7 @@ async function leadosRequest<T = unknown>(
 
   if (!response.ok) {
     const text = await response.text().catch(() => "");
-    throw new Error(`LeadOS API error ${response.status}: ${text}`);
+    throw new Error(`Optimateo API error ${response.status}: ${text}`);
   }
 
   return response.json() as Promise<T>;
@@ -249,7 +251,7 @@ export function sendLeadOSEvent(payload: LeadOSEventPayload): void {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 3_000);
 
-  fetch(`${LEADOS_BASE_URL}/events`, {
+  fetch(`${OPTIMATEO_BASE_URL}/events`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,

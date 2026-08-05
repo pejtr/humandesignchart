@@ -88,7 +88,7 @@ export default function AdminCRM() {
 
   const sendEmailMutation = trpc.leados.sendEmail.useMutation({
     onSuccess: () => {
-      toast.success("Email odeslán přes LeadOS");
+      toast.success("Email odeslán přes Optimateo CRM");
       setEmailTo("");
       setEmailSubject("");
       setEmailHtml("");
@@ -122,19 +122,19 @@ export default function AdminCRM() {
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
               <BarChart3 className="w-8 h-8 text-purple-500" />
-              LeadOS CRM
+              Optimateo CRM
             </h1>
             <p className="text-muted-foreground mt-1">
               Správa leadů, objednávek a emailových kampaní
             </p>
           </div>
           <a
-            href="https://ai-lead-gen.com"
+            href="https://www.optimateo.com"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm text-purple-600 hover:text-purple-700 font-medium"
           >
-            Otevřít LeadOS Dashboard
+            Otevřít Optimateo Dashboard
             <ExternalLink className="w-4 h-4" />
           </a>
         </div>
@@ -165,19 +165,19 @@ export default function AdminCRM() {
             {analyticsQuery.isLoading && (
               <div className="flex items-center justify-center py-16">
                 <RefreshCw className="w-6 h-6 animate-spin text-purple-500 mr-2" />
-                <span className="text-muted-foreground">Načítám statistiky z LeadOS...</span>
+                <span className="text-muted-foreground">Načítám statistiky z Optimateo CRM...</span>
               </div>
             )}
             {analyticsQuery.error && (
               <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium">Nelze načíst data z LeadOS</p>
+                  <p className="font-medium">Nelze načíst data z Optimateo CRM</p>
                   <p className="text-sm mt-1">{analyticsQuery.error.message}</p>
                   <p className="text-sm mt-1 text-red-600">
                     Zkontroluj API klíč v{" "}
-                    <a href="https://ai-lead-gen.com" target="_blank" rel="noopener noreferrer" className="underline">
-                      LeadOS Dashboard → Admin → Integrace & API
+                    <a href="https://www.optimateo.com" target="_blank" rel="noopener noreferrer" className="underline">
+                      Optimateo Dashboard → Admin → Integrace & API
                     </a>
                   </p>
                 </div>
@@ -406,7 +406,7 @@ export default function AdminCRM() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Send className="w-5 h-5 text-purple-500" />
-                  Odeslat email přes LeadOS
+                  Odeslat email přes Optimateo CRM
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -550,17 +550,17 @@ function LeadOSError({ message }: { message: string }) {
     <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
       <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
       <div>
-        <p className="font-medium">Chyba při komunikaci s LeadOS</p>
+        <p className="font-medium">Chyba při komunikaci s Optimateo CRM</p>
         <p className="text-sm mt-1">{message}</p>
         <p className="text-sm mt-2">
           Zkontroluj API klíč v{" "}
           <a
-            href="https://ai-lead-gen.com"
+            href="https://www.optimateo.com"
             target="_blank"
             rel="noopener noreferrer"
             className="underline font-medium"
           >
-            LeadOS Dashboard → Admin → Integrace & API → API Keys
+            Optimateo Dashboard → Admin → Integrace & API → API Keys
           </a>
         </p>
       </div>

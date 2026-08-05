@@ -25,6 +25,7 @@ import { useSklikPageViews } from "./hooks/useSklik";
 import { useAuth } from "./_core/hooks/useAuth";
 import type { Locale } from "./contexts/LanguageContext";
 import { useReportWebVitals } from "./hooks/useReportWebVitals";
+import { useRedditPageViews } from "./hooks/useRedditPixel";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
 const ChartResult = lazy(() => import("./pages/ChartResult"));
@@ -61,6 +62,7 @@ const CrmDashboard = lazy(() => import("./pages/CrmDashboard"));
 const HumanDesignTest = lazy(() => import("./pages/HumanDesignTest"));
 const AdminAds = lazy(() => import("./pages/AdminAds"));
 const AffiliateProgram = lazy(() => import("./pages/AffiliateProgram"));
+const RedditLanding = lazy(() => import("./pages/RedditLanding"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -223,6 +225,9 @@ function LocaleRoutes() {
             <Route path="/:locale/pricing">
               {() => <SafeRoute><Pricing /></SafeRoute>}
             </Route>
+            <Route path="/:locale/reddit-human-design">
+              {() => <SafeRoute><RedditLanding /></SafeRoute>}
+            </Route>
             <Route path="/:locale/affiliate">
               {() => <SafeRoute><AffiliateProgram /></SafeRoute>}
             </Route>
@@ -286,6 +291,7 @@ function LocaleRoutes() {
             <Route path="/incarnation-cross"><LegacyRedirect path="/incarnation-cross" /></Route>
             <Route path="/daily-transit"><LegacyRedirect path="/daily-transit" /></Route>
             <Route path="/pricing"><LegacyRedirect path="/pricing" /></Route>
+            <Route path="/reddit-human-design"><LegacyRedirect path="/reddit-human-design" /></Route>
             <Route path="/payment/success"><LegacyRedirect path="/payment/success" /></Route>
             <Route path="/payment/cancel"><LegacyRedirect path="/payment/cancel" /></Route>
             <Route path="/composite"><LegacyRedirect path="/composite" /></Route>
@@ -315,6 +321,7 @@ function App() {
   useUTM();
   useSklikPageViews();
   useGA4PageViews();
+  useRedditPageViews();
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light" switchable>

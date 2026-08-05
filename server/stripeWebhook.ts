@@ -167,6 +167,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
     // META Conversions API — server-side Purchase (dedup with client pixel via event_id)
     await trackConversion({
       eventName: "Purchase",
+      eventId: session.id,
+      redditClickId: session.metadata?.rdt_cid,
       email: userEmail ?? customerEmail,
       userId,
       value: amountCzk,
@@ -193,6 +195,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
       await fulfillCreditsOrder(userId, 5, "Stripe");
       await trackConversion({
         eventName: "Purchase",
+        eventId: session.id,
+        redditClickId: session.metadata?.rdt_cid,
         email: userEmail,
         userId,
         value: amountCzk,
@@ -214,6 +218,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
       }
       await trackConversion({
         eventName: "Purchase",
+        eventId: session.id,
+        redditClickId: session.metadata?.rdt_cid,
         email: userEmail,
         userId,
         value: amountCzk,
@@ -230,6 +236,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
       }
       await trackConversion({
         eventName: "Purchase",
+        eventId: session.id,
+        redditClickId: session.metadata?.rdt_cid,
         email: userEmail,
         userId,
         value: amountCzk,
@@ -259,6 +267,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
       }
       await trackConversion({
         eventName: "Purchase",
+        eventId: session.id,
+        redditClickId: session.metadata?.rdt_cid,
         email: userEmail,
         userId,
         value: amountCzkLifetime,

@@ -11,6 +11,7 @@
 import { createHash } from "crypto";
 import { ENV } from "./_core/env";
 import { sendLeadOSEvent, LeadOSEventType } from "./leados";
+import { sendRedditConversionEvent } from "./redditConversionsApi";
 
 type ConversionsApiEvent = {
   event_name: string;
@@ -60,6 +61,8 @@ interface SendEventOptions {
   userAgent?: string;
   eventSourceUrl?: string;
   predictedLtv?: number;
+  eventId?: string;
+  redditClickId?: string;
 }
 
 /**
@@ -91,7 +94,7 @@ export async function sendMetaConversionEvent(opts: SendEventOptions): Promise<v
   const event: ConversionsApiEvent = {
     event_name: opts.eventName,
     event_time: Math.floor(Date.now() / 1000),
-    event_id: `${opts.eventName}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    event_id: opts.eventId ?? `${opts.eventName}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     action_source: "website",
     user_data: userData,
     custom_data: {
@@ -127,7 +130,27 @@ export async function sendMetaConversionEvent(opts: SendEventOptions): Promise<v
  * Keeps both tracking systems in sync from a single call site.
  */
 export async function trackConversion(opts: SendEventOptions & { leadOSEvent?: LeadOSEventType; leadOSData?: Record<string, unknown> }) {
-  await sendMetaConversionEvent(opts);
+  const trackingTasks: Promise<unknown>[] = [
+    sendMetaConversionEvent(opts),
+  ];
+  if (opts.redditClickId) {
+    trackingTasks.push(sendRedditConversionEvent({
+      trackingType: opts.eventName === "Purchase" ? "PURCHASE" : "LEAD",
+      email: opts.email,
+      userId: opts.userId,
+      clickId: opts.redditClickId,
+      conversionId: opts.eventId,
+      value: opts.value,
+      currency: opts.currency,
+      contentIds: opts.contentIds,
+      contentName: opts.contentName,
+      contentCategory: opts.contentCategory,
+      ip: opts.ip,
+      userAgent: opts.userAgent,
+      eventSourceUrl: opts.eventSourceUrl,
+    }));
+  }
+  await Promise.all(trackingTasks);
   if (opts.leadOSEvent) {
     sendLeadOSEvent({
       event: opts.leadOSEvent,

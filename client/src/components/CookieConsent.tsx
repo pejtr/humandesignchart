@@ -3,6 +3,7 @@ import { Cookie, X, Settings2 } from "lucide-react";
 import { initPixelAfterConsent } from "@/hooks/useMetaPixel";
 import { initSklikAfterConsent } from "@/hooks/useSklik";
 import { ga4PageView, initGA4 } from "@/hooks/useGA4";
+import { initRedditPixelAfterConsent } from "@/hooks/useRedditPixel";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const CONSENT_KEY = "hd-cookie-consent";
@@ -43,7 +44,7 @@ export function CookieConsent() {
       // Consent already given — initialize analytics on page load
       try {
         const parsed = JSON.parse(stored) as ConsentState;
-        if (parsed.marketing) { initPixelAfterConsent(); initSklikAfterConsent(); }
+        if (parsed.marketing) { initPixelAfterConsent(); initSklikAfterConsent(); initRedditPixelAfterConsent(); }
         if (parsed.analytics) { initGA4(); initClarity(); }
       } catch { /* ignore */ }
       return;
@@ -59,20 +60,25 @@ export function CookieConsent() {
     setShow(false);
     initPixelAfterConsent();
     initSklikAfterConsent();
+    initRedditPixelAfterConsent();
     initGA4();
     ga4PageView(window.location.pathname);
     initClarity();
+    (window as any).optimateoTrack?.("page_view", { consent: "all" });
   };
 
   const acceptSelected = () => {
     const state: ConsentState = { ...consent, accepted: true };
     localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
     setShow(false);
-    if (state.marketing) { initPixelAfterConsent(); initSklikAfterConsent(); }
+    if (state.marketing) { initPixelAfterConsent(); initSklikAfterConsent(); initRedditPixelAfterConsent(); }
     if (state.analytics) {
       initGA4();
       ga4PageView(window.location.pathname);
       initClarity();
+    }
+    if (state.analytics || state.marketing) {
+      (window as any).optimateoTrack?.("page_view", { consent: "selected" });
     }
   };
 
