@@ -879,28 +879,6 @@ export default function Pricing() {
               </CardContent>
             </Card>
 
-            {/* FAQ */}
-            <div className="max-w-2xl mx-auto">
-              <h2 className="text-xl font-semibold text-center mb-6">
-                {isCzech ? "Časté otázky" : "Frequently Asked Questions"}
-              </h2>
-              <Accordion type="single" collapsible className="space-y-2">
-                {faqItems.map((item, i) => (
-                  <AccordionItem
-                    key={i}
-                    value={`faq-${i}`}
-                    className="border border-border/50 rounded-lg px-4"
-                  >
-                    <AccordionTrigger className="text-sm font-medium">
-                      {item.q}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-sm text-muted-foreground">
-                      {item.a}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </div>
           </TabsContent>
 
           {/* Gift Tab */}
