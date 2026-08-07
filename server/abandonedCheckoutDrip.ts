@@ -13,11 +13,11 @@ export interface AbandonedCartPayload {
  */
 export async function triggerAbandonedCheckoutDrip(payload: AbandonedCartPayload): Promise<boolean> {
   try {
-    await sendLeadOSEvent({
-      email: payload.email,
-      event: "chart_created" as any,
-      name: payload.name || "Návštěvník",
+    sendLeadOSEvent({
+      event: "chart_created",
       data: {
+        email: payload.email,
+        name: payload.name || "Návštěvník",
         item: payload.cartItem,
         price: payload.priceCZK,
         discountCode: "MARIE15",
