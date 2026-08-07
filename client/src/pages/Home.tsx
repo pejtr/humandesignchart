@@ -194,6 +194,7 @@ function getTypesData(isCs: boolean) {
 // Replace with real user reviews collected via dashboard feedback.
 
 import { FastTypeQuizModal } from "@/components/FastTypeQuizModal";
+import { TestimonialsSection } from "@/components/TestimonialsSection";
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
@@ -1197,6 +1198,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── Real User Testimonials ──────────────────────────────── */}
+      <TestimonialsSection />
 
       {/* ── SEO FAQ Section (Targeting GSC Keywords) ──────────────── */}
       <section

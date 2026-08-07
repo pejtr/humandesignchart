@@ -317,6 +317,21 @@ export const pushSubscriptions = mysqlTable("pushSubscriptions", {
 		primaryKey({ columns: [table.id], name: "pushSubscriptions_id" }),
 	]);
 
+export const testimonials = mysqlTable("testimonials", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	name: varchar({ length: 100 }).notNull(),
+	hdType: varchar({ length: 50 }),
+	text: text().notNull(),
+	rating: int().default(5).notNull(),
+	locale: varchar({ length: 5 }).default('cs').notNull(),
+	status: mysqlEnum(['pending', 'approved', 'rejected']).default('pending').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`(now())`).notNull(),
+},
+	(table) => [
+		primaryKey({ columns: [table.id], name: "testimonials_id" }),
+	]);
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Chart = typeof charts.$inferSelect;
@@ -351,3 +366,5 @@ export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
 export type InsertNewsletterSubscriber = typeof newsletterSubscribers.$inferInsert;
 export type PushSubscription = typeof pushSubscriptions.$inferSelect;
 export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
+export type Testimonial = typeof testimonials.$inferSelect;
+export type InsertTestimonial = typeof testimonials.$inferInsert;

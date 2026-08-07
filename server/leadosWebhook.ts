@@ -71,10 +71,9 @@ export function registerLeadOSWebhook(app: Express): void {
       return res.json({ received: true });
   };
 
-  // Canonical Optimateo route plus a temporary legacy alias for in-flight integrations.
+  // Canonical Optimateo webhook route.
   const rawJson = express.raw({ type: "application/json" });
   app.post("/api/optimateo/webhook", rawJson, handler);
-  app.post("/api/leados/webhook", rawJson, handler);
 }
 
 async function handleLeadOSEvent(payload: LeadOSWebhookPayload): Promise<void> {

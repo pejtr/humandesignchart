@@ -302,7 +302,7 @@ export default function IncarnationCross() {
     ogImage: OG_IMAGES.calculator,
     ogUrl: isCs
       ? "https://www.humandesignmapa.cz/cs/incarnation-cross"
-      : "https://humandesignchart.app/en/incarnation-cross",
+      : "https://www.humandesignchart.app/en/incarnation-cross",
     locale: isCs ? "cs_CZ" : "en_US",
     keywords: isCs
       ? "inkarnační kříž, human design, životní poslání, 4 brány, pravý úhlový kříž, levý úhlový kříž, juxtapoziční kříž, AI výklad"

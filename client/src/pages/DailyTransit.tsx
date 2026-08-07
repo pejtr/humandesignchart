@@ -101,7 +101,7 @@ export default function DailyTransit() {
     if (!transit) return "";
     const dateLocale = locale === "en" ? "en-US" : "cs-CZ";
     const date = new Date(transit.timestamp).toLocaleDateString(dateLocale);
-    const siteUrl = locale === "cs" ? "humandesignmapa.cz" : "humandesignchart.app";
+    const siteUrl = locale === "cs" ? "www.humandesignmapa.cz" : "www.humandesignchart.app";
     const header = locale === "en"
       ? `🌅 DAILY TRANSIT — ${date}`
       : `🌅 DENNÍ TRANZIT — ${date}`;
@@ -133,12 +133,12 @@ export default function DailyTransit() {
 
   const handleTelegramShare = () => {
     const text = encodeURIComponent(getShareText());
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(`https://${locale === "cs" ? "humandesignmapa.cz" : "humandesignchart.app"}/${locale}/daily-transit`)}&text=${text}`, "_blank");
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(`https://${locale === "cs" ? "www.humandesignmapa.cz" : "www.humandesignchart.app"}/${locale}/daily-transit`)}&text=${text}`, "_blank");
     setShowShareMenu(false);
   };
 
   const handleFacebookShare = () => {
-    const url = encodeURIComponent(`https://${locale === "cs" ? "humandesignmapa.cz" : "humandesignchart.app"}/${locale}/daily-transit`);
+    const url = encodeURIComponent(`https://${locale === "cs" ? "www.humandesignmapa.cz" : "www.humandesignchart.app"}/${locale}/daily-transit`);
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, "_blank");
     setShowShareMenu(false);
   };
@@ -148,7 +148,7 @@ export default function DailyTransit() {
 
     const dateLocale = locale === "en" ? "en-US" : "cs-CZ";
     const date = new Date(transit.timestamp).toLocaleDateString(dateLocale);
-    const siteUrl = locale === "cs" ? "humandesignmapa.cz" : "humandesignchart.app";
+    const siteUrl = locale === "cs" ? "www.humandesignmapa.cz" : "www.humandesignchart.app";
     const header = locale === "en"
       ? `DAILY TRANSIT — ${date}`
       : `DENNÍ TRANZIT — ${date}`;

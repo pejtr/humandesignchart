@@ -274,7 +274,7 @@ export default function AiGuide() {
     description: 'Chat with your personal AI Human Design guide. Ask questions about your type, strategy, authority, profile, and get instant personalized answers based on your unique chart.',
     keywords: 'human design ai guide, ai human design assistant, personal HD chat, human design questions, AI bodygraph analysis',
     ogImage: '/images/og-ai-guide_b44c2f20.webp',
-    ogUrl: 'https://humandesignchart.app/en/ai-guide',
+    ogUrl: 'https://www.humandesignchart.app/en/ai-guide',
     ogType: "website",
     locale: "en_US",
     jsonLd: {
@@ -282,7 +282,7 @@ export default function AiGuide() {
       "@type": "WebApplication",
       name: 'AI Human Design Guide — Chat with Your Personal HD Assistant',
       description: 'Chat with your personal AI Human Design guide. Ask questions about your type, strategy, authority, profile, and get instant personalized answers based on your unique chart.',
-      url: 'https://humandesignchart.app/en/ai-guide',
+      url: 'https://www.humandesignchart.app/en/ai-guide',
       applicationCategory: 'LifestyleApplication',
       inLanguage: 'en-US',
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },

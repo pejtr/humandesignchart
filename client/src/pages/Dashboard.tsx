@@ -28,6 +28,7 @@ import ReferralWidget from "@/components/ReferralWidget";
 import { StreakWidget } from "@/components/StreakWidget";
 import { AffiliateWidget } from "@/components/AffiliateWidget";
 import { EmotionalTracker } from "@/components/EmotionalTracker";
+import { TestimonialForm } from "@/components/TestimonialForm";
 import { FamilyTreeChart } from "@/components/FamilyTreeChart";
 import { TransitGateAlerts } from "@/components/TransitGateAlerts";
 import { DailyAffirmationsWidget } from "@/components/DailyAffirmationsWidget";
@@ -275,6 +276,19 @@ export default function Dashboard() {
               {/* Fáze 6 & Fáze 7 Retention Components */}
               <TransitGateAlerts />
               <EmotionalTracker />
+              <Card className="border-border/50 bg-card">
+                <CardContent className="p-5">
+                  <h3 className="font-serif text-base font-semibold mb-1">
+                    {locale === "en" ? "Share your experience" : "Sdílejte svou zkušenost"}
+                  </h3>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    {locale === "en"
+                      ? "Help others discover Human Design by sharing your journey."
+                      : "Pomozte ostatním objevit Human Design sdílením své cesty."}
+                  </p>
+                  <TestimonialForm hdType={focusData?.type as string | undefined} />
+                </CardContent>
+              </Card>
               <FamilyTreeChart />
               <DailyAffirmationsWidget />
 

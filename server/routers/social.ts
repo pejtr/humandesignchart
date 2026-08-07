@@ -282,18 +282,12 @@ async function publishToTikTok(
   caption: string,
   imageUrl?: string | null
 ): Promise<string> {
-  // TikTok Content Posting API requires a complex flow with file upload.
-  // For now, we use the Direct Post API (if available) or log as a manual entry.
-  // This is a placeholder for the actual TikTok integration.
-  console.log(
-    `[TikTok] Publishing for ${accountId}: ${caption.slice(0, 50)}...`
+  // TikTok Content Posting API requires a complex OAuth flow + file upload.
+  // Direct image posting is not supported — only video via multipart upload.
+  // Throw a clear error so users know TikTok publishing is not yet available.
+  throw new Error(
+    "Automatické publikování na TikTok zatím není podporováno. Příspěvek si prosím publikujte ručně."
   );
-  if (!imageUrl)
-    throw new Error("TikTok posts usually require a video or image");
-
-  // Note: Direct image posting is limited; usually requires a video.
-  // We'll return a simulated ID for now to allow the flow to complete.
-  return `tt_${randomSuffix()}_${Date.now()}`;
 }
 
 async function publishToPinterest(

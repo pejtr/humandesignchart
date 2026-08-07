@@ -6,6 +6,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider, useLanguage } from "./contexts/LanguageContext";
 import { CurrencyProvider } from "./contexts/CurrencyContext";
+import { AbTestingProvider } from "./contexts/AbTestingContext";
+import { JsonLdHead } from "./components/JsonLdHead";
 import Home from "./pages/Home";
 import { lazy, Suspense, useEffect } from "react";
 import HDLoader from "./components/HDLoader";
@@ -328,7 +330,9 @@ function App() {
         <TooltipProvider>
           <LanguageProvider>
             <CurrencyProvider>
-              <Toaster />
+              <AbTestingProvider>
+                <JsonLdHead />
+                <Toaster />
               <ReferralApplier />
               <WelcomeModalWrapper />
               <NewsletterPopup />
@@ -345,6 +349,7 @@ function App() {
                 <FloatingChatGuide />
               </Suspense>
               <LocaleRoutes />
+              </AbTestingProvider>
             </CurrencyProvider>
           </LanguageProvider>
         </TooltipProvider>
