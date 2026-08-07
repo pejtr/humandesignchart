@@ -43,6 +43,7 @@ import { CheckoutOrderBump } from "@/components/CheckoutOrderBump";
 import { GiftVoucherModal } from "@/components/GiftVoucherModal";
 import { TeamDesignAudit } from "@/components/TeamDesignAudit";
 import { VipClubBanner } from "@/components/VipClubBanner";
+import { BrainwaveSalesCard } from "@/components/BrainwaveSalesCard";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
@@ -1106,6 +1107,7 @@ export default function Pricing() {
 
         <div className="container max-w-4xl mx-auto my-8">
           <VipClubBanner />
+          <BrainwaveSalesCard />
           <TeamDesignAudit />
         </div>
       </div>

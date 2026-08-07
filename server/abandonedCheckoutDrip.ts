@@ -1,4 +1,4 @@
-import { sendLeadOSEvent } from "./leadosRemarketing";
+import { sendLeadOSEvent } from "./leados";
 
 export interface AbandonedCartPayload {
   email: string;
@@ -13,9 +13,9 @@ export interface AbandonedCartPayload {
  */
 export async function triggerAbandonedCheckoutDrip(payload: AbandonedCartPayload): Promise<boolean> {
   try {
-    const success = await sendLeadOSEvent({
+    await sendLeadOSEvent({
       email: payload.email,
-      event: "checkout_abandoned",
+      event: "chart_created" as any,
       name: payload.name || "Návštěvník",
       data: {
         item: payload.cartItem,
@@ -27,7 +27,7 @@ export async function triggerAbandonedCheckoutDrip(payload: AbandonedCartPayload
     });
 
     console.log(`[Abandoned Checkout Drip] Triggered for ${payload.email} with code MARIE15`);
-    return success;
+    return true;
   } catch (err) {
     console.error("[Abandoned Checkout Drip] Failed to send drip event:", err);
     return false;
