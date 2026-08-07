@@ -63,6 +63,8 @@ const RoleCompatibility = lazy(() => import("./pages/RoleCompatibility"));
 const CrmDashboard = lazy(() => import("./pages/CrmDashboard"));
 const HumanDesignTest = lazy(() => import("./pages/HumanDesignTest"));
 const AdminAds = lazy(() => import("./pages/AdminAds"));
+const VslChatFunnel = lazy(() => import("./pages/VslChatFunnel"));
+const UgcFactory = lazy(() => import("./pages/UgcFactory"));
 const AffiliateProgram = lazy(() => import("./pages/AffiliateProgram"));
 const RedditLanding = lazy(() => import("./pages/RedditLanding"));
 
@@ -232,6 +234,15 @@ function LocaleRoutes() {
             </Route>
             <Route path="/:locale/affiliate">
               {() => <SafeRoute><AffiliateProgram /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/vsl">
+              {() => <SafeRoute><VslChatFunnel /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/chat-reading">
+              {() => <SafeRoute><VslChatFunnel /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/ugc-factory">
+              {() => <SafeRoute><UgcFactory /></SafeRoute>}
             </Route>
             <Route path="/:locale/payment/success">
               {() => <SafeRoute><PaymentSuccess /></SafeRoute>}
