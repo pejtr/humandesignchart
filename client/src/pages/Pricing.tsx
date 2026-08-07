@@ -44,6 +44,7 @@ import { GiftVoucherModal } from "@/components/GiftVoucherModal";
 import { TeamDesignAudit } from "@/components/TeamDesignAudit";
 import { VipClubBanner } from "@/components/VipClubBanner";
 import { BrainwaveSalesCard } from "@/components/BrainwaveSalesCard";
+import { ComgateCheckoutModal } from "@/components/ComgateCheckoutModal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
@@ -75,6 +76,7 @@ export default function Pricing() {
   const [voucherCode, setVoucherCode] = useState("");
   const [includePartnerAddon, setIncludePartnerAddon] = useState(false);
   const [showGiftModal, setShowGiftModal] = useState(false);
+  const [showComgateModal, setShowComgateModal] = useState(false);
 
   useEffect(() => {
     viewContent({
@@ -1113,6 +1115,7 @@ export default function Pricing() {
       </div>
 
       <GiftVoucherModal open={showGiftModal} onOpenChange={setShowGiftModal} />
+      <ComgateCheckoutModal open={showComgateModal} onOpenChange={setShowComgateModal} />
       <Footer />
     </div>
   );
