@@ -67,6 +67,8 @@ const VslChatFunnel = lazy(() => import("./pages/VslChatFunnel"));
 const UgcFactory = lazy(() => import("./pages/UgcFactory"));
 const AffiliateProgram = lazy(() => import("./pages/AffiliateProgram"));
 const RedditLanding = lazy(() => import("./pages/RedditLanding"));
+const KidsHdGuide = lazy(() => import("./pages/KidsHdGuide"));
+const CustomerPortal = lazy(() => import("./pages/CustomerPortal"));
 
 function PageLoader() {
   return <HDLoader />;
@@ -243,6 +245,12 @@ function LocaleRoutes() {
             </Route>
             <Route path="/:locale/ugc-factory">
               {() => <SafeRoute><UgcFactory /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/kids-hd">
+              {() => <SafeRoute><KidsHdGuide /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/portal">
+              {() => <SafeRoute><CustomerPortal /></SafeRoute>}
             </Route>
             <Route path="/:locale/payment/success">
               {() => <SafeRoute><PaymentSuccess /></SafeRoute>}
