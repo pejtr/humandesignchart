@@ -1,68 +1,16 @@
 {
-  "name": "Human Design Chart",
-  "short_name": "HD Chart",
-  "description": "Free Human Design chart calculator with AI readings. Discover your type, strategy, authority and life purpose.",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#7c3aed",
-  "orientation": "portrait-primary",
-  "lang": "en",
-  "categories": ["lifestyle", "health", "education"],
+  "short_name": "Human Design",
+  "name": "Avanito Human Design & AI Marie",
   "icons": [
     {
-      "src": "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/icon-192_270b0157.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/icon-512_e795e720.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
     }
   ],
-  "screenshots": [
-    {
-      "src": "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/og-homepage-TnsCURzJFMQ4a9smwqmEMU.png",
-      "sizes": "1200x630",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Human Design Chart Calculator"
-    },
-    {
-      "src": "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/icon-512_e795e720.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Human Design Chart Mobile"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Calculate Chart",
-      "short_name": "Calculate",
-      "description": "Calculate your Human Design chart",
-      "url": "/calculate",
-      "icons": [
-        {
-          "src": "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/icon-192_270b0157.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "AI Guide",
-      "short_name": "AI Guide",
-      "description": "Chat with AI Human Design guide",
-      "url": "/ai-guide",
-      "icons": [
-        {
-          "src": "https://d2xsxph8kpxj0f.cloudfront.net/310419663032296198/SJUUMjJfby3uu5HSPh4u4R/icon-192_270b0157.png",
-          "sizes": "192x192"
-        }
-      ]
-    }
-  ]
+  "start_url": "/",
+  "background_color": "#090d16",
+  "theme_color": "#7c3aed",
+  "display": "standalone",
+  "orientation": "portrait"
 }

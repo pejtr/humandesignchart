@@ -336,6 +336,7 @@ function WelcomeModalWrapper() {
 
 const SeasonalFlashSaleBanner = lazy(() => import("./components/SeasonalFlashSaleBanner").then(m => ({ default: m.SeasonalFlashSaleBanner })));
 const LeadMagnetExitPopup = lazy(() => import("./components/LeadMagnetExitPopup").then(m => ({ default: m.LeadMagnetExitPopup })));
+const WebPushNotificationModal = lazy(() => import("./components/WebPushNotificationModal").then(m => ({ default: m.WebPushNotificationModal })));
 
 function App() {
   useReportWebVitals();
@@ -358,7 +359,11 @@ function App() {
               <ExitIntentPopup />
               <Suspense fallback={null}>
                 <SeasonalFlashSaleBanner />
+                <WelcomeBonusBanner />
+                <SocialProofTicker />
                 <LeadMagnetExitPopup />
+                <SmartChatWidget />
+                <WebPushNotificationModal />
               </Suspense>
               <ScrollToTop />
               <CookieConsent />

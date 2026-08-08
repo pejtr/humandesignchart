@@ -45,6 +45,8 @@ import { TeamDesignAudit } from "@/components/TeamDesignAudit";
 import { VipClubBanner } from "@/components/VipClubBanner";
 import { BrainwaveSalesCard } from "@/components/BrainwaveSalesCard";
 import { ComgateCheckoutModal } from "@/components/ComgateCheckoutModal";
+import { SmartCouponWidget } from "@/components/SmartCouponWidget";
+import { CustomerReviewsWidget } from "@/components/CustomerReviewsWidget";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
@@ -1108,6 +1110,7 @@ export default function Pricing() {
         </div>
 
         <div className="container max-w-4xl mx-auto my-8">
+          <CustomerReviewsWidget />
           <VipClubBanner />
           <BrainwaveSalesCard />
           <TeamDesignAudit />
