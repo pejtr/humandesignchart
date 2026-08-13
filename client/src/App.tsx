@@ -336,7 +336,6 @@ function WelcomeModalWrapper() {
 
 const SocialProofTicker = lazy(() => import("./components/SocialProofTicker").then(m => ({ default: m.SocialProofTicker })));
 const WelcomeBonusBanner = lazy(() => import("./components/WelcomeBonusBanner").then(m => ({ default: m.WelcomeBonusBanner })));
-const SmartChatWidget = lazy(() => import("./components/SmartChatWidget").then(m => ({ default: m.SmartChatWidget })));
 const SeasonalFlashSaleBanner = lazy(() => import("./components/SeasonalFlashSaleBanner").then(m => ({ default: m.SeasonalFlashSaleBanner })));
 const LeadMagnetExitPopup = lazy(() => import("./components/LeadMagnetExitPopup").then(m => ({ default: m.LeadMagnetExitPopup })));
 const WebPushNotificationModal = lazy(() => import("./components/WebPushNotificationModal").then(m => ({ default: m.WebPushNotificationModal })));
@@ -365,7 +364,6 @@ function App() {
                 <WelcomeBonusBanner />
                 <SocialProofTicker />
                 <LeadMagnetExitPopup />
-                <SmartChatWidget />
                 <WebPushNotificationModal />
               </Suspense>
               <ScrollToTop />
