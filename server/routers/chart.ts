@@ -59,6 +59,7 @@ export const chartRouter = router({
                 timezone: input.timezone,
                 category: input.category,
                 chartData: input.chartData,
+                isFavorite: 0,
             });
 
             sendLeadOSEvent({

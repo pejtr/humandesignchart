@@ -5,7 +5,45 @@ import { getDb } from "./index";
 export async function createChart(chart: InsertChart) {
     const db = await getDb();
     if (!db) throw new Error("Database not available");
-    const result = await db.insert(charts).values(chart);
+
+    // Production databases created by older migrations may not have the
+    // schema-level default for this column. Always provide it explicitly so a
+    // chart can be persisted reliably after a deployment or database restart.
+    const values: InsertChart = {
+        ...chart,
+        isFavorite: chart.isFavorite ?? 0,
+    };
+
+    // Automatic save and the manual Save button can be triggered close
+    // together. Reuse the existing chart instead of creating duplicates.
+    const existing = await db
+        .select({ id: charts.id })
+        .from(charts)
+        .where(and(
+            eq(charts.userId, values.userId),
+            eq(charts.name, values.name),
+            eq(charts.birthDate, values.birthDate),
+            eq(charts.birthTime, values.birthTime),
+        ))
+        .limit(1);
+
+    if (existing[0]) {
+        await db
+            .update(charts)
+            .set({
+                birthPlace: values.birthPlace,
+                latitude: values.latitude,
+                longitude: values.longitude,
+                timezone: values.timezone,
+                category: values.category,
+                chartData: values.chartData,
+                updatedAt: new Date(),
+            })
+            .where(and(eq(charts.id, existing[0].id), eq(charts.userId, values.userId)));
+        return existing[0].id;
+    }
+
+    const result = await db.insert(charts).values(values);
     return result[0].insertId;
 }
 

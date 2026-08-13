@@ -1,32 +1,89 @@
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Palette, Download, Crown, Frame, Check } from "lucide-react";
+import { Palette, Download, Crown, Frame, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import Bodygraph from "@/components/Bodygraph";
+import type { HumanDesignChartData } from "@shared/types";
+
+type PosterTheme = "cosmic" | "minimal" | "gold";
 
 interface PosterGeneratorModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   chartName?: string;
   chartType?: string;
+  chart?: HumanDesignChartData;
+  isPremium?: boolean;
+  onUpgrade?: () => void;
 }
 
-export function PosterGeneratorModal({ open, onOpenChange, chartName, chartType }: PosterGeneratorModalProps) {
+const THEMES: Record<PosterTheme, { background: string; foreground: string; accent: string; muted: string; border: string }> = {
+  cosmic: { background: "#070719", foreground: "#f8f4ff", accent: "#a970ff", muted: "#c4b5d9", border: "#7c3aed" },
+  gold: { background: "#21140d", foreground: "#fff8e7", accent: "#f4c95d", muted: "#dfc99c", border: "#d69e2e" },
+  minimal: { background: "#faf9f6", foreground: "#18131f", accent: "#7c3aed", muted: "#6b6470", border: "#d6cce7" },
+};
+
+function escapeXml(value: string) {
+  return value.replace(/[<>&'\"]/g, char => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", "\"": "&quot;" }[char] || char));
+}
+
+export function PosterGeneratorModal({
+  open,
+  onOpenChange,
+  chartName,
+  chartType,
+  chart,
+  isPremium = false,
+  onUpgrade,
+}: PosterGeneratorModalProps) {
   const { locale } = useLanguage();
   const isEn = locale === "en";
-  const [selectedTheme, setSelectedTheme] = useState<"cosmic" | "minimal" | "gold">("cosmic");
+  const [selectedTheme, setSelectedTheme] = useState<PosterTheme>("cosmic");
+  const previewRef = useRef<HTMLDivElement>(null);
+  const theme = useMemo(() => THEMES[selectedTheme], [selectedTheme]);
 
   const handleDownloadPoster = () => {
-    toast.success(
-      isEn
-        ? "Generating high-resolution printable A3 vector poster..."
-        : "Generuji plno-barevný vektorový A3 plakát v tiskové kvalitě..."
-    );
-    setTimeout(() => {
+    if (!isPremium) {
       onOpenChange(false);
-      toast.success(isEn ? "Poster download started!" : "Stažení plakátu zahájeno!");
-    }, 1500);
+      onUpgrade?.();
+      return;
+    }
+
+    const safeName = escapeXml(chartName || (isEn ? "My chart" : "Moje mapa"));
+    const safeType = escapeXml(chartType || "Human Design");
+    const bodygraphNode = previewRef.current?.querySelector("svg")?.cloneNode(true) as SVGElement | undefined;
+    let bodygraphMarkup = "";
+    if (bodygraphNode) {
+      bodygraphNode.setAttribute("x", "310");
+      bodygraphNode.setAttribute("y", "390");
+      bodygraphNode.setAttribute("width", "500");
+      bodygraphNode.setAttribute("height", "760");
+      bodygraphNode.setAttribute("preserveAspectRatio", "xMidYMid meet");
+      bodygraphMarkup = new XMLSerializer().serializeToString(bodygraphNode);
+    }
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 1584" width="1120" height="1584">
+      <rect width="1120" height="1584" rx="36" fill="${theme.background}"/>
+      <g fill="none" stroke="${theme.accent}" opacity=".22">
+        <circle cx="560" cy="790" r="390"/><circle cx="560" cy="790" r="300"/><circle cx="560" cy="790" r="210"/>
+        <path d="M560 400 898 985 222 985Z M222 595 898 595 560 1180Z"/>
+      </g>
+      <text x="560" y="130" fill="${theme.accent}" text-anchor="middle" font-family="Arial" font-size="24" letter-spacing="8">HUMAN DESIGN</text>
+      <text x="560" y="250" fill="${theme.foreground}" text-anchor="middle" font-family="Georgia" font-size="58" font-weight="700">${safeName}</text>
+      <text x="560" y="302" fill="${theme.muted}" text-anchor="middle" font-family="Arial" font-size="26">${safeType}</text>
+      ${bodygraphMarkup || `<g transform="translate(560 790)" fill="${theme.background}" stroke="${theme.accent}" stroke-width="8"><path d="M0-210 90-95 45-15-45-15-90-95Z"/><rect x="-70" y="15" width="140" height="115" rx="12"/><path d="M0 150 95 245 0 340-95 245Z"/><circle cx="0" cy="-305" r="58"/></g>`}
+      <text x="560" y="1460" fill="${theme.muted}" text-anchor="middle" font-family="Arial" font-size="18" letter-spacing="4">HUMANDESIGNMAPA.CZ · PREMIUM</text>
+      <rect x="22" y="22" width="1076" height="1540" rx="26" fill="none" stroke="${theme.border}" stroke-width="5"/>
+    </svg>`;
+    const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `human-design-${(chartName || "mapa").toLowerCase().replace(/[^a-z0-9]+/gi, "-")}-${selectedTheme}.svg`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success(isEn ? "Premium SVG poster downloaded." : "Premium SVG plakát byl stažen.");
   };
 
   return (
@@ -37,60 +94,66 @@ export function PosterGeneratorModal({ open, onOpenChange, chartName, chartType 
             <Frame className="w-6 h-6" />
           </div>
           <DialogTitle className="text-2xl font-serif font-bold text-foreground">
-            {isEn ? "Printable Wall Art Poster (A3/A2)" : "Luxusní Plakát Vaší Mapy na Zeď"}
+            {isEn ? "Printable Human Design poster" : "Plakát vaší Human Design mapy"}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
             {isEn
-              ? "Download high-resolution vector artwork of your Human Design chart, personalized with sacred geometry and your name for framing."
-              : "Stáhněte si vektorovou grafiku vaší mapy v tiskovém rozlišení s posvátnou geometrií a vaším jménem k zarámování na zeď."}
+              ? "A personalized scalable SVG for high-quality A3 printing. Included in Premium."
+              : "Personalizované vektorové SVG pro kvalitní tisk A3. Je součástí Premium."}
           </DialogDescription>
         </DialogHeader>
 
-        {/* Poster Theme Preview */}
         <div className="space-y-4 my-2">
-          <div className="relative aspect-[3/4] max-w-[200px] mx-auto rounded-2xl border-4 border-amber-400/60 shadow-xl overflow-hidden bg-slate-950 flex flex-col items-center justify-between p-4 text-white text-center">
-            <div className="text-[10px] uppercase font-mono tracking-widest text-amber-300">HUMAN DESIGN MAPA</div>
-            <div className="space-y-1">
-              <div className="font-serif text-sm font-bold">{chartName || "Osobní Mapa"}</div>
-              <div className="text-[10px] text-purple-200">{chartType || "Generátor 3/5"}</div>
+          <div
+            ref={previewRef}
+            className="relative aspect-[3/4] max-w-[210px] mx-auto rounded-2xl border-4 shadow-xl overflow-hidden flex flex-col items-center justify-between p-4 text-center transition-colors duration-300"
+            style={{ backgroundColor: theme.background, color: theme.foreground, borderColor: theme.border }}
+          >
+            <div className="absolute inset-5 rounded-full border opacity-20" style={{ borderColor: theme.accent }} />
+            <div className="relative text-[9px] uppercase font-mono tracking-[0.25em]" style={{ color: theme.accent }}>HUMAN DESIGN</div>
+            <div className="relative space-y-1">
+              <div className="font-serif text-sm font-bold">{chartName || (isEn ? "My chart" : "Moje mapa")}</div>
+              <div className="text-[10px]" style={{ color: theme.muted }}>{chartType || "Human Design"}</div>
             </div>
-            <div className="w-16 h-20 rounded-full border border-amber-400/40 flex items-center justify-center text-[9px] text-amber-300">
-              [BODYGRAPH]
+            <div className="relative h-[118px] w-[102px] overflow-hidden flex items-center justify-center">
+              {chart ? <Bodygraph chart={chart} width={102} height={118} /> : <Frame className="w-14 h-14" style={{ color: theme.accent }} />}
             </div>
-            <div className="text-[8px] text-muted-foreground font-mono">AVANITO HUMAN DESIGN · 300 DPI A3</div>
+            <div className="relative text-[7px] font-mono tracking-wider" style={{ color: theme.muted }}>HUMANDESIGNMAPA.CZ · PREMIUM</div>
           </div>
 
           <div className="space-y-2">
             <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
               <Palette className="w-3.5 h-3.5 text-purple-500" />
-              {isEn ? "Select Color Theme" : "Vyberte Barevný Styl"}
+              {isEn ? "Select color style" : "Vyberte barevný styl"}
             </label>
             <div className="grid grid-cols-3 gap-2">
-              {[
-                { id: "cosmic", label: "Vesmírná Noc", color: "bg-slate-900 text-purple-300" },
-                { id: "gold", label: "Zlatá Geometrie", color: "bg-amber-950 text-amber-300" },
-                { id: "minimal", label: "Čistý Minimalist", color: "bg-stone-100 text-stone-900 border" },
-              ].map(t => (
-                <button
-                  key={t.id}
-                  onClick={() => setSelectedTheme(t.id as any)}
-                  className={`p-2.5 rounded-xl text-xs font-medium transition-all flex items-center justify-between ${t.color} ${
-                    selectedTheme === t.id ? "ring-2 ring-purple-500 shadow-md" : "opacity-80 hover:opacity-100"
-                  }`}
-                >
-                  <span>{t.label}</span>
-                  {selectedTheme === t.id && <Check className="w-3.5 h-3.5" />}
-                </button>
-              ))}
+              {([
+                { id: "cosmic", cs: "Vesmírná noc", en: "Cosmic night" },
+                { id: "gold", cs: "Zlatá geometrie", en: "Golden geometry" },
+                { id: "minimal", cs: "Čistý minimal", en: "Clean minimal" },
+              ] as const).map(item => {
+                const colors = THEMES[item.id];
+                return (
+                  <button
+                    type="button"
+                    key={item.id}
+                    onClick={() => setSelectedTheme(item.id)}
+                    className={`p-2.5 rounded-xl text-xs font-medium transition-all flex items-center justify-between border ${selectedTheme === item.id ? "ring-2 ring-purple-500 shadow-md" : "opacity-80 hover:opacity-100"}`}
+                    style={{ backgroundColor: colors.background, color: colors.foreground, borderColor: colors.border }}
+                  >
+                    <span>{isEn ? item.en : item.cs}</span>
+                    {selectedTheme === item.id && <Check className="w-3.5 h-3.5" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <Button
-            onClick={handleDownloadPoster}
-            className="w-full bg-gradient-to-r from-amber-500 via-purple-600 to-indigo-600 hover:from-amber-600 hover:to-indigo-700 text-white font-bold text-xs h-11 rounded-xl shadow-lg gap-2 mt-2"
-          >
-            <Download className="w-4 h-4" />
-            {isEn ? "Stáhnout Vektorový Plakát A3 (+290 CZK)" : "Stáhnout Vektorový Plakát A3 (+290 Kč)"}
+          <Button onClick={handleDownloadPoster} className="w-full h-11 rounded-xl gap-2 font-bold">
+            {isPremium ? <Download className="w-4 h-4" /> : <Crown className="w-4 h-4" />}
+            {isPremium
+              ? (isEn ? "Download Premium SVG poster" : "Stáhnout Premium SVG plakát")
+              : (isEn ? "Unlock poster with Premium" : "Odemknout plakát v Premium")}
           </Button>
         </div>
       </DialogContent>

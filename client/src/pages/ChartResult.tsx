@@ -11,8 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
@@ -22,7 +20,7 @@ import {
   Save, Sparkles, ArrowLeft, Brain, Compass, Star, Sun, Moon,
   Loader2, Eye, Zap, Shield, Target, FileText, Download,
   ChevronRight, Info, Hexagon, CircleDot, Globe, Share2, Copy, Check,
-  User, Users, Heart, Briefcase, UserCheck, HelpCircle, GitCompare, Frame,
+  Heart, GitCompare, Frame, Crown,
 } from "lucide-react";
 import { PartnerCompareInvite } from "@/components/PartnerCompareInvite";
 import { AudioReadingAddon } from "@/components/AudioReadingAddon";
@@ -302,7 +300,10 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
     },
     onError: (err) => {
       autoSaveModeRef.current = false;
-      toast.error(err.message);
+      console.error("[chart.save] Chart persistence failed", err);
+      toast.error(locale === "cs"
+        ? "Mapu se nepodařilo uložit. Vaše vypočtená mapa zůstala bezpečně v tomto prohlížeči — zkuste uložení znovu."
+        : "The chart could not be saved. Your calculated chart remains safely in this browser — please try again.");
     },
   });
 
@@ -552,70 +553,9 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-x-clip">
       <SacredGeometry className="absolute inset-0 z-0" />
       <Navbar />
-
-      {/* ─── Save Category Dialog ─── */}
-      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
-        <DialogContent className="bg-popover text-popover-foreground max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="font-serif text-xl flex items-center gap-2">
-              <Save className="w-5 h-5 text-primary" />
-              {locale === "cs" ? "Uložit mapu" : "Save Chart"}
-            </DialogTitle>
-            <DialogDescription>
-              {locale === "cs" ? `Ukládám mapu pro: ${chartMeta?.name || ""}` : `Saving chart for: ${chartMeta?.name || ""}`}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                {locale === "cs" ? "Komu patří tato mapa?" : "Who is this chart for?"}
-              </Label>
-              <Select value={saveCategory} onValueChange={(v) => setSaveCategory(v as any)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="self">
-                    <div className="flex items-center gap-2"><User className="w-4 h-4 text-primary" /> {locale === "cs" ? "Já (moje vlastní mapa)" : "Myself"}</div>
-                  </SelectItem>
-                  <SelectItem value="family">
-                    <div className="flex items-center gap-2"><Heart className="w-4 h-4 text-rose-400" /> {locale === "cs" ? "Rodina (partner, rodiče, děti)" : "Family (partner, parents, kids)"}</div>
-                  </SelectItem>
-                  <SelectItem value="friend">
-                    <div className="flex items-center gap-2"><Users className="w-4 h-4 text-blue-400" /> {locale === "cs" ? "Přátelé" : "Friends"}</div>
-                  </SelectItem>
-                  <SelectItem value="client">
-                    <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-amber-400" /> {locale === "cs" ? "Klient / Kolega" : "Client / Colleague"}</div>
-                  </SelectItem>
-                  <SelectItem value="celebrity">
-                    <div className="flex items-center gap-2"><UserCheck className="w-4 h-4 text-violet-400" /> {locale === "cs" ? "Celebrita / Veřejná osobnost" : "Celebrity / Public figure"}</div>
-                  </SelectItem>
-                  <SelectItem value="other">
-                    <div className="flex items-center gap-2"><HelpCircle className="w-4 h-4 text-muted-foreground" /> {locale === "cs" ? "Jiné" : "Other"}</div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {saveCategory !== "self" && (
-              <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 text-xs text-muted-foreground">
-                💡 {locale === "cs"
-                  ? "Po uložení můžete tuto mapu porovnat se svou vlastní mapou pomocí Composite analýzy."
-                  : "After saving, you can compare this chart with your own using Composite analysis."}
-              </div>
-            )}
-          </div>
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setShowSaveDialog(false)}>{locale === "cs" ? "Zrušit" : "Cancel"}</Button>
-            <Button onClick={confirmSave} disabled={saveMutation.isPending}>
-              {saveMutation.isPending ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Save className="w-4 h-4 mr-1.5" />}
-              {locale === "cs" ? "Uložit" : "Save"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Onboarding modal for first-time users */}
       {showOnboarding && chart && (
@@ -721,9 +661,20 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                    {!subStatus?.isPremium && (subStatus?.blueprintPdfCredits ?? 0) === 0 && <span className="ml-1 text-xs opacity-60">🌙</span>}
                 </Button>
 
-                <Button variant="outline" onClick={() => setShowPosterModal(true)} className="gap-1.5 border-amber-300 dark:border-amber-800">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (!subStatus?.isPremium) {
+                      setShowPaywall(true);
+                      aiSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      return;
+                    }
+                    setShowPosterModal(true);
+                  }}
+                  className="gap-1.5 border-amber-300 dark:border-amber-800"
+                >
                   <Frame className="w-4 h-4 text-amber-500" />
-                  {locale === "cs" ? "Plakát na zeď (A3)" : "Wall Poster (A3)"}
+                  {locale === "cs" ? "Plakát A3 · Premium" : "A3 Poster · Premium"}
                 </Button>
               </div>
             </div>
@@ -731,7 +682,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Bodygraph Column */}
               <div className="lg:col-span-1">
-                <Card className="bg-card border-border/50 shadow-sm sticky top-24">
+                <Card id="chart-map" className="scroll-mt-36 bg-card border-border/50 shadow-sm lg:sticky lg:top-28">
                   <CardHeader className="pb-2">
                     <CardTitle className="font-serif text-lg">{t.chart.bodygraph}</CardTitle>
                     <CardDescription>{t.chart.bodygraphDesc}</CardDescription>
@@ -797,6 +748,36 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                         })}
                       </div>
                     )}
+                    <Separator />
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">
+                          {locale === "cs" ? "Navigace výkladem" : "Reading navigation"}
+                        </p>
+                        <Badge variant={savedChartId ? "secondary" : "outline"} className="text-[9px]">
+                          {savedChartId
+                            ? (locale === "cs" ? "Uloženo" : "Saved")
+                            : (locale === "cs" ? "Čeká na uložení" : "Not saved")}
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {[
+                          { href: "#foundations", label: locale === "cs" ? "Základy" : "Basics", icon: Shield },
+                          { href: "#relationship-analysis", label: locale === "cs" ? "Vztahy" : "Relationships", icon: Heart },
+                          { href: "#ai-reading", label: locale === "cs" ? "AI výklad" : "AI reading", icon: Sparkles },
+                          { href: "#premium-outputs", label: "Premium", icon: Crown },
+                        ].map(item => (
+                          <a
+                            key={item.href}
+                            href={item.href}
+                            className="flex items-center gap-1.5 rounded-lg border border-border/50 bg-muted/20 px-2 py-2 text-[11px] font-medium hover:border-primary/40 hover:bg-primary/5 hover:text-primary transition-colors"
+                          >
+                            <item.icon className="h-3.5 w-3.5" />
+                            {item.label}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </Card>
               </div>
@@ -805,16 +786,40 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
               <div className="lg:col-span-2 space-y-6">
 
                 {/* Partner Relational Synergy Visualizer */}
-                <PartnerSynergyVisualizer person1Name={chartMeta?.name || "Vy"} />
+                <PartnerSynergyVisualizer
+                  person1Name={chartMeta?.name || "Vy"}
+                  isPremium={Boolean(subStatus?.isPremium)}
+                  chartId={savedChartId}
+                />
 
                 {/* Partner Compare & Viral Rewards Card */}
                 <PartnerCompareInvite referralCode={(user as any)?.referralCode} chartName={chartMeta?.name} />
 
-                {/* 10-Minute Voice Audio Add-on */}
-                <AudioReadingAddon chartName={chartMeta?.name} />
+                {/* Premium audio output */}
+                <AudioReadingAddon
+                  chartName={chartMeta?.name}
+                  readingText={aiReadingType === "daily_transit" ? dailyTransitReading : aiReading}
+                  isPremium={Boolean(subStatus?.isPremium)}
+                  onUpgrade={() => {
+                    setShowPaywall(true);
+                    aiSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                />
 
                 {/* ─── AI Výklad — PRIMÁRNÍ SEKCE ─── */}
-                <div ref={aiSectionRef}>
+                <section
+                  id="ai-reading"
+                  ref={aiSectionRef}
+                  className="scroll-mt-36 rounded-3xl border border-primary/20 bg-gradient-to-b from-primary/[0.06] to-transparent p-3 sm:p-5 shadow-sm"
+                >
+                  <div className="mb-4 flex items-start gap-3">
+                    <div className="rounded-xl bg-primary/10 p-2 text-primary"><Sparkles className="h-5 w-5" /></div>
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">{locale === "cs" ? "Samostatná sekce" : "Dedicated section"}</p>
+                      <h2 className="font-serif text-2xl font-bold">{locale === "cs" ? "AI výklad vaší mapy" : "Your AI chart reading"}</h2>
+                      <p className="text-xs text-muted-foreground">{locale === "cs" ? "Vyberte téma, čtěte bez rušivých nabídek a výklad si stáhněte nebo přehrajte." : "Choose a topic, read without distractions, then download or play the result."}</p>
+                    </div>
+                  </div>
                   {showPaywall ? (
                     <PremiumPaywall variant="inline" />
                   ) : (aiStreaming || aiMutation.isPending || dailyTransitLoading || personalizedTransitMutation.isPending) && ((aiReadingType === "daily_transit" && !dailyTransitReading) || (aiReadingType !== "daily_transit" && !aiReading)) ? (
@@ -899,7 +904,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                             <p className="text-sm text-muted-foreground">{locale === "cs" ? "Generuji denní výklad tranzitů..." : "Generating daily transit reading..."}</p>
                           </div>
                         ) : (
-                          <div className="prose prose-sm max-w-none p-4 rounded-lg bg-white/60 border border-border/30 relative">
+                          <div className="prose prose-sm max-w-none max-h-[68vh] overflow-y-auto p-4 rounded-lg bg-white/80 border border-primary/20 relative shadow-inner">
                             <Streamdown>{aiReadingType === "daily_transit" ? (dailyTransitReading || "") : (aiReading || "")}</Streamdown>
                             {aiStreaming && aiReadingType !== "daily_transit" && (
                               <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-middle rounded-sm" />
@@ -1012,7 +1017,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                       </div>
                     </div>
                   )}
-                </div>
+                </section>
 
                 <ChartInsightsVisuals
                   chart={chart}
@@ -1026,7 +1031,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                 />
 
                 {/* ─── Type & Strategy Card ─── */}
-                <Card className="bg-card border-border/50 shadow-sm overflow-hidden">
+                <Card id="foundations" className="scroll-mt-36 bg-card border-border/50 shadow-sm overflow-hidden">
                   <CardHeader className="pb-3">
                     <CardTitle className="font-serif text-xl flex items-center gap-2">
                       <Shield className="w-5 h-5 text-primary" /> {t.chart.typeStrategy}
@@ -1710,6 +1715,12 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
         onOpenChange={setShowPosterModal}
         chartName={chartMeta?.name}
         chartType={czType}
+        chart={chart}
+        isPremium={Boolean(subStatus?.isPremium)}
+        onUpgrade={() => {
+          setShowPaywall(true);
+          aiSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }}
       />
     </div>
   );
