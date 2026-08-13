@@ -10,6 +10,7 @@ import {
 import { getStripe } from "../stripeWebhook";
 import { isPremiumUser, canGenerateAiReading, FREE_TIER } from "../stripeProducts";
 import { ENV } from "../_core/env";
+import { createManagedCheckoutSession } from "../stripeCheckout";
 
 export const subscriptionRouter = router({
     status: protectedProcedure.query(async ({ ctx }) => {
@@ -126,16 +127,15 @@ export const subscriptionRouter = router({
             }
 
             if (isSubscription) {
-                const session = await stripe.checkout.sessions.create({
+                const session = await createManagedCheckoutSession(stripe, {
                     mode: "subscription",
                     customer: customerId,
                     client_reference_id: user.id.toString(),
                     metadata,
                     allow_promotion_codes: true,
-                    // Apple Pay and Google Pay are offered automatically by Stripe
-                    // when cards are enabled and the domain is registered in Stripe.
-                    // PayPal is opt-in because Stripe must approve it for the account.
-                    payment_method_types: (ENV.stripeEnablePaypal ? ["card", "paypal"] : ["card"]) as any,
+                    // Stripe Managed Payments selects eligible methods dynamically.
+                    // Apple Pay / Google Pay remain available through card wallets;
+                    // PayPal appears only when the account, currency and buyer qualify.
                     line_items: [{
                         price_data: {
                             currency,
@@ -175,13 +175,12 @@ export const subscriptionRouter = router({
                         quantity: 1,
                     });
                 }
-                const session = await stripe.checkout.sessions.create({
+                const session = await createManagedCheckoutSession(stripe, {
                     mode: "payment",
                     customer: customerId,
                     client_reference_id: user.id.toString(),
                     metadata,
                     allow_promotion_codes: true,
-                    payment_method_types: (ENV.stripeEnablePaypal ? ["card", "paypal"] : ["card"]) as any,
                     line_items: lineItems,
                     success_url: successUrl,
                     cancel_url: cancelUrl,

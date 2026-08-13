@@ -9,7 +9,6 @@ export const ENV = {
   // Payment providers. Secrets are configured in Railway, never in source control.
   stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? "",
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
-  stripeEnablePaypal: process.env.STRIPE_ENABLE_PAYPAL === "true",
   comgateMerchantId: process.env.COMGATE_MERCHANT_ID ?? "",
   comgateSecret: process.env.COMGATE_SECRET ?? "",
   comgateTestMode: process.env.COMGATE_TEST_MODE !== "false", // Default to true for safety
