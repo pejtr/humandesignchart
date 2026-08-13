@@ -5,7 +5,15 @@ import { Headphones, Sparkles, ShieldCheck, CheckCircle2, ArrowRight, Zap } from
 import { HdBrainwavePlayerModal } from "./HdBrainwavePlayerModal";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-export function BrainwaveSalesCard() {
+interface BrainwaveSalesCardProps {
+  onCheckout?: () => void;
+  isCheckoutPending?: boolean;
+}
+
+export function BrainwaveSalesCard({
+  onCheckout,
+  isCheckoutPending = false,
+}: BrainwaveSalesCardProps) {
   const { locale } = useLanguage();
   const isEn = locale === "en";
   const [showPlayer, setShowPlayer] = useState(false);
@@ -73,20 +81,36 @@ export function BrainwaveSalesCard() {
                 {isEn ? "Today's Special Price" : "Dnešní Akční Cena"}
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-amber-300">390 Kč</span>
-                <span className="text-xs text-muted-foreground line-through">790 Kč</span>
+                <span className="text-2xl font-bold text-amber-300">195 Kč</span>
+                <span className="text-xs text-muted-foreground line-through">390 Kč</span>
               </div>
             </div>
 
-            <Button
-              onClick={() => setShowPlayer(true)}
-              size="lg"
-              className="w-full sm:w-auto bg-gradient-to-r from-amber-400 via-purple-500 to-indigo-600 hover:from-amber-500 hover:to-indigo-700 text-slate-950 font-extrabold text-xs sm:text-sm h-12 px-6 rounded-2xl shadow-xl gap-2"
-            >
-              <Headphones className="w-4 h-4 fill-current" />
-              {isEn ? "Listen to 12-Min Audio Demo" : "Spustit 12-Minutové Audio (Ukázka)"}
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
+            <div className="flex w-full flex-col gap-2 sm:w-auto">
+              <Button
+                onClick={onCheckout}
+                disabled={!onCheckout || isCheckoutPending}
+                size="lg"
+                className="w-full bg-gradient-to-r from-amber-400 via-purple-500 to-indigo-600 hover:from-amber-500 hover:to-indigo-700 text-slate-950 font-extrabold text-xs sm:text-sm h-12 px-6 rounded-2xl shadow-xl gap-2"
+              >
+                <Headphones className="w-4 h-4 fill-current" />
+                {isCheckoutPending
+                  ? isEn
+                    ? "Opening checkout..."
+                    : "Otevírám platbu..."
+                  : isEn
+                    ? "Get 12-Minute Audio for 195 CZK"
+                    : "Získat 12minutové audio za 195 Kč"}
+                <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
+              <button
+                type="button"
+                onClick={() => setShowPlayer(true)}
+                className="text-xs font-medium text-purple-200/80 underline-offset-4 hover:text-white hover:underline"
+              >
+                {isEn ? "Listen to a free demo" : "Nejdřív si poslechnout ukázku"}
+              </button>
+            </div>
           </div>
         </div>
       </Card>

@@ -30,4 +30,8 @@ describe("monetization product ladder", () => {
     expect(annualUpgrade).toBe(79800);
     expect(blueprint + annualUpgrade).toBe(STRIPE_PRODUCTS.PREMIUM_ANNUAL.pricesCzk);
   });
+
+  it("prices the brainwave audio at half of the former 390 CZK offer", () => {
+    expect(STRIPE_PRODUCTS.BRAINWAVE_AUDIO.pricesCzk).toBe(19500);
+  });
 });

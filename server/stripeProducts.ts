@@ -38,6 +38,13 @@ export const STRIPE_PRODUCTS = {
     pricesEur: 299,  // 2.99 EUR in cents
     metadata: { plan: "credits", credits: "5" },
   },
+  BRAINWAVE_AUDIO: {
+    name: "12minutové Human Design binaurální audio / 12-minute Human Design brainwave audio",
+    description: "Digitální binaurální audio 528 Hz a 40 Hz Gamma | Digital 528 Hz and 40 Hz Gamma audio",
+    pricesCzk: 19500,
+    pricesEur: 790,
+    metadata: { plan: "brainwave_audio" },
+  },
   BLUEPRINT: {
     name: "Osobní Human Design Blueprint / Personal Human Design Blueprint",
     description: "Osobní PDF report a 5 navazujících AI výkladů | Personal PDF report and 5 follow-up AI readings",

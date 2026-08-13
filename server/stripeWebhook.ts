@@ -205,6 +205,28 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, stripe:
         contentName: "Credit Pack",
         contentCategory: "credits",
       });
+    } else if (plan === "brainwave_audio") {
+      const { fulfillBrainwaveAudioOrder } = await import("./services/payment");
+      await fulfillBrainwaveAudioOrder(
+        userId,
+        session.payment_intent as string,
+        "Stripe",
+      );
+      if (affiliateCode) {
+        await trackAffiliateCommission(affiliateCode, userId, amountCzk, session.payment_intent as string);
+      }
+      await trackConversion({
+        eventName: "Purchase",
+        eventId: session.id,
+        redditClickId: session.metadata?.rdt_cid,
+        email: userEmail,
+        userId,
+        value: amountCzk,
+        currency,
+        contentIds: ["brainwave_audio"],
+        contentName: "12-minute Human Design Brainwave Audio",
+        contentCategory: "audio",
+      });
     } else if (plan === "blueprint") {
       const includePartnerAddon = session.metadata?.partner_addon === "true";
       await fulfillBlueprintOrder(

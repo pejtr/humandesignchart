@@ -32,7 +32,7 @@ export const subscriptionRouter = router({
     }),
     createCheckout: protectedProcedure
         .input(z.object({
-            plan: z.enum(["monthly", "annual", "lifetime", "credits", "blueprint", "blueprint_annual_upgrade", "gift_monthly", "gift_annual"]),
+            plan: z.enum(["monthly", "annual", "lifetime", "credits", "brainwave_audio", "blueprint", "blueprint_annual_upgrade", "gift_monthly", "gift_annual"]),
             locale: z.string().default("cs"),
             origin: z.string(),
             includePartnerAddon: z.boolean().default(false),
@@ -70,6 +70,7 @@ export const subscriptionRouter = router({
                 annual: { czk: 118800, eur: 4700, name: "Human Design Premium - Rocni", taxCode: "txcd_10103000" },
                 lifetime: { czk: 288800, eur: 11500, name: "Human Design Premium - Dozivotne", taxCode: "txcd_10103000" },
                 credits: { czk: 7700, eur: 299, name: "Human Design AI Credits (5x)", taxCode: "txcd_10105001" },
+                brainwave_audio: { czk: 19500, eur: 790, name: "12minutove Human Design binauralni audio", taxCode: "txcd_10701411" },
                 blueprint: { czk: 39000, eur: 1590, name: "Osobni Human Design Blueprint", taxCode: "txcd_10701411" },
                 blueprint_annual_upgrade: { czk: 79800, eur: 3190, name: "Rocni Premium - doplatek po Blueprintu", taxCode: "txcd_10103000" },
                 gift_monthly: { czk: 18800, eur: 749, name: "Darkovy poukaz - Premium Mesic", taxCode: "txcd_10103000" },

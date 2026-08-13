@@ -35,6 +35,7 @@ export default function PaymentSuccess() {
     | "annual"
     | "credits"
     | "lifetime"
+    | "brainwave_audio"
     | "blueprint"
     | "blueprint_annual_upgrade"
     | null;
@@ -80,6 +81,8 @@ export default function PaymentSuccess() {
           ? 2888
           : plan === "credits"
             ? 77
+            : plan === "brainwave_audio"
+              ? 195
             : plan === "blueprint"
               ? 390
               : plan === "blueprint_annual_upgrade"

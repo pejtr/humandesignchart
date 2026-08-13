@@ -57,6 +57,7 @@ type CheckoutPlan =
   | "annual"
   | "lifetime"
   | "credits"
+  | "brainwave_audio"
   | "blueprint"
   | "blueprint_annual_upgrade"
   | "gift_monthly"
@@ -242,6 +243,7 @@ export default function Pricing() {
       annual: 1188,
       lifetime: 2888,
       credits: 77,
+      brainwave_audio: 195,
       blueprint: includePartnerAddon ? 580 : 390,
       blueprint_annual_upgrade: 798,
       gift_monthly: 188,
@@ -249,8 +251,17 @@ export default function Pricing() {
     };
     initiateCheckout(values[plan], {
       content_name:
-        plan === "blueprint" ? "Personal Human Design Blueprint" : plan,
-      content_category: plan === "blueprint" ? "report" : "subscription",
+        plan === "blueprint"
+          ? "Personal Human Design Blueprint"
+          : plan === "brainwave_audio"
+            ? "12-minute Human Design Brainwave Audio"
+            : plan,
+      content_category:
+        plan === "blueprint"
+          ? "report"
+          : plan === "brainwave_audio"
+            ? "audio"
+            : "subscription",
       content_ids:
         plan === "blueprint" && includePartnerAddon
           ? ["blueprint", "blueprint_partner"]
@@ -1112,7 +1123,10 @@ export default function Pricing() {
         <div className="container max-w-4xl mx-auto my-8">
           <CustomerReviewsWidget />
           <VipClubBanner />
-          <BrainwaveSalesCard />
+          <BrainwaveSalesCard
+            onCheckout={() => handleCheckout("brainwave_audio")}
+            isCheckoutPending={createCheckout.isPending}
+          />
           <TeamDesignAudit />
         </div>
       </div>

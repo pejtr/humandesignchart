@@ -47,6 +47,13 @@ export async function handleComgateWebhook(req: Request, res: Response) {
 
         if (plan === "credits") {
             await fulfillCreditsOrder(userId, 5, "Comgate");
+        } else if (plan === "brainwave_audio") {
+            const { fulfillBrainwaveAudioOrder } = await import("./services/payment");
+            await fulfillBrainwaveAudioOrder(userId, transId, "Comgate");
+            if (affiliateCode) {
+                const amountCzk = comgateInfo.price ? parseFloat(comgateInfo.price) / 100 : 195;
+                await trackAffiliateCommission(affiliateCode, userId, amountCzk, transId);
+            }
         } else if (plan === "blueprint") {
             await fulfillBlueprintOrder(userId, metadata.partner === "1", transId, "Comgate");
         } else if (plan === "blueprint_annual_upgrade") {

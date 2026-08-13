@@ -51,6 +51,25 @@ export async function fulfillCreditsOrder(userId: number, quantity: number, sour
   console.log(`[${source}] Added ${quantity} credits to user ${userId}`);
 }
 
+export async function fulfillBrainwaveAudioOrder(
+  userId: number,
+  paymentRef: string,
+  source: string,
+) {
+  await logCreditTransaction(userId, 0, "brainwave_audio_purchase", {
+    paymentRef,
+    source,
+  });
+
+  try {
+    const user = await getUserById(userId);
+    await notifyOwner({
+      title: `🎧 Zakoupeno 12minutové binaurální audio [${source}]`,
+      content: `${user?.name || "zákazník"} (${user?.email || "neznámý"}) zakoupil binaurální audio.\nUser ID: ${userId}`,
+    });
+  } catch { /* non-critical */ }
+}
+
 export async function fulfillBlueprintOrder(
   userId: number,
   includePartnerAddon: boolean,
