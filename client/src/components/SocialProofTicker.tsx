@@ -119,7 +119,7 @@ export function SocialProofTicker() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 20, scale: 0.9 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="fixed bottom-4 left-4 z-40 max-w-[320px] sm:max-w-[360px] bg-white/95 dark:bg-[#120e24]/95 backdrop-blur-md border border-purple-200/50 dark:border-purple-800/40 rounded-2xl p-3.5 shadow-xl shadow-purple-900/10 pointer-events-auto"
+        className="fixed bottom-4 left-4 z-[200] max-w-[320px] sm:max-w-[360px] bg-white/95 dark:bg-[#120e24]/95 backdrop-blur-md border border-purple-200/50 dark:border-purple-800/40 rounded-2xl p-3.5 shadow-xl shadow-purple-900/10 pointer-events-auto"
       >
         <div className="flex items-start gap-3">
           <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 shrink-0 mt-0.5">

@@ -341,31 +341,6 @@ const projects = [
         </div>
 
         <div className="mystical-divider mt-8 mb-8" />
-        <div className="mb-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs text-muted-foreground">
-          <span className="font-semibold text-foreground">
-            {locale === "cs" ? "Doporučujeme:" : "Recommended:"}
-          </span>
-          <a
-            href="https://leanloophole.com/cb/?hop=idgetbonus&hopId=8b2bafbb-d593-4df7-a2dc-5fe0da2de431&v=cb&p=n&controls=1"
-            target="_blank"
-            rel="sponsored noopener noreferrer"
-            aria-label={
-              locale === "cs"
-                ? "Lean Loophole – doporučený affiliate odkaz (otevře se v novém okně)"
-                : "Lean Loophole – recommended affiliate link (opens in a new window)"
-            }
-            className="group inline-flex items-center gap-1 font-medium text-primary underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            Lean Loophole
-            <ArrowUpRight
-              aria-hidden="true"
-              className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-            />
-          </a>
-          <span className="text-[10px] uppercase tracking-wide opacity-70">
-            {locale === "cs" ? "affiliate odkaz" : "affiliate link"}
-          </span>
-        </div>
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} {t.footer.copyright}

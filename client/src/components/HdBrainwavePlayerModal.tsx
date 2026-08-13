@@ -17,6 +17,7 @@ export function HdBrainwavePlayerModal({ open, onOpenChange, centerName = "Otev�
   const [isPlaying, setIsPlaying] = useState(false);
   const [timeLeft, setTimeLeft] = useState(720); // 12 minutes (720s)
   const timerRef = useRef<any>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
     if (isPlaying) {
@@ -25,6 +26,7 @@ export function HdBrainwavePlayerModal({ open, onOpenChange, centerName = "Otev�
           if (prev <= 1) {
             setIsPlaying(false);
             clearInterval(timerRef.current);
+            audioContextRef.current?.suspend().catch(() => undefined);
             toast.success(isEn ? "12-minute session completed!" : "12minutové de-kondicionování bylo dokončeno!");
             return 720;
           }
@@ -37,9 +39,57 @@ export function HdBrainwavePlayerModal({ open, onOpenChange, centerName = "Otev�
     return () => clearInterval(timerRef.current);
   }, [isPlaying, isEn]);
 
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-    if (!isPlaying) {
+  useEffect(() => {
+    if (!open && isPlaying) {
+      audioContextRef.current?.suspend().catch(() => undefined);
+      setIsPlaying(false);
+    }
+  }, [open, isPlaying]);
+
+  useEffect(() => {
+    return () => {
+      audioContextRef.current?.close().catch(() => undefined);
+      audioContextRef.current = null;
+    };
+  }, []);
+
+  const startAudio = async () => {
+    let context = audioContextRef.current;
+    if (!context || context.state === "closed") {
+      context = new AudioContext();
+      const masterGain = context.createGain();
+      masterGain.gain.value = 0.08;
+      masterGain.connect(context.destination);
+
+      // A 40 Hz binaural difference centred around the 528 Hz soundscape.
+      for (const [frequency, pan] of [[508, -1], [548, 1]] as const) {
+        const oscillator = context.createOscillator();
+        const channelGain = context.createGain();
+        const panner = context.createStereoPanner();
+        oscillator.type = "sine";
+        oscillator.frequency.value = frequency;
+        channelGain.gain.value = 0.65;
+        panner.pan.value = pan;
+        oscillator.connect(channelGain).connect(panner).connect(masterGain);
+        oscillator.start();
+      }
+      audioContextRef.current = context;
+    }
+    await context.resume();
+  };
+
+  const togglePlay = async () => {
+    if (isPlaying) {
+      await audioContextRef.current?.suspend();
+      setIsPlaying(false);
+    } else {
+      try {
+        await startAudio();
+        setIsPlaying(true);
+      } catch {
+        toast.error(isEn ? "Audio could not be started in this browser." : "Zvuk se v tomto prohlížeči nepodařilo spustit.");
+        return;
+      }
       toast.info(
         isEn
           ? "Playing 528Hz Solfeggio & Gamma Brainwave Audio for HD Center De-conditioning"
