@@ -66,14 +66,14 @@ export const subscriptionRouter = router({
                 await updateUserSubscription(user.id, { stripeCustomerId: customerId });
             }
             const priceData = {
-                monthly: { czk: 18800, eur: 749, name: "Human Design Premium - Mesicni" },
-                annual: { czk: 118800, eur: 4700, name: "Human Design Premium - Rocni" },
-                lifetime: { czk: 288800, eur: 11500, name: "Human Design Premium - Dozivotne" },
-                credits: { czk: 7700, eur: 299, name: "Human Design AI Credits (5x)" },
-                blueprint: { czk: 39000, eur: 1590, name: "Osobni Human Design Blueprint" },
-                blueprint_annual_upgrade: { czk: 79800, eur: 3190, name: "Rocni Premium - doplatek po Blueprintu" },
-                gift_monthly: { czk: 18800, eur: 749, name: "Darkovy poukaz - Premium Mesic" },
-                gift_annual: { czk: 118800, eur: 4700, name: "Darkovy poukaz - Premium Rok" },
+                monthly: { czk: 18800, eur: 749, name: "Human Design Premium - Mesicni", taxCode: "txcd_10103000" },
+                annual: { czk: 118800, eur: 4700, name: "Human Design Premium - Rocni", taxCode: "txcd_10103000" },
+                lifetime: { czk: 288800, eur: 11500, name: "Human Design Premium - Dozivotne", taxCode: "txcd_10103000" },
+                credits: { czk: 7700, eur: 299, name: "Human Design AI Credits (5x)", taxCode: "txcd_10105001" },
+                blueprint: { czk: 39000, eur: 1590, name: "Osobni Human Design Blueprint", taxCode: "txcd_10701411" },
+                blueprint_annual_upgrade: { czk: 79800, eur: 3190, name: "Rocni Premium - doplatek po Blueprintu", taxCode: "txcd_10103000" },
+                gift_monthly: { czk: 18800, eur: 749, name: "Darkovy poukaz - Premium Mesic", taxCode: "txcd_10103000" },
+                gift_annual: { czk: 118800, eur: 4700, name: "Darkovy poukaz - Premium Rok", taxCode: "txcd_10103000" },
             }[input.plan];
             const currency = isCzech ? "czk" : "eur";
             const unitAmount = isCzech ? priceData.czk : priceData.eur;
@@ -143,6 +143,7 @@ export const subscriptionRouter = router({
                             recurring: { interval: input.plan === "monthly" ? "month" : "year" },
                             product_data: {
                                 name: priceData.name,
+                                tax_code: priceData.taxCode,
                                 metadata: { plan: input.plan },
                             },
                         },
@@ -158,7 +159,11 @@ export const subscriptionRouter = router({
                     price_data: {
                         currency,
                         unit_amount: unitAmount,
-                        product_data: { name: priceData.name, metadata: { plan: input.plan } },
+                        product_data: {
+                            name: priceData.name,
+                            tax_code: priceData.taxCode,
+                            metadata: { plan: input.plan },
+                        },
                     },
                     quantity: 1,
                 }];
@@ -168,6 +173,7 @@ export const subscriptionRouter = router({
                             currency,
                             unit_amount: partnerAddonAmount,
                             product_data: {
+                                tax_code: "txcd_10701411",
                                 name: isCzech ? "Partnerský Blueprint doplněk" : "Partner Blueprint add-on",
                                 metadata: { plan: "blueprint_partner" },
                             },
