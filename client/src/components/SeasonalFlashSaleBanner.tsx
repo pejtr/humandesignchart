@@ -1,68 +1,47 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Sparkles, Timer, ArrowRight, X, Gift } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, X } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export function SeasonalFlashSaleBanner() {
   const { locale, localePath } = useLanguage();
   const isEn = locale === "en";
-  const [dismissed, setDismissed] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(7200); // 2 hours
+  const [dismissed, setDismissed] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.sessionStorage.getItem("seasonal-promo-dismissed") === "1",
+  );
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSecondsLeft(prev => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  if (dismissed) return null;
 
-  if (dismissed || secondsLeft <= 0) return null;
-
-  const hours = Math.floor(secondsLeft / 3600);
-  const minutes = Math.floor((secondsLeft % 3600) / 60);
-  const seconds = secondsLeft % 60;
-  const timerStr = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  const dismiss = () => {
+    window.sessionStorage.setItem("seasonal-promo-dismissed", "1");
+    setDismissed(true);
+  };
 
   return (
-    <div className="bg-gradient-to-r from-purple-900 via-pink-800 to-amber-700 text-white py-2 px-4 shadow-lg relative z-20">
-      <div className="container max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-        <div className="flex items-center gap-2 text-xs font-semibold">
-          <span className="flex items-center gap-1 bg-amber-400 text-purple-950 px-2 py-0.5 rounded-full font-bold uppercase text-[10px]">
-            <Gift className="w-3 h-3" />
-            {isEn ? "Special Offer" : "Sezónní Akce 40% Sleva"}
-          </span>
-          <span>
-            {isEn
-              ? "New Year & Planetary Transit Sale — Claim your discounted Blueprint!"
-              : "Sezónní akce: Získejte plný rozbor s Maríí se slevou 40 %!"}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-lg text-amber-300 font-mono font-bold text-xs">
-            <Timer className="w-3.5 h-3.5" />
-            <span>{timerStr}</span>
-          </div>
-
-          <Button
-            size="sm"
-            className="bg-amber-400 hover:bg-amber-300 text-purple-950 font-bold text-xs px-3.5 py-1 rounded-lg shadow-sm gap-1"
-            asChild
-          >
-            <Link href={localePath("/pricing")}>
-              {isEn ? "Claim Discount" : "Využít Slevu 40 %"}
-              <ArrowRight className="w-3 h-3" />
-            </Link>
-          </Button>
-
-          <button
-            onClick={() => setDismissed(true)}
-            className="text-white/60 hover:text-white transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+    <div className="relative z-20 border-b border-purple-200/60 bg-purple-50/95 px-3 py-1.5 text-purple-950 dark:border-purple-800/50 dark:bg-[#160d2b]/95 dark:text-purple-100">
+      <div className="mx-auto flex max-w-6xl items-center justify-center gap-2 text-center text-[11px] sm:text-xs">
+        <span className="truncate">
+          {isEn
+            ? "Seasonal offer · Save 40% on your personal Blueprint"
+            : "Sezónní nabídka · Osobní rozbor nyní o 40 % výhodněji"}
+        </span>
+        <Link
+          href={localePath("/pricing")}
+          className="inline-flex shrink-0 items-center gap-1 font-semibold text-purple-700 hover:text-purple-900 dark:text-purple-300 dark:hover:text-white"
+        >
+          {isEn ? "View offer" : "Zobrazit"}
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+        <button
+          type="button"
+          onClick={dismiss}
+          className="ml-1 shrink-0 rounded p-0.5 text-purple-500 transition-colors hover:bg-purple-100 hover:text-purple-900 dark:hover:bg-purple-900/50 dark:hover:text-white"
+          aria-label={isEn ? "Close offer" : "Zavřít nabídku"}
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
       </div>
     </div>
   );
