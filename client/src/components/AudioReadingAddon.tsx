@@ -70,6 +70,15 @@ export function AudioReadingAddon({ readingText, isPremium = false, onUpgrade }:
       return;
     }
 
+    if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") {
+      toast.error(
+        isEn
+          ? "Natural voice playback is not supported in this browser."
+          : "Tento prohlížeč nepodporuje přehrání přirozeného českého hlasu.",
+      );
+      return;
+    }
+
     if (isPlaying) {
       window.speechSynthesis.cancel();
       setIsPlaying(false);
@@ -89,7 +98,12 @@ export function AudioReadingAddon({ readingText, isPremium = false, onUpgrade }:
     const voices = await loadSpeechVoices();
     const preferred = voices
       .filter(voice => voice.lang.toLocaleLowerCase().startsWith(isEn ? "en" : "cs"))
+      .filter(voice => isEn || !MALE_CZECH_VOICE_NAMES.some(candidate => voice.name.toLocaleLowerCase().includes(candidate)))
       .sort((left, right) => voiceScore(right, isEn) - voiceScore(left, isEn))[0];
+    if (!preferred && !isEn) {
+      toast.error("Na tomto zařízení není dostupný český ženský hlas. Doporučujeme Microsoft Edge nebo Chrome s hlasem Microsoft Vlasta.");
+      return;
+    }
     if (preferred) utterance.voice = preferred;
     utterance.onend = () => setIsPlaying(false);
     utterance.onerror = () => {
