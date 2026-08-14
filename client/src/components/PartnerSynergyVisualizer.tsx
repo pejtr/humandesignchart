@@ -22,6 +22,7 @@ export function PartnerSynergyVisualizer({
   const destination = isPremium
     ? `${localePath("/compare")}${chartId ? `?chartId=${chartId}` : ""}`
     : `${localePath("/pricing")}#plans`;
+  const hasNamedPartner = Boolean(person2Name && person2Name !== "Partner");
 
   return (
     <Card id="relationship-analysis" className="scroll-mt-36 border border-pink-300/40 dark:border-pink-800/40 bg-gradient-to-br from-pink-950/20 via-background to-purple-950/20 rounded-3xl p-6 sm:p-8 shadow-xl">
@@ -33,17 +34,28 @@ export function PartnerSynergyVisualizer({
               {isEn ? "Relationship synergy" : "Partnerská synergie"}
             </div>
             <h3 className="font-serif font-bold text-2xl text-foreground">
-              {isEn
-                ? `Energetic compatibility: ${person1Name} & ${person2Name}`
-                : `Energetická kompatibilita: ${person1Name} a ${person2Name}`}
+              {hasNamedPartner
+                ? (isEn
+                    ? `Energetic compatibility: ${person1Name} & ${person2Name}`
+                    : `Energetická kompatibilita: ${person1Name} a ${person2Name}`)
+                : (isEn
+                    ? "Where you naturally connect — and where friction may arise"
+                    : "Kde se přirozeně propojíte — a kde může vznikat tření")}
             </h3>
+            {!hasNamedPartner && (
+              <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                {isEn
+                  ? "Choose a second real chart to see attraction, communication patterns and places where you may condition each other."
+                  : "Vyberte druhou skutečnou mapu a uvidíte přitažlivost, komunikační vzorce i místa, kde se můžete navzájem podmiňovat."}
+              </p>
+            )}
           </div>
 
           <Button size="sm" className="bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs rounded-xl px-5 h-10 gap-2 shrink-0" asChild>
             <Link href={destination}>
               <Sparkles className="w-4 h-4" />
               {isPremium
-                ? (isEn ? "Create full relationship report" : "Vytvořit kompletní rozbor vztahu")
+                ? (isEn ? "Choose the second chart" : "Vybrat druhou mapu")
                 : (isEn ? "Unlock with Premium" : "Odemknout v Premium")}
             </Link>
           </Button>
@@ -57,8 +69,8 @@ export function PartnerSynergyVisualizer({
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {isEn
-                ? "Defined gates can connect with a partner's gates and create a continuous shared energy flow."
-                : "Vaše definované brány se mohou propojit s bránami partnera a vytvářet společný proud energie a inspirace."}
+                ? "Shows where two incomplete channels meet. This often feels like immediate attraction, momentum or creative chemistry."
+                : "Ukáže místa, kde se dvě neúplné dráhy spojí v celek. Často je vnímáte jako okamžitou přitažlivost, tah nebo tvůrčí chemii."}
             </p>
           </div>
 
@@ -69,8 +81,8 @@ export function PartnerSynergyVisualizer({
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {isEn
-                ? "Areas where conscious communication helps prevent emotional and mental conditioning."
-                : "Místa, kde vědomá komunikace pomáhá předcházet přebírání mentálního tlaku a emocí."}
+                ? "Reveals where one person's stable energy may override the other. Naming the pattern early makes communication easier."
+                : "Odhalí, kde stabilní energie jednoho může přehlušit druhého. Když vzorec pojmenujete včas, snáze se o něm domluvíte."}
             </p>
           </div>
         </div>

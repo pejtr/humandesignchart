@@ -122,6 +122,23 @@ function AiReadingProgress({ locale }: { locale: string }) {
   );
 }
 
+function getReadingTopicLabel(readingType: string | null, locale: string) {
+  const labels: Record<string, { cs: string; en: string }> = {
+    overview: { cs: "Kompletní přehled", en: "Complete overview" },
+    type_strategy: { cs: "Typ a strategie", en: "Type and strategy" },
+    profile: { cs: "Profil", en: "Profile" },
+    authority: { cs: "Autorita a rozhodování", en: "Authority and decisions" },
+    incarnation_cross: { cs: "Životní poslání", en: "Life purpose" },
+    career: { cs: "Kariéra", en: "Career" },
+    relationships: { cs: "Vztahy", en: "Relationships" },
+    channels: { cs: "Kanály", en: "Channels" },
+    daily_transit: { cs: "Dnešní energie", en: "Today's energy" },
+    moon: { cs: "Luna a její vliv", en: "Moon influence" },
+  };
+  const selected = labels[readingType || "overview"] || labels.overview;
+  return locale === "cs" ? selected.cs : selected.en;
+}
+
 export default function ChartResult({ id: propId }: { id?: string } = {}) {
   const params = useParams<{ id: string }>();
   const [, navigate] = useLocation();
@@ -543,6 +560,8 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
   const czSignature = chart ? (t.hd.signatures as any)[chart.signature] || chart.signature : "";
   const czNotSelf = chart ? (t.hd.notSelfs as any)[chart.notSelf] || chart.notSelf : "";
   const czDefinition = chart ? (t.hd.definitionTypes as any)[chart.definition] || chart.definition : "";
+  const authorityLabel = locale === "cs" ? (authorityDesc?.name || chart.authority) : chart.authority;
+  const readingTopicLabel = getReadingTopicLabel(aiReadingType, locale);
 
   if (!chart) {
     return (
@@ -683,6 +702,32 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
               </div>
             </div>
 
+            <section className="mb-8 overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-background to-amber-500/[0.07] p-5 shadow-sm sm:p-7" aria-label={locale === "cs" ? "První krok ve vaší mapě" : "Your first chart step"}>
+              <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+                <div className="max-w-3xl space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                    {locale === "cs" ? "Váš nejrychlejší začátek" : "Your fastest starting point"}
+                  </p>
+                  <h2 className="font-serif text-2xl font-bold sm:text-3xl">
+                    {locale === "cs" ? "Nejdřív rozhodování, potom detaily" : "Decisions first, details second"}
+                  </h2>
+                  <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
+                    {locale === "cs"
+                      ? `Vaše mapa není seznam vlastností. Je to praktický kompas: jako ${czType} začněte strategií „${czStrategy}“, rozhodnutí ověřujte přes svůj vnitřní mechanismus (${authorityLabel}) a jako signál souladu sledujte ${czSignature.toLowerCase()}.`
+                      : `Your chart is not a list of traits. Use it as a practical compass: begin with “${chart.strategy}”, check decisions through ${authorityLabel}, and notice ${chart.signature.toLowerCase()} as your signal of alignment.`}
+                  </p>
+                </div>
+                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row xl:shrink-0">
+                  <Button asChild className="rounded-xl">
+                    <a href="#ai-reading"><Sparkles className="mr-1.5 h-4 w-4" />{locale === "cs" ? "Vyložit aktuální otázku" : "Explore a current question"}</a>
+                  </Button>
+                  <Button asChild variant="outline" className="rounded-xl">
+                    <a href="#foundations">{locale === "cs" ? "Pochopit základy mapy" : "Understand the foundations"}</a>
+                  </Button>
+                </div>
+              </div>
+            </section>
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Bodygraph Column */}
               <div className="lg:col-span-1">
@@ -819,9 +864,9 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                   <div className="mb-4 flex items-start gap-3">
                     <div className="rounded-xl bg-primary/10 p-2 text-primary"><Sparkles className="h-5 w-5" /></div>
                     <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">{locale === "cs" ? "Samostatná sekce" : "Dedicated section"}</p>
-                      <h2 className="font-serif text-2xl font-bold">{locale === "cs" ? "AI výklad vaší mapy" : "Your AI chart reading"}</h2>
-                      <p className="text-xs text-muted-foreground">{locale === "cs" ? "Vyberte téma, čtěte bez rušivých nabídek a výklad si stáhněte nebo přehrajte." : "Choose a topic, read without distractions, then download or play the result."}</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">{locale === "cs" ? "Začněte tím, co právě řešíte" : "Start with what matters now"}</p>
+                      <h2 className="font-serif text-2xl font-bold">{locale === "cs" ? "Váš osobní výklad krok za krokem" : "Your personal reading, step by step"}</h2>
+                      <p className="text-xs leading-relaxed text-muted-foreground">{locale === "cs" ? "Vyberte otázku, která je pro vás dnes nejdůležitější. Pokud váháte, začněte Autoritou — ukáže vám, jak poznat správné rozhodnutí v těle, ne jen v hlavě." : "Choose the question that matters most today. If unsure, begin with Authority—it shows how to recognize a decision in your body, not only in your mind."}</p>
                     </div>
                   </div>
                   {showPaywall ? (
@@ -847,7 +892,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                           <CardTitle className="font-serif text-xl flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-primary" /> AI výklad vaší mapy
+                            <Sparkles className="w-5 h-5 text-primary" /> {locale === "cs" ? `Výklad: ${readingTopicLabel}` : `Reading: ${readingTopicLabel}`}
                           </CardTitle>
                           <Button
                             variant="outline"
@@ -863,7 +908,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                               URL.revokeObjectURL(url);
                             }}
                           >
-                            <Download className="w-3 h-3" /> Stáhnout
+                            <Download className="w-3 h-3" /> {locale === "cs" ? "Uložit výklad" : "Save reading"}
                           </Button>
                         </div>
                         {/* Reading type selector — always visible */}
@@ -918,7 +963,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                         {/* Thumbs up/down feedback + share reading */}
                         {!aiStreaming && (
                           <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border/20 flex-wrap">
-                            <span className="text-xs text-muted-foreground mr-1">Byl tento výklad užitečný?</span>
+                            <span className="text-xs text-muted-foreground mr-1">{locale === "cs" ? "Pomohl vám výklad uvidět další krok jasněji?" : "Did this reading make your next step clearer?"}</span>
                             <button
                               onClick={() => handleRating("up")}
                               className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${aiRating === "up"
@@ -926,7 +971,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                                 : "bg-muted/30 text-muted-foreground hover:bg-green-50 hover:text-green-600 border border-border/40"
                                 }`}
                             >
-                              👍 {aiRating === "up" ? "Děkujeme!" : "Ano"}
+                              👍 {aiRating === "up" ? (locale === "cs" ? "Děkujeme!" : "Thank you!") : (locale === "cs" ? "Ano, mám jasněji" : "Yes, it is clearer")}
                             </button>
                             <button
                               onClick={() => handleRating("down")}
@@ -935,7 +980,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                                 : "bg-muted/30 text-muted-foreground hover:bg-red-50 hover:text-red-600 border border-border/40"
                                 }`}
                             >
-                              👎 {aiRating === "down" ? "Děkujeme" : "Ne"}
+                              👎 {aiRating === "down" ? (locale === "cs" ? "Děkujeme" : "Thank you") : (locale === "cs" ? "Potřebuji jiný pohled" : "I need another angle")}
                             </button>
                             {/* Share reading button */}
                             {aiReadingId && isAuthenticated && (

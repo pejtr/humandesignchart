@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Copy, Check, Users, Gift, Share2, Sparkles } from "lucide-react";
+import { Check, Gift, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -40,17 +40,17 @@ export function PartnerCompareInvite({ referralCode, chartName }: PartnerCompare
           <div className="space-y-2 text-center md:text-left max-w-xl">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs font-semibold">
               <Gift className="w-3.5 h-3.5" />
-              {isEn ? "Viral Reward Bonus" : "Odměna: +2 AI Kredity pro obě strany"}
+              {isEn ? "Reward for both of you" : "Odměna pro oba: +2 AI kredity"}
             </div>
             <h3 className="text-xl sm:text-2xl font-bold font-serif text-foreground">
               {isEn
-                ? "Compare Compatibility with Partner or Friend"
-                : "Porovnejte kompatibilitu s partnerem nebo kamarádem"}
+                ? "Invite someone close and discover your shared dynamic"
+                : "Pozvěte někoho blízkého a objevte vaši společnou dynamiku"}
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {isEn
-                ? "Send this link to your partner or friend. Once they calculate their chart, both of you will receive +2 Free AI Reading Credits!"
-                : "Pošlete tento odkaz partnerovi či příteli. Jakmile si spočítá svou mapu, získáte oba automaticky +2 AI kredity zdarma!"}
+                ? `Send a friendly invite with a preview. After they create their chart, we will connect it with ${chartName ? `${chartName}'s chart` : "your chart"} and both of you will receive 2 AI credits.`
+                : `Pošlete přívětivou pozvánku s náhledem. Jakmile si druhý člověk vytvoří mapu, propojíme ji s ${chartName ? `mapou „${chartName}“` : "vaší mapou"} a oba získáte 2 AI kredity.`}
             </p>
           </div>
 
@@ -66,8 +66,8 @@ export function PartnerCompareInvite({ referralCode, chartName }: PartnerCompare
                   ? "Copied!"
                   : "Zkopírováno!"
                 : isEn
-                  ? "Copy Partner Link"
-                  : "Zkopírovat odkaz pro partnera"}
+                  ? "Copy invitation with preview"
+                  : "Zkopírovat pozvánku s náhledem"}
             </Button>
           </div>
         </div>

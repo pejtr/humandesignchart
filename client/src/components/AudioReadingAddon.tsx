@@ -128,13 +128,13 @@ export function AudioReadingAddon({ readingText, isPremium = false, onUpgrade }:
                 <Crown className="w-3 h-3" /> Premium
               </span>
               <h4 className="font-serif font-bold text-base text-foreground">
-                {isEn ? "Personal audio reading with Marie" : "Osobní audio výklad s Marií"}
+                {isEn ? "Take your reading with you" : "Vezměte si svůj výklad s sebou"}
               </h4>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {isEn
-                ? "Listen to your current AI interpretation while walking or driving. Included in Premium."
-                : "Poslechněte si aktuální AI výklad při chůzi nebo v autě. Je součástí Premium."}
+                ? "Marie reads the topic currently open below, so you can absorb it while walking, resting or driving. Included in Premium."
+                : "Marie vám česky přečte právě otevřené téma, abyste ho mohli vnímat při chůzi, odpočinku nebo v autě. Součást Premium."}
             </p>
           </div>
         </div>
@@ -149,7 +149,7 @@ export function AudioReadingAddon({ readingText, isPremium = false, onUpgrade }:
           {isPlaying
             ? (isEn ? "Stop" : "Zastavit")
             : isPremium
-              ? (isEn ? "Play my reading" : "Přehrát můj výklad")
+              ? (isEn ? "Listen to the reading" : "Poslechnout výklad")
               : (isEn ? "Unlock Premium" : "Odemknout Premium")}
         </Button>
       </div>
