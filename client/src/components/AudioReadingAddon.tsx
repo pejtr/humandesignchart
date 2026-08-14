@@ -20,6 +20,43 @@ function plainSpeechText(value: string) {
     .trim();
 }
 
+const FEMALE_CZECH_VOICE_NAMES = ["vlasta", "zuzana", "iveta", "tereza", "veronika", "jolana"];
+const MALE_CZECH_VOICE_NAMES = ["jakub", "antonin", "antonín", "vit", "vít"];
+
+function voiceScore(voice: SpeechSynthesisVoice, isEn: boolean) {
+  const name = voice.name.toLocaleLowerCase();
+  const language = voice.lang.toLocaleLowerCase();
+  const requestedLanguage = isEn ? "en" : "cs";
+  let score = language.startsWith(requestedLanguage) ? 100 : 0;
+
+  if (!isEn) {
+    if (FEMALE_CZECH_VOICE_NAMES.some(candidate => name.includes(candidate))) score += 60;
+    if (MALE_CZECH_VOICE_NAMES.some(candidate => name.includes(candidate))) score -= 80;
+  }
+  if (name.includes("natural")) score += 30;
+  if (name.includes("online")) score += 12;
+  if (name.includes("google")) score += 8;
+  if (voice.localService) score += 2;
+
+  return score;
+}
+
+async function loadSpeechVoices() {
+  const synth = window.speechSynthesis;
+  const available = synth.getVoices();
+  if (available.length > 0) return available;
+
+  return new Promise<SpeechSynthesisVoice[]>(resolve => {
+    const finish = () => {
+      window.clearTimeout(timeoutId);
+      synth.removeEventListener("voiceschanged", finish);
+      resolve(synth.getVoices());
+    };
+    const timeoutId = window.setTimeout(finish, 1200);
+    synth.addEventListener("voiceschanged", finish, { once: true });
+  });
+}
+
 export function AudioReadingAddon({ readingText, isPremium = false, onUpgrade }: AudioReadingAddonProps) {
   const { locale } = useLanguage();
   const isEn = locale === "en";
@@ -27,7 +64,7 @@ export function AudioReadingAddon({ readingText, isPremium = false, onUpgrade }:
 
   useEffect(() => () => window.speechSynthesis?.cancel(), []);
 
-  const toggleAudio = () => {
+  const toggleAudio = async () => {
     if (!isPremium) {
       onUpgrade?.();
       return;
@@ -46,9 +83,13 @@ export function AudioReadingAddon({ readingText, isPremium = false, onUpgrade }:
 
     const utterance = new SpeechSynthesisUtterance(plainSpeechText(readingText));
     utterance.lang = isEn ? "en-US" : "cs-CZ";
-    utterance.rate = 0.92;
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(voice => voice.lang.toLowerCase().startsWith(isEn ? "en" : "cs"));
+    utterance.rate = isEn ? 0.9 : 0.86;
+    utterance.pitch = isEn ? 1 : 1.04;
+    utterance.volume = 1;
+    const voices = await loadSpeechVoices();
+    const preferred = voices
+      .filter(voice => voice.lang.toLocaleLowerCase().startsWith(isEn ? "en" : "cs"))
+      .sort((left, right) => voiceScore(right, isEn) - voiceScore(left, isEn))[0];
     if (preferred) utterance.voice = preferred;
     utterance.onend = () => setIsPlaying(false);
     utterance.onerror = () => {

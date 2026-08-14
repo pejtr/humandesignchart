@@ -587,48 +587,52 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
             </Button>
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
-              <div>
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 mb-8">
+              <div className="min-w-0">
                 <h1 className="font-serif text-3xl md:text-4xl font-bold mb-2">{chartMeta?.name || t.chart.yourChart}</h1>
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge className={TYPE_COLORS[chart.type] || "bg-primary/20 text-primary"}>{czType}</Badge>
                   <Badge variant="outline">{chart.profile} {chart.profileName}</Badge>
                   <Badge variant="outline">{czDefinition}</Badge>
+                  {savedChartId && (
+                    <Badge variant="secondary" className="whitespace-nowrap">
+                      <Check className="mr-1 h-3 w-3" /> {t.common.saved}
+                    </Badge>
+                  )}
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="grid w-full grid-cols-1 min-[430px]:grid-cols-2 gap-2 lg:flex lg:w-auto lg:max-w-[68%] lg:flex-wrap lg:items-center lg:justify-end">
                 {!savedChartId && (
-                  <Button onClick={handleSave} disabled={saveMutation.isPending}>
+                  <Button onClick={handleSave} disabled={saveMutation.isPending} className="w-full min-w-0 lg:w-auto">
                     <Save className="w-4 h-4 mr-1.5" />
                     {saveMutation.isPending ? t.chart.saving : t.chart.saveChart}
                   </Button>
                 )}
                 {savedChartId && (
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="py-1.5 px-3">{t.common.saved}</Badge>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(localePath("/compare") + `?chartId=${savedChartId}`)}
-                      className="border-primary/30 text-primary hover:bg-primary/10"
-                    >
-                      <GitCompare className="w-4 h-4 mr-1.5" />
-                      {locale === "cs" ? "Composite" : "Composite"}
-                    </Button>
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(localePath("/compare") + `?chartId=${savedChartId}`)}
+                    className="w-full min-w-0 border-primary/30 text-primary hover:bg-primary/10 lg:w-auto"
+                  >
+                    <GitCompare className="w-4 h-4 mr-1.5 shrink-0" />
+                    {locale === "cs" ? "Porovnat mapu" : "Compare chart"}
+                  </Button>
                 )}
                 {shareUrl ? (
-                  <SocialShareButtons
-                    url={shareUrl}
-                    title={locale === "cs" ? `Moje Human Design Mapa: ${chartMeta?.name}` : `My Human Design Chart: ${chartMeta?.name}`}
-                  />
+                  <div className="col-span-full min-w-0 min-[540px]:col-span-1 lg:w-auto">
+                    <SocialShareButtons
+                      url={shareUrl}
+                      title={locale === "cs" ? `Moje Human Design Mapa: ${chartMeta?.name}` : `My Human Design Chart: ${chartMeta?.name}`}
+                    />
+                  </div>
                 ) : (
-                  <Button variant="outline" size="sm" onClick={handleShare} disabled={shareMutation.isPending}>
+                  <Button variant="outline" size="sm" onClick={handleShare} disabled={shareMutation.isPending} className="w-full min-w-0 lg:w-auto">
                     {shareMutation.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : copied ? <Check className="w-4 h-4 mr-1 text-green-500" /> : <Share2 className="w-4 h-4 mr-1" />}
                     {shareMutation.isPending ? "Sdílení..." : copied ? "Zkopírováno!" : "Sdílet mapu"}
                   </Button>
                 )}
-                <Button variant="outline" size="sm" onClick={async () => {
+                <Button variant="outline" size="sm" className="w-full min-w-0 lg:w-auto" onClick={async () => {
                   const canUseBlueprintPdf = (subStatus?.blueprintPdfCredits ?? 0) > 0;
                   if (!subStatus?.isPremium && !canUseBlueprintPdf) {
                     setShowPaywall(true);
@@ -671,10 +675,10 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                     }
                     setShowPosterModal(true);
                   }}
-                  className="gap-1.5 border-amber-300 dark:border-amber-800"
+                  className="w-full min-w-0 gap-1.5 border-amber-300 dark:border-amber-800 lg:w-auto"
                 >
-                  <Frame className="w-4 h-4 text-amber-500" />
-                  {locale === "cs" ? "Plakát A3 · Premium" : "A3 Poster · Premium"}
+                  <Frame className="w-4 h-4 shrink-0 text-amber-500" />
+                  <span className="truncate">{locale === "cs" ? "Plakát A3 · Premium" : "A3 Poster · Premium"}</span>
                 </Button>
               </div>
             </div>
