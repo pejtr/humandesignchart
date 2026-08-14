@@ -176,6 +176,21 @@ export default function Dashboard() {
   const focusStrategy = focusData?.strategy ? (((t.hd as any)?.strategy)?.[focusData.strategy] || focusData.strategy) : null;
   const focusAuthority = focusData?.authority || null;
   const focusProfile = focusData?.profile || null;
+  const focusStrategyLabel = locale === "en" ? focusStrategy : ({
+    "To Respond": "Reagovat",
+    "Wait for the Invitation": "Čekat na pozvání",
+    "Inform Before Acting": "Informovat před jednáním",
+    "Wait a Lunar Cycle": "Počkat lunární cyklus",
+  } as Record<string, string>)[focusStrategy || ""] || focusStrategy;
+  const focusAuthorityLabel = locale === "en" ? focusAuthority : ({
+    Sacral: "Sakrální autorita",
+    Emotional: "Emoční autorita",
+    Splenic: "Slezinná autorita",
+    Ego: "Ego autorita",
+    "Self-Projected": "Sebevyjádřená autorita",
+    "Mental / Environmental": "Mentální autorita",
+    Lunar: "Lunární autorita",
+  } as Record<string, string>)[focusAuthority || ""] || focusAuthority;
   const isMember = !!subQuery.data?.isPremium;
 
   return (
@@ -248,7 +263,7 @@ export default function Dashboard() {
                     </Badge>
                     {focusType && <Badge variant="outline">{focusType}</Badge>}
                     {focusProfile && <Badge variant="outline">{locale === "en" ? "Profile" : "Profil"} {focusProfile}</Badge>}
-                    {focusAuthority && <Badge variant="outline">{focusAuthority}</Badge>}
+                    {focusAuthorityLabel && <Badge variant="outline">{focusAuthorityLabel}</Badge>}
                   </div>
 
                   {focusChart && focusData ? (
@@ -258,8 +273,8 @@ export default function Dashboard() {
                       </h2>
                       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
                         {locale === "en"
-                          ? `As a ${focusType || "Human Design type"}, you do not need to force the next step. Notice what arrives, check it through ${focusAuthority || "your authority"}, and let ${focusStrategy || "your strategy"} reduce resistance.`
-                          : `Jako ${focusType || "váš typ"} nemusíte další krok tlačit silou. Všimněte si, co k vám přichází, ověřte to přes ${focusAuthority || "svou autoritu"} a nechte strategii „${focusStrategy || "reagovat"}“ snížit odpor.`}
+                          ? `As a ${focusType || "Human Design type"}, you do not need to force the next step. Notice what arrives, check it through ${focusAuthorityLabel || "your authority"}, and let ${focusStrategyLabel || "your strategy"} reduce resistance.`
+                          : `Jako ${focusType || "váš typ"} nemusíte další krok tlačit silou. Všimněte si, co k vám přichází, ověřte to přes ${focusAuthorityLabel || "svou autoritu"} a nechte strategii „${focusStrategyLabel || "reagovat"}“ snížit odpor.`}
                       </p>
                       <div className="mt-6 flex flex-wrap gap-2">
                         <Link href={localePath(`/chart/${focusChart.id}`)}>
@@ -293,7 +308,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <aside className="grid content-start gap-4 sm:grid-cols-2 xl:grid-cols-1">
+              <aside className="grid content-start gap-4 md:grid-cols-3 xl:grid-cols-1">
                 <TransitGateAlerts compact />
                 <DailyWheelOfFortune compact />
                 <Card className={`border-border/50 ${isMember ? "border-purple-500/25 bg-purple-500/[0.08]" : "bg-card"}`}>
