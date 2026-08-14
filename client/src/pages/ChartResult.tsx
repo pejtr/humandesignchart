@@ -560,7 +560,9 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
   const czSignature = chart ? (t.hd.signatures as any)[chart.signature] || chart.signature : "";
   const czNotSelf = chart ? (t.hd.notSelfs as any)[chart.notSelf] || chart.notSelf : "";
   const czDefinition = chart ? (t.hd.definitionTypes as any)[chart.definition] || chart.definition : "";
-  const authorityLabel = locale === "cs" ? (authorityDesc?.name || chart.authority) : chart.authority;
+  const authorityLabel = chart
+    ? (locale === "cs" ? (authorityDesc?.name || chart.authority) : chart.authority)
+    : "";
   const readingTopicLabel = getReadingTopicLabel(aiReadingType, locale);
 
   if (!chart) {
