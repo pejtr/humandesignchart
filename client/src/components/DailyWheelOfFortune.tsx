@@ -16,7 +16,7 @@ const REWARDS = [
   { label: "Denní Moudrost", credits: 0, color: "#3b82f6" },
 ];
 
-export function DailyWheelOfFortune() {
+export function DailyWheelOfFortune({ compact = false }: { compact?: boolean }) {
   const { locale } = useLanguage();
   const isEn = locale === "en";
   const [spinning, setSpinning] = useState(false);
@@ -50,25 +50,25 @@ export function DailyWheelOfFortune() {
   };
 
   return (
-    <Card className="border border-purple-300/40 dark:border-purple-800/40 bg-gradient-to-br from-purple-950/20 via-background to-amber-950/10 rounded-2xl overflow-hidden shadow-lg p-6">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="space-y-2 text-center md:text-left max-w-md">
+    <Card className={`border border-purple-300/40 dark:border-purple-800/40 bg-gradient-to-br from-purple-950/20 via-background to-amber-950/10 rounded-2xl overflow-hidden shadow-lg ${compact ? "p-4" : "p-6"}`}>
+      <div className={`flex items-center justify-between ${compact ? "gap-3" : "flex-col md:flex-row gap-6"}`}>
+        <div className={`${compact ? "min-w-0 space-y-1" : "space-y-2 text-center md:text-left max-w-md"}`}>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 text-xs font-semibold">
             <Trophy className="w-3.5 h-3.5" />
             {isEn ? "Daily Wheel of Fortune" : "Denní Kolo Odměn"}
           </div>
-          <h3 className="font-serif font-bold text-xl text-foreground">
-            {isEn ? "Spin for Daily Free AI Credits" : "Zatočte si o dnešní AI Kredity"}
+          <h3 className={`font-serif font-bold text-foreground ${compact ? "text-base" : "text-xl"}`}>
+            {isEn ? "Your daily reward" : "Dnešní odměna"}
           </h3>
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className={`text-xs text-muted-foreground leading-relaxed ${compact ? "line-clamp-2" : ""}`}>
             {isEn
               ? "Spin the cosmic wheel once every 24 hours to earn free AI reading credits and keep your daily streak alive!"
               : "Zatočte si vesmírným kolem jednou za 24 hodin, získejte kredity zdarma a udržte svou denní sérii!"}
           </p>
         </div>
 
-        <div className="flex flex-col items-center gap-4 shrink-0">
-          <div className="relative w-40 h-40 flex items-center justify-center">
+        <div className={`flex flex-col items-center shrink-0 ${compact ? "gap-2" : "gap-4"}`}>
+          <div className={`relative flex items-center justify-center ${compact ? "w-20 h-20" : "w-40 h-40"}`}>
             {/* Pointer */}
             <div className="absolute -top-2 z-20 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[14px] border-t-amber-400 drop-shadow-md" />
 
@@ -104,14 +104,14 @@ export function DailyWheelOfFortune() {
           <Button
             onClick={handleSpin}
             disabled={spinning || !!wonReward}
-            className="bg-amber-500 hover:bg-amber-400 text-purple-950 font-bold text-xs px-6 py-2 rounded-xl shadow-md gap-2"
+            className={`bg-amber-500 hover:bg-amber-400 text-purple-950 font-bold text-xs rounded-xl shadow-md gap-2 ${compact ? "h-8 px-3" : "px-6 py-2"}`}
           >
             <Sparkles className="w-4 h-4" />
             {spinning
               ? isEn ? "Spinning..." : "Točí se..."
               : wonReward
                 ? isEn ? `Won: ${wonReward}` : `Vyhráno: ${wonReward}`
-                : isEn ? "Spin Wheel Free" : "Zatočit kolem zdarma"}
+                : isEn ? "Spin" : "Zatočit"}
           </Button>
         </div>
       </div>

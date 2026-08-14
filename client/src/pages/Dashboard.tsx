@@ -174,6 +174,8 @@ export default function Dashboard() {
   const focusData = focusChart?.chartData as any;
   const focusType = focusData?.type ? ((t.types as any)[focusData.type] || focusData.type) : null;
   const focusStrategy = focusData?.strategy ? (((t.hd as any)?.strategy)?.[focusData.strategy] || focusData.strategy) : null;
+  const focusAuthority = focusData?.authority || null;
+  const focusProfile = focusData?.profile || null;
   const isMember = !!subQuery.data?.isPremium;
 
   return (
@@ -209,122 +211,121 @@ export default function Dashboard() {
           transition={{ duration: 0.5 }}
           className="flex-1 pt-24 pb-16 relative z-10"
         >
-          <div className="container max-w-5xl">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+          <div className="container max-w-7xl">
+            {/* Desktop command center */}
+            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <h1 className="font-serif text-3xl font-bold mb-1">{t.dashboard.title}</h1>
-                <p className="text-muted-foreground">
-                  {locale === 'en'
-                    ? `Welcome back, ${user?.name || 'Explorer'}. You have ${charts.length} saved chart${charts.length !== 1 ? 's' : ''}.`
-                    : `Vítejte zpět, ${user?.name || 'Průzkumníku'}. Máte ${charts.length} uložen${charts.length === 1 ? 'ou' : charts.length < 5 ? 'é' : 'ých'} map${charts.length === 1 ? 'u' : charts.length < 5 ? 'y' : ''}.`
-                  }
+                <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.22em] text-primary">
+                  {locale === "en" ? "Personal command center" : "Osobní řídicí centrum"}
+                </p>
+                <h1 className="font-serif text-3xl font-bold md:text-4xl">
+                  {locale === "en" ? "Your compass for today" : "Váš kompas pro dnešek"}
+                </h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {locale === "en"
+                    ? `${user?.name || "Explorer"}, everything important is now within one decision.`
+                    : `${user?.name || "Průzkumníku"}, vše důležité máte nyní na dosah jednoho rozhodnutí.`}
                 </p>
               </div>
-              <Link href={localePath("/calculate")}>
-                <Button className="bg-primary text-primary-foreground">
-                  <Plus className="w-4 h-4 mr-1.5" />
-                  {locale === 'en' ? 'New Chart' : 'Nová mapa'}
-                </Button>
-              </Link>
+              <div className="flex gap-2">
+                <Link href={localePath("/ai-guide")}>
+                  <Button variant="outline" className="gap-1.5"><Sparkles className="h-4 w-4" />{locale === "en" ? "Ask Marie" : "Zeptat se Marie"}</Button>
+                </Link>
+                <Link href={localePath("/calculate")}>
+                  <Button className="gap-1.5"><Plus className="h-4 w-4" />{locale === "en" ? "New chart" : "Nová mapa"}</Button>
+                </Link>
+              </div>
             </div>
 
-            {/* Daily Wheel of Fortune Retention Card */}
-            <div className="mb-8">
-              <DailyWheelOfFortune />
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-4 mb-8">
-              <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card">
-                <div className="absolute -right-10 -top-10 opacity-10 pointer-events-none">
-                  <SacredGeometry className="w-48 h-48" />
-                </div>
-                <CardContent className="relative p-5 md:p-6">
-                  <div className="flex items-center gap-2 mb-3 text-primary text-sm font-semibold">
-                    <Sparkles className="w-4 h-4" />
-                    {locale === "en" ? "Your focus for today" : "Váš dnešní fokus"}
+            <section className="mb-7 grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(310px,0.75fr)]">
+              <Card className="relative overflow-hidden border-primary/25 bg-gradient-to-br from-primary/[0.14] via-card to-amber-500/[0.08] shadow-xl">
+                <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
+                <div className="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-amber-400/10 blur-3xl" />
+                <CardContent className="relative flex h-full flex-col p-6 md:p-8">
+                  <div className="mb-5 flex flex-wrap items-center gap-2">
+                    <Badge className="border-primary/20 bg-primary/10 text-primary hover:bg-primary/10">
+                      <Sparkles className="mr-1 h-3 w-3" />{locale === "en" ? "Today's compass" : "Dnešní kompas"}
+                    </Badge>
+                    {focusType && <Badge variant="outline">{focusType}</Badge>}
+                    {focusProfile && <Badge variant="outline">{locale === "en" ? "Profile" : "Profil"} {focusProfile}</Badge>}
+                    {focusAuthority && <Badge variant="outline">{focusAuthority}</Badge>}
                   </div>
+
                   {focusChart && focusData ? (
                     <>
-                      <h2 className="font-serif text-2xl font-semibold mb-2">
-                        {locale === "en" ? "Return to your Strategy" : "Vraťte se ke své strategii"}
+                      <h2 className="max-w-3xl font-serif text-3xl font-bold leading-tight md:text-4xl">
+                        {locale === "en" ? "What is life asking you to respond to today?" : "Na co vás dnes život žádá odpovědět?"}
                       </h2>
-                      <p className="text-muted-foreground max-w-xl mb-4">
+                      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
                         {locale === "en"
-                          ? `As a ${focusType || "Human Design type"}, notice where your Strategy is asking for less resistance today.`
-                          : `Jako ${focusType || "váš typ"} dnes sledujte, kde vám vaše Strategie pomáhá jednat s menším odporem.`}
-                        {focusStrategy ? ` ${locale === "en" ? "Your strategy:" : "Vaše strategie:"} ${focusStrategy}.` : ""}
+                          ? `As a ${focusType || "Human Design type"}, you do not need to force the next step. Notice what arrives, check it through ${focusAuthority || "your authority"}, and let ${focusStrategy || "your strategy"} reduce resistance.`
+                          : `Jako ${focusType || "váš typ"} nemusíte další krok tlačit silou. Všimněte si, co k vám přichází, ověřte to přes ${focusAuthority || "svou autoritu"} a nechte strategii „${focusStrategy || "reagovat"}“ snížit odpor.`}
                       </p>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="mt-6 flex flex-wrap gap-2">
                         <Link href={localePath(`/chart/${focusChart.id}`)}>
-                          <Button size="sm" className="gap-1.5"><Compass className="w-4 h-4" />{locale === "en" ? "Open my chart" : "Otevřít moji mapu"}</Button>
+                          <Button className="gap-1.5"><Compass className="h-4 w-4" />{locale === "en" ? "Continue with my chart" : "Pokračovat v mojí mapě"}</Button>
                         </Link>
                         <Link href={localePath("/daily-transit")}>
-                          <Button size="sm" variant="outline" className="gap-1.5"><Sun className="w-4 h-4" />{locale === "en" ? "Today's transit" : "Dnešní tranzit"}</Button>
+                          <Button variant="outline" className="gap-1.5 bg-background/60"><Sun className="h-4 w-4" />{locale === "en" ? "Read today's energy" : "Přečíst dnešní energii"}</Button>
                         </Link>
                       </div>
                     </>
                   ) : (
                     <>
-                      <h2 className="font-serif text-2xl font-semibold mb-2">{locale === "en" ? "Start your personal journey" : "Začněte svou osobní cestu"}</h2>
-                      <p className="text-muted-foreground mb-4">{locale === "en" ? "Create your first chart to unlock a daily focus tailored to your design." : "Vytvořte si první mapu a odemkněte denní fokus podle svého designu."}</p>
-                      <Link href={localePath("/calculate")}><Button size="sm" className="gap-1.5"><Plus className="w-4 h-4" />{locale === "en" ? "Create my chart" : "Vytvořit mapu"}</Button></Link>
+                      <h2 className="font-serif text-3xl font-bold md:text-4xl">{locale === "en" ? "Build your personal compass" : "Vytvořte si osobní kompas"}</h2>
+                      <p className="mt-3 max-w-xl text-muted-foreground">{locale === "en" ? "Create your first chart and turn abstract information into practical guidance." : "Vytvořte první mapu a proměňte abstraktní informace v praktické vedení."}</p>
+                      <Link href={localePath("/calculate")} className="mt-6"><Button><Plus className="mr-1.5 h-4 w-4" />{locale === "en" ? "Create my chart" : "Vytvořit mapu"}</Button></Link>
                     </>
                   )}
-                </CardContent>
-              </Card>
 
-              {/* Fáze 6 & Fáze 7 Retention Components */}
-              <TransitGateAlerts />
-              <EmotionalTracker />
-              <Card className="border-border/50 bg-card">
-                <CardContent className="p-5">
-                  <h3 className="font-serif text-base font-semibold mb-1">
-                    {locale === "en" ? "Share your experience" : "Sdílejte svou zkušenost"}
-                  </h3>
-                  <p className="text-xs text-muted-foreground mb-4">
-                    {locale === "en"
-                      ? "Help others discover Human Design by sharing your journey."
-                      : "Pomozte ostatním objevit Human Design sdílením své cesty."}
-                  </p>
-                  <TestimonialForm hdType={focusData?.type as string | undefined} />
-                </CardContent>
-              </Card>
-              <FamilyTreeChart />
-              <DailyAffirmationsWidget />
-
-              <Card className={`border-border/50 ${isMember ? "bg-purple-500/10 border-purple-500/25" : "bg-card"}`}>
-                <CardContent className="p-5 md:p-6 h-full flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-semibold text-muted-foreground">{locale === "en" ? "Your membership" : "Vaše členství"}</span>
-                      {isMember ? <Crown className="w-5 h-5 text-purple-400" /> : <Lock className="w-5 h-5 text-muted-foreground" />}
-                    </div>
-                    <p className="font-serif text-xl font-semibold mb-1">{isMember ? (locale === "en" ? "Premium is active" : "Premium je aktivní") : (locale === "en" ? "Free explorer" : "Bezplatný průzkumník")}</p>
-                    <p className="text-sm text-muted-foreground">{isMember ? (locale === "en" ? "Your saved charts, AI readings and advanced tools are ready." : "Vaše mapy, AI výklady a pokročilé nástroje jsou připravené.") : `${subQuery.data?.freeReadingsLeft ?? 0} ${locale === "en" ? "free AI readings remaining" : "bezplatných AI výkladů zbývá"}`}</p>
+                  <div className="mt-auto grid grid-cols-2 gap-2 pt-7 md:grid-cols-4">
+                    {[
+                      { href: focusChart ? `/chart/${focusChart.id}#ai-reading` : "/calculate", icon: Sparkles, label: locale === "en" ? "Personal reading" : "Osobní výklad" },
+                      { href: "/compare", icon: Users, label: locale === "en" ? "Relationships" : "Vztahy" },
+                      { href: "/daily-transit", icon: Sun, label: locale === "en" ? "Energy today" : "Energie dnes" },
+                      { href: "/transit-calendar", icon: Calendar, label: locale === "en" ? "Plan ahead" : "Plánovat dopředu" },
+                    ].map(({ href, icon: Icon, label }) => (
+                      <Link key={label} href={localePath(href)} className="group flex items-center gap-2 rounded-xl border border-border/50 bg-background/55 px-3 py-2.5 text-xs font-semibold backdrop-blur transition hover:-translate-y-0.5 hover:border-primary/40 hover:bg-background">
+                        <Icon className="h-4 w-4 text-primary" /><span>{label}</span>
+                      </Link>
+                    ))}
                   </div>
-                  <Link href={localePath("/pricing")} className="mt-4"><Button variant={isMember ? "outline" : "default"} size="sm" className="w-full gap-1.5">{isMember ? (locale === "en" ? "Explore all benefits" : "Prohlédnout výhody") : (locale === "en" ? "Unlock Premium" : "Odemknout Premium")}<Zap className="w-4 h-4" /></Button></Link>
                 </CardContent>
               </Card>
-            </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-              {[
-                { label: locale === "en" ? "Saved charts" : "Uložené mapy", value: charts.length, icon: Compass },
-                { label: locale === "en" ? "AI readings" : "AI výklady", value: readings.length || "—", icon: Sparkles },
-                { label: locale === "en" ? "Free readings left" : "Volné výklady", value: isMember ? "∞" : (subQuery.data?.freeReadingsLeft ?? "—"), icon: Zap },
-                { label: locale === "en" ? "Daily practice" : "Denní praxe", value: "→", icon: Calendar },
-              ].map(({ label, value, icon: Icon }) => (
-                <Card key={label} className="border-border/40 bg-card/70"><CardContent className="p-4"><Icon className="w-4 h-4 text-primary mb-2" /><div className="text-xl font-semibold">{value}</div><div className="text-xs text-muted-foreground mt-1">{label}</div></CardContent></Card>
-              ))}
+              <aside className="grid content-start gap-4 sm:grid-cols-2 xl:grid-cols-1">
+                <TransitGateAlerts compact />
+                <DailyWheelOfFortune compact />
+                <Card className={`border-border/50 ${isMember ? "border-purple-500/25 bg-purple-500/[0.08]" : "bg-card"}`}>
+                  <CardContent className="flex items-center gap-4 p-4">
+                    <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${isMember ? "bg-purple-500/15 text-purple-500" : "bg-muted text-muted-foreground"}`}>
+                      {isMember ? <Crown className="h-5 w-5" /> : <Lock className="h-5 w-5" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{locale === "en" ? "Membership" : "Členství"}</p>
+                      <p className="truncate font-semibold">{isMember ? (locale === "en" ? "Premium active" : "Premium aktivní") : (locale === "en" ? "Free plan" : "Bezplatný plán")}</p>
+                    </div>
+                    <Link href={localePath("/pricing")}><Button size="sm" variant="ghost" className="px-2 text-primary"><Zap className="h-4 w-4" /></Button></Link>
+                  </CardContent>
+                </Card>
+              </aside>
+            </section>
+
+            <div className="mb-4 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">{locale === "en" ? "Your workspace" : "Váš pracovní prostor"}</p>
+                <h2 className="font-serif text-2xl font-bold">{locale === "en" ? "Charts, readings and practice" : "Mapy, výklady a praxe"}</h2>
+              </div>
+              <p className="hidden text-xs text-muted-foreground md:block">{charts.length} {locale === "en" ? "saved charts" : "uložených map"} · {isMember ? "Premium" : `${subQuery.data?.freeReadingsLeft ?? 0} ${locale === "en" ? "readings left" : "výkladů zbývá"}`}</p>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-1 mb-6 border-b border-border/40">
+            <div className="sticky top-24 z-20 mb-6 flex gap-1 overflow-x-auto rounded-2xl border border-border/50 bg-background/90 p-1.5 shadow-sm backdrop-blur-xl">
               <button
                 onClick={() => setActiveTab("charts")}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${activeTab === "charts"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === "charts"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                   }`}
               >
                 <Compass className="w-4 h-4" />
@@ -337,9 +338,9 @@ export default function Dashboard() {
               </button>
               <button
                 onClick={() => setActiveTab("readings")}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${activeTab === "readings"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === "readings"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                   }`}
               >
                 <Sparkles className="w-4 h-4" />
@@ -352,9 +353,9 @@ export default function Dashboard() {
               </button>
               <button
                 onClick={() => setActiveTab("transit")}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${activeTab === "transit"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === "transit"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                   }`}
               >
                 <Sun className="w-4 h-4" />
@@ -362,9 +363,9 @@ export default function Dashboard() {
               </button>
               <button
                 onClick={() => setActiveTab("subscription")}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${activeTab === "subscription"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === "subscription"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                   }`}
               >
                 <CreditCard className="w-4 h-4" />
@@ -377,9 +378,9 @@ export default function Dashboard() {
               </button>
               <button
                 onClick={() => setActiveTab("settings")}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${activeTab === "settings"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === "settings"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                   }`}
               >
                 <Settings className="w-4 h-4" />
@@ -785,6 +786,45 @@ export default function Dashboard() {
             {/* ─── Settings Tab ─── */}
             {activeTab === "settings" && (
               <SettingsSection />
+            )}
+
+            {activeTab === "charts" && (
+              <details className="group mt-8 rounded-3xl border border-border/50 bg-card/55 shadow-sm backdrop-blur">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 marker:content-none sm:px-6">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                      {locale === "en" ? "Deeper practice" : "Hlubší praxe"}
+                    </p>
+                    <h2 className="font-serif text-xl font-bold">
+                      {locale === "en" ? "Journal, family and affirmations" : "Deník, rodina a afirmace"}
+                    </h2>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {locale === "en" ? "Open only when you want to go deeper." : "Otevřete jen tehdy, když chcete jít více do hloubky."}
+                    </p>
+                  </div>
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform group-open:rotate-180">
+                    <ChevronDown className="h-4 w-4" />
+                  </div>
+                </summary>
+                <div className="grid gap-4 border-t border-border/40 p-4 sm:p-6 xl:grid-cols-2 [&>*]:my-0">
+                  <EmotionalTracker />
+                  <DailyAffirmationsWidget />
+                  <FamilyTreeChart />
+                  <Card className="border-border/50 bg-card">
+                    <CardContent className="p-5">
+                      <h3 className="font-serif text-base font-semibold mb-1">
+                        {locale === "en" ? "Share your experience" : "Sdílejte svou zkušenost"}
+                      </h3>
+                      <p className="text-xs text-muted-foreground mb-4">
+                        {locale === "en"
+                          ? "Help others discover Human Design by sharing your journey."
+                          : "Pomozte ostatním objevit Human Design sdílením své cesty."}
+                      </p>
+                      <TestimonialForm hdType={focusData?.type as string | undefined} />
+                    </CardContent>
+                  </Card>
+                </div>
+              </details>
             )}
 
           </div>
