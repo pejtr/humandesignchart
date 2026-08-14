@@ -99,20 +99,17 @@ export const chatRouter = router({
         locale: input.locale,
         title: null,
         messageCount: 0,
-        lastMessageAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
       });
 
       const insertId = (result as any).insertId ?? (result as any)[0]?.insertId;
-      return {
-        id: Number(insertId),
-        userId: ctx.user.id,
-        chartId: input.chartId ?? null,
-        locale: input.locale,
-        title: null,
-        messageCount: 0,
-      };
+      const created = await db.select().from(chatConversations)
+        .where(and(
+          eq(chatConversations.id, Number(insertId)),
+          eq(chatConversations.userId, ctx.user.id)
+        ))
+        .limit(1);
+
+      return created[0];
     }),
 
   /** List all conversations for the current user */

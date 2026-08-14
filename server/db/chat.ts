@@ -28,13 +28,20 @@ export async function getOrCreateConversation(userId: number, chartId: number | 
         chartId,
         locale,
         messageCount: 0,
-        lastMessageAt: new Date().toISOString(),
     };
 
     const result = await db.insert(chatConversations).values(newConversation);
     const id = result[0].insertId;
 
-    return { ...newConversation, id };
+    // Read the row back so database-managed timestamp defaults are returned in
+    // the same shape as an existing conversation. ISO strings are intentionally
+    // not written to MySQL TIMESTAMP columns because strict SQL mode rejects
+    // the `T`/`Z` format.
+    const created = await db.select().from(chatConversations)
+        .where(eq(chatConversations.id, id))
+        .limit(1);
+
+    return created[0];
 }
 
 export async function getChatMessages(conversationId: number) {
@@ -63,7 +70,7 @@ export async function saveChatMessage(conversationId: number, userId: number, ro
     await db.update(chatConversations)
         .set({
             messageCount: sql`${chatConversations.messageCount} + 1`,
-            lastMessageAt: new Date().toISOString(),
+            lastMessageAt: sql`CURRENT_TIMESTAMP`,
         })
         .where(eq(chatConversations.id, conversationId));
 }
@@ -77,7 +84,7 @@ export async function clearChatHistory(conversationId: number) {
     await db.update(chatConversations)
         .set({
             messageCount: 0,
-            lastMessageAt: new Date().toISOString(),
+            lastMessageAt: sql`CURRENT_TIMESTAMP`,
         })
         .where(eq(chatConversations.id, conversationId));
 }
