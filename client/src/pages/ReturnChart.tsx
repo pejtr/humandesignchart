@@ -115,8 +115,6 @@ export default function ReturnChart() {
         birthPlace: selectedChart.birthPlace,
         latitude: parseFloat(selectedChart.latitude),
         longitude: parseFloat(selectedChart.longitude),
-        timezoneOffset: 0,
-        timezone: selectedChart.timezone,
       });
 
       setReturnData(result);

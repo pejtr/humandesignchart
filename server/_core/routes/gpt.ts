@@ -4,20 +4,22 @@ export function registerGptRoutes(app: Express) {
   // ─── Custom GPT SEO Backlink Endpoint ──────────────────────────────────
   app.post("/api/gpt/calculate", async (req: Request, res: Response) => {
     try {
-      const { birthDate, birthTime, latitude, longitude, timezoneOffset, timezone } = req.body;
-      if (!birthDate || !birthTime || latitude == null || longitude == null || timezoneOffset == null) {
+      const { birthDate, birthTime, latitude, longitude, disambiguation } = req.body;
+      if (!birthDate || !birthTime || latitude == null || longitude == null) {
         return res.status(400).json({ error: "Missing required fields" });
       }
       const { calculateChart } = await import("../../humandesign");
-      const chart = calculateChart(
+      const { lookupIanaTimezone } = await import("../../humandesign/timezone");
+      const chart = calculateChart({
+        name: "API request",
         birthDate,
         birthTime,
-        "API request",
-        Number(latitude),
-        Number(longitude),
-        Number(timezoneOffset),
-        timezone || "UTC",
-      );
+        birthPlace: "API request",
+        latitude: Number(latitude),
+        longitude: Number(longitude),
+        timezone: lookupIanaTimezone(Number(latitude), Number(longitude)),
+        disambiguation,
+      });
       const protocol = req.hostname.includes("localhost") ? "http" : "https";
       const isEn = req.hostname.includes("default") || req.hostname.includes("app") || req.hostname.includes("chart.com");
       const domain = isEn ? "www.humandesignchart.app" : "www.humandesignmapa.cz";
@@ -64,10 +66,9 @@ export function registerGptRoutes(app: Express) {
                       "birthTime": { "type": "string", "example": "14:30" },
                       "latitude": { "type": "number", "example": 50.0755 },
                       "longitude": { "type": "number", "example": 14.4378 },
-                      "timezone": { "type": "string", "example": "Europe/Prague" },
-                      "timezoneOffset": { "type": "number", "example": 1 }
+                      "disambiguation": { "type": "string", "enum": ["earlier", "later"] }
                     },
-                    "required": ["birthDate", "birthTime", "latitude", "longitude", "timezoneOffset"]
+                    "required": ["birthDate", "birthTime", "latitude", "longitude"]
                   }
                 }
               }

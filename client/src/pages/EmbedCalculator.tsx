@@ -7,6 +7,7 @@ import { Loader2, MapPin, Compass } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSEO } from "@/hooks/useSEO";
+import { TimeDisambiguationField, type TimeDisambiguation } from "@/components/TimeDisambiguationField";
 
 export default function EmbedCalculator() {
     const { t, localePath, locale } = useLanguage();
@@ -22,11 +23,10 @@ export default function EmbedCalculator() {
     const [name, setName] = useState("");
     const [birthDate, setBirthDate] = useState("");
     const [birthTime, setBirthTime] = useState("");
+    const [disambiguation, setDisambiguation] = useState<TimeDisambiguation>("");
     const [birthPlace, setBirthPlace] = useState("");
     const [latitude, setLatitude] = useState("");
     const [longitude, setLongitude] = useState("");
-    const [timezone, setTimezone] = useState("");
-    const [timezoneOffset, setTimezoneOffset] = useState(0);
     const [locationResolved, setLocationResolved] = useState(false);
 
     const calculateMutation = trpc.chart.calculate.useMutation({
@@ -64,9 +64,6 @@ export default function EmbedCalculator() {
                 setLatitude(result.lat);
                 setLongitude(result.lon);
                 setBirthPlace(result.display_name);
-                const tzOffset = Math.round(parseFloat(result.lon) / 15);
-                setTimezoneOffset(tzOffset);
-                setTimezone(`UTC${tzOffset >= 0 ? "+" : ""}${tzOffset}`);
                 setLocationResolved(true);
                 toast.success(t.calculator?.locationFound || "Location found");
             } else {
@@ -91,8 +88,7 @@ export default function EmbedCalculator() {
             birthPlace,
             latitude: parseFloat(latitude),
             longitude: parseFloat(longitude),
-            timezoneOffset,
-            timezone,
+            ...(disambiguation ? { disambiguation } : {}),
         });
     };
 
@@ -145,6 +141,12 @@ export default function EmbedCalculator() {
                             />
                         </div>
                     </div>
+
+                    <TimeDisambiguationField
+                        value={disambiguation}
+                        onChange={setDisambiguation}
+                        isEnglish={locale === "en"}
+                    />
 
                     <div className="space-y-1.5">
                         <Label htmlFor="birthPlace" className="text-xs">{t.calculator?.birthPlace || "Place of birth"}</Label>

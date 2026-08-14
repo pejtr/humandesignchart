@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { calculateChart } from "../humandesign";
 import {
@@ -6,31 +7,46 @@ import {
     deleteChart, toggleFavorite,
 } from "../db";
 import { sendLeadOSEvent } from "../leados";
+import {
+    ChartCalculationInputSchema,
+    ChartCalculationRequestSchema,
+    ChartResultSchema,
+} from "../../shared/chartSchemas";
+import {
+    lookupIanaTimezone,
+    TimezoneResolutionError,
+} from "../humandesign/timezone";
 
 export const chartRouter = router({
     calculate: publicProcedure
-        .input(z.object({
-            name: z.string().min(1),
-            birthDate: z.string(),
-            birthTime: z.string(),
-            birthPlace: z.string(),
-            latitude: z.number(),
-            longitude: z.number(),
-            timezoneOffset: z.number(),
-            timezone: z.string(),
-        }))
+        .input(ChartCalculationRequestSchema)
         .mutation(async ({ input }) => {
-            const chartData = calculateChart(
-                input.birthDate,
-                input.birthTime,
-                input.birthPlace,
-                input.latitude,
-                input.longitude,
-                input.timezoneOffset,
-                input.timezone,
-            );
-            return chartData;
+            try {
+                const canonicalInput = ChartCalculationInputSchema.parse({
+                    ...input,
+                    timezone: lookupIanaTimezone(input.latitude, input.longitude),
+                });
+                return ChartResultSchema.parse(calculateChart(canonicalInput));
+            } catch (error) {
+                if (error instanceof TimezoneResolutionError) {
+                    throw new TRPCError({
+                        code: "BAD_REQUEST",
+                        message: error.message,
+                        cause: { timezoneCode: error.code },
+                    });
+                }
+                throw error;
+            }
         }),
+
+    resolveTimezone: publicProcedure
+        .input(z.object({
+            latitude: z.number().finite().min(-90).max(90),
+            longitude: z.number().finite().min(-180).max(180),
+        }))
+        .query(({ input }) => ({
+            timezone: lookupIanaTimezone(input.latitude, input.longitude),
+        })),
 
     save: protectedProcedure
         .input(z.object({

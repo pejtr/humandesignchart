@@ -187,8 +187,6 @@ describe("chart.calculate via router", () => {
       birthPlace: "Prague",
       latitude: 50.0755,
       longitude: 14.4378,
-      timezoneOffset: 1,
-      timezone: "CET",
     });
 
     expect(result).toBeDefined();
@@ -217,9 +215,30 @@ describe("chart.calculate via router", () => {
         birthPlace: "Prague",
         latitude: 50.0755,
         longitude: 14.4378,
-        timezoneOffset: 1,
-        timezone: "CET",
       })
     ).rejects.toThrow();
+  });
+
+  it("never treats a client numeric UTC offset as authoritative", async () => {
+    const caller = appRouter.createCaller(createPublicContext());
+    const canonical = {
+      name: "Offset tampering test",
+      birthDate: "1990-06-15",
+      birthTime: "14:30",
+      birthPlace: "Prague",
+      latitude: 50.0755,
+      longitude: 14.4378,
+    };
+
+    const expected = await caller.chart.calculate(canonical);
+    const tampered = await caller.chart.calculate({
+      ...canonical,
+      timezoneOffset: -720,
+      timezone: "Pacific/Honolulu",
+    } as typeof canonical);
+
+    expect(tampered.birthUtc).toBe(expected.birthUtc);
+    expect(tampered.timezone).toBe("Europe/Prague");
+    expect(tampered.activatedGates).toEqual(expected.activatedGates);
   });
 });

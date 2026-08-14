@@ -9,6 +9,11 @@ import {
   GATE_WHEEL, CHANNELS, CENTER_GATES, MOTOR_CENTERS,
   PROFILES, TYPES, PLANET_NAMES, type PlanetName,
 } from "./constants";
+import {
+  CALCULATION_VERSION,
+  type ChartCalculationInput,
+} from "../../shared/chartSchemas";
+import { resolveBirthInstant } from "./timezone";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -47,6 +52,10 @@ export interface HumanDesignChart {
   birthTime: string;
   birthPlace: string;
   timezone: string;
+  calculationVersion: typeof CALCULATION_VERSION;
+  birthUtc: string;
+  utcOffsetMinutes: number;
+  utcOffsetSeconds: number;
 
   // Core chart elements
   type: string;
@@ -511,22 +520,15 @@ function determineDreamRave(allActivations: GateActivation[]) {
 
 // ─── Main Calculator ─────────────────────────────────────────────────────────
 
-export function calculateChart(
-  birthDateStr: string,
-  birthTimeStr: string,
-  birthPlace: string,
-  latitude: number,
-  longitude: number,
-  timezoneOffsetHours: number,
-  timezone: string
-): HumanDesignChart {
-  // Parse birth date and time
-  const [year, month, day] = birthDateStr.split("-").map(Number);
-  const [hours, minutes] = birthTimeStr.split(":").map(Number);
-
-  // Convert to UTC
-  const utcHours = hours - timezoneOffsetHours;
-  const birthDate = new Date(Date.UTC(year, month - 1, day, utcHours, minutes));
+export function calculateChart(input: ChartCalculationInput): HumanDesignChart {
+  const {
+    birthDate: birthDateStr,
+    birthTime: birthTimeStr,
+    birthPlace,
+    timezone,
+  } = input;
+  const resolvedBirth = resolveBirthInstant(input);
+  const birthDate = new Date(resolvedBirth.epochMilliseconds);
   const birthJD = dateToJD(birthDate);
 
   // Calculate Personality (birth) positions
@@ -637,10 +639,14 @@ export function calculateChart(
   const dreamRave = determineDreamRave(allActivations);
 
   return {
+    calculationVersion: CALCULATION_VERSION,
     birthDate: birthDateStr,
     birthTime: birthTimeStr,
     birthPlace,
     timezone,
+    birthUtc: resolvedBirth.birthUtc,
+    utcOffsetMinutes: resolvedBirth.utcOffsetMinutes,
+    utcOffsetSeconds: resolvedBirth.utcOffsetSeconds,
     type,
     profile: profileKey,
     profileName,

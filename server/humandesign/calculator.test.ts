@@ -1,12 +1,31 @@
 import { describe, expect, it } from "vitest";
 import { calculateChart } from "./calculator";
 
+function chartInput(
+  birthDate: string,
+  birthTime: string,
+  birthPlace: string,
+  latitude: number,
+  longitude: number,
+  timezone: string,
+) {
+  return {
+    name: "Calculator fixture",
+    birthDate,
+    birthTime,
+    birthPlace,
+    latitude,
+    longitude,
+    timezone,
+  };
+}
+
 describe("Human Design Calculator", () => {
   it("calculates Ra Uru Hu's chart correctly (Manifestor 5/1)", () => {
-    const chart = calculateChart(
+    const chart = calculateChart(chartInput(
       "1948-04-09", "00:05", "Montreal, Canada",
-      45.5017, -73.5673, -5, "EST"
-    );
+      45.5017, -73.5673, "America/Toronto"
+    ));
 
     expect(chart.type).toBe("Manifestor");
     expect(chart.profile).toBe("5/1");
@@ -46,10 +65,10 @@ describe("Human Design Calculator", () => {
   });
 
   it("calculates Einstein's chart correctly (Generator 1/4)", () => {
-    const chart = calculateChart(
+    const chart = calculateChart(chartInput(
       "1879-03-14", "11:30", "Ulm, Germany",
-      48.3985, 9.9912, 1, "CET"
-    );
+      48.3985, 9.9912, "Europe/Berlin"
+    ));
 
     expect(chart.type).toBe("Generator");
     expect(chart.profile).toBe("1/4");
@@ -70,19 +89,19 @@ describe("Human Design Calculator", () => {
     // Reflector: no defined centers
 
     // Ra Uru Hu is a Manifestor
-    const manifestor = calculateChart("1948-04-09", "00:05", "Montreal", 45.5, -73.57, -5, "EST");
+    const manifestor = calculateChart(chartInput("1948-04-09", "00:05", "Montreal", 45.5, -73.57, "America/Toronto"));
     expect(manifestor.type).toBe("Manifestor");
 
     // Einstein is a Generator
-    const generator = calculateChart("1879-03-14", "11:30", "Ulm", 48.4, 9.99, 1, "CET");
+    const generator = calculateChart(chartInput("1879-03-14", "11:30", "Ulm", 48.4, 9.99, "Europe/Berlin"));
     expect(generator.type).toBe("Generator");
   });
 
   it("calculates gate activations for all 13 planets", () => {
-    const chart = calculateChart(
+    const chart = calculateChart(chartInput(
       "1990-01-15", "12:00", "Prague",
-      50.0755, 14.4378, 1, "CET"
-    );
+      50.0755, 14.4378, "Europe/Prague"
+    ));
 
     // Should have 13 personality activations and 13 design activations
     expect(chart.personalityActivations.length).toBe(13);
@@ -112,10 +131,10 @@ describe("Human Design Calculator", () => {
 
   it("correctly calculates profile from Sun lines", () => {
     // Profile is determined by Personality Sun line / Design Sun line
-    const chart = calculateChart(
+    const chart = calculateChart(chartInput(
       "1948-04-09", "00:05", "Montreal",
-      45.5017, -73.5673, -5, "EST"
-    );
+      45.5017, -73.5673, "America/Toronto"
+    ));
 
     const pSunLine = chart.personalityActivations[0].line;
     const dSunLine = chart.designActivations[0].line;
@@ -123,10 +142,10 @@ describe("Human Design Calculator", () => {
   });
 
   it("calculates variables (digestion, environment, perspective, awareness)", () => {
-    const chart = calculateChart(
+    const chart = calculateChart(chartInput(
       "1990-06-15", "14:30", "Berlin",
-      52.52, 13.405, 2, "CEST"
-    );
+      52.52, 13.405, "Europe/Berlin"
+    ));
 
     expect(chart.variables).toBeDefined();
     expect(chart.variables.digestion).toBeDefined();
@@ -136,10 +155,10 @@ describe("Human Design Calculator", () => {
   });
 
   it("design date is approximately 88 days before birth", () => {
-    const chart = calculateChart(
+    const chart = calculateChart(chartInput(
       "2000-06-15", "12:00", "London",
-      51.5074, -0.1278, 0, "UTC"
-    );
+      51.5074, -0.1278, "Europe/London"
+    ));
 
     // Design date should be roughly 88 days before birth
     const birthDate = new Date("2000-06-15");
@@ -152,10 +171,10 @@ describe("Human Design Calculator", () => {
   });
 
   it("all 9 centers are present in chart output", () => {
-    const chart = calculateChart(
+    const chart = calculateChart(chartInput(
       "1990-01-01", "00:00", "New York",
-      40.7128, -74.006, -5, "EST"
-    );
+      40.7128, -74.006, "America/New_York"
+    ));
 
     const centerNames = chart.centers.map((c) => c.name).sort();
     expect(centerNames).toEqual([
@@ -166,10 +185,10 @@ describe("Human Design Calculator", () => {
 
   it("incarnation cross type matches profile line", () => {
     // Lines 1-3 = Right Angle, Line 4 = Juxtaposition, Lines 5-6 = Left Angle
-    const chart = calculateChart(
+    const chart = calculateChart(chartInput(
       "1948-04-09", "00:05", "Montreal",
-      45.5017, -73.5673, -5, "EST"
-    );
+      45.5017, -73.5673, "America/Toronto"
+    ));
 
     const pSunLine = chart.personalityActivations[0].line;
     if (pSunLine <= 3) {

@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
+import { TimeDisambiguationField, type TimeDisambiguation } from "@/components/TimeDisambiguationField";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { saveChartDraft } from "@/lib/chartDraft";
 
@@ -45,11 +46,10 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [birthTime, setBirthTime] = useState("");
+  const [disambiguation, setDisambiguation] = useState<TimeDisambiguation>("");
   const [birthPlace, setBirthPlace] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
-  const [timezone, setTimezone] = useState("");
-  const [timezoneOffset, setTimezoneOffset] = useState(0);
   const [locationResolved, setLocationResolved] = useState(false);
   const [category, setCategory] = useState<string>("self");
 
@@ -87,7 +87,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
   const calculateMutation = trpc.chart.calculate.useMutation({
     onSuccess: (data) => {
       saveChartDraft(data, {
-        name, birthDate, birthTime, birthPlace, latitude, longitude, timezone, category,
+        name, birthDate, birthTime, birthPlace, latitude, longitude, timezone: data.timezone, category,
       });
       navigate(localePath("/chart/new"));
     },
@@ -108,9 +108,6 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
         setLatitude(result.lat);
         setLongitude(result.lon);
         setBirthPlace(result.display_name);
-        const tzOffset = Math.round(parseFloat(result.lon) / 15);
-        setTimezoneOffset(tzOffset);
-        setTimezone(`UTC${tzOffset >= 0 ? "+" : ""}${tzOffset}`);
         setLocationResolved(true);
         toast.success(t.calculator.locationFound);
       } else {
@@ -143,8 +140,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
       birthPlace,
       latitude: parseFloat(latitude),
       longitude: parseFloat(longitude),
-      timezoneOffset,
-      timezone,
+      ...(disambiguation ? { disambiguation } : {}),
     });
   };
 
@@ -245,6 +241,12 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                   </div>
                 </div>
 
+                <TimeDisambiguationField
+                  value={disambiguation}
+                  onChange={setDisambiguation}
+                  isEnglish={isEn}
+                />
+
                 {/* Relationship Category */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
@@ -325,7 +327,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                   {locationResolved && (
                     <div className="flex items-center gap-2 text-sm text-green-600">
                       <Info className="w-3.5 h-3.5" />
-                      {t.calculator.coordinates}: {latitude}, {longitude} ({timezone})
+                      {t.calculator.coordinates}: {latitude}, {longitude}
                     </div>
                   )}
                 </div>

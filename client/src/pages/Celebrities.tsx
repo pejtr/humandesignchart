@@ -75,8 +75,6 @@ export default function Celebrities() {
       birthPlace: celeb.birthPlace,
       latitude: celeb.lat,
       longitude: celeb.lon,
-      timezoneOffset: celeb.tz,
-      timezone: `UTC${celeb.tz >= 0 ? "+" : ""}${celeb.tz}`,
     });
   };
 

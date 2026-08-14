@@ -16,5 +16,9 @@ export default defineConfig({
     environment: "node",
     include: ["server/**/*.test.ts", "server/**/*.spec.ts"],
     setupFiles: ["server/vitest-setup.ts"],
+    // Keep module transforms below the point where import-only tests become
+    // timing-dependent on heavily loaded CI/Windows runners.
+    maxWorkers: 4,
+    minWorkers: 1,
   },
 });

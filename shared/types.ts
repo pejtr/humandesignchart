@@ -14,8 +14,7 @@ export interface ChartInput {
   birthPlace: string;
   latitude: number;
   longitude: number;
-  timezoneOffset: number;
-  timezone: string;
+  disambiguation?: "earlier" | "later";
   category?: "self" | "family" | "friend" | "client" | "celebrity" | "other";
 }
 
@@ -62,10 +61,14 @@ export interface IncarnationCrossData {
 }
 
 export interface HumanDesignChartData {
+  calculationVersion: string;
   birthDate: string;
   birthTime: string;
   birthPlace: string;
   timezone: string;
+  birthUtc: string;
+  utcOffsetMinutes: number;
+  utcOffsetSeconds: number;
   type: string;
   profile: string;
   profileName: string;

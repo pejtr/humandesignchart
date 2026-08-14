@@ -6,25 +6,16 @@
  * NOT Julian Day numbers. Planet.position2000 also takes JDE (Julian Ephemeris Day).
  */
 
-// @ts-expect-error -- astronomia does not publish complete TypeScript declarations.
 import { planetposition, julian, solar, moonposition } from "astronomia";
 
 // VSOP87B data (heliocentric spherical coordinates)
-// @ts-expect-error -- astronomia VSOP data modules have no declarations.
 import vsop87Bearth from "astronomia/data/vsop87Bearth";
-// @ts-expect-error -- astronomia VSOP data modules have no declarations.
 import vsop87Bmercury from "astronomia/data/vsop87Bmercury";
-// @ts-expect-error -- astronomia VSOP data modules have no declarations.
 import vsop87Bvenus from "astronomia/data/vsop87Bvenus";
-// @ts-expect-error -- astronomia VSOP data modules have no declarations.
 import vsop87Bmars from "astronomia/data/vsop87Bmars";
-// @ts-expect-error -- astronomia VSOP data modules have no declarations.
 import vsop87Bjupiter from "astronomia/data/vsop87Bjupiter";
-// @ts-expect-error -- astronomia VSOP data modules have no declarations.
 import vsop87Bsaturn from "astronomia/data/vsop87Bsaturn";
-// @ts-expect-error -- astronomia VSOP data modules have no declarations.
 import vsop87Buranus from "astronomia/data/vsop87Buranus";
-// @ts-expect-error -- astronomia VSOP data modules have no declarations.
 import vsop87Bneptune from "astronomia/data/vsop87Bneptune";
 
 function unwrap(mod: any) {

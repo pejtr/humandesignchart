@@ -302,7 +302,6 @@ const TEST_BIRTH_DATA = {
   birthPlace: "Praha, Cesko",
   latitude: 50.0755,
   longitude: 14.4378,
-  timezoneOffset: -120,
   timezone: "Europe/Prague",
 };
 

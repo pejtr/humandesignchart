@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSEO } from "@/hooks/useSEO";
 import type { HumanDesignChartData } from "@shared/types";
+import { TimeDisambiguationField, type TimeDisambiguation } from "@/components/TimeDisambiguationField";
 
 interface ChartFormData {
   name: string;
@@ -21,14 +22,13 @@ interface ChartFormData {
   birthPlace: string;
   latitude: string;
   longitude: string;
-  timezone: string;
-  timezoneOffset: number;
+  disambiguation: TimeDisambiguation;
   locationResolved: boolean;
 }
 
 const emptyForm = (): ChartFormData => ({
   name: "", birthDate: "", birthTime: "", birthPlace: "",
-  latitude: "", longitude: "", timezone: "", timezoneOffset: 0, locationResolved: false,
+  latitude: "", longitude: "", disambiguation: "", locationResolved: false,
 });
 
 function ChartInputForm({ label, form, setForm, onCalculate, loading }: {
@@ -38,7 +38,7 @@ function ChartInputForm({ label, form, setForm, onCalculate, loading }: {
   onCalculate: () => void;
   loading: boolean;
 }) {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
 
   const handlePlaceSearch = async () => {
     if (!form.birthPlace.trim()) return;
@@ -49,14 +49,11 @@ function ChartInputForm({ label, form, setForm, onCalculate, loading }: {
       const results = await response.json();
       if (results && results.length > 0) {
         const r = results[0];
-        const tzOff = Math.round(parseFloat(r.lon) / 15);
         setForm({
           ...form,
           latitude: r.lat,
           longitude: r.lon,
           birthPlace: r.display_name,
-          timezoneOffset: tzOff,
-          timezone: `UTC${tzOff >= 0 ? "+" : ""}${tzOff}`,
           locationResolved: true,
         });
         toast.success(t.calculator.locationFound);
@@ -86,6 +83,11 @@ function ChartInputForm({ label, form, setForm, onCalculate, loading }: {
             <Input type="time" value={form.birthTime} onChange={e => setForm({ ...form, birthTime: e.target.value })} />
           </div>
         </div>
+        <TimeDisambiguationField
+          value={form.disambiguation}
+          onChange={(disambiguation) => setForm({ ...form, disambiguation })}
+          isEnglish={locale === "en"}
+        />
         <div className="space-y-2">
           <Label className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{t.calculator.birthPlace}</Label>
           <div className="flex gap-2">
@@ -98,7 +100,7 @@ function ChartInputForm({ label, form, setForm, onCalculate, loading }: {
             <Button type="button" variant="secondary" size="sm" onClick={handlePlaceSearch}>{t.calculator.findLocation}</Button>
           </div>
           {form.locationResolved && (
-            <p className="text-xs text-green-600">{form.latitude}, {form.longitude} ({form.timezone})</p>
+            <p className="text-xs text-green-600">{form.latitude}, {form.longitude}</p>
           )}
         </div>
         <Button
@@ -153,8 +155,7 @@ export default function ChartComparison() {
       birthPlace: form.birthPlace,
       latitude: parseFloat(form.latitude),
       longitude: parseFloat(form.longitude),
-      timezoneOffset: form.timezoneOffset,
-      timezone: form.timezone,
+      ...(form.disambiguation ? { disambiguation: form.disambiguation } : {}),
     });
   };
 

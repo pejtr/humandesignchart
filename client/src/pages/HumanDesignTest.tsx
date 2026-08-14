@@ -10,6 +10,7 @@ import { Loader2, ArrowRight, ArrowLeft, CheckCircle2, User, Heart, Sparkles, Ma
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
+import { TimeDisambiguationField, type TimeDisambiguation } from "@/components/TimeDisambiguationField";
 
 export default function HumanDesignTest() {
     const [, navigate] = useLocation();
@@ -40,11 +41,10 @@ export default function HumanDesignTest() {
     const [email, setEmail] = useState("");
     const [birthDate, setBirthDate] = useState("");
     const [birthTime, setBirthTime] = useState("");
+    const [disambiguation, setDisambiguation] = useState<TimeDisambiguation>("");
     const [birthPlace, setBirthPlace] = useState("");
     const [latitude, setLatitude] = useState("");
     const [longitude, setLongitude] = useState("");
-    const [timezone, setTimezone] = useState("");
-    const [timezoneOffset, setTimezoneOffset] = useState(0);
     const [locationResolved, setLocationResolved] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -66,9 +66,6 @@ export default function HumanDesignTest() {
                 setLatitude(result.lat);
                 setLongitude(result.lon);
                 setBirthPlace(result.display_name.split(',')[0]); // Take city name
-                const tzOffset = Math.round(parseFloat(result.lon) / 15);
-                setTimezoneOffset(tzOffset);
-                setTimezone(`UTC${tzOffset >= 0 ? "+" : ""}${tzOffset}`);
                 setLocationResolved(true);
                 handleNext();
             } else {
@@ -103,13 +100,12 @@ export default function HumanDesignTest() {
                 birthPlace,
                 latitude: parseFloat(latitude),
                 longitude: parseFloat(longitude),
-                timezoneOffset,
-                timezone,
+                ...(disambiguation ? { disambiguation } : {}),
             });
 
             sessionStorage.setItem("chartResult", JSON.stringify(data));
             sessionStorage.setItem("chartMeta", JSON.stringify({
-                name, birthDate, birthTime, birthPlace, latitude, longitude, timezone, category: "self"
+                name, birthDate, birthTime, birthPlace, latitude, longitude, timezone: data.timezone, category: "self"
             }));
 
             // Můžeme redirectovat na OTO okno nebo klasicky na mapu
@@ -184,6 +180,13 @@ export default function HumanDesignTest() {
                                 className="h-14 text-lg text-center"
                                 value={birthDate}
                                 onChange={(e) => setBirthDate(e.target.value)}
+                            />
+                        </div>
+                        <div className="max-w-xs mx-auto text-left">
+                            <TimeDisambiguationField
+                                value={disambiguation}
+                                onChange={setDisambiguation}
+                                isEnglish={isEn}
                             />
                         </div>
                         <Button
