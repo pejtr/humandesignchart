@@ -283,6 +283,7 @@ export default function IncarnationCross() {
 
   const hdContentQuery = trpc.content.getHdContent.useQuery();
   const hdData = hdContentQuery.data;
+  const ownedChartsQuery = trpc.chart.list.useQuery(undefined, { enabled: isAuthenticated });
 
   const [chart, setChart] = useState<HumanDesignChartData | null>(null);
   const [chartMeta, setChartMeta] = useState<any>(null);
@@ -322,15 +323,27 @@ export default function IncarnationCross() {
       return;
     }
     if (!chart) return;
+    const ownedChart = ownedChartsQuery.data?.find((candidate) =>
+      candidate.birthDate === chartMeta?.birthDate &&
+      candidate.birthTime === chartMeta?.birthTime &&
+      (!chartMeta?.name || candidate.name === chartMeta.name)
+    ) ?? ownedChartsQuery.data?.find((candidate) => candidate.category === "self");
+    if (!ownedChart) {
+      toast.error(isCs ? "Nejprve mapu uložte, aby mohl server bezpečně ověřit její data." : "Save the chart first so the server can verify its data securely.");
+      return;
+    }
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
     setAiContent("");
     setIsStreaming(true);
     try {
-      const chartEncoded = encodeURIComponent(JSON.stringify(chart));
-      const url = `/api/ai/stream?chartData=${chartEncoded}&readingType=incarnation_cross&locale=${locale}`;
-      const response = await fetch(url, { signal: controller.signal });
+      const response = await fetch("/api/ai/stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chartId: ownedChart.id, readingType: "incarnation_cross", locale: locale === "en" ? "en" : "cs" }),
+        signal: controller.signal,
+      });
       if (!response.ok || !response.body) {
         throw new Error("Stream failed");
       }

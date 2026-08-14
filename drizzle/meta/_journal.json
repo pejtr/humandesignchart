@@ -127,6 +127,13 @@
       "when": 1786718232613,
       "tag": "0017_numerous_william_stryker",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1786719499880,
+      "tag": "0018_chemical_sasquatch",
+      "breakpoints": true
     }
   ]
 }

@@ -3,24 +3,20 @@ import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "../_core/trpc";
 import { invokeLLM } from "../_core/llm";
 import {
-    createAiReading, getAiReadings, getAllReadingsByUser,
+    getAiReadings, getAllReadingsByUser,
     updateReadingRating, getReadingById, createSharedChart,
-    getUserCharts,
+    getUserCharts, getChartById,
 } from "../db";
 import { sanitizeInput, sanitizeHistory, checkRateLimit, MAX_QUESTION_LENGTH } from "../security/promptSanitizer";
 import crypto from "crypto";
-import { getSystemPrompt, getReadingPrompt } from "../ai/prompts";
+import { generateOwnedReading, OwnedReadingError, OwnedReadingInputSchema } from "../ai/ownedReading";
+import { productionOwnedReadingDependencies } from "../ai/productionOwnedReading";
+import { isPremiumUser } from "../stripeProducts";
+import { ChartResultSchema } from "../../shared/chartSchemas";
 
 export const aiRouter = router({
     generateReading: protectedProcedure
-        .input(z.object({
-            chartId: z.number(),
-            chartData: z.record(z.string(), z.unknown()).refine(
-              (val) => JSON.stringify(val).length <= 500_000,
-              "Chart data too large"
-            ),
-            readingType: z.enum(["overview", "type_strategy", "profile", "authority", "incarnation_cross", "channels", "gates", "variables", "relationships", "career", "moon"]),
-        }))
+        .input(OwnedReadingInputSchema)
         .mutation(async ({ ctx, input }) => {
             const { countAiReadingsByUser } = await import("../db");
             const { canGenerateAiReading } = await import("../stripeProducts");
@@ -33,35 +29,26 @@ export const aiRouter = router({
             if (!check.allowed) {
                 throw new TRPCError({ code: "PAYMENT_REQUIRED", message: "Free limit reached" });
             }
-
-            const chart: Record<string, unknown> = { ...input.chartData };
-            if (input.readingType === "moon") {
-                const { getMoonReadingContext } = await import("./transit");
-                chart.currentMoon = await getMoonReadingContext();
+            try {
+                return await generateOwnedReading({
+                    userId: ctx.user.id,
+                    input,
+                    consumeCredit: !isPremiumUser(userForCheck) && ctx.user.aiReadingCredits > 0,
+                    dependencies: productionOwnedReadingDependencies(),
+                });
+            } catch (error) {
+                if (error instanceof OwnedReadingError) {
+                    if (error.code === "CHART_NOT_FOUND") {
+                        throw new TRPCError({ code: "NOT_FOUND", message: "Chart not found" });
+                    }
+                    if (error.code === "INVALID_CANONICAL_CHART") {
+                        throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Stored chart must be recalculated before an AI reading can be generated" });
+                    }
+                    console.error("[AI Grounding] Reading rejected", { userId: ctx.user.id, chartId: input.chartId, code: error.code, message: error.message });
+                    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "AI_GROUNDING_FAILED", cause: { groundingCode: error.code } });
+                }
+                throw error;
             }
-
-            const isEn = false; // standard readings are in Czech as before (or detect via chart data if needed)
-            const systemPrompt = getSystemPrompt(isEn);
-            const userPrompt = getReadingPrompt(chart, input.readingType, isEn);
-
-            const response = await invokeLLM({
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: userPrompt },
-                ],
-            });
-
-            const rawContent = response.choices?.[0]?.message?.content;
-            const content = typeof rawContent === 'string' ? rawContent : "Unable to generate reading at this time.";
-
-            const readingId = await createAiReading({
-                userId: ctx.user.id,
-                chartId: input.chartId,
-                readingType: input.readingType,
-                content,
-            });
-
-            return { id: readingId, content };
         }),
 
     getReadings: protectedProcedure
@@ -131,10 +118,19 @@ export const aiRouter = router({
             let natalChannelList: Array<{ gate1: number; gate2: number }> = [];
             let primaryChartData: any = null;
             try {
-                const userCharts = await getUserCharts(ctx.user.id);
-                const primaryChart = userCharts.find((c: any) => c.category === "self") ?? userCharts[0];
+                const userCharts = input.chartId ? [] : await getUserCharts(ctx.user.id);
+                const primaryChart = input.chartId
+                    ? await getChartById(input.chartId, ctx.user.id)
+                    : userCharts.find((c: any) => c.category === "self") ?? userCharts[0];
+                if (input.chartId && !primaryChart) {
+                    throw new TRPCError({ code: "NOT_FOUND", message: "Chart not found" });
+                }
                 if (primaryChart?.chartData) {
-                    const cd = primaryChart.chartData as any;
+                    const canonical = ChartResultSchema.safeParse(primaryChart.chartData);
+                    if (!canonical.success) {
+                        throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Stored chart must be recalculated before AI guidance can use it" });
+                    }
+                    const cd = canonical.data;
                     primaryChartData = cd;
                     const definedCenters = (cd.centers ?? []).filter((c: any) => c.defined).map((c: any) => c.name).join(", ");
                     natalChannelList = (cd.channels ?? []).map((c: any) => ({ gate1: Number(c.gate1), gate2: Number(c.gate2) }));
@@ -148,8 +144,9 @@ export const aiRouter = router({
                         userChartContext = `\n\n--- HUMAN DESIGN MAPA UŽIVATELE ---\nJméno: ${primaryChart.name || ctx.user.name}\nTyp: ${cd.type}\nProfil: ${cd.profile}${cd.profileName ? ` (${cd.profileName})` : ""}\nAutorita: ${cd.authority}\nDefinice: ${cd.definition}\nStrategie: ${cd.strategy}\nInkarnační kříž: ${cd.incarnationCross?.name ?? "neznámý"}\nDefinovaná centra: ${definedCenters || "žádná"}\nDráhy (kanály): ${channels || "žádné"}\nAktivované brány: ${gates || "žádné"}\nNarození: ${primaryChart.birthDate} ${primaryChart.birthTime} — ${primaryChart.birthPlace}\n\nZNÁŠ design tohoto člověka. VŽDY používej tyto detaily při odpovídání. Nikdy se neptej na datum narození ani detaily designu — už je máš. Přirozeně odkazuj na jejich konkrétní typ, profil, autoritu a dráhy ve svých odpovědích.`;
                     }
                 }
-            } catch (_e) {
-                // Non-blocking
+            } catch (error) {
+                if (error instanceof TRPCError) throw error;
+                console.warn("[AI Guide] Canonical chart context unavailable", error);
             }
 
             const systemPromptBase = isEn

@@ -433,35 +433,15 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
     }
     setAiStreaming(true);
 
-    const chartSnapshot = {
-      type: chart?.type,
-      profile: chart?.profile,
-      profileName: chart?.profileName,
-      authority: chart?.authority,
-      definition: chart?.definition,
-      strategy: chart?.strategy,
-      signature: chart?.signature,
-      notSelf: chart?.notSelf,
-      aura: chart?.aura,
-      centers: chart?.centers,
-      channels: chart?.channels,
-      activatedGates: chart?.activatedGates,
-      personalityActivations: chart?.personalityActivations,
-      designActivations: chart?.designActivations,
-      incarnationCross: chart?.incarnationCross,
-      variables: chart?.variables,
-    };
-
     let accumulated = "";
 
     fetch("/api/ai/stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        chartData: chartSnapshot,
         readingType: type,
-        chartId: savedChartId || 0,
-        locale,
+        chartId: savedChartId,
+        locale: locale === "en" ? "en" : "cs",
       }),
       signal: abort.signal,
     })
@@ -471,10 +451,18 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
           setShowPaywall(true);
           return;
         }
+        if ([404, 412, 502].includes(res.status)) {
+          const body = await res.json().catch(() => ({ error: "AI_GROUNDING_FAILED" }));
+          setAiStreaming(false);
+          toast.error(body.error === "AI_GROUNDING_FAILED"
+            ? (locale === "cs" ? "VĂ˝klad neproĹˇel kontrolou faktĹŻ. Kredit nebyl odeÄŤten." : "The reading failed fact validation. No credit was consumed.")
+            : body.error);
+          return;
+        }
         if (!res.ok || !res.body) {
           // Fallback to tRPC mutation
           setAiStreaming(false);
-          aiMutation.mutate({ chartId: savedChartId || 0, chartData: chart as any, readingType: type as any });
+          aiMutation.mutate({ chartId: savedChartId!, readingType: type as any, locale: locale === "en" ? "en" : "cs" });
           return;
         }
         const reader = res.body.getReader();
@@ -514,7 +502,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
         if (err.name !== "AbortError") {
           setAiStreaming(false);
           // Fallback to tRPC mutation
-          aiMutation.mutate({ chartId: savedChartId || 0, chartData: chart as any, readingType: type as any });
+          aiMutation.mutate({ chartId: savedChartId!, readingType: type as any, locale: locale === "en" ? "en" : "cs" });
         }
       });
   };

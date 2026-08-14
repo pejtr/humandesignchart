@@ -131,7 +131,10 @@ vi.mock("./db", () => ({
   calculateUserLevel: vi.fn(() => "searcher"),
   processStreakCheckIn: vi.fn(async () => ({ streakUpdated: true, newStreak: 1, creditsAwarded: 0 })),
   claimDailyReward: vi.fn(async () => ({ alreadyClaimed: false, creditsAwarded: 1 })),
-  getChartById: vi.fn(async (id: number) => chartStore.get(id) ?? null),
+  getChartById: vi.fn(async (id: number, userId: number) => {
+    const chart = chartStore.get(id);
+    return chart?.userId === userId ? chart : null;
+  }),
   getUserCharts: vi.fn(async (userId: number) => {
     return Array.from(chartStore.values()).filter(c => c.userId === userId);
   }),
@@ -153,6 +156,11 @@ vi.mock("./db", () => ({
     if (chart) chart.isFavorite = isFavorite ? 1 : 0;
   }),
   createAiReading: vi.fn(async (data: any) => {
+    const id = ++readingAutoId;
+    readingStore.set(id, { ...data, id, rating: null, createdAt: new Date().toISOString() });
+    return id;
+  }),
+  persistGroundedAiReading: vi.fn(async (data: any) => {
     const id = ++readingAutoId;
     readingStore.set(id, { ...data, id, rating: null, createdAt: new Date().toISOString() });
     return id;
@@ -219,8 +227,17 @@ vi.mock("./db.notifications", () => ({
 }));
 
 vi.mock("./_core/llm", () => ({
-  invokeLLM: vi.fn().mockResolvedValue({
+  invokeLLM: vi.fn().mockImplementation(async ({ messages }: any) => {
+    const prompt = messages?.find((message: any) => message.role === "user")?.content ?? "";
+    const match = prompt.match(/IMMUTABLE FACTS[^\n]*\n(\{.*\})\n\nReturn/s);
+    return {
     choices: [{ message: { content: "Toto je testovací AI výklad pro QA healthcheck." } }],
+      ...{
+        model: "qa-grounded-model",
+        choices: [{ message: { content: JSON.stringify({ facts: match ? JSON.parse(match[1]) : {}, interpretationMarkdown: "QA grounded reading" }) } }],
+        usage: { prompt_tokens: 100, completion_tokens: 20, total_tokens: 120 },
+      },
+    };
   }),
 }));
 
@@ -532,12 +549,13 @@ describe("5. AI Reading — Generation and rating", () => {
   beforeAll(async () => {
     const ctx = createAuthContext(99903);
     const caller = appRouter.createCaller(ctx);
+    const canonicalChart = await caller.chart.calculate(TEST_BIRTH_DATA);
     const chart = await caller.chart.save({
       ...TEST_BIRTH_DATA,
       latitude: String(TEST_BIRTH_DATA.latitude),
       longitude: String(TEST_BIRTH_DATA.longitude),
       category: "self",
-      chartData: TEST_CHART_DATA as any,
+      chartData: canonicalChart as any,
     });
     savedChartId = chart.id;
   });
@@ -547,8 +565,8 @@ describe("5. AI Reading — Generation and rating", () => {
     const caller = appRouter.createCaller(ctx);
     const result = await caller.ai.generateReading({
       chartId: savedChartId,
-      chartData: TEST_CHART_DATA as any,
       readingType: "overview",
+      locale: "cs",
     });
 
     expect(result).toBeDefined();

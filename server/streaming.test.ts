@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 
 // ─── Test: Streaming AI Reading Architecture ───────────────────────────────
 
@@ -25,34 +25,36 @@ describe("SSE Streaming Endpoint", () => {
     expect(aiContent).toContain('"down"');
   });
 
-  it("should handle stream: true in LLM request body", async () => {
+  it("does not enable raw provider token streaming for grounded readings", async () => {
     const fs = await import("fs");
     const streamContent = fs.readFileSync(
       "./server/_core/routes/aiStream.ts",
       "utf-8"
     );
-    expect(streamContent).toContain("stream: true");
-    expect(streamContent).toContain("max_tokens: 1800");
+    expect(streamContent).not.toContain("stream: true");
+    expect(streamContent).toContain("await generateOwnedReading");
   });
 
-  it("should emit data: {token} SSE events", async () => {
+  it("emits only the complete grounded result through the compatibility SSE response", async () => {
     const fs = await import("fs");
     const streamContent = fs.readFileSync(
       "./server/_core/routes/aiStream.ts",
       "utf-8"
     );
-    expect(streamContent).toContain('JSON.stringify({ token })');
-    expect(streamContent).toContain('JSON.stringify({ done: true })');
+    expect(streamContent).toContain("JSON.stringify({ token: result.content })");
+    expect(streamContent).toContain("groundingStatus: result.groundingStatus");
   });
 
-  it("should save completed reading to DB after stream ends", async () => {
+  it("generates, validates and persists before opening the SSE response", async () => {
     const fs = await import("fs");
     const streamContent = fs.readFileSync(
       "./server/_core/routes/aiStream.ts",
       "utf-8"
     );
-    expect(streamContent).toContain("createAiReading");
-    expect(streamContent).toContain("fullContent && chartId");
+    expect(streamContent.indexOf("await generateOwnedReading")).toBeLessThan(streamContent.indexOf('res.setHeader("Content-Type"'));
+
+    const serviceContent = fs.readFileSync("./server/ai/ownedReading.ts", "utf-8");
+    expect(serviceContent.indexOf("validateGroundedReading")).toBeLessThan(serviceContent.indexOf("args.dependencies.persist"));
   });
 
   it("should authenticate request using sdk before streaming", async () => {

@@ -1,5 +1,5 @@
 import { eq, and, desc, gte, sql } from "drizzle-orm";
-import { aiReadings, InsertAiReading, charts } from "../../drizzle/schema";
+import { aiReadings, InsertAiReading, charts, users } from "../../drizzle/schema";
 import { getDb } from "./index";
 
 export async function createAiReading(reading: InsertAiReading) {
@@ -7,6 +7,24 @@ export async function createAiReading(reading: InsertAiReading) {
     if (!db) throw new Error("Database not available");
     const result = await db.insert(aiReadings).values(reading);
     return result[0].insertId;
+}
+
+export async function persistGroundedAiReading(input: InsertAiReading & { consumeCredit: boolean }) {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    return db.transaction(async (tx: any) => {
+        if (input.consumeCredit) {
+            const result = await tx.update(users).set({
+                aiReadingCredits: sql`GREATEST(COALESCE(${users.aiReadingCredits}, 0) - 1, 0)`,
+            }).where(and(eq(users.id, input.userId), gte(users.aiReadingCredits, 1)));
+            if (((result[0] as { affectedRows?: number })?.affectedRows ?? 0) !== 1) {
+                throw new Error("AI credit could not be consumed");
+            }
+        }
+        const { consumeCredit: _consumeCredit, ...reading } = input;
+        const result = await tx.insert(aiReadings).values(reading);
+        return result[0].insertId as number;
+    });
 }
 
 export async function getAiReadings(chartId: number, userId: number) {
