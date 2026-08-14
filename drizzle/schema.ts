@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm"
 
 export const affiliateConversions = mysqlTable("affiliateConversions", {
 	id: int().autoincrement().notNull(),
+	paymentEventId: int(),
 	affiliateUserId: int().notNull(),
 	convertedUserId: int().notNull(),
 	stripeSubscriptionId: varchar({ length: 64 }),
@@ -15,6 +16,7 @@ export const affiliateConversions = mysqlTable("affiliateConversions", {
 },
 	(table) => [
 		primaryKey({ columns: [table.id], name: "affiliateConversions_id" }),
+		unique("affiliateConversions_paymentEventId_unique").on(table.paymentEventId),
 	]);
 
 export const affiliatePayouts = mysqlTable("affiliatePayouts", {
@@ -261,6 +263,50 @@ export const userNotifications = mysqlTable("user_notifications", {
 		primaryKey({ columns: [table.id], name: "user_notifications_id" }),
 	]);
 
+export const paymentEvents = mysqlTable("payment_events", {
+	id: int().autoincrement().notNull(),
+	provider: mysqlEnum(['stripe', 'comgate']).notNull(),
+	eventId: varchar({ length: 255 }).notNull(),
+	eventType: varchar({ length: 100 }).notNull(),
+	status: mysqlEnum(['received', 'processing', 'fulfilled', 'failed', 'audit', 'reversed']).default('received').notNull(),
+	attemptCount: int().default(0).notNull(),
+	userId: int(),
+	productKey: varchar({ length: 64 }),
+	paymentRef: varchar({ length: 255 }),
+	amountMinor: int(),
+	expectedAmountMinor: int(),
+	currency: varchar({ length: 3 }),
+	reversalOfPaymentEventId: int(),
+	rawPayload: json(),
+	errorCode: varchar({ length: 100 }),
+	errorMessage: text(),
+	claimedAt: timestamp({ mode: 'string' }),
+	processedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default(sql`(now())`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).default(sql`(now())`).onUpdateNow().notNull(),
+},
+	(table) => [
+		primaryKey({ columns: [table.id], name: "payment_events_id" }),
+		unique("payment_events_provider_eventId_unique").on(table.provider, table.eventId),
+	]);
+
+export const entitlementLedger = mysqlTable("entitlement_ledger", {
+	id: int().autoincrement().notNull(),
+	paymentEventId: int().notNull(),
+	userId: int().notNull(),
+	entitlementKey: varchar({ length: 100 }).notNull(),
+	quantity: int().default(1).notNull(),
+	status: mysqlEnum(['pending', 'active', 'reversed', 'manual_review']).default('pending').notNull(),
+	metadata: json(),
+	appliedAt: timestamp({ mode: 'string' }),
+	reversedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default(sql`(now())`).notNull(),
+},
+	(table) => [
+		primaryKey({ columns: [table.id], name: "entitlement_ledger_id" }),
+		unique("entitlement_ledger_event_key_unique").on(table.paymentEventId, table.entitlementKey),
+	]);
+
 export const users = mysqlTable("users", {
 	id: int().autoincrement().notNull(),
 	openId: varchar({ length: 64 }).notNull(),
@@ -346,6 +392,10 @@ export type AffiliateConversion = typeof affiliateConversions.$inferSelect;
 export type InsertAffiliateConversion = typeof affiliateConversions.$inferInsert;
 export type AffiliatePayout = typeof affiliatePayouts.$inferSelect;
 export type InsertAffiliatePayout = typeof affiliatePayouts.$inferInsert;
+export type PaymentEvent = typeof paymentEvents.$inferSelect;
+export type InsertPaymentEvent = typeof paymentEvents.$inferInsert;
+export type EntitlementLedgerEntry = typeof entitlementLedger.$inferSelect;
+export type InsertEntitlementLedgerEntry = typeof entitlementLedger.$inferInsert;
 export type UserNotification = typeof userNotifications.$inferSelect;
 export type InsertUserNotification = typeof userNotifications.$inferInsert;
 export type SocialAccount = typeof socialAccounts.$inferSelect;
