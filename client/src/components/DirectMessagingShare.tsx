@@ -33,7 +33,9 @@ export function DirectMessagingShare({ title, shareUrl }: DirectMessagingSharePr
           text: message,
           url,
         });
-      } catch { }
+      } catch {
+        // The native share sheet reports cancellation as an exception.
+      }
     } else {
       navigator.clipboard.writeText(url);
       toast.success(isEn ? "Link copied!" : "Odkaz zkopírován!");

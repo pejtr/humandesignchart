@@ -30,7 +30,9 @@ export function useReportWebVitals(enabled = true) {
         });
       });
       lcpObs.observe({ type: "largest-contentful-paint", buffered: true });
-    } catch {}
+    } catch {
+      // Observer is not supported by every browser.
+    }
 
     // FID
     try {
@@ -45,7 +47,9 @@ export function useReportWebVitals(enabled = true) {
         }
       });
       fidObs.observe({ type: "first-input", buffered: true });
-    } catch {}
+    } catch {
+      // Observer is not supported by every browser.
+    }
 
     // CLS
     try {
@@ -68,7 +72,9 @@ export function useReportWebVitals(enabled = true) {
         });
         sendMetrics(metrics);
       });
-    } catch {}
+    } catch {
+      // Observer is not supported by every browser.
+    }
 
     // Report on pagehide (for LCP/FID)
     window.addEventListener("pagehide", () => {
@@ -85,7 +91,9 @@ export function useReportWebVitals(enabled = true) {
           type: "application/json",
         });
         navigator.sendBeacon?.("/api/analytics/web-vitals", blob);
-      } catch {}
+      } catch {
+        // Analytics must never interrupt the page lifecycle.
+      }
     }
   }, [enabled]);
 }

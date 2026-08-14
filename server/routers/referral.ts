@@ -63,7 +63,9 @@ export const referralRouter = router({
                     title: "New Referral Completed 🎉",
                     content: `${newUser.name || newUser.openId} signed up via referral code ${input.referralCode} from ${referrer.name || referrer.openId}. Both received 1 free reading credit.`,
                 });
-            } catch { }
+            } catch {
+                // Owner notification is best-effort and must not block fulfillment.
+            }
 
             return { success: true, creditsAwarded: 1 };
         }),

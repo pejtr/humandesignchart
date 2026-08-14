@@ -18,6 +18,8 @@ export default tseslint.config(
     ignores: [
       "dist/**",
       "node_modules/**",
+      ".claude/**",
+      "tmp/**",
       "*.config.*",
       "client/src/components/ui/**",
     ],

@@ -227,7 +227,7 @@ The Initiator is a newly recognized energy type, still being understood within t
 
 Living by your **Human Design Strategy** is not about rigid rules; it\\'s about cultivating awareness and trust in your inner authority. It\\'s a journey of deconditioning, letting go of societal pressures to initiate or respond in ways that are unnatural for you. When you consistently apply your strategy, you begin to experience a profound shift: opportunities appear effortlessly, relationships become more harmonious, and your energy is conserved for what truly matters.
 
-By understanding and embodying your unique **human design strategy**, you unlock the door to a life lived in authentic flow. It\'s a powerful tool for self-discovery and empowerment, guiding you to make decisions that are inherently correct for you.
+By understanding and embodying your unique **human design strategy**, you unlock the door to a life lived in authentic flow. It's a powerful tool for self-discovery and empowerment, guiding you to make decisions that are inherently correct for you.
 
 Ready to discover your unique **Human Design Strategy** and unlock your potential? [Calculate your free Human Design chart today](/en/chart) and begin your journey to living in flow!
 

@@ -65,7 +65,6 @@ export default function DailyTransit() {
 
   const stableInput = useMemo(
     () => (effectiveChartId ? { chartId: effectiveChartId } : undefined),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [effectiveChartId, refreshKey]
   );
 

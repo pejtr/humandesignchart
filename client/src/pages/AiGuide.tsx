@@ -447,7 +447,9 @@ export default function AiGuide() {
       setLoadedConvId(conv.id); // new thread has no history, mark as loaded
       setMessages([{ id: "welcome", role: "assistant", content: welcomeMessage, timestamp: new Date() }]);
       refetchConversations();
-    } catch { }
+    } catch {
+      // Mutation feedback is rendered by the existing query state.
+    }
   }, [conversations, locale, welcomeMessage, createConvMutation, refetchConversations, selectedChartId]);
 
   const scrollToBottom = () => {
@@ -468,7 +470,6 @@ export default function AiGuide() {
     };
     window.addEventListener("ai-guide-send", handler);
     return () => window.removeEventListener("ai-guide-send", handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, messages, conversationId]);
 
   const handleSend = async (text?: string) => {

@@ -20,7 +20,7 @@ function initClarity() {
   const clarityId = (import.meta as any).env?.VITE_CLARITY_ID as string | undefined;
   if (!clarityId || (window as any).clarity) return;
   (function(c: any, l: any, a: any, r: any, i: any) {
-    (c[a] = c[a] || function() { (c[a].q = c[a].q || []).push(arguments); });
+    (c[a] = c[a] || function(...args: unknown[]) { (c[a].q = c[a].q || []).push(args); });
     const s = l.createElement(r); s.async = 1; s.src = "https://www.clarity.ms/tag/" + i;
     const t = l.getElementsByTagName(r)[0]; t.parentNode?.insertBefore(s, t);
   })(window, document, "clarity", "script", clarityId);

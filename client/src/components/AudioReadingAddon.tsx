@@ -15,7 +15,7 @@ interface AudioReadingAddonProps {
 function plainSpeechText(value: string) {
   return value
     .replace(/```[\s\S]*?```/g, " ")
-    .replace(/[#*_>`~\[\]()]/g, " ")
+    .replace(/[#*_>`~[\]()]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }

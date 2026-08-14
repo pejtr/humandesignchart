@@ -81,7 +81,9 @@ export function AuthSidebar() {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, String(expanded));
-    } catch {}
+    } catch {
+      // Storage can be unavailable in private browsing; layout still works in memory.
+    }
     // Update CSS variable so main content shifts accordingly
     document.documentElement.style.setProperty("--sidebar-w", expanded ? "200px" : "56px");
   }, [expanded]);

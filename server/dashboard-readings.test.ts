@@ -99,7 +99,7 @@ describe("getReadingById", () => {
       readingType: "profile",
       content: "Váš profil 3/5...",
       rating: null,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     };
     vi.mocked(getReadingById).mockResolvedValue(mockReading);
 
@@ -138,7 +138,7 @@ describe("shareReading procedure logic", () => {
     await createSharedChart({
       token: "abc123token",
       chartData: { readingContent: reading!.content, readingType: reading!.readingType } as any,
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
     });
 
     expect(createSharedChart).toHaveBeenCalledWith(

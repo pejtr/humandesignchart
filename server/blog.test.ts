@@ -66,7 +66,7 @@ describe("Blog Articles", () => {
 
   it("should have articles about strategy", () => {
     const strategyArticles = blogArticles.filter(a =>
-      a.category === "Strategie" || a.tags.includes("strategie")
+      a.category === "strategie" || a.tags.includes("strategie")
     );
     expect(strategyArticles.length).toBeGreaterThan(0);
   });

@@ -1450,16 +1450,16 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                   <TabsContent value="genekeys" className="mt-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {["pe", "ps", "de", "ds"].map((type) => {
-                        let planet = type[1] === "s" ? "Sun" : "Earth";
-                        let isPers = type[0] === "p";
-                        let title = isPers && planet === "Sun" ? "Životní dílo (Life's Work)" :
+                        const planet = type[1] === "s" ? "Sun" : "Earth";
+                        const isPers = type[0] === "p";
+                        const title = isPers && planet === "Sun" ? "Životní dílo (Life's Work)" :
                           isPers && planet === "Earth" ? "Evoluce (Evolution)" :
                             !isPers && planet === "Sun" ? "Vyzařování (Radiance)" : "Cíl (Purpose)";
-                        let activation = (isPers ? chart.personalityActivations : chart.designActivations || [])
+                        const activation = (isPers ? chart.personalityActivations : chart.designActivations || [])
                           .find(a => a.planet === planet);
                         if (!activation) return null;
 
-                        let gateData = hdData?.gates[activation.gate];
+                        const gateData = hdData?.gates[activation.gate];
                         return (
                           <Card key={type} className="bg-card border-border/50 shadow-sm overflow-hidden">
                             <CardHeader className={`pb-2 ${isPers ? "bg-muted/10 border-b border-border/30" : "bg-red-500/5 border-b border-red-500/10"}`}>

@@ -57,9 +57,9 @@ async function applyReferral(
     referredUserId: newUserId,
     referralCode: referralCode.toUpperCase(),
     status: "completed",
-    referrerCredited: true,
-    referredCredited: true,
-    completedAt: new Date(),
+    referrerCredited: 1,
+    referredCredited: 1,
+    completedAt: new Date().toISOString(),
   });
 
   await addAiReadingCredits(referrer.id, 1);

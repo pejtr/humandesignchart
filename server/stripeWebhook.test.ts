@@ -174,15 +174,15 @@ describe("Stripe Webhook — Voucher Code Generation", () => {
 
 describe("Stripe Webhook — Affiliate Self-Referral Prevention", () => {
   it("prevents affiliate from earning commission on their own purchase", () => {
-    const affiliateId = 42;
-    const userId = 42; // same user
+    const affiliateId: number = 42;
+    const userId: number = 42; // same user
     const shouldTrack = affiliateId !== userId;
     expect(shouldTrack).toBe(false);
   });
 
   it("allows affiliate to earn commission on other users' purchases", () => {
-    const affiliateId = 42;
-    const userId = 99; // different user
+    const affiliateId: number = 42;
+    const userId: number = 99; // different user
     const shouldTrack = affiliateId !== userId;
     expect(shouldTrack).toBe(true);
   });

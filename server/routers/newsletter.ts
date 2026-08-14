@@ -58,7 +58,9 @@ const baseUrl = getBaseUrl(ctx.req);
                     title: "New Newsletter Subscriber ✨",
                     content: `${input.email} subscribed (locale: ${input.locale}, source: ${input.source})`,
                 });
-            } catch { }
+            } catch {
+                // Owner notification is best-effort and must not block signup.
+            }
             return { success: true, alreadySubscribed: false, needsConfirmation: true };
         }),
 

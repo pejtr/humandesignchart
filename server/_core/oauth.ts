@@ -335,7 +335,9 @@ export function registerOAuthRoutes(app: Express) {
         try {
           const user = JSON.parse(userStr);
           name = [user.name?.firstName, user.name?.lastName].filter(Boolean).join(" ") || null;
-        } catch {}
+        } catch {
+          // Apple may omit or return malformed one-time profile data.
+        }
       }
 
       await handleUserSession(req, res, {

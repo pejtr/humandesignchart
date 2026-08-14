@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "client/src/**/*.test.ts",
+    "client/src/**/*.test.tsx",
+    "server/**/*.test.ts",
+    "shared/**/*.test.ts"
+  ],
+  "exclude": ["node_modules", "build", "dist", ".claude"],
+  "compilerOptions": {
+    "incremental": false,
+    "target": "ES2022",
+    "types": ["node", "vite/client", "vitest/globals"]
+  }
+}

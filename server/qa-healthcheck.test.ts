@@ -34,10 +34,103 @@ const testimonialStore = new Map<number, any>();
 let testimonialAutoId = 1;
 const subscriberStore = new Map<string, any>();
 
+function drizzleTableName(table: any): string {
+  const nameSymbol = Object.getOwnPropertySymbols(table ?? {}).find(
+    symbol => symbol.toString() === "Symbol(drizzle:Name)"
+  );
+  return nameSymbol ? String(table[nameSymbol]) : "unknown";
+}
+
+function queryStrings(value: unknown, seen = new WeakSet<object>()): string[] {
+  if (typeof value === "string") return [value];
+  if (!value || typeof value !== "object" || seen.has(value)) return [];
+  seen.add(value);
+  return Object.values(value).flatMap(item => queryStrings(item, seen));
+}
+
+function createMockDb() {
+  const rowsFor = (table: string, selection: Record<string, unknown> | undefined, condition: unknown) => {
+    if (table === "newsletter_subscribers") {
+      const values = queryStrings(condition);
+      return Array.from(subscriberStore.values()).filter(row =>
+        values.includes(row.email) || values.includes(row.confirmToken)
+      );
+    }
+    if (table === "testimonials") {
+      const approved = Array.from(testimonialStore.values()).filter(row => row.status === "approved");
+      if (selection && "count" in selection) {
+        const avgRating = approved.length
+          ? approved.reduce((sum, row) => sum + row.rating, 0) / approved.length
+          : 0;
+        return [{ count: approved.length, avgRating }];
+      }
+      return approved;
+    }
+    if (table === "users") {
+      return [{
+        id: 99911,
+        currentStreak: 3,
+        longestStreak: 7,
+        totalCreditsEarned: 4,
+        aiReadingCredits: 10,
+        lastDailyRewardAt: null,
+        subscriptionStatus: "none",
+      }];
+    }
+    if (table === "referrals") return [];
+    return [];
+  };
+
+  return {
+    select: vi.fn((selection?: Record<string, unknown>) => {
+      let table = "unknown";
+      let condition: unknown;
+      const chain: any = {
+        from(value: any) {
+          table = drizzleTableName(value);
+          return chain;
+        },
+        where(value: unknown) {
+          condition = value;
+          return chain;
+        },
+        orderBy() { return chain; },
+        limit() { return Promise.resolve(rowsFor(table, selection, condition)); },
+        then(resolve: (value: any) => unknown, reject?: (reason: unknown) => unknown) {
+          return Promise.resolve(rowsFor(table, selection, condition)).then(resolve, reject);
+        },
+      };
+      return chain;
+    }),
+    insert: vi.fn((table: any) => ({
+      values: vi.fn(async (data: any) => {
+        const name = drizzleTableName(table);
+        if (name === "newsletter_subscribers") {
+          subscriberStore.set(data.email, { id: subscriberStore.size + 1, ...data });
+          return [{ insertId: subscriberStore.size }];
+        }
+        if (name === "testimonials") {
+          const id = testimonialAutoId++;
+          testimonialStore.set(id, { id, ...data });
+          return [{ insertId: id }];
+        }
+        return [{ insertId: 1 }];
+      }),
+    })),
+    update: vi.fn(() => ({
+      set: vi.fn(() => ({ where: vi.fn(async () => [{ affectedRows: 1 }]) })),
+    })),
+  };
+}
+
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
 vi.mock("./db", () => ({
-  getDb: vi.fn().mockResolvedValue({}),
+  getDb: vi.fn().mockImplementation(async () => createMockDb()),
+  countTotalCharts: vi.fn(async () => chartStore.size),
+  calculateUserLevel: vi.fn(() => "searcher"),
+  processStreakCheckIn: vi.fn(async () => ({ streakUpdated: true, newStreak: 1, creditsAwarded: 0 })),
+  claimDailyReward: vi.fn(async () => ({ alreadyClaimed: false, creditsAwarded: 1 })),
   getChartById: vi.fn(async (id: number) => chartStore.get(id) ?? null),
   getUserCharts: vi.fn(async (userId: number) => {
     return Array.from(chartStore.values()).filter(c => c.userId === userId);
@@ -77,7 +170,16 @@ vi.mock("./db", () => ({
   getReadingById: vi.fn(async (id: number) => readingStore.get(id) ?? null),
   createSharedChart: vi.fn(async (data: any) => data.token),
   getSharedChart: vi.fn(async (token: string) => null),
-  getUserById: vi.fn(async (id: number) => null),
+  getUserById: vi.fn(async (id: number) => ({
+    id,
+    openId: `test-openid-${id}`,
+    name: `QA Test User ${id}`,
+    email: `qa-test-${id}@example.com`,
+    referralCode: null,
+    aiReadingCredits: 10,
+    subscriptionStatus: "none",
+    subscriptionPlan: "none",
+  })),
   getUserByOpenId: vi.fn(async () => null),
   getUserByReferralCode: vi.fn(async () => null),
   getReferralByReferredUser: vi.fn(async () => null),
@@ -101,6 +203,17 @@ vi.mock("./db", () => ({
   }),
   getUserNotifications: vi.fn(async (userId: number) => []),
   getUnreadCount: vi.fn(async () => 0),
+  markNotificationRead: vi.fn(async () => {}),
+  markAllNotificationsRead: vi.fn(async () => {}),
+}));
+
+vi.mock("./db.notifications", () => ({
+  getUserNotifications: vi.fn(async (userId: number) =>
+    Array.from(notificationStore.values()).filter(row => row.userId === userId)
+  ),
+  getUnreadCount: vi.fn(async (userId: number) =>
+    Array.from(notificationStore.values()).filter(row => row.userId === userId && !row.isRead).length
+  ),
   markNotificationRead: vi.fn(async () => {}),
   markAllNotificationsRead: vi.fn(async () => {}),
 }));
@@ -138,7 +251,7 @@ function createPublicContext(): TrpcContext {
   return {
     user: null,
     req: { protocol: "https", headers: {} } as TrpcContext["req"],
-    res: { clearCookie: () => {} } as TrpcContext["res"],
+    res: { clearCookie: () => {} } as unknown as TrpcContext["res"],
   };
 }
 
@@ -164,7 +277,7 @@ function createAuthContext(userId: number, role: "user" | "admin" | "moderator" 
       notificationPreferences: { dailyTransit: true, system: true, credits: true, campaigns: true },
     } as any,
     req: { protocol: "https", headers: {} } as TrpcContext["req"],
-    res: { clearCookie: () => {} } as TrpcContext["res"],
+    res: { clearCookie: () => {} } as unknown as TrpcContext["res"],
   };
 }
 
@@ -223,13 +336,15 @@ describe("1. Smoke — Router existence", () => {
   it("content.blogList(CS) returns articles", async () => {
     const caller = appRouter.createCaller(createPublicContext());
     const result = await caller.content.blogList({ locale: "cs" });
-    expect(Array.isArray(result)).toBe(true);
+    expect(Array.isArray(result.articles)).toBe(true);
+    expect(Array.isArray(result.categories)).toBe(true);
   });
 
   it("content.blogList(EN) returns articles", async () => {
     const caller = appRouter.createCaller(createPublicContext());
     const result = await caller.content.blogList({ locale: "en" });
-    expect(Array.isArray(result)).toBe(true);
+    expect(Array.isArray(result.articles)).toBe(true);
+    expect(Array.isArray(result.categories)).toBe(true);
   });
 
   it("testimonials.getApproved returns array", async () => {
@@ -355,18 +470,18 @@ describe("3. Composite — Chart comparison (family)", () => {
     chartBId = b.id;
   });
 
-  it("composite.analyze returns electromagnetic, shared, and bridges", async () => {
+  it("composite.analyze returns the current relationship contract", async () => {
     const ctx = createAuthContext(99902);
     const caller = appRouter.createCaller(ctx);
     const result = await caller.composite.analyze({ chartIdA: chartAId, chartIdB: chartBId });
 
     expect(result).toBeDefined();
     expect(result).toHaveProperty("electromagnetic");
-    expect(result).toHaveProperty("shared");
-    expect(result).toHaveProperty("bridges");
+    expect(result).toHaveProperty("sharedChannels");
+    expect(result).toHaveProperty("centerCompatibility");
     expect(Array.isArray(result.electromagnetic)).toBe(true);
-    expect(Array.isArray(result.shared)).toBe(true);
-    expect(Array.isArray(result.bridges)).toBe(true);
+    expect(Array.isArray(result.sharedChannels)).toBe(true);
+    expect(Array.isArray(result.centerCompatibility)).toBe(true);
   });
 
   it("composite.analyze(self vs self) returns data without errors", async () => {
@@ -538,18 +653,18 @@ describe("8. Referral — Code generation and application", () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe("9. Gift Voucher — Check and redeem", () => {
-  it("gift.check with non-existent code returns invalid", async () => {
+  it("giftVoucher.check with non-existent code returns invalid", async () => {
     const caller = appRouter.createCaller(createPublicContext());
-    const result = await caller.gift.check({ code: "HD-INVALID-CODE-1234" });
+    const result = await caller.giftVoucher.check({ code: "HD-INVALID-CODE-1234" });
     expect(result.valid).toBe(false);
     expect(result.reason).toBe("not_found");
   });
 
-  it("gift.redeem with non-existent code throws", async () => {
+  it("giftVoucher.redeem with non-existent code throws", async () => {
     const ctx = createAuthContext(99907);
     const caller = appRouter.createCaller(ctx);
     await expect(
-      caller.gift.redeem({ code: "HD-INVALID-CODE-1234" })
+      caller.giftVoucher.redeem({ code: "HD-INVALID-CODE-1234" })
     ).rejects.toThrow();
   });
 });
@@ -570,8 +685,8 @@ describe("10. Notifications — CRUD", () => {
     const ctx = createAuthContext(99908);
     const caller = appRouter.createCaller(ctx);
     const result = await caller.notifications.getUnreadCount();
-    expect(typeof result).toBe("number");
-    expect(result).toBeGreaterThanOrEqual(0);
+    expect(typeof result.count).toBe("number");
+    expect(result.count).toBeGreaterThanOrEqual(0);
   });
 });
 
@@ -763,8 +878,8 @@ describe("15. Chart Comparison — Multi-chart (family + friend)", () => {
     const caller = appRouter.createCaller(ctx);
     const result = await caller.composite.analyze({ chartIdA: selfChartId, chartIdB: familyChartId });
     expect(result.electromagnetic).toBeDefined();
-    expect(result.shared).toBeDefined();
-    expect(result.bridges).toBeDefined();
+    expect(result.sharedChannels).toBeDefined();
+    expect(result.centerCompatibility).toBeDefined();
   });
 
   it("composite.analyze(self vs friend) works", async () => {
@@ -806,20 +921,22 @@ describe("15. Chart Comparison — Multi-chart (family + friend)", () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe("16. Gamification — Streak and achievements", () => {
-  it("gamification.getStreak returns streak data", async () => {
+  it("gamification.getStats returns streak data", async () => {
     const ctx = createAuthContext(99911);
     const caller = appRouter.createCaller(ctx);
-    const result = await caller.gamification.getStreak();
+    const result = await caller.gamification.getStats();
     expect(result).toBeDefined();
     expect(typeof result.currentStreak).toBe("number");
     expect(typeof result.longestStreak).toBe("number");
   });
 
-  it("gamification.getAchievements returns array", async () => {
+  it("gamification.getStats returns progression and reward data", async () => {
     const ctx = createAuthContext(99911);
     const caller = appRouter.createCaller(ctx);
-    const result = await caller.gamification.getAchievements();
-    expect(Array.isArray(result)).toBe(true);
+    const result = await caller.gamification.getStats();
+    expect(typeof result.totalCreditsEarned).toBe("number");
+    expect(typeof result.dailyRewardAvailable).toBe("boolean");
+    expect(result.level).toBeDefined();
   });
 });
 

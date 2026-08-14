@@ -7,7 +7,7 @@ export async function getOrCreateConversation(userId: number, chartId: number | 
     if (!db) throw new Error("Database not available");
 
     // Try to find an existing active conversation for this user and chart
-    let conversation = await db.select().from(chatConversations)
+    const conversation = await db.select().from(chatConversations)
         .where(
             and(
                 eq(chatConversations.userId, userId),

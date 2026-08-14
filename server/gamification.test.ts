@@ -66,7 +66,7 @@ describe("processStreakCheckIn", () => {
       streakUpdated: true,
       newStreak: 2,
       creditsAwarded: 0,
-      alreadyCheckedIn: false,
+      streakBroken: false,
     });
     const result = await processStreakCheckIn(1);
     expect(result.streakUpdated).toBe(true);
@@ -78,22 +78,22 @@ describe("processStreakCheckIn", () => {
       streakUpdated: true,
       newStreak: 7,
       creditsAwarded: 1,
-      alreadyCheckedIn: false,
+      streakBroken: false,
     });
     const result = await processStreakCheckIn(1);
     expect(result.creditsAwarded).toBe(1);
     expect(result.newStreak).toBe(7);
   });
 
-  it("returns alreadyCheckedIn=true if called twice on same day", async () => {
+  it("does not update the streak if called twice on the same day", async () => {
     vi.mocked(processStreakCheckIn).mockResolvedValue({
       streakUpdated: false,
       newStreak: 3,
       creditsAwarded: 0,
-      alreadyCheckedIn: true,
+      streakBroken: false,
     });
     const result = await processStreakCheckIn(1);
-    expect(result.alreadyCheckedIn).toBe(true);
+    expect(result.streakUpdated).toBe(false);
   });
 
   it("resets streak to 1 if more than 1 day has passed", async () => {
@@ -101,7 +101,7 @@ describe("processStreakCheckIn", () => {
       streakUpdated: true,
       newStreak: 1,
       creditsAwarded: 0,
-      alreadyCheckedIn: false,
+      streakBroken: true,
     });
     const result = await processStreakCheckIn(1);
     expect(result.newStreak).toBe(1);
@@ -114,6 +114,7 @@ describe("claimDailyReward", () => {
 
   it("awards credits on first claim of the day", async () => {
     vi.mocked(claimDailyReward).mockResolvedValue({
+      success: true,
       alreadyClaimed: false,
       creditsAwarded: 0.1,
     });
@@ -124,6 +125,7 @@ describe("claimDailyReward", () => {
 
   it("returns alreadyClaimed=true on second claim", async () => {
     vi.mocked(claimDailyReward).mockResolvedValue({
+      success: false,
       alreadyClaimed: true,
       creditsAwarded: 0,
     });

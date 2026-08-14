@@ -87,7 +87,9 @@ export const affiliateRouter = router({
                     title: "Affiliate Payout Requested 💰",
                     content: `User ID ${ctx.user.id} requested payout of ${pending} CZK via ${input.paymentMethod}.`,
                 });
-            } catch { }
+            } catch {
+                // Owner notification is best-effort and must not block the request.
+            }
 
             return { success: true, amount: pending };
         }),

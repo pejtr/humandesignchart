@@ -13,7 +13,7 @@ export function WelcomeBonusBanner() {
   useEffect(() => {
     // Persistent timer start in localStorage
     const savedStart = localStorage.getItem("welcomeBonusStart");
-    let startTime = savedStart ? parseInt(savedStart, 10) : Date.now();
+    const startTime = savedStart ? parseInt(savedStart, 10) : Date.now();
     if (!savedStart) {
       localStorage.setItem("welcomeBonusStart", startTime.toString());
     }
