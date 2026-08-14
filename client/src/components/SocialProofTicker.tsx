@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Crown, X, Compass, Zap } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useLocation } from "wouter";
 
 interface EventItem {
   id: string;
@@ -75,7 +76,9 @@ const SAMPLE_EVENTS: EventItem[] = [
 
 export function SocialProofTicker() {
   const { locale } = useLanguage();
+  const [location] = useLocation();
   const isEn = locale === "en";
+  const isAiGuide = location.includes("/ai-guide");
   const [currentEvent, setCurrentEvent] = useState<EventItem | null>(null);
   const [isDismissed, setIsDismissed] = useState(false);
 
@@ -119,7 +122,9 @@ export function SocialProofTicker() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 20, scale: 0.9 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="fixed bottom-4 left-4 z-[200] max-w-[320px] sm:max-w-[360px] bg-white/95 dark:bg-[#120e24]/95 backdrop-blur-md border border-purple-200/50 dark:border-purple-800/40 rounded-2xl p-3.5 shadow-xl shadow-purple-900/10 pointer-events-auto"
+        className={`fixed left-3 right-3 z-[60] max-w-none sm:left-4 sm:right-auto sm:max-w-[360px] md:bottom-4 bg-white/95 dark:bg-[#120e24]/95 backdrop-blur-md border border-purple-200/50 dark:border-purple-800/40 rounded-xl sm:rounded-2xl p-3 shadow-xl shadow-purple-900/10 pointer-events-auto ${
+          isAiGuide ? "bottom-[9rem]" : "bottom-[5.25rem]"
+        }`}
       >
         <div className="flex items-start gap-3">
           <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 shrink-0 mt-0.5">

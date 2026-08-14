@@ -282,6 +282,23 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
     return staticRoutes[slug];
   }
 
+  // ── Dynamic: /partner/:referralCode ───────────────────────────────
+  // Clean, share-friendly invite URL. The client redirects people to
+  // the calculator while crawlers receive a complete preview card.
+  if (slug.startsWith("partner/")) {
+    const referralCode = slug.replace("partner/", "").split(/[?#]/)[0];
+    return {
+      title: isEn
+        ? "Let's Compare Our Human Design Charts ✨"
+        : "Pojďme porovnat naše Human Design mapy ✨",
+      description: isEn
+        ? "Create your free chart and discover the energy, strengths and dynamics of our relationship."
+        : "Vytvořte si zdarma svou mapu a objevte energii, silné stránky i dynamiku našeho vztahu.",
+      canonical: `${base}/${locale}/partner/${encodeURIComponent(referralCode)}`,
+      ogImage: `${CS}/images/og-homepage.png`,
+    };
+  }
+
   // ── Dynamic: /types/:type ──────────────────────────────────────────
   if (slug.startsWith("types/")) {
     const type = slug.replace("types/", "");

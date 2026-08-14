@@ -16,7 +16,7 @@ export function PartnerCompareInvite({ referralCode, chartName }: PartnerCompare
   const [copied, setCopied] = useState(false);
 
   const code = referralCode || "HDM2026";
-  const shareUrl = `${window.location.origin}/${locale}/calculate?ref=${code}&mode=partner`;
+  const shareUrl = `${window.location.origin}/${locale}/partner/${encodeURIComponent(code)}`;
 
   const handleCopy = async () => {
     try {

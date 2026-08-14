@@ -129,6 +129,7 @@ export function AuthSidebar() {
           const linkContent = (
             <Link
               href={localePath(item.href)}
+              onClick={() => window.scrollTo({ top: 0, left: 0, behavior: active ? "smooth" : "auto" })}
               className={`relative flex items-center gap-2.5 w-full h-9 rounded-lg transition-all duration-150 no-underline group ${expanded ? 'px-2' : 'justify-center px-0'}`}
               style={
                 active

@@ -8,6 +8,11 @@ export function ScrollToTop() {
   const isAiGuide = location.includes("/ai-guide");
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    setVisible(false);
+  }, [location]);
+
+  useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 400);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);

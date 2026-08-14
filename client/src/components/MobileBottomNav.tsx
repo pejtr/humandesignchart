@@ -102,7 +102,7 @@ export function MobileBottomNav() {
           const Icon = item.icon;
 
           return (
-            <Link key={item.id} href={item.href}>
+            <Link key={item.id} href={item.href} onClick={() => window.scrollTo({ top: 0, left: 0, behavior: isActive ? "smooth" : "auto" })}>
               <button className="relative flex flex-col items-center justify-center gap-0.5 w-14 h-14 rounded-xl transition-all">
                 <Icon
                   className={`w-5 h-5 transition-colors ${

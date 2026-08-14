@@ -126,6 +126,14 @@ function LegacyRedirect({ path }: { path: string }) {
   return <Redirect to={`/${locale}${path}`} />;
 }
 
+function PartnerInviteRedirect({ locale, code }: { locale: string; code: string }) {
+  const [, setLocation] = useLocation();
+  useEffect(() => {
+    setLocation(`/${locale}/calculate?ref=${encodeURIComponent(code)}&mode=partner`, { replace: true });
+  }, [code, locale, setLocation]);
+  return <PageLoader />;
+}
+
 /** All app routes, rendered inside a locale prefix */
 function LocaleRoutes() {
   const { isAuthenticated } = useAuth();
@@ -144,6 +152,9 @@ function LocaleRoutes() {
             <Route path="/:locale" component={Home} />
 
             {/* Core pages */}
+            <Route path="/:locale/partner/:code">
+              {(params: any) => <PartnerInviteRedirect locale={params.locale} code={params.code} />}
+            </Route>
             <Route path="/:locale/calculate">
               {() => <SafeRoute><ChartCalculator /></SafeRoute>}
             </Route>

@@ -368,6 +368,7 @@ export default function AiGuide() {
   const totalMessages = messages.filter(m => m.role === "user").length;
   const showUpgradeBanner = !isPremium && totalMessages >= 3 && isAuthenticated;
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesViewportRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const askMutation = trpc.ai.askGuide.useMutation();
@@ -450,7 +451,9 @@ export default function AiGuide() {
   }, [conversations, locale, welcomeMessage, createConvMutation, refetchConversations, selectedChartId]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const viewport = messagesViewportRef.current;
+    if (!viewport) return;
+    viewport.scrollTo({ top: viewport.scrollHeight, behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -704,6 +707,7 @@ export default function AiGuide() {
                   className="flex-1 space-y-4 mb-4 pr-1 md:overflow-y-auto"
                   style={{ maxHeight: "var(--chat-max-h, none)" }}
                   ref={el => {
+                    messagesViewportRef.current = el;
                     // On desktop apply max-height for inner scroll; on mobile let page scroll
                     if (el) {
                       const isMd = window.innerWidth >= 768;
