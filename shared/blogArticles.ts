@@ -931,6 +931,75 @@ Nejlepší způsob, jak pracovat s touto energií? Jednoduše: **žijte svůj de
 
 *Chcete vědět, jak slunovrat ovlivňuje vaši konkrétní mapu? [Vypočítejte si svůj Human Design](/cs/calculate) a zjistěte, které brány a centra jsou u vás definované — a jak s nimi vědomě pracovat.*`,
   },
+  {
+    slug: "psychosomatika-zuby-duchovni-priciny",
+    title: "Zuby a jejich duchovní příčiny: Psychosomatika, emoce a Human Design",
+    metaTitle: "Zuby a duchovní příčiny problémů: Psychosomatika a Human Design | 2026",
+    metaDescription: "Máte problémy se zuby, kazivostí nebo zatínáním čelisti? Zjistěte duševní příčiny problémů se zuby a jak souvisejí s otevřenými centry v Human Designu.",
+    excerpt: "Zubní kaz ani skřípání zubů nejsou jen otázkou hygieny. Zuby reprezentují naši schopnost prosadit se, stousat životní výzvy a vyjádřit potlačený hněv.",
+    category: "centra",
+    categoryLabel: "Centra & Psychosomatika",
+    readingTime: 12,
+    publishedAt: "2026-08-08",
+    updatedAt: "2026-08-08",
+    coverColor: "bg-gradient-to-br from-rose-50 to-purple-50",
+    coverIcon: "Sparkles",
+    tags: ["psychosomatika", "zuby", "duchovní příčiny", "hrdlo", "emoce", "bruxismus"],
+    content: `## Co nám říkají naše zuby? Psychosomatický pohled
+
+Zuby jsou nejtvrdší tkání v lidském těle. V psychosomatice a celostní medicíně představují **naši sílu, schopnost se prosadit, uchopit životní příležitosti a "rozkousat" problémy**, které nám život staví do cesty.
+
+Pokud máme problémy se zuby — od zvýšené kazivosti, přes záněty dásní až po noční skřípání (bruxismus) — tělo nám často signalizuje hlubší vnitřní konflikt, potlačenou agresi nebo neschopnost vyjádřit vlastní pravdu.
+
+![Psychosomatika zubů a hrdelního centra v Human Designu](https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=1200&q=80&auto=format&fit=crop)
+
+---
+
+## Význam jednotlivých typů zubů
+
+Každá skupina zubů má svůj specifický psychologický a energetický význam:
+
+### 1. Řezáky (Přední zuby) — Vztah k rodině a základní důvěra
+Přední zuby reprezentují náš **první kontakt se světem a vztah k rodičovským vzorům**.
+- **Horní řezáky**: Otcovská autorita, mužský princip a naše schopnost směřovat vpřed.
+- **Dolní řezáky**: Mateřská péče, ženský princip, citová stabilita a pocit bezpečí.
+
+### 2. Špičáky — Agresivita a zdravé hranice
+Špičáky slouží k trhání a uchopování. V duševní rovině představují **zdravou agresivitu, schopnost říci NIE a nastavení hranic**. Pokud si zakazujeme hněv nebo se bojíme konfliktů, špičáky se mohou zvýšeně kazit nebo obrušovat.
+
+### 3. Třenové zuby (Předstoličky) — Rozhodování a analýza
+Tyto zuby drtí potravu. Vnímáme je jako odraz **naší schopnosti analyzovat životní situace a činit rozhodnutí**. Problémy zde vznikají při dlouhodobé nerozhodnosti a pocitu, že nás život "drtí".
+
+### 4. Stoličky a Zuby moudrosti — Hluboká moudrost a kořeny
+Stoličky zpracovávají to nejtvrdší. Odpovídají za **zpracování hlubokých životních lekcí, moudrost předků a stabilitu**. Zadržované zuby moudrosti často ukazují na strach vstoupit do dospělosti a převzít plnou odpovědnost za svůj život.
+
+---
+
+## Propojení s Human Designem a energetickými centry
+
+V Human Designu nacházíme přímou souvislost mezi zdravím dutiny ústní a fungováním našich energetických center:
+
+### Otevřené Hrdelní Centrum (Open Throat Center)
+Lidé s otevřeným Hrdlem mají tendenci **zatínat čelisti a trpět nočním bruxismem (skřípáním zubů)**. Vzniká to z podvědomého tlaku promluvit ve špatný čas nebo z potlačování vlastního hlasu, aby nikoho neurazili.
+
+### Otevřené Srdce / Ego (Open Ego Center)
+Pokud se neustále snažíte ostatním dokazovat svou hodnotu a přepínáte své síly, napětí se uvolňuje v oblasti čelistního kloubu. Tělo reaguje mikro-prasklinami v zubní sklovině.
+
+### Emocionální Solar Plexus & Spleen (Slezina)
+Nevyjádřený hněv a strach mají přímý dopad na kyselost prostředí v ústech. Chronický stres a úzkost snižují produkci slin, což vede k rychlému rozvoji zubního kazu a zánětům dásní (parodontóze).
+
+---
+
+## Jak navrátit rovnováhu a zdraví svojim zubům?
+
+1. **Vědomé uvolnění čelisti během dne**: Několikrát denně zkontrolujte, zda nemáte zatnuté zuby. Jazyk by měl volně spočívat na patře.
+2. **Vyjadřování emoční pravdy**: Učte se komunikovat své pocity bez pocitu viny.
+3. **Zjistěte své nastavení v Human Designu**: Poznejte svou Strategii a Autoritu, abyste přestali tlačit na pilu v oblastech, kde máte přirozeně přijímat.
+
+---
+
+*Chcete zjistit, jak jsou na tom vaše energetická centra a zda máte definované Hrdlo či Ego? [Vypočítejte si svou mapu v kalkulačce zdarma](/cs/calculate) a konzultujte své nastavení s AI Marií!*`,
+  },
 ];
 
 // Helper aliases and functions
