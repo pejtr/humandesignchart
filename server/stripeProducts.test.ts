@@ -27,7 +27,7 @@ describe("monetization product ladder", () => {
     const annualUpgrade = STRIPE_PRODUCTS.BLUEPRINT_ANNUAL_UPGRADE.pricesCzk;
     expect(blueprint).toBe(39000);
     expect(STRIPE_PRODUCTS.BLUEPRINT_PARTNER_ADDON.pricesCzk).toBe(19000);
-    expect(annualUpgrade).toBe(79800);
+    expect(annualUpgrade).toBe(80000);
     expect(blueprint + annualUpgrade).toBe(STRIPE_PRODUCTS.PREMIUM_ANNUAL.pricesCzk);
   });
 

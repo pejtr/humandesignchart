@@ -33,6 +33,7 @@ import { adsRouter } from "./routers/ads";
 import { angelNumbersRouter } from "./routers/angelNumbers";
 import { pushRouter } from "./routers/push";
 import { testimonialsRouter } from "./routers/testimonials";
+import { maatRouter } from "./routers/maat";
 
 export const appRouter = router({
   system: systemRouter,
@@ -60,6 +61,7 @@ export const appRouter = router({
   angelNumbers: angelNumbersRouter,
   push: pushRouter,
   testimonials: testimonialsRouter,
+  maat: maatRouter,
 });
 
 export type AppRouter = typeof appRouter;

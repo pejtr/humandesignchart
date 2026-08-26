@@ -1,70 +1,90 @@
 /**
  * Stripe Products & Prices Configuration
- * Human Design App — Premium Subscription Plans
+ * Human Design App — MAAT NeuroHive 5.55 Offer Stack
  *
  * Prices in CZK (Czech Koruna) and EUR.
- * These are created dynamically on first checkout if not yet in Stripe.
  */
 
 export const STRIPE_PRODUCTS = {
+  // 1. MARIE PLUS — Regenerative Subscription (189 CZK/mo, 1190 CZK/yr)
   PREMIUM_MONTHLY: {
-    name: "Human Design Premium — Měsíční / Monthly",
-    description: "Neomezené AI výklady, PDF reporty, všechny nástroje | Unlimited AI readings, PDF reports, all tools",
-    pricesCzk: 18800, // 188 CZK in haléře
-    pricesEur: 749,   // 7.49 EUR in cents
+    name: "Marie Plus — Měsíční Předplatné / Monthly",
+    description: "Personalizované denní tranzity, týdenní digest, reflexní deník, vztahové mapy, fair AI kvóta",
+    pricesCzk: 18900, // 189 CZK in haléře
+    pricesEur: 790,   // 7.90 EUR in cents
     interval: "month" as const,
     metadata: { plan: "monthly" },
   },
   PREMIUM_ANNUAL: {
-    name: "Human Design Premium — Roční / Annual",
-    description: "Vše z měsíčního plánu + úspora cca 47 % | Everything in monthly + ~47% savings",
-    pricesCzk: 118800, // 1188 CZK in haléře
-    pricesEur: 4700,  // 47 EUR in cents
+    name: "Marie Plus — Roční Předplatné / Annual",
+    description: "Vše z měsíční Marie Plus s výhodnější roční platbou 1 190 Kč",
+    pricesCzk: 119000, // 1 190 CZK in haléře
+    pricesEur: 4800,   // 48.00 EUR in cents
     interval: "year" as const,
     metadata: { plan: "annual" },
   },
+
+  // 2. DEEP READING — Primary Single-Purchase Product (390 - 490 CZK)
+  BLUEPRINT: {
+    name: "Deep Reading — Kompletní Osobní Rozbor (PDF + Audio)",
+    description: "Personalizovaný strukturovaný výklad, praktické využití v životě, PDF i audio v jednom balíčku, trvalý přístup",
+    pricesCzk: 39000, // 390 CZK base test price
+    pricesEur: 1590,  // 15.90 EUR
+    metadata: { plan: "blueprint" },
+  },
+  DEEP_READING_TEST_490: {
+    name: "Deep Reading — Kompletní Osobní Rozbor (PDF + Audio)",
+    description: "Personalizovaný strukturovaný výklad, praktické využití v životě, PDF i audio v jednom balíčku, trvalý přístup",
+    pricesCzk: 49000, // 490 CZK test variant
+    pricesEur: 1990,  // 19.90 EUR
+    metadata: { plan: "blueprint_490" },
+  },
+
+  // 3. RELATIONSHIP DYNAMICS — Contextual Product for 2+ Charts
+  RELATIONSHIP_DYNAMICS: {
+    name: "Relationship Dynamics — Kontextový Vztahový Rozbor",
+    description: "Propojení a energetický vliv dvou osobních map bez arbitrárních procent kompatibility",
+    pricesCzk: 29000, // 290 CZK
+    pricesEur: 1190,  // 11.90 EUR
+    metadata: { plan: "relationship_dynamics" },
+  },
+
+  BLUEPRINT_ANNUAL_UPGRADE: {
+    name: "Roční Marie Plus po Deep Reading",
+    description: "Doplatek roční Marie Plus po zakoupení Deep Reading",
+    pricesCzk: 80000, // 800 CZK (390 + 800 = 1190 CZK)
+    pricesEur: 3210,
+    metadata: { plan: "blueprint_annual_upgrade" },
+  },
+  // Deprecated/Legacy compatibility aliases
   PREMIUM_LIFETIME: {
-    name: "Human Design Premium — Doživotně / Lifetime",
-    description: "Exkluzivní VIP přístup navždy bez dalších poplatků | Exclusive VIP access forever with no recurring fees",
-    pricesCzk: 288800, // 2888 CZK in haléře
-    pricesEur: 11500,  // 115 EUR in cents
-    interval: "payment" as const, // one-time payment
-    metadata: { plan: "lifetime" },
+    name: "Human Design Premium — Deprecated",
+    description: "MAAT Veto: Lifetime unlimited plan is deprecated in favor of Marie Plus.",
+    pricesCzk: 288800,
+    pricesEur: 11500,
+    interval: "payment" as const,
+    metadata: { plan: "lifetime", deprecated: "true" },
   },
   CREDIT_PACK: {
-    name: "Human Design AI Credits — 5 výkladů / 5 readings",
-    description: "5 AI výkladů bez předplatného | 5 AI readings without subscription",
-    pricesCzk: 7700, // 77 CZK in haléře
-    pricesEur: 299,  // 2.99 EUR in cents
+    name: "Human Design AI Credits — 5 výkladů",
+    description: "Doplňkové AI kredity pro nepředplatitele",
+    pricesCzk: 7700,
+    pricesEur: 299,
     metadata: { plan: "credits", credits: "5" },
   },
   BRAINWAVE_AUDIO: {
-    name: "12minutové Human Design binaurální audio / 12-minute Human Design brainwave audio",
-    description: "Digitální binaurální audio 528 Hz a 40 Hz Gamma | Digital 528 Hz and 40 Hz Gamma audio",
+    name: "Human Design Audio",
+    description: "Integrováno do balíčku Deep Reading",
     pricesCzk: 19500,
     pricesEur: 790,
     metadata: { plan: "brainwave_audio" },
   },
-  BLUEPRINT: {
-    name: "Osobní Human Design Blueprint / Personal Human Design Blueprint",
-    description: "Osobní PDF report a 5 navazujících AI výkladů | Personal PDF report and 5 follow-up AI readings",
-    pricesCzk: 39000,
-    pricesEur: 1590,
-    metadata: { plan: "blueprint" },
-  },
   BLUEPRINT_PARTNER_ADDON: {
-    name: "Partnerský Blueprint doplněk / Partner Blueprint add-on",
-    description: "Druhý PDF report a 5 AI výkladů pro partnerskou mapu | Second PDF report and 5 AI readings for a partner chart",
+    name: "Partnerský Blueprint doplněk",
+    description: "Integrováno do Relationship Dynamics",
     pricesCzk: 19000,
     pricesEur: 790,
     metadata: { plan: "blueprint_partner" },
-  },
-  BLUEPRINT_ANNUAL_UPGRADE: {
-    name: "Roční Premium po Blueprintu / Annual Premium after Blueprint",
-    description: "Roční Premium se započtením ceny Blueprintu | Annual Premium with the Blueprint price credited",
-    pricesCzk: 79800,
-    pricesEur: 3190,
-    metadata: { plan: "blueprint_annual_upgrade" },
   },
   GIFT_MONTHLY: {
     name: "Dárkový poukaz — Premium Měsíc / Gift Voucher Monthly",
