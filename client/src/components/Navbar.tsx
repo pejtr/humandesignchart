@@ -16,6 +16,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { trpc } from "@/lib/trpc";
+import { SpeedPerformanceBadge } from "@/components/SpeedPerformanceBadge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -137,6 +138,13 @@ export default function Navbar() {
     { href: "/andelska-cisla", label: locale === "cs" ? "Andělská čísla" : "Angel Numbers", icon: Sparkles, desc: locale === "cs" ? "Významy asynchronicit" : "Meanings of synchronicity" },
   ];
 
+    { href: "/encyclopedia", label: locale === "cs" ? "Encyklopedie" : "Encyclopedia", icon: Layers, desc: locale === "cs" ? "Průvodce všemi HD pojmy" : "Guide to all HD concepts" },
+    { href: "/celebrities", label: t.nav.celebrities, icon: Users, desc: locale === "cs" ? "Mapy známých osobností" : "Charts of famous people" },
+    { href: "/iching", label: t.nav.iChing, icon: Hexagon, desc: locale === "cs" ? "I-Ťing orákulum" : "I Ching Oracle" },
+    { href: "/incarnation-cross", label: locale === "cs" ? "Inkarnační kříž" : "Incarnation Cross", icon: Target, desc: locale === "cs" ? "Životní poslání a 4 brány kříže" : "Life purpose and 4 gates of the cross" },
+    { href: "/andelska-cisla", label: locale === "cs" ? "Andělská čísla" : "Angel Numbers", icon: Sparkles, desc: locale === "cs" ? "Významy asynchronicit" : "Meanings of synchronicity" },
+  ];
+
   return (
     <>
       <header className={`sticky top-0 left-0 right-0 z-[100] transition-colors duration-300 ease-in-out navbar-mystical ${isScrolled
@@ -145,9 +153,9 @@ export default function Navbar() {
         }`}>
         <nav className="w-full flex items-center justify-between h-16 px-3 sm:px-4 xl:px-8 relative gap-2 sm:gap-4 max-w-screen-2xl mx-auto">
           {/* Left: Logo */}
-          <div className="flex shrink-0 items-center justify-start xl:w-48 min-w-0">
+          <div className="flex shrink-0 items-center justify-start gap-3 xl:w-72 min-w-0">
             <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline shrink-0 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600 via-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-red-500/20 group-hover:shadow-red-500/40 transition-shadow">
                 <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <circle cx="12" cy="4" r="2" />
                   <circle cx="12" cy="12" r="2.5" />
@@ -164,6 +172,9 @@ export default function Navbar() {
                 Human Design
               </span>
             </Link>
+            <div className="hidden lg:block">
+              <SpeedPerformanceBadge />
+            </div>
           </div>
 
           {/* Center: Desktop nav links */}
