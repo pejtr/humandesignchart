@@ -16,7 +16,6 @@ import { useTheme } from "@/contexts/ThemeContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { trpc } from "@/lib/trpc";
-import { SpeedPerformanceBadge } from "@/components/SpeedPerformanceBadge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -146,7 +145,7 @@ export default function Navbar() {
         }`}>
         <nav className="w-full flex items-center justify-between h-16 px-3 sm:px-4 xl:px-8 relative gap-2 sm:gap-4 max-w-screen-2xl mx-auto">
           {/* Left: Logo */}
-          <div className="flex shrink-0 items-center justify-start gap-3 xl:w-72 min-w-0">
+          <div className="flex shrink-0 items-center justify-start min-w-0">
             <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline shrink-0 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600 via-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-red-500/20 group-hover:shadow-red-500/40 transition-shadow">
                 <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -165,9 +164,6 @@ export default function Navbar() {
                 Human Design
               </span>
             </Link>
-            <div className="hidden lg:block">
-              <SpeedPerformanceBadge />
-            </div>
           </div>
 
           {/* Center: Desktop nav links */}
