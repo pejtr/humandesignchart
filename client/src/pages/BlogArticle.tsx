@@ -42,7 +42,7 @@ function renderMarkdown(md: string): string {
     .replace(/^- (.+)$/gm, '<li class="ml-4 mb-1">$1</li>')
     .replace(/^(\d+)\. (.+)$/gm, '<li class="ml-4 mb-1"><span class="font-semibold text-primary">$1.</span> $2</li>')
     .replace(/((?:<li[^>]*>.*<\/li>\n?)+)/g, '<ul class="list-disc list-outside pl-4 mb-4 space-y-1 text-foreground/90">$1</ul>')
-    .replace(/^(?!<[hul]|<li|$)(.+)$/gm, '<p class="mb-4 leading-relaxed text-foreground/85">$1</p>')
+    .replace(/^(?!<\/?(?:h[1-6]|ul|li|figure|p)\b|$)(.+)$/gm, '<p class="mb-4 leading-relaxed text-foreground/85">$1</p>')
     .replace(/<ul[^>]*>\s*<ul/g, '<ul')
     .replace(/<\/ul>\s*<\/ul>/g, '</ul>');
 }
@@ -258,6 +258,7 @@ export default function BlogArticle({ slug: propSlug }: { slug?: string } = {}) 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
+      <main>
 
       {article.coverImage && (
         <div className="w-full h-64 md:h-80 overflow-hidden mt-16">
@@ -346,13 +347,12 @@ export default function BlogArticle({ slug: propSlug }: { slug?: string } = {}) 
                                 <ProgressiveImage
                                   src={ra.coverImage}
                                   alt={ra.title}
+                                  fallbackSrc="/images/blog-fallback.png"
                                   className="w-full h-full"
                                   imgClassName="object-cover group-hover:scale-105 transition-transform duration-300"
                                 />
                               ) : (
-                                <div className={`w-full h-full flex items-center justify-center text-2xl ${ra.coverColor ?? 'bg-primary/10'}`}>
-                                  <BookOpen className="w-6 h-6 text-primary/40" />
-                                </div>
+                                <img src="/images/blog-fallback.png" alt="" className="h-full w-full object-cover" />
                               )}
                             </div>
                             {/* Text */}
@@ -402,12 +402,12 @@ export default function BlogArticle({ slug: propSlug }: { slug?: string } = {}) 
 
           <div className="container max-w-4xl">
             <div className="flex items-center justify-between mb-5">
-              <h4 className="font-serif text-base font-bold flex items-center gap-2 text-foreground">
+              <h2 className="font-serif text-base font-bold flex items-center gap-2 text-foreground">
                 <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
                   <BookOpen className="w-3.5 h-3.5 text-primary" />
                 </span>
                 {isEn ? "Also read" : "Také si přečtěte"}
-              </h4>
+              </h2>
               <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
                 {isEn ? "Swipe" : "Posuňte"} →
               </span>
@@ -434,13 +434,12 @@ export default function BlogArticle({ slug: propSlug }: { slug?: string } = {}) 
                           <ProgressiveImage
                             src={ra.coverImage}
                             alt={ra.title}
+                            fallbackSrc="/images/blog-fallback.png"
                             className="w-full h-full"
                             imgClassName="object-cover group-hover:scale-110 transition-transform duration-500"
                           />
                         ) : (
-                          <div className={`w-full h-full flex items-center justify-center ${ra.coverColor ?? 'bg-gradient-to-br from-primary/10 to-primary/5'}`}>
-                            <BookOpen className="w-7 h-7 text-primary/25" />
-                          </div>
+                          <img src="/images/blog-fallback.png" alt="" className="h-full w-full object-cover" />
                         )}
                         {/* Bottom gradient overlay on image */}
                         <div className="absolute inset-x-0 bottom-0 h-8" style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.15))' }} />
@@ -512,10 +511,10 @@ export default function BlogArticle({ slug: propSlug }: { slug?: string } = {}) 
             <div className="container max-w-4xl">
               <div className="rounded-xl border border-border/50 bg-card p-5">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-serif text-sm font-semibold flex items-center gap-2">
+                  <h2 className="font-serif text-sm font-semibold flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-primary" />
                     {isEn ? `Series: ${article.categoryLabel}` : `Série: ${article.categoryLabel}`}
-                  </h4>
+                  </h2>
                   <span className="text-xs text-muted-foreground">
                     {currentSeriesIdx + 1} / {seriesArticles.length}
                   </span>
@@ -617,12 +616,13 @@ export default function BlogArticle({ slug: propSlug }: { slug?: string } = {}) 
             </Button>
             <Button size="lg" variant="outline" className="border-primary/40 text-primary hover:bg-primary/5" asChild>
               <Link href={localePath("/dashboard?tab=subscription")}>
-                {isEn ? "Invite a friend → free reading" : "Pozvat příteľe → výklad zdarma"}
+                {isEn ? "Invite a friend → free reading" : "Pozvat přítele → výklad zdarma"}
               </Link>
             </Button>
           </div>
         </div>
       </section>
+      </main>
 
       <Footer />
     </div>

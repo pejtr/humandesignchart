@@ -42,8 +42,8 @@ export default function DailyEnergyBar() {
   const isCs = locale === "cs";
 
   const { data, isLoading } = trpc.transit.current.useQuery(undefined, {
-    staleTime: 5 * 60 * 1000,
-    refetchInterval: 10 * 60 * 1000,
+    staleTime: 24 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading || !data) return null;

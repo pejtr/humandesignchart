@@ -455,7 +455,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
           const body = await res.json().catch(() => ({ error: "AI_GROUNDING_FAILED" }));
           setAiStreaming(false);
           toast.error(body.error === "AI_GROUNDING_FAILED"
-            ? (locale === "cs" ? "VĂ˝klad neproĹˇel kontrolou faktĹŻ. Kredit nebyl odeÄŤten." : "The reading failed fact validation. No credit was consumed.")
+            ? (locale === "cs" ? "Výklad neprošel kontrolou faktů. Kredit nebyl odečten." : "The reading failed fact validation. No credit was consumed.")
             : body.error);
           return;
         }

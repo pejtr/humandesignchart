@@ -16,7 +16,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { trpc } from "@/lib/trpc";
-import { SpeedPerformanceBadge } from "@/components/SpeedPerformanceBadge";
+import { DailyInsightBadge } from "@/components/DailyInsightBadge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -146,8 +146,8 @@ export default function Navbar() {
         }`}>
         <nav className="w-full flex items-center justify-between h-16 px-3 sm:px-4 xl:px-8 relative gap-2 sm:gap-4 max-w-screen-2xl mx-auto">
           {/* Left: Logo */}
-          <div className="flex shrink-0 items-center justify-start gap-3 xl:w-72 min-w-0">
-            <Link href={localePath("/")} className="flex items-center gap-2.5 no-underline shrink-0 group">
+          <div className="flex shrink-0 items-center justify-start gap-3 min-w-0 2xl:w-[28rem]">
+            <Link href={localePath("/")} aria-label={locale === "cs" ? "Human Design — domů" : "Human Design — home"} className="flex items-center gap-2.5 no-underline shrink-0 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600 via-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-red-500/20 group-hover:shadow-red-500/40 transition-shadow">
                 <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <circle cx="12" cy="4" r="2" />
@@ -165,8 +165,8 @@ export default function Navbar() {
                 Human Design
               </span>
             </Link>
-            <div className="hidden lg:block">
-              <SpeedPerformanceBadge />
+            <div className="hidden lg:block min-w-0">
+              <DailyInsightBadge />
             </div>
           </div>
 
@@ -377,7 +377,7 @@ export default function Navbar() {
             <div className="flex 2xl:hidden items-center gap-1">
               {!isAuthenticated && (
                 <a href={getLoginUrl()} aria-label={t.common.signIn}>
-                  <Button size="sm" className="h-9 px-2 sm:px-3 bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Button aria-label={t.common.signIn} size="sm" className="h-9 px-2 sm:px-3 bg-primary text-primary-foreground hover:bg-primary/90">
                     <User className="w-4 h-4 sm:hidden" />
                     <span className="hidden sm:inline">{t.common.signIn}</span>
                   </Button>
@@ -440,6 +440,7 @@ export default function Navbar() {
           borderLeft: "1px solid var(--border)",
         }}
         aria-hidden={!mobileOpen}
+        inert={!mobileOpen}
       >
         {/* Drawer header */}
         <div className="order-1 flex items-center justify-between px-5 py-4 border-b border-border/50 shrink-0">

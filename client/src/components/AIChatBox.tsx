@@ -133,7 +133,8 @@ export function AIChatBox({
   const [minHeightForLastMessage, setMinHeightForLastMessage] = useState(0);
 
   useEffect(() => {
-    if (containerRef.current && inputAreaRef.current) {
+    const measure = () => {
+      if (!containerRef.current || !inputAreaRef.current) return;
       const containerHeight = containerRef.current.offsetHeight;
       const inputHeight = inputAreaRef.current.offsetHeight;
       const scrollAreaHeight = containerHeight - inputHeight;
@@ -146,7 +147,13 @@ export function AIChatBox({
       const calculatedHeight = scrollAreaHeight - 32 - userMessageReservedHeight;
 
       setMinHeightForLastMessage(Math.max(0, calculatedHeight));
-    }
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (containerRef.current) observer.observe(containerRef.current);
+    if (inputAreaRef.current) observer.observe(inputAreaRef.current);
+    return () => observer.disconnect();
   }, []);
 
   // Scroll to bottom helper function with smooth animation
@@ -164,6 +171,10 @@ export function AIChatBox({
       });
     }
   };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,13 +202,13 @@ export function AIChatBox({
     <div
       ref={containerRef}
       className={cn(
-        "flex flex-col bg-card text-card-foreground rounded-lg border shadow-sm",
+        "flex min-h-0 flex-col bg-card text-card-foreground rounded-lg border shadow-sm",
         className
       )}
       style={{ height }}
     >
       {/* Messages Area */}
-      <div ref={scrollAreaRef} className="flex-1 overflow-hidden">
+      <div ref={scrollAreaRef} className="min-h-0 flex-1 overflow-hidden">
         {displayMessages.length === 0 ? (
           <div className="flex h-full flex-col p-4">
             <div className="flex flex-1 flex-col items-center justify-center gap-6 text-muted-foreground">
@@ -223,7 +234,7 @@ export function AIChatBox({
             </div>
           </div>
         ) : (
-          <ScrollArea className="h-full">
+          <ScrollArea className="h-full min-h-0 w-full">
             <div className="flex flex-col space-y-4 p-4">
               {displayMessages.map((message, index) => {
                 // Apply min-height to last message only if NOT loading (when loading, the loading indicator gets it)

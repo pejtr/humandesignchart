@@ -253,8 +253,9 @@ export function FloatingChatGuide() {
                 onSendMessage={handleSendMessage}
                 isLoading={isLoading}
                 placeholder={isEn ? "Ask Marie..." : "Zeptejte se Marie..."}
-                className="border-none rounded-none shadow-none flex-1"
-                height="100%"
+                className="min-h-0 flex-1 rounded-none border-none shadow-none"
+                height="auto"
+                emptyStateMessage={isEn ? "Ask Marie your first question" : "Zeptejte se Marie na první otázku"}
                 suggestedPrompts={
                   isEn
                     ? [

@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { blogArticles, getBlogArticleBySlug, getBlogArticlesByCategory } from "./data/blogArticles";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 
 describe("Blog Articles", () => {
   it("should have at least 10 articles", () => {
@@ -74,6 +76,14 @@ describe("Blog Articles", () => {
   it("content should be substantial (at least 500 chars)", () => {
     for (const article of blogArticles) {
       expect(article.content.length).toBeGreaterThan(500);
+    }
+  });
+
+  it("all local cover images exist in the public bundle", () => {
+    for (const article of blogArticles) {
+      if (!article.coverImage || /^https?:\/\//.test(article.coverImage)) continue;
+      const imagePath = resolve(process.cwd(), "client/public", article.coverImage.replace(/^\//, ""));
+      expect(existsSync(imagePath), `${article.slug}: missing ${article.coverImage}`).toBe(true);
     }
   });
 });

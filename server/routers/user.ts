@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { updateUserPreferences } from "../db/users";
+import { TRPCError } from "@trpc/server";
 
 const preferencesSchema = z.object({
     dailyTransit: z.boolean(),
@@ -37,7 +38,10 @@ export const userRouter = router({
         }),
 
     testDailyTransit: protectedProcedure
-        .mutation(async () => {
+        .mutation(async ({ ctx }) => {
+            if (ctx.user.role !== "admin") {
+                throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+            }
             const { processDailyTransits } = await import("../jobs/dailyTransit");
             await processDailyTransits();
             return { success: true };

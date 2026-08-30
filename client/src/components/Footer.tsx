@@ -125,9 +125,9 @@ const projects = [
 
           {/* Features */}
           <div>
-            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">
+            <h2 className="font-serif text-sm font-semibold text-foreground mb-4">
               {t.footer.features}
-            </h4>
+            </h2>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link
@@ -166,9 +166,9 @@ const projects = [
 
           {/* Learn */}
           <div>
-            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">
+            <h2 className="font-serif text-sm font-semibold text-foreground mb-4">
               {t.footer.learn}
-            </h4>
+            </h2>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link
@@ -223,9 +223,9 @@ const projects = [
 
           {/* Account */}
           <div>
-            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">
+            <h2 className="font-serif text-sm font-semibold text-foreground mb-4">
               {t.footer.accountLabel}
-            </h4>
+            </h2>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link
@@ -248,9 +248,9 @@ const projects = [
 
           {/* Partner Sites */}
           <div className="md:hidden">
-            <h4 className="font-serif text-sm font-semibold text-foreground mb-4">
+            <h2 className="font-serif text-sm font-semibold text-foreground mb-4">
               {locale === "cs" ? "Spřátelené projekty" : "Partner projects"}
-            </h4>
+            </h2>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="relative group/tip">
                 <a

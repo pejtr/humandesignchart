@@ -9,6 +9,8 @@ interface ProgressiveImageProps {
   imgClassName?: string;
   style?: CSSProperties;
   placeholderColor?: string;
+  /** Optional image shown when the primary source cannot be loaded. */
+  fallbackSrc?: string;
 }
 
 /**
@@ -26,10 +28,17 @@ export function ProgressiveImage({
   imgClassName = "object-contain",
   style,
   placeholderColor = "rgba(168,85,247,0.08)",
+  fallbackSrc,
 }: ProgressiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
+  const [activeSrc, setActiveSrc] = useState(src);
   const imgRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setActiveSrc(src);
+    setIsLoaded(false);
+  }, [src]);
 
   useEffect(() => {
     if (!imgRef.current) return;
@@ -67,13 +76,21 @@ export function ProgressiveImage({
       {/* Actual image */}
       {isInView && (
         <img
-          src={src}
+          src={activeSrc}
           alt={alt}
           decoding="async"
           className={`w-full h-full transition-opacity duration-300 ${imgClassName} ${
             isLoaded ? "opacity-100 blur-0" : "opacity-0"
           }`}
           onLoad={() => setIsLoaded(true)}
+          onError={() => {
+            if (fallbackSrc && activeSrc !== fallbackSrc) {
+              setIsLoaded(false);
+              setActiveSrc(fallbackSrc);
+            } else {
+              setIsLoaded(true);
+            }
+          }}
           ref={(el) => {
             if (el && el.complete && el.naturalWidth > 0 && !isLoaded) {
               setIsLoaded(true);

@@ -47,6 +47,21 @@ export async function getUnreadCount(userId: number): Promise<number> {
   return result[0]?.count ?? 0;
 }
 
+export async function hasDailyTransitNotification(userId: number, pragueDay: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  const [row] = await db
+    .select({ id: userNotifications.id })
+    .from(userNotifications)
+    .where(and(
+      eq(userNotifications.userId, userId),
+      eq(userNotifications.type, "system"),
+      sql`JSON_UNQUOTE(JSON_EXTRACT(${userNotifications.data}, '$.dailyTransitDate')) = ${pragueDay}`,
+    ))
+    .limit(1);
+  return Boolean(row);
+}
+
 export async function markNotificationRead(id: number, userId: number): Promise<void> {
   const db = await getDb();
   if (!db) return;

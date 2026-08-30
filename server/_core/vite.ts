@@ -19,7 +19,7 @@ function shouldInjectSeo(url: string): boolean {
   if (url.startsWith("/assets/")) return false;
   if (url.startsWith("/shared/")) return false;
   if (url.startsWith("/embed/")) return false;
-  if (url === "/sitemap.xml" || url === "/robots.txt" || url === "/rss.xml") return false;
+  if (url === "/sitemap.xml" || url === "/robots.txt" || url === "/rss.xml" || url === "/llms.txt") return false;
   if (url === "/favicon.svg" || url === "/favicon.ico" || url === "/manifest.json") return false;
   if (url.startsWith("/images/")) return false;
   if (url.startsWith("/sw.js")) return false;

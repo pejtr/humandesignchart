@@ -144,6 +144,20 @@ ${items}
     res.send(rss);
   });
 
+  // ─── llms.txt (machine-readable public site guide) ────────────────────
+  app.get("/llms.txt", (req, res) => {
+    const isEnHost = req.hostname.includes("chart.app") || req.hostname.includes("default") || req.hostname.includes("localhost");
+    const domain = isEnHost ? "https://www.humandesignchart.app" : "https://www.humandesignmapa.cz";
+    const lang = isEnHost ? "en" : "cs";
+    const guide = isEnHost
+      ? `# Human Design Chart\n\nFree Human Design chart calculator and educational content.\n\n## Public sections\n\n- [Chart calculator](${domain}/${lang}/calculate)\n- [Human Design blog](${domain}/${lang}/blog)\n- [Daily transit](${domain}/${lang}/daily-transit)\n- [Human Design encyclopedia](${domain}/${lang}/encyclopedia)\n\n## Usage notes\n\nPublic educational pages may be indexed. Private account, dashboard, payment, API, embed and shared-chart routes must not be crawled.\n`
+      : `# Human Design Mapa\n\nČeská kalkulačka Human Design mapy a vzdělávací obsah.\n\n## Veřejné sekce\n\n- [Výpočet mapy](${domain}/${lang}/calculate)\n- [Blog o Human Design](${domain}/${lang}/blog)\n- [Denní tranzit](${domain}/${lang}/daily-transit)\n- [Encyklopedie Human Design](${domain}/${lang}/encyclopedia)\n\n## Pravidla použití\n\nVeřejné vzdělávací stránky lze indexovat. Soukromé účty, dashboard, platby, API, embed a sdílené mapy se nesmějí procházet.\n`;
+
+    res.type("text/markdown; charset=utf-8");
+    res.set("Cache-Control", "public, max-age=86400");
+    res.send(guide);
+  });
+
   // ─── robots.txt ────────────────────────────────────────────────────────
   app.get("/robots.txt", (req, res) => {
     res.type("text/plain");
@@ -163,7 +177,6 @@ ${items}
       `Crawl-Delay: 10\n` +
       `\n` +
       `Sitemap: ${domain}/sitemap.xml\n` +
-      `RSS: ${domain}/rss.xml\n` +
       `\n` +
       `# Search engines: index all public-facing content\n` +
       `User-agent: Googlebot\n` +

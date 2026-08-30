@@ -708,7 +708,7 @@ Reflektor zrcadlí partnera. Je důležité, aby Reflektor měl prostor pro svou
     updatedAt: "2026-03-03",
     coverColor: "bg-gradient-to-br from-teal-50 to-cyan-50",
     coverIcon: "Star",
-    coverImage: "/images/how-purpose_d49470f1.webp",
+    coverImage: "/images/how-purpose.png",
     tags: ["inkarnační kříž", "životní účel", "brány", "poslání", "slunce"],
     content: `## Co je inkarnační kříž?
 
@@ -856,7 +856,7 @@ Začněte prvními čtyřmi body a postupně se ponořujte hlouběji. Human Desi
     readingTime: 9,
     publishedAt: "2026-06-01",
     updatedAt: "2026-06-01",
-    coverImage: "/images/blog-summer-solstice-2026_70623f1d.jpg",
+    coverImage: "/images/blog-fallback.png",
     coverColor: "bg-gradient-to-br from-amber-50 to-yellow-100",
     coverIcon: "Sun",
     tags: ["tranzity", "slunovrat", "brána 15", "brána 10", "sezónní cykly", "planetární program"],

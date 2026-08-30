@@ -76,7 +76,7 @@ export function LeadMagnetExitPopup() {
           <DialogTitle className="text-2xl font-serif font-bold text-foreground">
             {isEn
               ? "Free PDF Guide: 5 Common Human Design Pitfalls"
-              : "Zdarma PDF Průvodce: 5 nejčastějších pastí vášho HD Typu"}
+              : "Zdarma PDF průvodce: 5 nejčastějších pastí vašeho HD typu"}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
             {isEn

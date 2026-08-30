@@ -14,9 +14,9 @@ export default function RedditLanding() {
   const { viewContent } = useMetaPixel();
 
   useSEO({
-    title: isCs ? "Human Design bez ezoterickĂ© mlhy" : "Human Design without the mystical fog",
+    title: isCs ? "Human Design bez ezoterické mlhy" : "Human Design without the mystical fog",
     description: isCs
-      ? "VypoÄŤĂ­tejte si mapu zdarma a sami posuÄŹte, zda je pro vĂˇs Human Design praktickĂ˝."
+      ? "Vypočítejte si mapu zdarma a sami posuďte, zda je pro vás Human Design praktický."
       : "Create your free chart and decide for yourself whether Human Design is useful to you.",
     locale: isCs ? "cs_CZ" : "en_US",
   });
@@ -31,7 +31,7 @@ export default function RedditLanding() {
   }, [viewContent]);
 
   const points = isCs
-    ? ["Mapa podle data, ÄŤasu a mĂ­sta narozenĂ­", "PraktickĂ˝ vĂ˝klad typu, strategie a autority", "Jedna kompletnĂ­ AI interpretace zdarma"]
+    ? ["Mapa podle data, času a místa narození", "Praktický výklad typu, strategie a autority", "Jedna kompletní AI interpretace zdarma"]
     : ["Chart based on birth date, time and place", "Practical reading of type, strategy and authority", "One complete AI interpretation free"];
 
   return (
@@ -43,20 +43,20 @@ export default function RedditLanding() {
           <div className="relative mx-auto max-w-4xl text-center">
             <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-purple-300/50 bg-purple-50/80 px-4 py-2 text-sm text-purple-800">
               <Sparkles className="h-4 w-4" />
-              {isCs ? "PĹ™iĹˇli jste z Redditu? ZaÄŤnÄ›te zdarma." : "Coming from Reddit? Start free."}
+              {isCs ? "Přišli jste z Redditu? Začněte zdarma." : "Coming from Reddit? Start free."}
             </div>
             <h1 className="font-serif text-4xl font-semibold tracking-tight md:text-6xl">
-              {isCs ? "Human Design bez velkĂ˝ch slibĹŻ" : "Human Design without big promises"}
+              {isCs ? "Human Design bez velkých slibů" : "Human Design without big promises"}
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
               {isCs
-                ? "Bereme ho jako nĂˇstroj sebereflexe, ne jako nĂˇhradu medicĂ­ny, psychologie ani vlastnĂ­ho Ăşsudku. VytvoĹ™te si mapu a rozhodnÄ›te se podle vlastnĂ­ zkuĹˇenosti."
+                ? "Bereme ho jako nástroj sebereflexe, ne jako náhradu medicíny, psychologie ani vlastního úsudku. Vytvořte si mapu a rozhodněte se podle vlastní zkušenosti."
                 : "We treat it as a self-reflection tool, not a replacement for medicine, psychology, or your own judgment. Create a chart and judge it from your own experience."}
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button size="lg" asChild className="min-w-64 bg-teal-600 hover:bg-teal-700">
                 <Link href={`${localePath("/calculate")}?utm_source=reddit&utm_medium=paid_social&utm_campaign=reddit_hdm_test`}>
-                  {isCs ? "VytvoĹ™it mapu zdarma" : "Create my free chart"}
+                  {isCs ? "Vytvořit mapu zdarma" : "Create my free chart"}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -69,7 +69,7 @@ export default function RedditLanding() {
 
         <section className="mx-auto grid max-w-5xl gap-8 px-5 py-16 md:grid-cols-2">
           <div className="rounded-3xl border border-border bg-card p-7 shadow-sm">
-            <h2 className="font-serif text-3xl">{isCs ? "Co skuteÄŤnÄ› dostanete" : "What you actually get"}</h2>
+            <h2 className="font-serif text-3xl">{isCs ? "Co skutečně dostanete" : "What you actually get"}</h2>
             <ul className="mt-6 space-y-4">
               {points.map(point => (
                 <li key={point} className="flex gap-3 text-muted-foreground">
@@ -81,10 +81,10 @@ export default function RedditLanding() {
           </div>
           <div className="rounded-3xl border border-purple-200 bg-purple-50/60 p-7">
             <ShieldCheck className="h-7 w-7 text-purple-700" />
-            <h2 className="mt-4 font-serif text-3xl">{isCs ? "FĂ©rovĂ˝ test pĹ™ed platbou" : "A fair test before payment"}</h2>
+            <h2 className="mt-4 font-serif text-3xl">{isCs ? "Férový test před platbou" : "A fair test before payment"}</h2>
             <p className="mt-4 leading-relaxed text-muted-foreground">
               {isCs
-                ? "ZĂˇkladnĂ­ mapa a prvnĂ­ vĂ˝klad jsou zdarma. PlatebnĂ­ Ăşdaje nepotĹ™ebujeme. Premium nabĂ­dneme aĹľ ve chvĂ­li, kdy uĹľ vĂ­te, co od nÄ›j ÄŤekat."
+                ? "Základní mapa a první výklad jsou zdarma. Platební údaje nepotřebujeme. Premium nabídneme až ve chvíli, kdy už víte, co od něj čekat."
                 : "Your basic chart and first reading are free, with no payment details required. We only offer Premium after you know what to expect."}
             </p>
           </div>
