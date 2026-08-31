@@ -17,6 +17,15 @@ import { TimeDisambiguationField, type TimeDisambiguation } from "@/components/T
 import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { saveChartDraft } from "@/lib/chartDraft";
 
+const CALCULATOR_HERO_VISUALS = {
+  self: { eyebrowCs: "Moje mapa", eyebrowEn: "My chart", headlineCs: "Začněte u sebe.", headlineEn: "Start with yourself.", background: "radial-gradient(circle at 18% 18%, rgba(168,85,247,.20), transparent 38%), radial-gradient(circle at 82% 25%, rgba(99,102,241,.16), transparent 32%), linear-gradient(140deg, rgba(250,248,255,.96), rgba(244,247,255,.82))", accent: "#8b5cf6" },
+  friend: { eyebrowCs: "Partnerská mapa", eyebrowEn: "Partner chart", headlineCs: "Lépe si rozumět ve dvou.", headlineEn: "Understand each other better.", background: "radial-gradient(circle at 14% 24%, rgba(244,114,182,.18), transparent 36%), radial-gradient(circle at 84% 24%, rgba(251,146,60,.17), transparent 34%), linear-gradient(140deg, rgba(255,248,252,.96), rgba(255,250,245,.86))", accent: "#ec4899" },
+  family: { eyebrowCs: "Rodinná mapa", eyebrowEn: "Family chart", headlineCs: "Pohled na vztah s respektem.", headlineEn: "A respectful view of your relationship.", background: "radial-gradient(circle at 18% 24%, rgba(20,184,166,.18), transparent 34%), radial-gradient(circle at 84% 18%, rgba(59,130,246,.15), transparent 34%), linear-gradient(140deg, rgba(245,255,253,.96), rgba(246,250,255,.85))", accent: "#14b8a6" },
+  client: { eyebrowCs: "Mapa pro práci", eyebrowEn: "Work chart", headlineCs: "Více jasnosti pro spolupráci.", headlineEn: "More clarity for collaboration.", background: "radial-gradient(circle at 16% 22%, rgba(245,158,11,.18), transparent 34%), radial-gradient(circle at 84% 22%, rgba(99,102,241,.15), transparent 34%), linear-gradient(140deg, rgba(255,252,243,.96), rgba(247,248,255,.84))", accent: "#d97706" },
+  other: { eyebrowCs: "Mapa dítěte", eyebrowEn: "Child chart", headlineCs: "Vnímat jedinečnost od začátku.", headlineEn: "See uniqueness from the beginning.", background: "radial-gradient(circle at 18% 22%, rgba(34,197,94,.17), transparent 34%), radial-gradient(circle at 84% 20%, rgba(56,189,248,.18), transparent 34%), linear-gradient(140deg, rgba(247,255,249,.96), rgba(246,252,255,.85))", accent: "#16a34a" },
+  celebrity: { eyebrowCs: "Mapa blízkého", eyebrowEn: "A loved one's chart", headlineCs: "Objevovat bez nálepek.", headlineEn: "Explore without labels.", background: "radial-gradient(circle at 18% 20%, rgba(139,92,246,.17), transparent 34%), radial-gradient(circle at 84% 24%, rgba(6,182,212,.17), transparent 34%), linear-gradient(140deg, rgba(249,248,255,.96), rgba(244,253,255,.84))", accent: "#6366f1" },
+} as const;
+
 export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | "test" | "typy" }) {
   const [, navigate] = useLocation();
   const { isAuthenticated } = useAuth();
@@ -52,6 +61,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
   const [longitude, setLongitude] = useState("");
   const [locationResolved, setLocationResolved] = useState(false);
   const [category, setCategory] = useState<string>("self");
+  const heroVisual = CALCULATOR_HERO_VISUALS[category as keyof typeof CALCULATOR_HERO_VISUALS] ?? CALCULATOR_HERO_VISUALS.self;
 
   const [embedCopied, setEmbedCopied] = useState(false);
   const handleCopyEmbed = () => {
@@ -146,6 +156,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-hidden">
+      <div className="absolute inset-x-0 top-16 h-[34rem] pointer-events-none z-0 transition-opacity duration-500" style={{ background: heroVisual.background }} aria-hidden="true" />
       {/* Mystical Background Decorations */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {/* Large faint logo icon in the background */}
@@ -170,11 +181,11 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
       <Navbar />
 
       <main className="flex-1 pt-24 pb-16">
-        <div className="container max-w-2xl">
+        <div className="container max-w-2xl relative">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border bg-white/70 text-sm mb-4 transition-colors duration-500" style={{ borderColor: `${heroVisual.accent}55`, color: heroVisual.accent }}>
               <Compass className="w-4 h-4" />
-              {t.nav.calculateChart}
+              {isEn ? heroVisual.eyebrowEn : heroVisual.eyebrowCs}
             </div>
             <h1 className="font-serif text-3xl md:text-4xl font-bold mb-3">
               {seoType === "kalkulacka" && isEn === false ? "Human Design Kalkulačka Zdarma" :
@@ -188,6 +199,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                   seoType === "typy" && isEn === false ? "Generátor, Projektor, Manifestor nebo Reflektor? Použijte náš výpočet a objevte svůj přesný typ a strategii pro lepší život." :
                     t.calculator.description}
             </p>
+            <p className="mt-3 text-sm font-medium transition-colors duration-500" style={{ color: heroVisual.accent }}>{isEn ? heroVisual.headlineEn : heroVisual.headlineCs}</p>
           </div>
 
           <Card className="bg-card border-border/50 shadow-sm">
@@ -258,16 +270,16 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                         <TooltipTrigger asChild>
                           <span className="inline-flex items-center gap-1 text-xs text-muted-foreground cursor-help">
                             <Lock className="w-3 h-3" />
-                            {isEn ? "Login to save" : "Přihlaste se pro uložení"}
+                            {isEn ? "Sign in to save" : "Přihlaste se pro uložení"}
                           </span>
                         </TooltipTrigger>
                         <TooltipContent side="right">
-                          <p className="text-xs">{isEn ? "Log in to save charts to your collection" : "Přihlaste se a ukládejte mapy do své sbírky"}</p>
+                          <p className="text-xs">{isEn ? "You can choose a visual context now; sign in to save the chart to your collection." : "Kontext můžete vybrat hned; pro uložení mapy do sbírky se přihlaste."}</p>
                         </TooltipContent>
                       </Tooltip>
                     )}
                   </div>
-                  <div className={`grid grid-cols-3 gap-2 ${!isAuthenticated ? 'opacity-40 pointer-events-none select-none' : ''}`}>
+                  <div className="grid grid-cols-3 gap-2">
                     {RELATIONSHIP_OPTIONS.map((opt) => {
                       const Icon = opt.icon;
                       const label = isEn ? opt.labelEn : opt.labelCs;
@@ -276,8 +288,8 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                         <button
                           key={opt.value}
                           type="button"
-                          disabled={!isAuthenticated}
                           onClick={() => setCategory(opt.value)}
+                          aria-pressed={active}
                           className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-xs font-medium transition-all duration-150 ${active
                             ? 'border-primary bg-primary/10 text-primary'
                             : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'

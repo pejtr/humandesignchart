@@ -28,7 +28,7 @@ export const STRIPE_PRODUCTS = {
   BLUEPRINT: {
     name: "Deep Reading — Kompletní Osobní Rozbor (PDF + Audio)",
     description: "Personalizovaný strukturovaný výklad, praktické využití v životě, PDF i audio v jednom balíčku, trvalý přístup",
-    pricesCzk: 39000, // 390 CZK base test price
+    pricesCzk: 29000, // transparent minimum honorarium; voluntary support is calculated separately
     pricesEur: 1590,  // 15.90 EUR
     metadata: { plan: "blueprint" },
   },
@@ -52,7 +52,7 @@ export const STRIPE_PRODUCTS = {
   BLUEPRINT_ANNUAL_UPGRADE: {
     name: "Roční Marie Plus po Deep Reading",
     description: "Doplatek roční Marie Plus po zakoupení Deep Reading",
-    pricesCzk: 80000, // 800 CZK (390 + 800 = 1190 CZK)
+    pricesCzk: 80000, // existing upgrade contract; legacy Blueprint purchases remain compatible
     pricesEur: 3210,
     metadata: { plan: "blueprint_annual_upgrade" },
   },

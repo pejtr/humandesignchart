@@ -23,6 +23,16 @@ function purchase(eventId = "evt_1", provider: "stripe" | "comgate" = "stripe"):
   };
 }
 
+function blueprintPurchase(eventId = "evt_blueprint", topUpMinor = 0): NormalizedPaymentEvent {
+  return {
+    action: "purchase", provider: "stripe", eventId, eventType: "checkout.session.completed",
+    userId: 7, productKey: "blueprint", paymentRef: `pi_${eventId}`,
+    amountMinor: 29000 + topUpMinor, offerAmountMinor: 29000 + topUpMinor,
+    minimumAmountMinor: 29000, voluntaryTopUpMinor: topUpMinor,
+    currency: "CZK", partnerAddon: false, rawPayload: {},
+  };
+}
+
 class MemoryStore implements PaymentStore {
   state: State = { rows: [], fulfillments: 0, reversals: 0, affiliateCommissions: 0, nextId: 1 };
   failNextFulfillment = false;
@@ -120,6 +130,23 @@ describe("payment event replay safety", () => {
     const bad = { ...purchase(), offerAmountMinor: 1 };
     const result = await processNormalizedPaymentEvent(store, bad);
     expect(result).toMatchObject({ outcome: "audit", code: "OFFER_AMOUNT_MISMATCH" });
+    expect(store.state.fulfillments).toBe(0);
+  });
+
+  it("fulfills the Blueprint at the server minimum or with a voluntary top-up without changing delivery", async () => {
+    const store = new MemoryStore();
+    expect((await processNormalizedPaymentEvent(store, blueprintPurchase("evt_minimum"))).outcome).toBe("fulfilled");
+    expect((await processNormalizedPaymentEvent(store, blueprintPurchase("evt_topup", 10000))).outcome).toBe("fulfilled");
+    expect(store.state.fulfillments).toBe(2);
+    expect(store.state.affiliateCommissions).toBe(0);
+  });
+
+  it("audits forged Blueprint minimum or voluntary top-up totals without fulfillment", async () => {
+    const store = new MemoryStore();
+    const forgedMinimum = { ...blueprintPurchase("evt_forged_minimum"), minimumAmountMinor: 39000 };
+    const forgedTotal = { ...blueprintPurchase("evt_forged_total", 10000), amountMinor: 29000 };
+    expect(await processNormalizedPaymentEvent(store, forgedMinimum)).toMatchObject({ outcome: "audit", code: "HONORARIUM_AMOUNT_MISMATCH" });
+    expect(await processNormalizedPaymentEvent(store, forgedTotal)).toMatchObject({ outcome: "audit", code: "HONORARIUM_AMOUNT_MISMATCH" });
     expect(store.state.fulfillments).toBe(0);
   });
 

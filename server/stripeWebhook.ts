@@ -120,7 +120,9 @@ async function processCheckout(event: Stripe.Event) {
   const productKey = session.metadata?.plan;
   const paymentRef = session.mode === "subscription" ? idOf(session.subscription) : idOf(session.payment_intent);
   const currency = session.currency?.toUpperCase();
-  if (!Number.isInteger(userId) || userId <= 0 || !isPaymentProductKey(productKey) || !paymentRef || (currency !== "CZK" && currency !== "EUR") || session.amount_subtotal == null || session.amount_total == null) {
+  const voluntaryTopUpMinor = Number(session.metadata?.voluntary_top_up_minor ?? "0");
+  const minimumAmountMinor = Number(session.metadata?.honorarium_minimum_minor);
+  if (!Number.isInteger(userId) || userId <= 0 || !isPaymentProductKey(productKey) || !paymentRef || (currency !== "CZK" && currency !== "EUR") || session.amount_subtotal == null || session.amount_total == null || (productKey === "blueprint" && (!Number.isInteger(minimumAmountMinor) || !Number.isInteger(voluntaryTopUpMinor)))) {
     await recordPaymentAuditEvent({
       provider: "stripe",
       eventId: event.id,
@@ -143,6 +145,8 @@ async function processCheckout(event: Stripe.Event) {
     paymentRef,
     amountMinor: session.amount_total,
     offerAmountMinor: session.amount_subtotal,
+    minimumAmountMinor: productKey === "blueprint" ? minimumAmountMinor : undefined,
+    voluntaryTopUpMinor,
     currency,
     partnerAddon: session.metadata?.partner_addon === "true",
     affiliateCode: session.metadata?.affiliate_code || undefined,

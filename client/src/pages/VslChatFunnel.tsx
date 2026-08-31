@@ -235,7 +235,7 @@ export default function VslChatFunnel() {
                   className="w-full sm:w-auto bg-gradient-to-r from-amber-400 via-purple-500 to-indigo-600 hover:scale-105 text-slate-950 font-extrabold text-sm h-12 px-8 rounded-2xl shadow-xl gap-2"
                   asChild
                 >
-                  <Link href={localePath("/pricing") + "?coupon=VSL50"}>
+                  <Link href={localePath("/honorace") + "?coupon=VSL50"}>
                     <Sparkles className="w-4 h-4 fill-current" />
                     {isEn ? "Claim 50% Off Blueprint Now" : "Získat 50% Slevu a Stáhnout Blueprint"}
                   </Link>

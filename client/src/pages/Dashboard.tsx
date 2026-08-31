@@ -320,7 +320,7 @@ export default function Dashboard() {
                       <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{locale === "en" ? "Membership" : "Členství"}</p>
                       <p className="truncate font-semibold">{isMember ? (locale === "en" ? "Premium active" : "Premium aktivní") : (locale === "en" ? "Free plan" : "Bezplatný plán")}</p>
                     </div>
-                    <Link href={localePath("/pricing")}><Button size="sm" variant="ghost" className="px-2 text-primary"><Zap className="h-4 w-4" /></Button></Link>
+                    <Link href={localePath("/honorace")}><Button size="sm" variant="ghost" className="px-2 text-primary"><Zap className="h-4 w-4" /></Button></Link>
                   </CardContent>
                 </Card>
               </aside>
@@ -768,7 +768,7 @@ export default function Dashboard() {
                             ? 'Upgrade to Premium for unlimited AI readings, PDF reports, and all advanced tools.'
                             : 'Upgradujte na Premium pro neomezené AI výklady, PDF reporty a všechny pokročilé nástroje.'}
                         </p>
-                        <Link href={localePath("/pricing")}>
+                        <Link href={localePath("/honorace")}>
                           <Button className="bg-primary text-primary-foreground w-full">
                             <Crown className="w-4 h-4 mr-2" />
                             {locale === 'en' ? 'Upgrade to Premium — from 83 CZK/month' : 'Upgradovat na Premium — od 83 Kč/měsíc'}
@@ -779,7 +779,7 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
                 <div className="text-center">
-                  <Link href={localePath("/pricing")}>
+                  <Link href={localePath("/honorace")}>
                     <Button variant="outline" size="sm">
                       <CreditCard className="w-4 h-4 mr-2" />
                       {locale === 'en' ? 'View all plans & gift vouchers' : 'Zobrazit všechny plány a dárkové poukazy'}
