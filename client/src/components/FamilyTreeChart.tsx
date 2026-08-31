@@ -70,7 +70,7 @@ export function FamilyTreeChart() {
             className="bg-amber-400 hover:bg-amber-300 text-purple-950 font-bold text-xs rounded-xl px-4 h-9 gap-1.5 shrink-0"
             asChild
           >
-            <Link href={localePath("/pricing")}>
+            <Link href={localePath("/honorace")}>
               <ShieldCheck className="w-4 h-4" />
               {isEn ? "Unlock Family Penta" : "Odemknout Rodinnou Pentu"}
             </Link>

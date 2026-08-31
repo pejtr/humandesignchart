@@ -30,7 +30,7 @@ describe("stale chunk recovery", () => {
 
     expect(
       recoverStaleChunk(new Error("Failed to fetch dynamically imported module"), {
-        pathname: "/cs/pricing",
+        pathname: "/cs/honorace",
         reload,
         storage,
         now: () => 10_000,
@@ -38,7 +38,7 @@ describe("stale chunk recovery", () => {
     ).toBe(true);
     expect(reload).toHaveBeenCalledOnce();
     expect(storage.setItem).toHaveBeenCalledWith(
-      "hd:stale-chunk-reload:/cs/pricing",
+      "hd:stale-chunk-reload:/cs/honorace",
       "10000"
     );
   });
@@ -49,7 +49,7 @@ describe("stale chunk recovery", () => {
 
     expect(
       recoverStaleChunk(new Error("ChunkLoadError: Loading chunk Pricing failed"), {
-        pathname: "/cs/pricing",
+        pathname: "/cs/honorace",
         reload,
         storage,
         now: () => 20_000,

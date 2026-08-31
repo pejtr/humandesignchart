@@ -22,7 +22,7 @@ export async function triggerAbandonedCheckoutDrip(payload: AbandonedCartPayload
         price: payload.priceCZK,
         discountCode: "MARIE15",
         discountPercent: 15,
-        checkoutRecoveryUrl: `https://humandesign.cz/pricing?coupon=MARIE15`,
+        checkoutRecoveryUrl: `https://www.humandesignmapa.cz/cs/honorace?coupon=MARIE15`,
       },
     });
 

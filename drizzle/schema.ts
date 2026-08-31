@@ -282,6 +282,10 @@ export const paymentEvents = mysqlTable("payment_events", {
 	paymentRef: varchar({ length: 255 }),
 	amountMinor: int(),
 	expectedAmountMinor: int(),
+	// Financial decomposition is durable: a voluntary top-up never affects
+	// entitlements, but must remain auditable independently of raw provider data.
+	minimumAmountMinor: int(),
+	voluntaryTopUpMinor: int(),
 	currency: varchar({ length: 3 }),
 	reversalOfPaymentEventId: int(),
 	rawPayload: json(),

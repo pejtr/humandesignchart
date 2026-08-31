@@ -61,7 +61,7 @@ export default function RedditLanding() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href={localePath("/pricing")}>{isCs ? "Co obsahuje Premium" : "See Premium"}</Link>
+                <Link href={localePath("/honorace")}>{isCs ? "Co obsahuje Premium" : "See Premium"}</Link>
               </Button>
             </div>
           </div>

@@ -27,7 +27,7 @@ export function triggerSMSRecovery({
       phoneNumber,
       email,
       name,
-      cartUrl: cartUrl || "https://humandesign.avanito.cz/cs/pricing",
+      cartUrl: cartUrl || "https://www.humandesignmapa.cz/cs/honorace",
       tags: ["sms_recovery_30m", "whatsapp_checkout_drip"],
       channel: "sms_whatsapp",
     },

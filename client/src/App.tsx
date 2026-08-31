@@ -123,7 +123,20 @@ function RootRedirect() {
  */
 function LegacyRedirect({ path }: { path: string }) {
   const locale = detectPreferredLocale();
-  return <Redirect to={`/${locale}${path}`} />;
+  const [, setLocation] = useLocation();
+  useEffect(() => {
+    setLocation(`/${locale}${path}${window.location.search}`, { replace: true });
+  }, [locale, path, setLocation]);
+  return <PageLoader />;
+}
+
+/** Preserve recovery/voucher parameters while retiring pricing and cenik. */
+function HonoraceAliasRedirect({ locale }: { locale: string }) {
+  const [, setLocation] = useLocation();
+  useEffect(() => {
+    setLocation(`/${locale}/honorace${window.location.search}`, { replace: true });
+  }, [locale, setLocation]);
+  return <PageLoader />;
 }
 
 function PartnerInviteRedirect({ locale, code }: { locale: string; code: string }) {
@@ -239,8 +252,14 @@ function LocaleRoutes() {
             <Route path="/:locale/crm-dashboard">
               {() => <SafeRoute><CrmDashboard /></SafeRoute>}
             </Route>
-            <Route path="/:locale/pricing">
+            <Route path="/:locale/honorace">
               {() => <SafeRoute><Pricing /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/pricing">
+              {(params: { locale: string }) => <HonoraceAliasRedirect locale={params.locale} />}
+            </Route>
+            <Route path="/:locale/cenik">
+              {(params: { locale: string }) => <HonoraceAliasRedirect locale={params.locale} />}
             </Route>
             <Route path="/:locale/reddit-human-design">
               {() => <SafeRoute><RedditLanding /></SafeRoute>}
@@ -322,7 +341,9 @@ function LocaleRoutes() {
             <Route path="/blog/:slug">{(params: any) => <LegacyRedirect path={`/blog/${params.slug}`} />}</Route>
             <Route path="/incarnation-cross"><LegacyRedirect path="/incarnation-cross" /></Route>
             <Route path="/daily-transit"><LegacyRedirect path="/daily-transit" /></Route>
-            <Route path="/pricing"><LegacyRedirect path="/pricing" /></Route>
+            <Route path="/honorace"><LegacyRedirect path="/honorace" /></Route>
+            <Route path="/pricing"><LegacyRedirect path="/honorace" /></Route>
+            <Route path="/cenik"><LegacyRedirect path="/honorace" /></Route>
             <Route path="/reddit-human-design"><LegacyRedirect path="/reddit-human-design" /></Route>
             <Route path="/payment/success"><LegacyRedirect path="/payment/success" /></Route>
             <Route path="/payment/cancel"><LegacyRedirect path="/payment/cancel" /></Route>
