@@ -1340,3 +1340,53 @@
     animation: none !important;
   }
 }
+
+/* ── Quantum Living Aura System — Dimensional Living Quantum Organism ─────────────── */
+@keyframes spinOrbit {
+  0% {
+    transform: rotate(0deg) scale(1);
+    filter: blur(45px) hue-rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.06);
+    filter: blur(55px) hue-rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    filter: blur(45px) hue-rotate(360deg);
+  }
+}
+
+@keyframes counterSpin {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.spinning-conic-aura {
+  animation: spinOrbit 14s infinite linear;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    #7c3aed 0deg,
+    #ec4899 72deg,
+    #10b981 144deg,
+    #f59e0b 216deg,
+    #3b82f6 288deg,
+    #7c3aed 360deg
+  );
+  will-change: transform, filter;
+}
+
+.inner-counter-spin {
+  animation: counterSpin 9s infinite linear;
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    #ec4899,
+    #7c3aed,
+    #3b82f6,
+    #10b981,
+    #f59e0b,
+    #ec4899
+  );
+  will-change: transform;
+}
+

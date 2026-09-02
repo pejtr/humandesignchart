@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import { TimeDisambiguationField, type TimeDisambiguation } from "@/components/TimeDisambiguationField";
+import { QuantumLivingAura } from "@/components/QuantumLivingAura";
 
 export default function HumanDesignTest() {
     const [, navigate] = useLocation();
