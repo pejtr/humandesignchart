@@ -34,9 +34,11 @@ import { angelNumbersRouter } from "./routers/angelNumbers";
 import { pushRouter } from "./routers/push";
 import { testimonialsRouter } from "./routers/testimonials";
 import { maatRouter } from "./routers/maat";
+import { hdlabRouter } from "./routers/hdlab";
 
 export const appRouter = router({
   system: systemRouter,
+  hdlab: hdlabRouter,
   social: socialRouter,
   leados: leadosRouter,
   chat: chatRouter,
