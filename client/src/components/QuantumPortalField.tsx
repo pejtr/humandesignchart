@@ -36,7 +36,7 @@ export function QuantumPortalField({ className = "" }: QuantumPortalFieldProps) 
       <QuantumLivingAura intensity="vibrant">
         <div className="rounded-3xl bg-white/95 dark:bg-slate-900/95 border-2 border-purple-300/80 dark:border-purple-500/40 p-6 md:p-8 shadow-2xl backdrop-blur-xl space-y-6">
           
-          <!-- Portal Header -->
+          {/* Portal Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-600 via-pink-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-600/30 text-white font-bold">
@@ -60,10 +60,10 @@ export function QuantumPortalField({ className = "" }: QuantumPortalFieldProps) 
             </div>
           </div>
 
-          <!-- Dynamic Portal Content Grid -->
+          {/* Dynamic Portal Content Grid */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
             
-            <!-- Left: Gate & Channel Visual Badge -->
+            {/* Left: Gate & Channel Visual Badge */}
             <div className="md:col-span-4 p-5 rounded-2xl bg-gradient-to-br from-purple-50 via-pink-50/50 to-indigo-50 dark:from-slate-800/80 dark:to-purple-950/50 border border-purple-200 dark:border-purple-800/60 text-center space-y-3 shadow-inner">
               <div className="flex items-center justify-center gap-2 text-purple-700 dark:text-purple-300 text-xs font-bold uppercase tracking-wider">
                 <Sparkles className="w-4 h-4 text-purple-600" />
@@ -80,7 +80,7 @@ export function QuantumPortalField({ className = "" }: QuantumPortalFieldProps) 
               </div>
             </div>
 
-            <!-- Right: AI Marie's Daily Impulse -->
+            {/* Right: AI Marie's Daily Impulse */}
             <div className="md:col-span-8 space-y-4">
               <div className="p-4 rounded-2xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/80 space-y-2">
                 <div className="flex items-center gap-2 text-purple-900 dark:text-purple-200 font-bold text-xs">
@@ -92,7 +92,7 @@ export function QuantumPortalField({ className = "" }: QuantumPortalFieldProps) 
                 </p>
               </div>
 
-              <!-- Action Links -->
+              {/* Action Links */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                 <span className="text-[11px] text-slate-500 dark:text-slate-400">
                   {isCs ? "🔄 Aktualizuje se denně o půlnoci s planetárním tranzitem" : "🔄 Updates daily at midnight UTC with planetary transits"}
