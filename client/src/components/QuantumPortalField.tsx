@@ -18,18 +18,17 @@ export function QuantumPortalField({ className = "" }: QuantumPortalFieldProps) 
   const isCs = locale === "cs";
 
   // Query current daily transit data
-  const { data: transitData, isLoading } = trpc.transit.getDailyTransit.useQuery(undefined, {
+  const { data: transitData, isLoading } = trpc.transit.current.useQuery(undefined, {
     staleTime: 1000 * 60 * 30, // 30 mins
   });
 
-  const todayGate = transitData?.sunGate ?? 55;
-  const todayGateName = transitData?.sunGateName ?? (isCs ? "Brána Hojnosti & Svobody Emocí" : "Gate of Abundance & Freedom");
-  const channelName = transitData?.activeChannelName ?? (isCs ? "Kanál Emocionální Vlny 39-55" : "Channel of Emotional Wave 39-55");
-  const dailyImpulse = transitData?.dailyImpulse ?? (
-    isCs
-      ? "Dnešní energetické pole otevírá hluboké emoce. Vnímejte impulzy svého těla a nenechte se strhnout tlakem mysli."
-      : "Today's quantum field opens deep emotional resonance. Trust your body's response and avoid mental pressure."
-  );
+  const sunGateItem = transitData?.transitGates?.find((g: any) => g.planet === "Sun");
+  const todayGate = sunGateItem?.gate ?? 55;
+  const todayGateName = isCs ? "Brána Hojnosti & Svobody Emocí" : "Gate of Abundance & Freedom";
+  const channelName = isCs ? "Kanál Emocionální Vlny 39-55" : "Channel of Emotional Wave 39-55";
+  const dailyImpulse = isCs
+    ? "Dnešní energetické pole otevírá hluboké emoce. Vnímejte impulzy svého těla a nenechte se strhnout tlakem mysli."
+    : "Today's quantum field opens deep emotional resonance. Trust your body's response and avoid mental pressure.";
 
   return (
     <div className={`w-full max-w-4xl mx-auto ${className}`}>

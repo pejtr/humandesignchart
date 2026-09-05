@@ -19,7 +19,7 @@ export const hdlabRouter = router({
         chartId: z.number().optional(),
         refId: z.string().optional(),
         amountMinor: z.number().optional(),
-        metadata: z.record(z.any()).optional(),
+        metadata: z.record(z.string(), z.any()).optional(),
       })
     )
     .mutation(({ ctx, input }) => {
