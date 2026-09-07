@@ -342,18 +342,18 @@ const projects = [
           </div>
         </div>
 
-        {/* Footer Embedded AI Marie Chatbot */}
-        <div className="mt-10 p-6 rounded-3xl bg-gradient-to-r from-purple-900/10 via-indigo-900/10 to-amber-900/10 border border-purple-500/20 backdrop-blur-xl shadow-lg relative overflow-hidden">
+        {/* Footer Embedded ORACULUM Chatbot */}
+        <div className="mt-10 p-6 rounded-3xl bg-gradient-to-r from-amber-900/10 via-slate-900/10 to-amber-900/10 border border-amber-500/20 backdrop-blur-xl shadow-lg relative overflow-hidden">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-purple-600/20 text-purple-700 dark:text-purple-300 flex items-center justify-center border border-purple-500/30">
-                <Bot className="w-5 h-5 animate-pulse" />
+              <div className="w-10 h-10 rounded-2xl bg-[#111A2E] text-[#C59235] flex items-center justify-center border border-amber-500/30 font-serif font-bold text-lg">
+                ✦
               </div>
               <div>
                 <h3 className="font-serif font-bold text-base text-foreground flex items-center gap-2">
-                  <span>{locale === "cs" ? "Zeptat se AI Marie" : "Ask AI Marie"}</span>
-                  <span className="px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-300 text-[10px] font-bold border border-purple-500/20">
-                    24/7 AI Asistentka
+                  <span>{locale === "cs" ? "Zeptat se ORACULA" : "Ask ORACULUM"}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 text-[10px] font-mono font-bold border border-amber-500/20">
+                    ORACULUM Core v3.3
                   </span>
                 </h3>
                 <p className="text-xs text-muted-foreground">
@@ -380,7 +380,7 @@ const projects = [
           <div className="flex items-center gap-2 pt-2">
             <input
               type="text"
-              placeholder={locale === "cs" ? "Zadejte svůj dotaz pro AI Marie..." : "Type your question for AI Marie..."}
+              placeholder={locale === "cs" ? "Zadejte svůj dotaz pro ORACULUM..." : "Type your question for ORACULUM..."}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
                   window.location.href = localePath(`/vsl-chat?q=${encodeURIComponent((e.target as HTMLInputElement).value.trim())}`);

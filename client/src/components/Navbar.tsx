@@ -161,9 +161,12 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
                   <line x1="16.8" y1="7" x2="14" y2="10.5" />
                 </svg>
               </div>
-              <span className="font-serif text-xl font-bold tracking-tight text-foreground hidden sm:block truncate">
-                Human Design
-              </span>
+              <div className="flex flex-col">
+                <span className="font-serif text-lg font-bold tracking-tight text-foreground hidden sm:block truncate">
+                  OMNI HD LAB
+                </span>
+                <span class="text-[9px] font-mono tracking-widest text-amber-600 dark:text-amber-400 uppercase font-semibold hidden sm:block">by OMNI APPS</span>
+              </div>
             </Link>
             {!offerMode && <div className="hidden lg:block min-w-0">
               <DailyInsightBadge />

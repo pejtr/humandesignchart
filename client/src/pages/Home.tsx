@@ -737,41 +737,30 @@ export default function Home() {
       <section className="relative overflow-hidden border-y border-violet-100 bg-gradient-to-r from-[#f8f3ff] via-white to-[#fff9eb] py-10 dark:border-violet-900/50 dark:from-violet-950/30 dark:via-background dark:to-amber-950/20">
         <div className="container relative z-10 flex max-w-5xl flex-col items-center gap-6 md:flex-row md:gap-9">
           <div className="relative aspect-[16/10] w-full max-w-sm shrink-0 overflow-hidden rounded-[2rem] border border-amber-200/80 bg-[#160b2f] shadow-xl shadow-violet-900/15 ring-8 ring-violet-500/10 md:w-[38%] md:max-w-none">
-            <img
-              src="/images/brand/marie-landing-v1.webp"
-              alt={
-                isCs
-                  ? "Marie, osobní průvodkyně Human Designem"
-                  : "Marie, your personal Human Design guide"
-              }
-              className="h-full w-full object-cover object-center"
-            />
-            <span className="absolute bottom-1 right-2 flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-violet-700 text-amber-100 shadow-lg">
-              <Moon className="h-4 w-4 -rotate-12" />
-            </span>
+          <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border-2 border-[#C59235]/60 bg-gradient-to-br from-[#1A1D24] via-[#111A2E] to-[#0A0D14] shadow-xl flex items-center justify-center text-[#C59235] font-serif font-bold text-3xl">
+            ✦
           </div>
           <div className="flex-1 text-center md:text-left">
-            <div className="mb-2 flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-violet-700 md:justify-start dark:text-violet-300">
-              <Sparkles className="h-4 w-4" />{" "}
-              {isCs ? "Marie · osobní průvodkyně" : "Marie · personal guide"}
+            <div className="mb-2 flex items-center justify-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B88326] md:justify-start">
+              <span>✦ ORACULUM · OBSERVATORY CORE v3.3</span>
             </div>
             <h2 className="font-serif text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
               {isCs
-                ? "Vaše osobní průvodkyně mapou i každodenním rozhodováním"
-                : "Your personal guide through your chart and everyday decisions"}
+                ? "ORACULUM interpretace pro osobní reflexi"
+                : "ORACULUM interpretation for personal reflection"}
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
               {isCs
-                ? "Marie propojuje vaši mapu, Lunu a aktuální tranzity do praktických odpovědí. Bez robotického tónu — jako klidná průvodkyně, která zná váš kontext."
-                : "Marie connects your chart, the Moon and current transits into practical answers — with a calm, personal voice that remembers your context."}
+                ? "ORACULUM propojuje vaši mapu a aktuální tranzity do praktických podnětů pro rozhodování, práce i vztahů. Bez zavádějících tvrzení — srozumitelná struktura pro váš přirozený rytmus."
+                : "ORACULUM connects your chart and transits into practical insights for decisions, career, and relationships."}
             </p>
           </div>
           <Button
             asChild
-            className="shrink-0 bg-violet-700 text-white hover:bg-violet-800"
+            className="shrink-0 bg-[#C59235] text-white hover:bg-[#B88326] shadow-md"
           >
             <Link href={localePath("/honorace") + "#blueprint"}>
-              {isCs ? "Poznat svůj Blueprint" : "Discover my Blueprint"}
+              {isCs ? "Zeptat se ORACULA" : "Ask ORACULUM"}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
