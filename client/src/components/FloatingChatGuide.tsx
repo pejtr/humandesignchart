@@ -148,23 +148,25 @@ export function FloatingChatGuide() {
               onClick={() => setIsOpen(true)}
               aria-label={
                 isEn
-                  ? "Open ORACULUM"
-                  : "Otevřít ORACULUM"
+                  ? "Open ARACULUM"
+                  : "Otevřít ARACULUM"
               }
               title={
-                isEn ? "ORACULUM — Observatory Intelligence" : "ORACULUM — Observatorní Inteligenci"
+                isEn ? "ARACULUM — personal guide" : "ARACULUM — osobní průvodkyně"
               }
-              className="group relative w-14 h-14 overflow-visible rounded-full border-2 border-amber-400/80 bg-[#111A2E] p-0 text-white shadow-xl ring-4 ring-amber-500/10 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.03]"
+              className="group relative w-16 h-16 overflow-visible rounded-full border-2 border-amber-100/90 bg-[#160b2f] p-0 text-white shadow-xl ring-4 ring-violet-500/10 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.03]"
             >
               <span
-                className="absolute -inset-2 -z-10 rounded-full bg-amber-500/20 blur-lg transition-opacity group-hover:bg-amber-400/35"
+                className="absolute -inset-2 -z-10 rounded-full bg-violet-500/20 blur-lg transition-opacity group-hover:bg-violet-400/35"
                 aria-hidden="true"
               />
-              <div className="h-full w-full rounded-full bg-gradient-to-br from-[#1A1D24] via-[#111A2E] to-[#0A0D14] flex items-center justify-center font-serif text-lg font-bold text-[#C59235]">
-                ✦
-              </div>
-              <span className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-full border border-amber-300/70 bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-900 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block">
-                {isEn ? "Ask ORACULUM" : "Zeptat se ORACULA"}
+              <img
+                src="/images/brand/veleknezka-master-v1.png"
+                alt=""
+                className="h-full w-full rounded-full object-cover object-[center_16%]"
+              />
+              <span className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-full border border-violet-200/70 bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-900 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block">
+                {isEn ? "Ask ARACULUM" : "Zeptat se ARACULUM"}
               </span>
             </Button>
           </motion.div>
@@ -189,13 +191,17 @@ export function FloatingChatGuide() {
           >
             <div className="flex items-center justify-between p-3 border-b bg-muted/30">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full border border-amber-400/70 bg-[#111A2E] text-[#C59235] flex items-center justify-center font-serif font-bold text-sm shrink-0">
-                  ✦
+                <div className="w-9 h-9 overflow-hidden rounded-full border border-amber-200/70 bg-[#160b2f] shrink-0">
+                  <img
+                    src="/images/brand/veleknezka-master-v1.png"
+                    alt=""
+                    className="h-full w-full object-cover object-[center_16%]"
+                  />
                 </div>
                 <div>
-                  <h3 className="text-sm font-serif font-bold leading-none text-foreground">ORACULUM</h3>
-                  <p class="text-[10px] font-mono text-amber-600 dark:text-amber-400 font-bold mt-0.5">
-                    {isEn ? "Observatory Core v3.3" : "Observatorní Inteligenci v3.3"}
+                  <h3 className="text-sm font-semibold leading-none text-foreground">ARACULUM</h3>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    {isEn ? "Personal guide" : "Osobní průvodkyně"}
                   </p>
                 </div>
               </div>

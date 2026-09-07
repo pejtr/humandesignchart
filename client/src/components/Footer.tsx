@@ -342,7 +342,7 @@ const projects = [
           </div>
         </div>
 
-        {/* Footer Embedded ORACULUM Chatbot */}
+        {/* Footer Embedded ARACULUM Chatbot */}
         <div className="mt-10 p-6 rounded-3xl bg-gradient-to-r from-amber-900/10 via-slate-900/10 to-amber-900/10 border border-amber-500/20 backdrop-blur-xl shadow-lg relative overflow-hidden">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
@@ -351,9 +351,9 @@ const projects = [
               </div>
               <div>
                 <h3 className="font-serif font-bold text-base text-foreground flex items-center gap-2">
-                  <span>{locale === "cs" ? "Zeptat se ORACULA" : "Ask ORACULUM"}</span>
+                  <span>{locale === "cs" ? "Zeptat se ARACULUM" : "Ask ARACULUM"}</span>
                   <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 text-[10px] font-mono font-bold border border-amber-500/20">
-                    ORACULUM Core v3.3
+                    ARACULUM
                   </span>
                 </h3>
                 <p className="text-xs text-muted-foreground">
@@ -380,7 +380,7 @@ const projects = [
           <div className="flex items-center gap-2 pt-2">
             <input
               type="text"
-              placeholder={locale === "cs" ? "Zadejte svůj dotaz pro ORACULUM..." : "Type your question for ORACULUM..."}
+              placeholder={locale === "cs" ? "Zadejte svůj dotaz pro ARACULUM..." : "Type your question for ARACULUM..."}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
                   window.location.href = localePath(`/vsl-chat?q=${encodeURIComponent((e.target as HTMLInputElement).value.trim())}`);
