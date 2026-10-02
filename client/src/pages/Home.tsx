@@ -195,11 +195,13 @@ function getTypesData(isCs: boolean) {
 
 import { FastTypeQuizModal } from "@/components/FastTypeQuizModal";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
+import PremiumUSHome from "./PremiumUSHome";
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const { t, locale, localePath } = useLanguage();
   const isCs = locale === "cs";
+  const isPremiumUsDomain = typeof window !== "undefined" && window.location.hostname.endsWith("humandesignchart.app");
 
   const [showQuiz, setShowQuiz] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -577,6 +579,10 @@ export default function Home() {
           featured: false,
         },
       ];
+
+  if (!isCs && isPremiumUsDomain) {
+    return <PremiumUSHome localePath={localePath} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
