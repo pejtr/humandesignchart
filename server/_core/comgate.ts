@@ -1,5 +1,17 @@
 import { ENV } from "./env";
 
+const COMGATE_REF_ID_MAX_LENGTH = 255;
+
+/**
+ * Packs order metadata into Comgate's refId (max 255 chars). Returns null
+ * instead of truncating, because a cut-off reference cannot be decoded by the
+ * webhook and the paid order would never be fulfilled.
+ */
+export function encodeComgateRefId(metadata: Record<string, unknown>): string | null {
+    const refId = Buffer.from(JSON.stringify(metadata)).toString("base64");
+    return refId.length <= COMGATE_REF_ID_MAX_LENGTH ? refId : null;
+}
+
 export interface ComgatePaymentInput {
     price: number; // in halere (cents)
     currency: "CZK" | "EUR";

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { Check, FileText, Gift, Heart, LockKeyhole, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -17,7 +17,9 @@ import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { getRedditClickIdForCapi } from "@/hooks/useRedditPixel";
 
 function formatPrice(amountMinor: number, currency: string, locale: string) {
-  return new Intl.NumberFormat(locale === "cs" ? "cs-CZ" : "en-US", { style: "currency", currency: currency.toUpperCase(), maximumFractionDigits: 0 }).format(amountMinor / 100);
+  // Show cents only when the price has them (€15.90 must not render as €16).
+  const fractionDigits = amountMinor % 100 === 0 ? 0 : 2;
+  return new Intl.NumberFormat(locale === "cs" ? "cs-CZ" : "en-US", { style: "currency", currency: currency.toUpperCase(), minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }).format(amountMinor / 100);
 }
 
 export default function Pricing() {
@@ -36,8 +38,10 @@ export default function Pricing() {
   useSEO({ title: isCs ? "Honorace — Členství a dobrovolná podpora | Human Design" : "Honorarium — Membership and voluntary support | Human Design", description: isCs ? "Transparentní minimální honorace za službu a dobrovolná podpora dalšího rozvoje." : "Transparent minimum service prices and optional voluntary support.", ogImage: OG_IMAGES.default, ogUrl: `${window.location.origin}/${locale}/honorace`, locale: isCs ? "cs_CZ" : "en_US" });
 
   useEffect(() => {
-    viewContent({ content_name: "Personal Human Design Blueprint", content_category: "report", content_ids: ["blueprint"], content_type: "product", value: (offerQuery.data?.amountMinor ?? 29000) / 100 });
-  }, [offerQuery.data?.amountMinor, viewContent]);
+    // Wait for the catalog so the reported value and currency match the charge.
+    if (!offerQuery.data) return;
+    viewContent({ content_name: "Personal Human Design Blueprint", content_category: "report", content_ids: ["blueprint"], content_type: "product", value: offerQuery.data.amountMinor / 100, currency: offerQuery.data.currency });
+  }, [offerQuery.data?.amountMinor, offerQuery.data?.currency, viewContent]);
 
   const checkout = trpc.subscription.createCheckout.useMutation({ onSuccess: ({ url }) => { if (url) window.location.assign(url); }, onError: error => toast.error(error.message) });
   const redeemVoucher = trpc.giftVoucher.redeem.useMutation({ onSuccess: () => { toast.success(isCs ? "Dárkový kód byl uplatněn." : "Gift voucher redeemed."); setVoucherCode(""); }, onError: error => toast.error(error.message) });
@@ -49,12 +53,26 @@ export default function Pricing() {
   const totalPrice = offer ? formatPrice(totalAmountMinor, offer.currency, locale) : "…";
 
   const beginCheckout = () => {
-    if (!user) return window.location.assign(getLoginUrl());
+    // Come back here after sign-in and continue straight into checkout.
+    if (!user) return window.location.assign(getLoginUrl(`/${locale}/honorace?checkout=1`));
     if (hasBlueprintAccess) return navigate(`/${locale}/dashboard`);
     if (!offer) return;
     initiateCheckout(totalAmountMinor / 100, { content_name: "Personal Human Design Blueprint", content_category: "report", content_ids: includePartnerAddon ? ["blueprint", "blueprint_partner"] : ["blueprint"], content_type: "product", num_items: includePartnerAddon ? 2 : 1 });
     checkout.mutate({ plan: "blueprint", locale, origin: window.location.origin, includePartnerAddon, voluntaryTopUpMinor, redditClickId: getRedditClickIdForCapi() });
   };
+  // Resume the checkout the visitor started before signing in (see beginCheckout).
+  const resumedCheckoutRef = useRef(false);
+  useEffect(() => {
+    if (resumedCheckoutRef.current || !user || !offer || statusQuery.isLoading) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") !== "1") return;
+    resumedCheckoutRef.current = true;
+    params.delete("checkout");
+    const query = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
+    beginCheckout();
+  }, [user, offer, statusQuery.isLoading]);
+
   const redeem = () => {
     if (!user) return window.location.assign(getLoginUrl());
     if (voucherCode.trim()) redeemVoucher.mutate({ code: voucherCode.trim() });
@@ -75,7 +93,7 @@ export default function Pricing() {
         </div>
         <div className="overflow-hidden rounded-[2rem] border border-violet-100 bg-white p-4 shadow-xl shadow-violet-100/60"><img src="/images/brand/veleknezka-master-v1.png" width={941} height={1672} alt={isCs ? "Marie, průvodkyně Human Designem" : "Marie, Human Design guide"} className="aspect-[941/1672] w-full rounded-[1.35rem] object-cover object-top" /></div>
       </section>
-      <section className="mx-auto max-w-4xl px-5 pb-16 md:px-8"><div className="rounded-[2rem] border border-amber-200 bg-white p-6 shadow-xl md:p-10"><div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-start"><div><p className="text-sm font-bold uppercase tracking-[0.16em] text-amber-700">{isCs ? "OMNI HD LAB · DEEP" : "OMNI HD LAB · DEEP"}</p><h2 className="mt-3 font-serif text-3xl">{isCs ? "Osobní hlubší rozbor vaší mapy." : "Personal deep reading of your chart."}</h2></div><div className="text-left sm:text-right"><p className="text-3xl font-bold">{price}</p><p className="mt-1 text-sm text-slate-500">{isCs ? "jednorázový nákup" : "one-time purchase"}</p></div></div><p className="mt-5 max-w-2xl text-sm leading-6 text-slate-600">{isCs ? "Získáváte kompletní osobní rozbor pro rozhodování, vztahy a práci v PDF, na webu i v audiu + permanentní uložení profilu." : "You get a complete personal reading for decision making, relationships and work in PDF, web & audio + permanent profile access."}</p><ul className="mt-8 grid gap-4 md:grid-cols-2">{features.map(feature => <li key={feature} className="flex gap-3 text-slate-700"><Check className="mt-0.5 size-5 shrink-0 text-emerald-600" />{feature}</li>)}</ul><Button size="lg" className="mt-6 w-full rounded-xl bg-[#C59235] py-6 text-base hover:bg-[#B88326] text-white shadow-md font-bold" onClick={beginCheckout} disabled={checkout.isPending || offerQuery.isLoading}>{hasBlueprintAccess ? (isCs ? "Otevřít moji mapu" : "Open my chart") : (isCs ? "Vytvořit OMNI HD LAB · DEEP (390 Kč)" : "Create OMNI HD LAB · DEEP (390 CZK)")}</Button><p className="mt-4 text-center text-sm text-slate-500">{offer?.delivery ?? (isCs ? "Přístup ihned po potvrzení platby." : "Access immediately after payment confirmation.")}</p></div></section>
+      <section className="mx-auto max-w-4xl px-5 pb-16 md:px-8"><div className="rounded-[2rem] border border-amber-200 bg-white p-6 shadow-xl md:p-10"><div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-start"><div><p className="text-sm font-bold uppercase tracking-[0.16em] text-amber-700">{isCs ? "OMNI HD LAB · DEEP" : "OMNI HD LAB · DEEP"}</p><h2 className="mt-3 font-serif text-3xl">{isCs ? "Osobní hlubší rozbor vaší mapy." : "Personal deep reading of your chart."}</h2></div><div className="text-left sm:text-right"><p className="text-3xl font-bold">{price}</p><p className="mt-1 text-sm text-slate-500">{isCs ? "jednorázový nákup" : "one-time purchase"}</p></div></div><p className="mt-5 max-w-2xl text-sm leading-6 text-slate-600">{isCs ? "Získáváte kompletní osobní rozbor pro rozhodování, vztahy a práci v PDF, na webu i v audiu + permanentní uložení profilu." : "You get a complete personal reading for decision making, relationships and work in PDF, web & audio + permanent profile access."}</p><ul className="mt-8 grid gap-4 md:grid-cols-2">{features.map(feature => <li key={feature} className="flex gap-3 text-slate-700"><Check className="mt-0.5 size-5 shrink-0 text-emerald-600" />{feature}</li>)}</ul><Button size="lg" className="mt-6 h-auto w-full whitespace-normal rounded-xl bg-[#C59235] py-4 text-base leading-snug hover:bg-[#B88326] text-white shadow-md font-bold" onClick={beginCheckout} disabled={checkout.isPending || offerQuery.isLoading}>{hasBlueprintAccess ? (isCs ? "Otevřít moji mapu" : "Open my chart") : checkout.isPending ? (isCs ? "Přesměrování na platbu…" : "Redirecting to payment…") : (isCs ? `Vytvořit OMNI HD LAB · DEEP (${price})` : `Create OMNI HD LAB · DEEP (${price})`)}</Button><p className="mt-4 text-center text-sm text-slate-500">{offer?.delivery ?? (isCs ? "Přístup ihned po potvrzení platby." : "Access immediately after payment confirmation.")}</p></div></section>
       <section className="border-y border-amber-100 bg-amber-50/40 py-14"><div className="mx-auto max-w-5xl px-5 md:px-8"><h2 className="font-serif text-3xl">{isCs ? "Členství ORACULUM+ " : "ORACULUM+ Membership"}</h2><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{isCs ? "Průběžná hodnota, denní tranzity, reflexní deník a výhledy. Roční variantu s vyhodnocením připravujeme." : "Ongoing insights, daily transits, reflection journal and perspectives."}</p><div className="mt-8 grid gap-5 md:grid-cols-3">{[{ name: "ORACULUM+", minimum: "189 Kč / měsíc", recommended: "1 190 Kč / rok (-47 %)" }].map(tier => <div key={tier.name} className="rounded-2xl border border-amber-200 bg-white p-5 shadow-sm"><p className="font-serif text-2xl font-bold">{tier.name}</p><p className="mt-3 text-sm font-semibold text-slate-700">{tier.minimum}</p><p className="text-xs text-amber-700 font-medium">{tier.recommended}</p></div>)}</div></div></section>
       <section className="border-y border-violet-100 bg-white py-14"><div className="mx-auto max-w-5xl px-5 md:px-8"><h2 className="font-serif text-3xl">{isCs ? "Jak to funguje" : "How it works"}</h2><div className="mt-8 grid gap-5 md:grid-cols-3">{[isCs ? "Vypočítáte si mapu zdarma." : "Calculate your free chart.", isCs ? "Vyberete Blueprint pro svou mapu." : "Choose a Blueprint for your chart.", isCs ? "Po potvrzení platby pokračujete ve svém účtu." : "Continue in your account after payment confirmation."].map((step, index) => <div key={step} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100"><p className="text-sm font-bold text-violet-700">0{index + 1}</p><p className="mt-3 font-medium text-slate-700">{step}</p></div>)}</div></div></section>
       <section className="mx-auto max-w-5xl px-5 py-14 md:px-8"><div className="rounded-2xl border border-slate-200 bg-white p-6"><p className="inline-flex items-center gap-2 font-semibold"><Heart className="size-4 text-rose-500" />{isCs ? "MAAT — vědomý přístup k Human Designu" : "MAAT — a conscious approach to Human Design"}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{isCs ? "Blueprint nenahrazuje vlastní zkušenost ani odbornou péči. Je to pozvání dívat se na sebe s větší pozorností a ověřovat si, co vám skutečně funguje." : "The Blueprint does not replace lived experience or professional care. It is an invitation to observe what truly works for you."}</p></div></section>
