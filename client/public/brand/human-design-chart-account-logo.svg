@@ -8,7 +8,7 @@
   <filter id="glow" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
-<rect width="1024" height="1024" rx="170" fill="url(#bg)"/>
+<rect width="1024" height="1024" fill="#070809"/><rect x="24" y="24" width="976" height="976" rx="156" fill="url(#bg)" stroke="#2a2417" stroke-width="2"/>
 <circle cx="512" cy="512" r="350" fill="none" stroke="url(#gold)" stroke-width="5" opacity=".95" filter="url(#soft)"/>
 <circle cx="512" cy="512" r="315" fill="none" stroke="#d6b05a" stroke-width="1.5" opacity=".24"/>
 <ellipse cx="512" cy="512" rx="190" ry="333" fill="none" stroke="url(#gold)" stroke-width="2.5" opacity=".42" transform="rotate(34 512 512)"/>
