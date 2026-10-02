@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+<title>Human Design Chart premium mark</title>
+<desc>Obsidian and gold geometric bodygraph compass mark.</desc>
+<defs>
+  <radialGradient id="bg" cx="50%" cy="42%" r="72%"><stop offset="0" stop-color="#17130c"/><stop offset=".48" stop-color="#0d0d0e"/><stop offset="1" stop-color="#050607"/></radialGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b5"/><stop offset=".28" stop-color="#e8c46b"/><stop offset=".62" stop-color="#b9822d"/><stop offset="1" stop-color="#f3dc8a"/></linearGradient>
+  <linearGradient id="gold2" x1=".5" y1="0" x2=".5" y2="1"><stop offset="0" stop-color="#fff6cf"/><stop offset=".5" stop-color="#d6a947"/><stop offset="1" stop-color="#95631f"/></linearGradient>
+  <filter id="glow" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="1024" height="1024" rx="170" fill="url(#bg)"/>
+<circle cx="512" cy="512" r="350" fill="none" stroke="url(#gold)" stroke-width="5" opacity=".95" filter="url(#soft)"/>
+<circle cx="512" cy="512" r="315" fill="none" stroke="#d6b05a" stroke-width="1.5" opacity=".24"/>
+<ellipse cx="512" cy="512" rx="190" ry="333" fill="none" stroke="url(#gold)" stroke-width="2.5" opacity=".42" transform="rotate(34 512 512)"/>
+<ellipse cx="512" cy="512" rx="190" ry="333" fill="none" stroke="url(#gold)" stroke-width="2.5" opacity=".42" transform="rotate(-34 512 512)"/>
+<g fill="#f6dfa0" filter="url(#glow)"><circle cx="512" cy="162" r="8"/><circle cx="862" cy="512" r="8"/><circle cx="512" cy="862" r="8"/><circle cx="162" cy="512" r="8"/></g>
+<g fill="#d7aa4a" opacity=".86"><circle cx="264" cy="264" r="6"/><circle cx="760" cy="264" r="6"/><circle cx="760" cy="760" r="6"/><circle cx="264" cy="760" r="6"/></g>
+<path d="M512 157 474 237h76z" fill="url(#gold2)" stroke="#fff2bf" stroke-width="2"/>
+<g stroke="url(#gold)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <path d="M512 236v58M512 328v44M512 438v42M512 548v66M512 674v54"/>
+  <path d="M377 526c52 9 77 24 105 58M647 526c-52 9-77 24-105 58"/>
+  <path d="M380 526c39-64 67-84 108-96M644 526c-39-64-67-84-108-96" opacity=".72"/>
+</g>
+<polygon points="512,263 553,304 512,345 471,304" fill="#0b0c0d" stroke="url(#gold)" stroke-width="7"/>
+<rect x="468" y="366" width="88" height="72" rx="18" fill="#0b0c0d" stroke="url(#gold)" stroke-width="7"/>
+<polygon points="512,452 572,512 512,572 452,512" fill="#0b0c0d" stroke="url(#gold)" stroke-width="8" filter="url(#soft)"/>
+<path d="M512 474v76M474 512h76" stroke="url(#gold2)" stroke-width="5" stroke-linecap="round"/>
+<path d="M512 486l26 26-26 26-26-26z" fill="url(#gold2)" opacity=".92"/>
+<polygon points="351,526 408,486 408,566" fill="#0b0c0d" stroke="url(#gold)" stroke-width="7"/>
+<polygon points="673,526 616,486 616,566" fill="#0b0c0d" stroke="url(#gold)" stroke-width="7"/>
+<rect x="468" y="614" width="88" height="88" rx="22" fill="#0b0c0d" stroke="url(#gold)" stroke-width="7"/>
+<rect x="470" y="728" width="84" height="92" rx="42" fill="#0b0c0d" stroke="url(#gold)" stroke-width="7"/>
+<g fill="url(#gold2)"><circle cx="512" cy="304" r="9"/><circle cx="512" cy="402" r="9"/><circle cx="512" cy="658" r="9"/><circle cx="512" cy="774" r="9"/></g>
+<path d="M347 810c51 30 106 45 165 45s114-15 165-45" fill="none" stroke="#d1a94f" stroke-width="2" opacity=".34"/>
+</svg>
