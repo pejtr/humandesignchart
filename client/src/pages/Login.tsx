@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft } from "lucide-react";
+import { sanitizeReturnPath } from "@shared/returnPath";
 
 const providers = [
   {
@@ -48,6 +49,8 @@ export default function Login() {
   const { locale, localePath } = useLanguage();
   const [, navigate] = useLocation();
   const isEn = locale === "en";
+  const returnTo = sanitizeReturnPath(new URLSearchParams(window.location.search).get("returnTo"));
+  const withReturnTo = (url: string) => (returnTo ? `${url}?returnTo=${encodeURIComponent(returnTo)}` : url);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -64,7 +67,7 @@ export default function Login() {
         </CardHeader>
         <CardContent className="space-y-3">
           {providers.map((p, i) => (
-            <a key={p.id} href={p.url} className="block">
+            <a key={p.id} href={withReturnTo(p.url)} className="block">
               <Button
                 variant="outline"
                 className={`w-full justify-center gap-3 h-12 text-sm font-medium ${p.bgClass}`}

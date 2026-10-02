@@ -5,6 +5,7 @@ import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
+import { ENV } from "./env";
 import { registerStorageProxy } from "./storageProxy";
 import { registerStripeWebhook } from "../stripeWebhook";
 import { registerLeadOSWebhook } from "../leadosWebhook";
@@ -67,6 +68,11 @@ async function startServer() {
     }
     next();
   });
+
+  if (ENV.isProduction && ENV.comgateMerchantId && ENV.comgateTestMode) {
+    // COMGATE_TEST_MODE defaults to test unless it is exactly "false".
+    console.warn("[Comgate] Production is running in TEST mode: CZ payments are not real. Set COMGATE_TEST_MODE=false to take live payments.");
+  }
 
   // ⚠️ Webhook routes MUST be registered BEFORE express.json()
   registerStripeWebhook(app);

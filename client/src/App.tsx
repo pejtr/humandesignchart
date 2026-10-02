@@ -15,6 +15,7 @@ import ReferralApplier from "./components/ReferralApplier";
 import NewsletterPopup from "./components/NewsletterPopup";
 import ExitIntentPopup from "./components/ExitIntentPopup";
 import WelcomeModal, { useWelcomeModal } from "./components/WelcomeModal";
+import { isPurchasePath } from "./lib/purchasePath";
 import PageTransition from "./components/PageTransition";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
@@ -362,7 +363,10 @@ function LocaleRoutes() {
 
 function WelcomeModalWrapper() {
   const { shouldShow, dismiss } = useWelcomeModal();
-  if (!shouldShow) return null;
+  const [location] = useLocation();
+  // Keep the buy button and payment confirmation unobstructed; the tour can
+  // still show on the visitor's next non-purchase page.
+  if (!shouldShow || isPurchasePath(location)) return null;
   return <WelcomeModal onClose={dismiss} />;
 }
 

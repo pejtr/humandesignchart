@@ -1,4 +1,5 @@
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { sanitizeReturnPath } from "@shared/returnPath";
 import { createHmac, randomBytes, timingSafeEqual, createSign, createPrivateKey } from "node:crypto";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
@@ -26,16 +27,20 @@ function getFormBody(req: Request, key: string): string | undefined {
 }
 
 // ─── Stateless CSRF state ──────────────────────────────────────────────
-function signState(provider: OAuthProvider): string {
-  const payload = `${Date.now()}.${randomBytes(8).toString("hex")}.${provider}`;
+// The optional fourth segment carries the post-login return path. It is part
+// of the signed payload, so it cannot be swapped in transit.
+export function signState(provider: OAuthProvider, returnTo?: string | null): string {
+  const safeReturnTo = sanitizeReturnPath(returnTo);
+  const returnSegment = safeReturnTo ? `.${Buffer.from(safeReturnTo, "utf8").toString("base64url")}` : "";
+  const payload = `${Date.now()}.${randomBytes(8).toString("hex")}.${provider}${returnSegment}`;
   const sig = createHmac("sha256", ENV.cookieSecret).update(payload).digest("base64url");
   return `${payload}.${sig}`;
 }
 
-function verifyState(state: string | undefined): { valid: boolean; provider: OAuthProvider } {
-  if (!state) return { valid: false, provider: "google" };
+export function verifyState(state: string | undefined): { valid: boolean; provider: OAuthProvider; returnTo: string | null } {
+  if (!state) return { valid: false, provider: "google", returnTo: null };
   const dotIdx = state.lastIndexOf(".");
-  if (dotIdx <= 0) return { valid: false, provider: "google" };
+  if (dotIdx <= 0) return { valid: false, provider: "google", returnTo: null };
 
   const payload = state.slice(0, dotIdx);
   const sig = state.slice(dotIdx + 1);
@@ -44,19 +49,20 @@ function verifyState(state: string | undefined): { valid: boolean; provider: OAu
   const a = Buffer.from(sig);
   const b = Buffer.from(expected);
   if (a.length !== b.length || !timingSafeEqual(a, b)) {
-    return { valid: false, provider: "google" };
+    return { valid: false, provider: "google", returnTo: null };
   }
 
-  // payload format: timestamp.randomhex.provider
+  // payload format: timestamp.randomhex.provider[.base64url(returnTo)]
   const parts = payload.split(".");
   const ts = Number(parts[0]);
   const age = Date.now() - ts;
   if (!Number.isFinite(age) || age < 0 || age > STATE_MAX_AGE_MS) {
-    return { valid: false, provider: "google" };
+    return { valid: false, provider: "google", returnTo: null };
   }
 
   const provider = (parts[2] || "google") as OAuthProvider;
-  return { valid: true, provider };
+  const returnTo = parts[3] ? sanitizeReturnPath(Buffer.from(parts[3], "base64url").toString("utf8")) : null;
+  return { valid: true, provider, returnTo };
 }
 
 function getRedirectUri(req: Request, provider: OAuthProvider): string {
@@ -106,6 +112,7 @@ async function handleUserSession(
     name: string | null;
     email: string | null;
     picture?: string | null;
+    returnTo?: string | null;
   }
 ) {
   const openId = `${opts.provider}:${opts.providerSub}`;
@@ -171,7 +178,7 @@ async function handleUserSession(
     maxAge: ONE_YEAR_MS,
   });
 
-  res.redirect(302, "/");
+  res.redirect(302, sanitizeReturnPath(opts.returnTo) ?? "/");
 }
 
 export function registerOAuthRoutes(app: Express) {
@@ -184,7 +191,7 @@ export function registerOAuthRoutes(app: Express) {
     res.redirect(302, buildGoogleAuthUrl({
       clientId: ENV.googleClientId,
       redirectUri: getRedirectUri(req, "google"),
-      state: signState("google"),
+      state: signState("google", getQueryParam(req, "returnTo")),
     }));
   });
 
@@ -200,7 +207,7 @@ export function registerOAuthRoutes(app: Express) {
       res.status(400).json({ error: "code and state are required" });
       return;
     }
-    const { valid } = verifyState(state);
+    const { valid, returnTo } = verifyState(state);
     if (!valid) {
       res.status(400).json({ error: "Invalid OAuth state" });
       return;
@@ -216,6 +223,7 @@ export function registerOAuthRoutes(app: Express) {
 
       await handleUserSession(req, res, {
         provider: "google",
+        returnTo,
         providerSub: profile.sub,
         name: profile.name,
         email: profile.email,
@@ -239,7 +247,7 @@ export function registerOAuthRoutes(app: Express) {
     res.redirect(302, buildFacebookAuthUrl({
       clientId: ENV.facebookClientId,
       redirectUri: getRedirectUri(req, "facebook"),
-      state: signState("facebook"),
+      state: signState("facebook", getQueryParam(req, "returnTo")),
     }));
   });
 
@@ -255,7 +263,7 @@ export function registerOAuthRoutes(app: Express) {
       res.status(400).json({ error: "code and state are required" });
       return;
     }
-    const { valid } = verifyState(state);
+    const { valid, returnTo } = verifyState(state);
     if (!valid) {
       res.status(400).json({ error: "Invalid OAuth state" });
       return;
@@ -271,6 +279,7 @@ export function registerOAuthRoutes(app: Express) {
 
       await handleUserSession(req, res, {
         provider: "facebook",
+        returnTo,
         providerSub: profile.id,
         name: profile.name,
         email: profile.email,
@@ -294,7 +303,7 @@ export function registerOAuthRoutes(app: Express) {
     res.redirect(302, buildAppleAuthUrl({
       clientId: ENV.appleClientId,
       redirectUri: getRedirectUri(req, "apple"),
-      state: signState("apple"),
+      state: signState("apple", getQueryParam(req, "returnTo")),
     }));
   });
 
@@ -312,7 +321,7 @@ export function registerOAuthRoutes(app: Express) {
       res.status(400).json({ error: "code and state are required" });
       return;
     }
-    const { valid } = verifyState(state);
+    const { valid, returnTo } = verifyState(state);
     if (!valid) {
       res.status(400).json({ error: "Invalid OAuth state" });
       return;
@@ -342,6 +351,7 @@ export function registerOAuthRoutes(app: Express) {
 
       await handleUserSession(req, res, {
         provider: "apple",
+        returnTo,
         providerSub: profile.sub,
         name,
         email: profile.email,
@@ -357,6 +367,7 @@ export function registerOAuthRoutes(app: Express) {
 
   // ─── Legacy: /api/oauth/login (defaults to Google) ──────────────────
   app.get("/api/oauth/login", (req: Request, res: Response) => {
-    res.redirect(302, "/api/oauth/login/google");
+    const returnTo = sanitizeReturnPath(getQueryParam(req, "returnTo"));
+    res.redirect(302, returnTo ? `/api/oauth/login/google?returnTo=${encodeURIComponent(returnTo)}` : "/api/oauth/login/google");
   });
 }
