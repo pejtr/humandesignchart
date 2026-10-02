@@ -16,14 +16,6 @@ import {
   Zap,
 } from "lucide-react";
 
-const INK = "#071426";
-const NAVY = "#081A31";
-const NAVY_2 = "#0D2442";
-const GOLD = "#F4C762";
-const GOLD_DEEP = "#C99534";
-const CREAM = "#F7F3EA";
-const VIOLET = "#8B5CF6";
-
 function BodygraphPreview({ compact = false }: { compact?: boolean }) {
   return (
     <svg
@@ -378,7 +370,7 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
               [CalendarDays, "Date of birth", "May 14, 1990"],
               [Clock3, "Time of birth", "14:37"],
               [MapPin, "Place of birth", "Austin, Texas"],
-            ].map(([Icon, label, value], index) => {
+            ].map(([Icon, label, value]) => {
               const FieldIcon = Icon as typeof CalendarDays;
               return (
                 <div key={String(label)} className="flex items-center gap-3 rounded-2xl border border-white/8 bg-[#0D2442] px-4 py-4">
