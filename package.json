@@ -12,7 +12,9 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "healthcheck": "vitest run server/qa-healthcheck.test.ts --reporter=verbose",
-    "db:push": "drizzle-kit generate && drizzle-kit migrate"
+    "db:push": "drizzle-kit generate && drizzle-kit migrate",
+    "build:cloudflare": "vite build && esbuild workers/pages-api.ts --bundle --format=esm --platform=browser --target=es2022 --minify --outfile=dist/public/_worker.js",
+    "deploy:cloudflare": "pnpm build:cloudflare && npx -y wrangler@4.147.0 pages deploy dist/public --project-name humandesignchart-web --branch main"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
