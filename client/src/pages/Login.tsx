@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft } from "lucide-react";
+import { sanitizeReturnPath } from "@shared/returnPath";
 
 const providers = [
   {
@@ -48,6 +49,8 @@ export default function Login() {
   const { locale, localePath } = useLanguage();
   const [, navigate] = useLocation();
   const isEn = locale === "en";
+  const returnTo = sanitizeReturnPath(new URLSearchParams(window.location.search).get("returnTo"));
+  const withReturnTo = (url: string) => (returnTo ? `${url}?returnTo=${encodeURIComponent(returnTo)}` : url);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -64,7 +67,7 @@ export default function Login() {
         </CardHeader>
         <CardContent className="space-y-3">
           {providers.map((p, i) => (
-            <a key={p.id} href={p.url} className="block">
+            <a key={p.id} href={withReturnTo(p.url)} className="block">
               <Button
                 variant="outline"
                 className={`w-full justify-center gap-3 h-12 text-sm font-medium ${p.bgClass}`}
@@ -80,9 +83,11 @@ export default function Login() {
           </div>
 
           <p className="text-center text-xs text-muted-foreground leading-relaxed">
-            {isEn
-              ? "By signing in, you agree to our Terms of Service and Privacy Policy."
-              : "Přihlášením souhlasíte s našimi Podmínkami použití a Zásadami ochrany soukromí."}
+            {isEn ? (
+              <>By signing in, you agree to our <a href={localePath("/terms")} className="underline">Terms</a> and <a href={localePath("/privacy")} className="underline">Privacy Policy</a>.</>
+            ) : (
+              <>Přihlášením souhlasíte s <a href={localePath("/terms")} className="underline">obchodními podmínkami</a> a <a href={localePath("/privacy")} className="underline">zásadami ochrany osobních údajů</a>.</>
+            )}
           </p>
 
           <div className="flex justify-center pt-2">

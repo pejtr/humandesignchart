@@ -13,6 +13,8 @@ import { ENV } from "../_core/env";
 import { createManagedCheckoutSession } from "../stripeCheckout";
 import { getBlueprintOffer } from "../payments/publicOfferCatalog";
 import { resolveHonorariumSelection } from "../payments/honorarium";
+import { CHECKOUT_PRICES_MINOR } from "@shared/checkoutPrices";
+import { encodeComgateRefId } from "../_core/comgate";
 
 export const subscriptionRouter = router({
     blueprintOffer: publicProcedure
@@ -47,10 +49,11 @@ export const subscriptionRouter = router({
             senderName: z.string().optional(),
             personalMessage: z.string().optional(),
             redditClickId: z.string().max(255).optional(),
+            // Consumer's express consent to immediate delivery of digital
+            // content (§ 1837 l) OZ). Recorded on the order as evidence.
+            digitalDeliveryConsent: z.boolean().default(false),
         }))
         .mutation(async ({ ctx, input }) => {
-            const stripe = getStripe();
-            if (!stripe) throw new Error("Stripe not configured");
             const user = ctx.user;
             const isGift = input.plan.startsWith("gift_");
             const isSubscription = input.plan === "monthly" || input.plan === "annual";
@@ -65,23 +68,21 @@ export const subscriptionRouter = router({
                     });
                 }
             }
-            let customerId = user.stripeCustomerId;
-            if (!customerId) {
-                const customer = await stripe.customers.create({ email: user.email || undefined, name: user.name || undefined, metadata: { user_id: user.id.toString() } });
-                customerId = customer.id;
-                await updateUserSubscription(user.id, { stripeCustomerId: customerId });
-            }
             const priceData = {
-                monthly: { czk: 18900, eur: 790, name: "Human Design Premium - Mesicni", taxCode: "txcd_10103000" },
-                annual: { czk: 119000, eur: 4800, name: "Human Design Premium - Rocni", taxCode: "txcd_10103000" },
-                lifetime: { czk: 288800, eur: 11500, name: "Human Design Premium - Dozivotne", taxCode: "txcd_10103000" },
-                credits: { czk: 7700, eur: 299, name: "Human Design AI Credits (5x)", taxCode: "txcd_10105001" },
-                brainwave_audio: { czk: 19500, eur: 790, name: "12minutove Human Design binauralni audio", taxCode: "txcd_10701411" },
-                blueprint: { czk: 29000, eur: 1590, name: "Osobni Human Design Blueprint", taxCode: "txcd_10701411" },
-                blueprint_annual_upgrade: { czk: 80000, eur: 3210, name: "Rocni Premium - doplatek po Blueprintu", taxCode: "txcd_10103000" },
-                gift_monthly: { czk: 18800, eur: 749, name: "Darkovy poukaz - Premium Mesic", taxCode: "txcd_10103000" },
-                gift_annual: { czk: 118800, eur: 4700, name: "Darkovy poukaz - Premium Rok", taxCode: "txcd_10103000" },
-            }[input.plan];
+                ...{
+                    monthly: { name: "Human Design Premium - Mesicni", taxCode: "txcd_10103000" },
+                    annual: { name: "Human Design Premium - Rocni", taxCode: "txcd_10103000" },
+                    lifetime: { name: "Human Design Premium - Dozivotne", taxCode: "txcd_10103000" },
+                    credits: { name: "Human Design AI Credits (5x)", taxCode: "txcd_10105001" },
+                    brainwave_audio: { name: "12minutove Human Design binauralni audio", taxCode: "txcd_10701411" },
+                    blueprint: { name: "Osobni Human Design Blueprint", taxCode: "txcd_10701411" },
+                    blueprint_annual_upgrade: { name: "Rocni Premium - doplatek po Blueprintu", taxCode: "txcd_10103000" },
+                    gift_monthly: { name: "Darkovy poukaz - Premium Mesic", taxCode: "txcd_10103000" },
+                    gift_annual: { name: "Darkovy poukaz - Premium Rok", taxCode: "txcd_10103000" },
+                }[input.plan],
+                czk: CHECKOUT_PRICES_MINOR[input.plan].CZK,
+                eur: CHECKOUT_PRICES_MINOR[input.plan].EUR,
+            };
             const currency = isCzech ? "czk" : "eur";
             const paymentCurrency = isCzech ? "CZK" : "EUR";
             // Blueprint is deliberately read from the canonical offer catalog for
@@ -115,6 +116,10 @@ export const subscriptionRouter = router({
                 } : {}),
             };
             if (input.redditClickId) metadata.rdt_cid = input.redditClickId;
+            if (input.digitalDeliveryConsent) {
+                metadata.digital_delivery_consent = "true";
+                metadata.digital_delivery_consent_at = new Date().toISOString();
+            }
             if (isGift) {
                 if (input.recipientEmail) metadata.recipient_email = input.recipientEmail;
                 if (input.recipientName) metadata.recipient_name = input.recipientName;
@@ -127,33 +132,50 @@ export const subscriptionRouter = router({
             if (!isSubscription && isCzech && ENV.comgateMerchantId && (honorarium?.voluntaryTopUpMinor ?? 0) === 0) {
                 const { createComgateCheckoutSession } = await import("../_core/comgate");
                 
-                const rawMeta: any = {
+                // Only fields the Comgate webhook reads. Comgate caps refId at
+                // 255 chars, and a truncated reference can no longer be decoded,
+                // which would leave a paid order without its entitlement.
+                const rawMeta: Record<string, unknown> = {
                         u: user.id,
                         p: input.plan,
-                        email: user.email,
-                        name: user.name,
                         partner: input.plan === "blueprint" && input.includePartnerAddon ? 1 : 0,
+                        ...(input.digitalDeliveryConsent ? { dc: 1 } : {}),
                         ...(honorarium ? { hm: honorarium.minimumAmountMinor, ht: honorarium.voluntaryTopUpMinor } : {}),
                 };
                 if (input.recipientEmail) rawMeta.recEmail = input.recipientEmail;
                 if (input.recipientName) rawMeta.recName = input.recipientName;
                 if (input.senderName) rawMeta.sndName = input.senderName;
-                
-                const refId = Buffer.from(JSON.stringify(rawMeta)).toString("base64").substring(0, 255);
 
-                try {
-                    const comgateRes = await createComgateCheckoutSession({
-                        price: honorarium?.totalAmountMinor ?? unitAmount,
-                        currency: "CZK",
-                        label: productName,
-                        refId: refId,
-                        email: user.email || "neznamy@zakaznik.cz",
-                        lang: "cs"
-                    });
-                    return { url: comgateRes.redirectUrl };
-                } catch (e: any) {
-                    console.error("[Comgate API error]", e);
+                const refId = encodeComgateRefId(rawMeta);
+
+                if (!refId) {
+                    console.warn("[Comgate] Order reference exceeds 255 chars; using Stripe checkout", { userId: user.id, plan: input.plan });
+                } else {
+                    try {
+                        const comgateRes = await createComgateCheckoutSession({
+                            price: honorarium?.totalAmountMinor ?? unitAmount,
+                            currency: "CZK",
+                            label: productName,
+                            refId: refId,
+                            email: user.email || "neznamy@zakaznik.cz",
+                            lang: "cs"
+                        });
+                        return { url: comgateRes.redirectUrl };
+                    } catch (e: any) {
+                        console.error("[Comgate API error]", e);
+                    }
                 }
+            }
+
+            // Stripe is only needed from here on, so a Comgate checkout keeps
+            // working even when Stripe keys are missing.
+            const stripe = getStripe();
+            if (!stripe) throw new Error("Stripe not configured");
+            let customerId = user.stripeCustomerId;
+            if (!customerId) {
+                const customer = await stripe.customers.create({ email: user.email || undefined, name: user.name || undefined, metadata: { user_id: user.id.toString() } });
+                customerId = customer.id;
+                await updateUserSubscription(user.id, { stripeCustomerId: customerId });
             }
 
             if (isSubscription) {

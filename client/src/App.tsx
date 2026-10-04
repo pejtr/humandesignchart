@@ -15,6 +15,7 @@ import ReferralApplier from "./components/ReferralApplier";
 import NewsletterPopup from "./components/NewsletterPopup";
 import ExitIntentPopup from "./components/ExitIntentPopup";
 import WelcomeModal, { useWelcomeModal } from "./components/WelcomeModal";
+import { isPurchasePath } from "./lib/purchasePath";
 import PageTransition from "./components/PageTransition";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
@@ -49,6 +50,7 @@ const BlogArticle = lazy(() => import("./pages/BlogArticle"));
 const IncarnationCross = lazy(() => import("./pages/IncarnationCross"));
 const DailyTransit = lazy(() => import("./pages/DailyTransit"));
 const Pricing = lazy(() => import("./pages/Pricing"));
+const Legal = lazy(() => import("./pages/Legal"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const PaymentCancel = lazy(() => import("./pages/PaymentCancel"));
 const NewsletterConfirm = lazy(() => import("./pages/NewsletterConfirm"));
@@ -255,6 +257,15 @@ function LocaleRoutes() {
             <Route path="/:locale/honorace">
               {() => <SafeRoute><Pricing /></SafeRoute>}
             </Route>
+            <Route path="/:locale/terms">
+              {() => <SafeRoute><Legal doc="terms" /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/privacy">
+              {() => <SafeRoute><Legal doc="privacy" /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/withdrawal">
+              {() => <SafeRoute><Legal doc="withdrawal" /></SafeRoute>}
+            </Route>
             <Route path="/:locale/pricing">
               {(params: { locale: string }) => <HonoraceAliasRedirect locale={params.locale} />}
             </Route>
@@ -342,6 +353,9 @@ function LocaleRoutes() {
             <Route path="/incarnation-cross"><LegacyRedirect path="/incarnation-cross" /></Route>
             <Route path="/daily-transit"><LegacyRedirect path="/daily-transit" /></Route>
             <Route path="/honorace"><LegacyRedirect path="/honorace" /></Route>
+            <Route path="/terms"><LegacyRedirect path="/terms" /></Route>
+            <Route path="/privacy"><LegacyRedirect path="/privacy" /></Route>
+            <Route path="/withdrawal"><LegacyRedirect path="/withdrawal" /></Route>
             <Route path="/pricing"><LegacyRedirect path="/honorace" /></Route>
             <Route path="/cenik"><LegacyRedirect path="/honorace" /></Route>
             <Route path="/reddit-human-design"><LegacyRedirect path="/reddit-human-design" /></Route>
@@ -362,12 +376,13 @@ function LocaleRoutes() {
 
 function WelcomeModalWrapper() {
   const { shouldShow, dismiss } = useWelcomeModal();
-  if (!shouldShow) return null;
+  const [location] = useLocation();
+  // Keep the buy button and payment confirmation unobstructed; the tour can
+  // still show on the visitor's next non-purchase page.
+  if (!shouldShow || isPurchasePath(location)) return null;
   return <WelcomeModal onClose={dismiss} />;
 }
 
-const SocialProofTicker = lazy(() => import("./components/SocialProofTicker").then(m => ({ default: m.SocialProofTicker })));
-const SeasonalFlashSaleBanner = lazy(() => import("./components/SeasonalFlashSaleBanner").then(m => ({ default: m.SeasonalFlashSaleBanner })));
 const LeadMagnetExitPopup = lazy(() => import("./components/LeadMagnetExitPopup").then(m => ({ default: m.LeadMagnetExitPopup })));
 const WebPushNotificationModal = lazy(() => import("./components/WebPushNotificationModal").then(m => ({ default: m.WebPushNotificationModal })));
 
@@ -391,8 +406,6 @@ function App() {
               <NewsletterPopup />
               <ExitIntentPopup />
               <Suspense fallback={null}>
-                <SeasonalFlashSaleBanner />
-                <SocialProofTicker />
                 <LeadMagnetExitPopup />
                 <WebPushNotificationModal />
               </Suspense>

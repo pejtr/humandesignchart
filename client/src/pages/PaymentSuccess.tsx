@@ -23,6 +23,7 @@ import {
   Clock3,
 } from "lucide-react";
 import { Link } from "wouter";
+import { CHECKOUT_PRICES_MINOR, isCheckoutPlan } from "@shared/checkoutPrices";
 
 export default function PaymentSuccess() {
   const { locale, localePath } = useLanguage();
@@ -72,34 +73,24 @@ export default function PaymentSuccess() {
 
     // Track Purchase event (META Pixel + Conversions API) — fires once per mount
     const searchParams = new URLSearchParams(window.location.search);
-    const sessionId = searchParams.get("session_id");
+    // Stripe returns session_id; a Comgate return URL can carry the transaction as id.
+    const sessionId = searchParams.get("session_id") || searchParams.get("id");
     const trackingKey = sessionId ? `hd-purchase-tracked:${sessionId}` : null;
-    const planValue =
-      plan === "annual"
-        ? 1188
-        : plan === "lifetime"
-          ? 2888
-          : plan === "credits"
-            ? 77
-            : plan === "brainwave_audio"
-              ? 195
-            : plan === "blueprint"
-              ? 390
-              : plan === "blueprint_annual_upgrade"
-                ? 798
-                : 188;
-    const currency = isEn ? "EUR" : "CZK";
-    if (!trackingKey || localStorage.getItem(trackingKey) !== "true") {
-      meta.purchase(plan === "credits" ? 77 : planValue, {
-        content_ids: plan ? [plan] : undefined,
+    // Report what was actually charged, in the charged currency (cs → CZK,
+    // otherwise EUR, mirroring subscription.createCheckout).
+    const currency = locale === "cs" ? "CZK" : "EUR";
+    const planValue = isCheckoutPlan(plan) ? CHECKOUT_PRICES_MINOR[plan][currency] / 100 : undefined;
+    if (planValue !== undefined && (!trackingKey || localStorage.getItem(trackingKey) !== "true")) {
+      meta.purchase(planValue, {
+        content_ids: [plan as string],
         content_type: "product",
         currency,
         order_id: sessionId || undefined,
-        predicted_ltv: plan === "blueprint" ? 1188 : planValue,
+        predicted_ltv: plan === "blueprint" ? CHECKOUT_PRICES_MINOR.annual[currency] / 100 : planValue,
       });
       if (trackingKey) localStorage.setItem(trackingKey, "true");
     }
-  }, [isEn, plan]);
+  }, [isEn, locale, plan]);
 
   const nextSteps = isEn
     ? [
