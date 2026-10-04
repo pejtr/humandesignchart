@@ -49,10 +49,11 @@ export const subscriptionRouter = router({
             senderName: z.string().optional(),
             personalMessage: z.string().optional(),
             redditClickId: z.string().max(255).optional(),
+            // Consumer's express consent to immediate delivery of digital
+            // content (§ 1837 l) OZ). Recorded on the order as evidence.
+            digitalDeliveryConsent: z.boolean().default(false),
         }))
         .mutation(async ({ ctx, input }) => {
-            const stripe = getStripe();
-            if (!stripe) throw new Error("Stripe not configured");
             const user = ctx.user;
             const isGift = input.plan.startsWith("gift_");
             const isSubscription = input.plan === "monthly" || input.plan === "annual";
@@ -66,12 +67,6 @@ export const subscriptionRouter = router({
                         message: "Zvýhodněný doplatek je dostupný 48 hodin po nákupu Blueprintu.",
                     });
                 }
-            }
-            let customerId = user.stripeCustomerId;
-            if (!customerId) {
-                const customer = await stripe.customers.create({ email: user.email || undefined, name: user.name || undefined, metadata: { user_id: user.id.toString() } });
-                customerId = customer.id;
-                await updateUserSubscription(user.id, { stripeCustomerId: customerId });
             }
             const priceData = {
                 ...{
@@ -121,6 +116,10 @@ export const subscriptionRouter = router({
                 } : {}),
             };
             if (input.redditClickId) metadata.rdt_cid = input.redditClickId;
+            if (input.digitalDeliveryConsent) {
+                metadata.digital_delivery_consent = "true";
+                metadata.digital_delivery_consent_at = new Date().toISOString();
+            }
             if (isGift) {
                 if (input.recipientEmail) metadata.recipient_email = input.recipientEmail;
                 if (input.recipientName) metadata.recipient_name = input.recipientName;
@@ -140,6 +139,7 @@ export const subscriptionRouter = router({
                         u: user.id,
                         p: input.plan,
                         partner: input.plan === "blueprint" && input.includePartnerAddon ? 1 : 0,
+                        ...(input.digitalDeliveryConsent ? { dc: 1 } : {}),
                         ...(honorarium ? { hm: honorarium.minimumAmountMinor, ht: honorarium.voluntaryTopUpMinor } : {}),
                 };
                 if (input.recipientEmail) rawMeta.recEmail = input.recipientEmail;
@@ -165,6 +165,17 @@ export const subscriptionRouter = router({
                         console.error("[Comgate API error]", e);
                     }
                 }
+            }
+
+            // Stripe is only needed from here on, so a Comgate checkout keeps
+            // working even when Stripe keys are missing.
+            const stripe = getStripe();
+            if (!stripe) throw new Error("Stripe not configured");
+            let customerId = user.stripeCustomerId;
+            if (!customerId) {
+                const customer = await stripe.customers.create({ email: user.email || undefined, name: user.name || undefined, metadata: { user_id: user.id.toString() } });
+                customerId = customer.id;
+                await updateUserSubscription(user.id, { stripeCustomerId: customerId });
             }
 
             if (isSubscription) {

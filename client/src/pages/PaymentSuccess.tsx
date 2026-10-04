@@ -73,7 +73,8 @@ export default function PaymentSuccess() {
 
     // Track Purchase event (META Pixel + Conversions API) — fires once per mount
     const searchParams = new URLSearchParams(window.location.search);
-    const sessionId = searchParams.get("session_id");
+    // Stripe returns session_id; a Comgate return URL can carry the transaction as id.
+    const sessionId = searchParams.get("session_id") || searchParams.get("id");
     const trackingKey = sessionId ? `hd-purchase-tracked:${sessionId}` : null;
     // Report what was actually charged, in the charged currency (cs → CZK,
     // otherwise EUR, mirroring subscription.createCheckout).

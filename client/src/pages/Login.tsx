@@ -83,9 +83,11 @@ export default function Login() {
           </div>
 
           <p className="text-center text-xs text-muted-foreground leading-relaxed">
-            {isEn
-              ? "By signing in, you agree to our Terms of Service and Privacy Policy."
-              : "Přihlášením souhlasíte s našimi Podmínkami použití a Zásadami ochrany soukromí."}
+            {isEn ? (
+              <>By signing in, you agree to our <a href={localePath("/terms")} className="underline">Terms</a> and <a href={localePath("/privacy")} className="underline">Privacy Policy</a>.</>
+            ) : (
+              <>Přihlášením souhlasíte s <a href={localePath("/terms")} className="underline">obchodními podmínkami</a> a <a href={localePath("/privacy")} className="underline">zásadami ochrany osobních údajů</a>.</>
+            )}
           </p>
 
           <div className="flex justify-center pt-2">
