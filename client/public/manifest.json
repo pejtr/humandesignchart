@@ -1,16 +1,17 @@
 {
-  "short_name": "Human Design",
-  "name": "Avanito Human Design & AI Marie",
+  "short_name": "HD Mapa",
+  "name": "Human Design Mapa",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ],
   "start_url": "/",
-  "background_color": "#090d16",
-  "theme_color": "#7c3aed",
+  "background_color": "#fff8ea",
+  "theme_color": "#f7c65c",
   "display": "standalone",
   "orientation": "portrait"
 }
