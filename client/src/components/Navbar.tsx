@@ -165,7 +165,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
                 <span className="font-serif text-lg font-bold tracking-tight text-foreground hidden sm:block truncate">
                   {locale === "cs" ? "HUMAN DESIGN MAPA" : "OMNI HD LAB"}
                 </span>
-                <span className="text-[9px] font-mono tracking-widest text-amber-600 dark:text-amber-400 uppercase font-semibold hidden sm:block">by OMNI APPS</span>
+                
               </div>
             </Link>
             {!offerMode && <div className="hidden lg:block min-w-0">
