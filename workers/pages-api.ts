@@ -199,6 +199,27 @@ export default {
       });
     }
 
-    return env.ASSETS.fetch(request);
+    const asset = await env.ASSETS.fetch(request);
+    const isEnHost = url.hostname === "humandesignchart.app" || url.hostname === "www.humandesignchart.app";
+    const contentType = asset.headers.get("content-type") || "";
+    if (!isEnHost || !contentType.includes("text/html")) return asset;
+
+    // One Pages project serves both brands. Keep the Czech static template for
+    // the CZ host, but prevent the EN host from publishing Czech host-level
+    // language, RSS and canonical-domain signals. Route-specific metadata is
+    // handled by the application.
+    const html = await asset.text();
+    const normalized = html
+      .replace('<html lang="cs">', '<html lang="en">')
+      .replace(
+        /<link rel="alternate" type="application\/rss\+xml"[^>]*>/,
+        '<link rel="alternate" type="application/rss+xml" title="Human Design Blog" href="https://www.humandesignchart.app/rss.xml" />',
+      )
+      .replaceAll("https://www.humandesignmapa.cz", "https://www.humandesignchart.app");
+
+    const headers = new Headers(asset.headers);
+    headers.delete("content-length");
+    headers.set("content-language", "en");
+    return new Response(normalized, { status: asset.status, statusText: asset.statusText, headers });
   },
 };
