@@ -12,6 +12,9 @@ import {
   lookupIanaTimezone,
   TimezoneResolutionError,
 } from "../server/humandesign/timezone";
+import { BLOG_ARTICLES } from "../server/data/blogArticles";
+import { BLOG_ARTICLES_EN } from "../server/data/blogArticlesEn";
+import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
 
 type Env = {
   ASSETS: {
@@ -69,9 +72,110 @@ const appRouter = router({
   publicStats: publicStatsRouter,
 });
 
+const sitemapStaticPages = [
+  { loc: "/", priority: "1.0", changefreq: "weekly" },
+  { loc: "/calculate", priority: "1.0", changefreq: "monthly" },
+  { loc: "/encyclopedia", priority: "0.8", changefreq: "weekly" },
+  { loc: "/ai-guide", priority: "0.8", changefreq: "monthly" },
+  { loc: "/transits", priority: "0.7", changefreq: "daily" },
+  { loc: "/transit-calendar", priority: "0.6", changefreq: "daily" },
+  { loc: "/celebrities", priority: "0.8", changefreq: "monthly" },
+  { loc: "/compare", priority: "0.7", changefreq: "monthly" },
+  { loc: "/composite", priority: "0.7", changefreq: "monthly" },
+  { loc: "/role-compatibility", priority: "0.7", changefreq: "monthly" },
+  { loc: "/return-chart", priority: "0.6", changefreq: "monthly" },
+  { loc: "/variables", priority: "0.7", changefreq: "monthly" },
+  { loc: "/iching", priority: "0.7", changefreq: "monthly" },
+  { loc: "/incarnation-cross", priority: "0.7", changefreq: "monthly" },
+  { loc: "/daily-transit", priority: "0.6", changefreq: "daily" },
+  { loc: "/types/generator", priority: "0.9", changefreq: "monthly" },
+  { loc: "/types/manifesting-generator", priority: "0.9", changefreq: "monthly" },
+  { loc: "/types/projector", priority: "0.9", changefreq: "monthly" },
+  { loc: "/types/manifestor", priority: "0.9", changefreq: "monthly" },
+  { loc: "/types/reflector", priority: "0.9", changefreq: "monthly" },
+  { loc: "/blog", priority: "0.9", changefreq: "weekly" },
+  { loc: "/honorace", priority: "0.6", changefreq: "monthly" },
+  { loc: "/human-design-kalkulacka", priority: "0.9", changefreq: "monthly" },
+  { loc: "/human-design-test", priority: "0.8", changefreq: "monthly" },
+  { loc: "/human-design-typy", priority: "0.8", changefreq: "monthly" },
+  { loc: "/andelska-cisla", priority: "0.9", changefreq: "weekly" },
+];
+
+function makeSitemap(requestUrl: URL) {
+  const isEnHost = requestUrl.hostname.includes("humandesignchart.app");
+  const base = isEnHost ? "https://humandesignchart.app" : "https://humandesignmapa.cz";
+  const locale = isEnHost ? "en" : "cs";
+  const now = new Date().toISOString().slice(0, 10);
+  const nodes: string[] = [];
+
+  const node = (loc: string, changefreq: string, priority: string, lastmod?: string) => `  <url>
+    <loc>${loc}</loc>
+    ${lastmod ? `<lastmod>${lastmod}</lastmod>` : ""}
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>`;
+
+  for (const page of sitemapStaticPages) {
+    const url = base + (page.loc === "/" ? `/${locale}/` : `/${locale}${page.loc}`);
+    nodes.push(node(url, page.changefreq, page.priority));
+  }
+
+  const articles = isEnHost ? BLOG_ARTICLES_EN : BLOG_ARTICLES;
+  for (const article of articles) {
+    const url = `${base}/${locale}/blog/${article.slug}`;
+    nodes.push(node(url, "monthly", "0.8", article.updatedAt || article.publishedAt || now));
+  }
+
+  if (!isEnHost) {
+    for (const article of ANGEL_NUMBERS) {
+      const url = `${base}/cs/andelska-cisla/${article.slug}`;
+      nodes.push(node(url, "weekly", "0.7", article.updatedAt || now));
+    }
+  }
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${nodes.join("\n")}
+</urlset>`;
+}
+
+function makeRobots(requestUrl: URL) {
+  const isEnHost = requestUrl.hostname.includes("humandesignchart.app");
+  const domain = isEnHost ? "https://humandesignchart.app" : "https://humandesignmapa.cz";
+  return `User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /embed/
+Disallow: /shared/
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /payment/
+Disallow: /refer/
+Sitemap: ${domain}/sitemap.xml
+`;
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === "/sitemap.xml") {
+      return new Response(makeSitemap(url), {
+        headers: {
+          "content-type": "application/xml; charset=utf-8",
+          "cache-control": "public, max-age=3600",
+        },
+      });
+    }
+
+    if (url.pathname === "/robots.txt") {
+      return new Response(makeRobots(url), {
+        headers: {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "public, max-age=3600",
+        },
+      });
+    }
 
     if (url.pathname.startsWith("/api/trpc")) {
       return fetchRequestHandler({

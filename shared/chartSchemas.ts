@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const CALCULATION_VERSION = "2.0.0-iana" as const;
+export const CALCULATION_VERSION = "2.1.0-reference-verified" as const;
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const timePattern = /^\d{2}:\d{2}(?::\d{2})?$/;
