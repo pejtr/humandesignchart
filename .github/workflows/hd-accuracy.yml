@@ -1,5 +1,3 @@
-[Reading 41 lines from start (total: 41 lines, 0 remaining)]
-
 name: Human Design Accuracy Gate
 
 on:
@@ -41,5 +39,3 @@ jobs:
           server/humandesign/calculator.test.ts
           server/humandesign/timezone.test.ts
           --reporter=dot
-
-[executed on device: Mac (fb8fe304-209f-41a2-b745-4ff5da12937c)]
