@@ -8,7 +8,7 @@ import { BLOG_ARTICLES } from "../data/blogArticles";
 import { BLOG_ARTICLES_EN } from "../data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../data/angelNumbers";
 
-const CS = "https://www.humandesignmapa.cz";
+const CS = "https://humandesignmapa.cz";
 const EN = "https://www.humandesignchart.app";
 
 interface RouteMeta {
