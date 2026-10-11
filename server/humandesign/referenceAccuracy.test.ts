@@ -1,5 +1,3 @@
-[Reading 116 lines from start (total: 116 lines, 0 remaining)]
-
 import { describe, expect, it } from "vitest";
 import { calculateChart } from "./calculator";
 
@@ -116,5 +114,3 @@ describe("Human Design golden reference accuracy", () => {
     });
   });
 });
-
-[executed on device: Mac (fb8fe304-209f-41a2-b745-4ff5da12937c)]
