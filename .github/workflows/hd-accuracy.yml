@@ -1,0 +1,45 @@
+[Reading 41 lines from start (total: 41 lines, 0 remaining)]
+
+name: Human Design Accuracy Gate
+
+on:
+  pull_request:
+    paths:
+      - "server/humandesign/**"
+      - "shared/chartSchemas.ts"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/hd-accuracy.yml"
+  push:
+    branches: [main]
+    paths:
+      - "server/humandesign/**"
+      - "shared/chartSchemas.ts"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/hd-accuracy.yml"
+
+jobs:
+  reference-accuracy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+      - name: Verify reference charts and timezone mechanics
+        run: >-
+          pnpm vitest run
+          server/humandesign/referenceAccuracy.test.ts
+          server/humandesign/calculator.test.ts
+          server/humandesign/timezone.test.ts
+          --reporter=dot
+
+[executed on device: Mac (fb8fe304-209f-41a2-b745-4ff5da12937c)]
