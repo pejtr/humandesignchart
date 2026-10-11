@@ -1,12 +1,15 @@
+[Reading 246 lines from start (total: 246 lines, 0 remaining)]
+
 /**
  * Ephemeris calculations using astronomia library (VSOP87)
  * Calculates geocentric ecliptic longitudes for all 13 HD celestial bodies
  * 
- * IMPORTANT: astronomia's solar.apparentLongitude takes T (Julian centuries from J2000),
- * NOT Julian Day numbers. Planet.position2000 also takes JDE (Julian Ephemeris Day).
+ * IMPORTANT: Human Design gate mapping needs geocentric tropical longitudes in the
+ * equinox/ecliptic of date. VSOP87 planet.position() provides the date frame; using
+ * position2000() here shifts historical charts enough to cross gate/line boundaries.
  */
 
-import { planetposition, julian, solar, moonposition } from "astronomia";
+import { planetposition, julian, solar, moonposition, pluto, coord, precess, base } from "astronomia";
 
 // VSOP87B data (heliocentric spherical coordinates)
 import vsop87Bearth from "astronomia/data/vsop87Bearth";
@@ -59,38 +62,75 @@ function helioToGeoLon(earthPos: any, planetPos: any): number {
 }
 
 /**
- * Calculate mean longitude of Moon's ascending node (Meeus Ch. 47)
+ * True lunar ascending node from the instantaneous orbital plane.
+ *
+ * Human Design reference charts use the true node rather than the mean node.
+ * `moonposition.trueNode()` is a short periodic approximation and can be off
+ * enough to cross a Human Design line boundary.  Deriving the osculating
+ * orbital plane from the Moon position/velocity reproduces the reference
+ * gate/line values at those boundaries.
  */
-function meanNorthNode(T: number): number {
-  const omega = 125.04452 - 1934.136261 * T + 0.0020708 * T * T + (T * T * T) / 450000;
-  return normalizeDeg(omega);
+function trueNorthNodeLongitude(jd: number): number {
+  const dt = 1 / 1440; // one minute in days
+  const cartesian = (sampleJd: number): [number, number, number] => {
+    const p = moonposition.position(sampleJd);
+    const cosLat = Math.cos(p.lat);
+    return [
+      p.range * cosLat * Math.cos(p.lon),
+      p.range * cosLat * Math.sin(p.lon),
+      p.range * Math.sin(p.lat),
+    ];
+  };
+
+  const r = cartesian(jd);
+  const before = cartesian(jd - dt);
+  const after = cartesian(jd + dt);
+  const v: [number, number, number] = [
+    (after[0] - before[0]) / (2 * dt),
+    (after[1] - before[1]) / (2 * dt),
+    (after[2] - before[2]) / (2 * dt),
+  ];
+
+  const h: [number, number, number] = [
+    r[1] * v[2] - r[2] * v[1],
+    r[2] * v[0] - r[0] * v[2],
+    r[0] * v[1] - r[1] * v[0],
+  ];
+
+  // n = k × h, the ascending-node vector in the ecliptic plane.
+  return normalizeDeg(Math.atan2(h[0], -h[1]) * RAD2DEG);
 }
 
 /**
- * Simplified Pluto longitude (Meeus Ch. 37 polynomial + corrections)
+ * Geocentric ecliptic longitude of Pluto in the equinox/ecliptic of date.
+ * `pluto.heliocentric()` is J2000, so convert the Earth/Pluto vector to a
+ * geocentric J2000 direction and precess it to the date before gate mapping.
  */
-function plutoLongitude(T: number): number {
-  const J = 34.35 + 3034.9057 * T;
-  const S = 50.08 + 1222.1138 * T;
-  const P = 238.96 + 144.9600 * T;
-  
-  const Jrad = J * Math.PI / 180;
-  const Srad = S * Math.PI / 180;
-  const Prad = P * Math.PI / 180;
-  
-  let lon = 238.958116 + 144.9600 * T;
-  
-  // Main perturbation terms
-  lon += -19.799805 * Math.sin(Prad) + 19.850055 * Math.cos(Prad);
-  lon += 0.897144 * Math.sin(2 * Prad) - 4.956699 * Math.cos(2 * Prad);
-  lon += 0.610820 * Math.sin(3 * Prad) + 1.210476 * Math.cos(3 * Prad);
-  lon += -0.341639 * Math.sin(4 * Prad) - 0.190541 * Math.cos(4 * Prad);
-  lon += 0.036181 * Math.sin(5 * Prad) - 0.004539 * Math.cos(5 * Prad);
-  lon += 0.016684 * Math.sin(6 * Prad) + 0.000518 * Math.cos(6 * Prad);
-  lon += -4.387478 * Math.sin(Srad - Prad) + 7.440062 * Math.cos(Srad - Prad);
-  lon += 2.225400 * Math.sin(Jrad - Prad) - 1.527490 * Math.cos(Jrad - Prad);
-  
-  return normalizeDeg(lon);
+function plutoLongitude(jd: number): number {
+  const earthPos = earth.position2000(jd);
+  const plutoPos = pluto.heliocentric(jd);
+
+  const eX = earthPos.range * Math.cos(earthPos.lat) * Math.cos(earthPos.lon);
+  const eY = earthPos.range * Math.cos(earthPos.lat) * Math.sin(earthPos.lon);
+  const eZ = earthPos.range * Math.sin(earthPos.lat);
+  const pX = plutoPos.range * Math.cos(plutoPos.lat) * Math.cos(plutoPos.lon);
+  const pY = plutoPos.range * Math.cos(plutoPos.lat) * Math.sin(plutoPos.lon);
+  const pZ = plutoPos.range * Math.sin(plutoPos.lat);
+
+  const x = pX - eX;
+  const y = pY - eY;
+  const z = pZ - eZ;
+  const lonJ2000 = Math.atan2(y, x);
+  const latJ2000 = Math.atan2(z, Math.hypot(x, y));
+  const epoch = base.JDEToJulianYear(jd);
+  const eclipticOfDate = precess.eclipticPosition(
+    new coord.Ecliptic(lonJ2000, latJ2000),
+    2000.0,
+    epoch,
+    0,
+    0,
+  );
+  return normalizeDeg(eclipticOfDate.lon * RAD2DEG);
 }
 
 export interface PlanetaryPositions {
@@ -126,22 +166,21 @@ export function calculatePlanetaryPositions(jd: number): PlanetaryPositions {
   const moonPos = moonposition.position(jd);
   const moonLon = normalizeDeg(moonPos.lon * RAD2DEG);
   
-  // North & South Node (use T, not JD)
-  const northNodeLon = meanNorthNode(T);
+  // True North & South lunar nodes
+  const northNodeLon = trueNorthNodeLongitude(jd);
   const southNodeLon = normalizeDeg(northNodeLon + 180);
   
-  // Outer planets (geocentric from heliocentric VSOP87)
-  // position2000 takes JDE (Julian Ephemeris Day)
-  const earthHelio = earth.position2000(jd);
+  // Planets: heliocentric VSOP87 in equinox/ecliptic of date → geocentric longitude
+  const earthHelio = earth.position(jd);
   
   const planetLons: Record<string, number> = {};
   for (const [name, planet] of Object.entries(planets)) {
-    const pos = planet.position2000(jd);
+    const pos = planet.position(jd);
     planetLons[name] = helioToGeoLon(earthHelio, pos);
   }
   
-  // Pluto (simplified, uses T)
-  const plutoLon = plutoLongitude(T);
+  // Pluto: geocentric, precessed from J2000 to ecliptic of date
+  const plutoLon = plutoLongitude(jd);
   
   return {
     Sun: sunLon,
@@ -207,3 +246,5 @@ export function findDesignDate(birthJD: number): number {
   
   return jd;
 }
+
+[executed on device: Mac (fb8fe304-209f-41a2-b745-4ff5da12937c)]
