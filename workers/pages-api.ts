@@ -103,55 +103,45 @@ const sitemapStaticPages = [
 
 function makeSitemap(requestUrl: URL) {
   const isEnHost = requestUrl.hostname.includes("humandesignchart.app");
-  const csBase = "https://www.humandesignmapa.cz";
-  const enBase = "https://www.humandesignchart.app";
+  const base = isEnHost ? "https://humandesignchart.app" : "https://humandesignmapa.cz";
+  const locale = isEnHost ? "en" : "cs";
   const now = new Date().toISOString().slice(0, 10);
   const nodes: string[] = [];
 
-  const node = (loc: string, csAlt: string, enAlt: string, changefreq: string, priority: string, lastmod: string) => `  <url>
+  const node = (loc: string, changefreq: string, priority: string, lastmod?: string) => `  <url>
     <loc>${loc}</loc>
-    <lastmod>${lastmod}</lastmod>
+    ${lastmod ? `<lastmod>${lastmod}</lastmod>` : ""}
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
-    <xhtml:link rel="alternate" hreflang="cs" href="${csAlt}" />
-    <xhtml:link rel="alternate" hreflang="en" href="${enAlt}" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${enAlt}" />
   </url>`;
 
   for (const page of sitemapStaticPages) {
-    const csUrl = csBase + (page.loc === "/" ? "/cs/" : "/cs" + page.loc);
-    const enUrl = enBase + (page.loc === "/" ? "/en/" : "/en" + page.loc);
-    nodes.push(node(isEnHost ? enUrl : csUrl, csUrl, enUrl, page.changefreq, page.priority, now));
+    const url = base + (page.loc === "/" ? `/${locale}/` : `/${locale}${page.loc}`);
+    nodes.push(node(url, page.changefreq, page.priority));
   }
 
-  const maxLen = Math.max(BLOG_ARTICLES.length, BLOG_ARTICLES_EN.length);
-  for (let i = 0; i < maxLen; i++) {
-    const csArt = BLOG_ARTICLES[i];
-    const enArt = BLOG_ARTICLES_EN[i];
-    if (isEnHost && !enArt) continue;
-    if (!isEnHost && !csArt) continue;
-    const csUrl = csArt ? `${csBase}/cs/blog/${csArt.slug}` : `${csBase}/cs/blog`;
-    const enUrl = enArt ? `${enBase}/en/blog/${enArt.slug}` : `${enBase}/en/blog`;
-    const article = isEnHost ? enArt : csArt;
-    const lastmod = article?.updatedAt || article?.publishedAt || now;
-    nodes.push(node(isEnHost ? enUrl : csUrl, csUrl, enUrl, "monthly", "0.8", lastmod));
+  const articles = isEnHost ? BLOG_ARTICLES_EN : BLOG_ARTICLES;
+  for (const article of articles) {
+    const url = `${base}/${locale}/blog/${article.slug}`;
+    nodes.push(node(url, "monthly", "0.8", article.updatedAt || article.publishedAt || now));
   }
 
-  for (const article of ANGEL_NUMBERS) {
-    const csUrl = `${csBase}/cs/andelska-cisla/${article.slug}`;
-    const enUrl = `${enBase}/en/andelska-cisla/${article.slug}`;
-    nodes.push(node(isEnHost ? enUrl : csUrl, csUrl, enUrl, "weekly", "0.7", article.updatedAt || now));
+  if (!isEnHost) {
+    for (const article of ANGEL_NUMBERS) {
+      const url = `${base}/cs/andelska-cisla/${article.slug}`;
+      nodes.push(node(url, "weekly", "0.7", article.updatedAt || now));
+    }
   }
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${nodes.join("\n")}
 </urlset>`;
 }
 
 function makeRobots(requestUrl: URL) {
   const isEnHost = requestUrl.hostname.includes("humandesignchart.app");
-  const domain = isEnHost ? "https://www.humandesignchart.app" : "https://www.humandesignmapa.cz";
+  const domain = isEnHost ? "https://humandesignchart.app" : "https://humandesignmapa.cz";
   return `User-agent: *
 Allow: /
 Disallow: /api/
