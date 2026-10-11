@@ -27,7 +27,7 @@ export const authRouter = router({
 
 export const publicStatsRouter = router({
     chartCount: publicProcedure.query(async () => {
-        const count = await countTotalCharts();
-        return { count: count + 12847 };
+        // Real number only: this is shown to visitors as social proof.
+        return { count: await countTotalCharts() };
     }),
 });

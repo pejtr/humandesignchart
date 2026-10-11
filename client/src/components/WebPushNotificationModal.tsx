@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Bell, Sparkles, Check, ShieldCheck, Sun } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { isPurchasePath } from "@/lib/purchasePath";
+import { isNoInterruptPath } from "@/lib/purchasePath";
 
 export function WebPushNotificationModal() {
   const { locale } = useLanguage();
@@ -17,8 +17,8 @@ export function WebPushNotificationModal() {
     const promptSeen = localStorage.getItem("hd_push_prompt_seen");
     if (!promptSeen && typeof window !== "undefined" && "Notification" in window) {
       const timer = setTimeout(() => {
-        // Never interrupt a visitor who is buying or paying.
-        if (!isPurchasePath(window.location.pathname)) setOpen(true);
+        // Never interrupt a visitor on a landing, buy or payment page.
+        if (!isNoInterruptPath(window.location.pathname)) setOpen(true);
       }, 5000); // Prompt 5 seconds after page load
       return () => clearTimeout(timer);
     }

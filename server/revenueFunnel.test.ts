@@ -25,7 +25,8 @@ import { processPaymentEvent } from "./payments/mysqlStore";
 import { trackConversion } from "./metaConversionsApi";
 import { STRIPE_PRODUCTS } from "./stripeProducts";
 import { getBlueprintOffer } from "./payments/publicOfferCatalog";
-import { isPurchasePath } from "@/lib/purchasePath";
+import { isPurchasePath, isNoInterruptPath } from "@/lib/purchasePath";
+import { hostDefaultLocale } from "@/lib/hostLocale";
 
 describe("sanitizeReturnPath", () => {
   it("accepts same-origin paths with query", () => {
@@ -137,5 +138,27 @@ describe("Auto-opening modals stay off the purchase path", () => {
 
   it.each(["/cs", "/cs/calculate", "/en/chart/new", "/cs/blog/honorace-tips"])("leaves %s alone", (path) => {
     expect(isPurchasePath(path)).toBe(false);
+  });
+});
+
+describe("Landing pages stay free of auto-opening modals", () => {
+  it.each(["/", "/en", "/cs/", "/en/calculate", "/human-design-kalkulacka", "/cs/honorace"])("suppresses on %s", (path) => {
+    expect(isNoInterruptPath(path)).toBe(true);
+  });
+
+  it.each(["/en/chart/new", "/cs/dashboard", "/en/blog"])("allows on %s", (path) => {
+    expect(isNoInterruptPath(path)).toBe(false);
+  });
+});
+
+describe("Brand domain decides the default language", () => {
+  it.each([
+    ["humandesignchart.app", "en"],
+    ["www.humandesignchart.app", "en"],
+    ["humandesignmapa.cz", "cs"],
+    ["WWW.HUMANDESIGNMAPA.CZ", "cs"],
+    ["localhost", null],
+  ])("%s → %s", (host, locale) => {
+    expect(hostDefaultLocale(host)).toBe(locale);
   });
 });

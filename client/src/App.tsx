@@ -15,7 +15,8 @@ import ReferralApplier from "./components/ReferralApplier";
 import NewsletterPopup from "./components/NewsletterPopup";
 import ExitIntentPopup from "./components/ExitIntentPopup";
 import WelcomeModal, { useWelcomeModal } from "./components/WelcomeModal";
-import { isPurchasePath } from "./lib/purchasePath";
+import { isNoInterruptPath } from "./lib/purchasePath";
+import { hostDefaultLocale } from "./lib/hostLocale";
 import PageTransition from "./components/PageTransition";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
@@ -90,10 +91,12 @@ function StaffOnlyRoute({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * Detect preferred language from browser settings.
- * Returns detected locale based on Accept-Language header.
+ * Detect preferred language: the brand domain's language first, then the
+ * browser's language settings.
  */
 function detectPreferredLocale(): Locale {
+  const hostLocale = hostDefaultLocale(window.location.hostname);
+  if (hostLocale) return hostLocale;
   const langs = navigator.languages || [navigator.language];
   for (const lang of langs) {
     const code = lang.toLowerCase().split("-")[0];
@@ -377,9 +380,9 @@ function LocaleRoutes() {
 function WelcomeModalWrapper() {
   const { shouldShow, dismiss } = useWelcomeModal();
   const [location] = useLocation();
-  // Keep the buy button and payment confirmation unobstructed; the tour can
-  // still show on the visitor's next non-purchase page.
-  if (!shouldShow || isPurchasePath(location)) return null;
+  // Keep landing, buy and payment pages unobstructed; the tour can still show
+  // once the visitor moves on (e.g. to their chart).
+  if (!shouldShow || isNoInterruptPath(location)) return null;
   return <WelcomeModal onClose={dismiss} />;
 }
 

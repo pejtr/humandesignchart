@@ -28,13 +28,16 @@ import {
   Sparkles,
 } from "lucide-react";
 
+// Below this the counter reads as weak proof, so it stays hidden.
+const MIN_PUBLIC_CHART_COUNT = 1000;
+
 // ─── Animated Chart Counter (count-up on scroll into view) ────────────────────────────────────
 function ChartCounter({ isCs }: { isCs: boolean }) {
   const { data } = trpc.publicStats.chartCount.useQuery(undefined, {
     staleTime: 60_000,
   });
   const [displayCount, setDisplayCount] = useState(0);
-  const targetCount = data?.count ?? 12847;
+  const targetCount = data?.count ?? 0;
   const hasAnimated = useRef(false);
   const counterRef = useRef<HTMLDivElement>(null);
 
@@ -66,6 +69,7 @@ function ChartCounter({ isCs }: { isCs: boolean }) {
     return () => observer.disconnect();
   }, [data, targetCount]);
 
+  if (targetCount < MIN_PUBLIC_CHART_COUNT) return null;
   const formatted = displayCount.toLocaleString(isCs ? "cs-CZ" : "en-US");
 
   return (
