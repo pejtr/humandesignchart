@@ -1,6 +1,8 @@
+[Reading 120 lines from start (total: 120 lines, 0 remaining)]
+
 import { z } from "zod";
 
-export const CALCULATION_VERSION = "2.0.0-iana" as const;
+export const CALCULATION_VERSION = "2.1.0-reference-verified" as const;
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const timePattern = /^\d{2}:\d{2}(?::\d{2})?$/;
@@ -118,3 +120,5 @@ export type ChartCalculationInput = z.infer<typeof ChartCalculationInputSchema>;
 export type ChartCalculationRequest = z.infer<typeof ChartCalculationRequestSchema>;
 export type ChartResult = z.infer<typeof ChartResultSchema>;
 export type LocalTimeDisambiguation = z.infer<typeof LocalTimeDisambiguationSchema>;
+
+[executed on device: Mac (fb8fe304-209f-41a2-b745-4ff5da12937c)]
