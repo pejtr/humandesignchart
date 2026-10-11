@@ -14,6 +14,10 @@ export function useWelcomeModal() {
   const [shouldShow, setShouldShow] = useState(false);
 
   useEffect(() => {
+    // EN landing: do not block the primary free-chart funnel with a welcome wizard.
+    // Existing CZ users keep their current onboarding behavior.
+    const host = window.location.hostname.toLowerCase();
+    if (host === "humandesignchart.app" || host.endsWith(".humandesignchart.app")) return;
     const seen = localStorage.getItem(STORAGE_KEY);
     if (!seen) {
       // Small delay so the page loads first
