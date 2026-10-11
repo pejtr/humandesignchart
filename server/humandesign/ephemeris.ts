@@ -1,5 +1,3 @@
-[Reading 246 lines from start (total: 246 lines, 0 remaining)]
-
 /**
  * Ephemeris calculations using astronomia library (VSOP87)
  * Calculates geocentric ecliptic longitudes for all 13 HD celestial bodies
@@ -246,5 +244,3 @@ export function findDesignDate(birthJD: number): number {
   
   return jd;
 }
-
-[executed on device: Mac (fb8fe304-209f-41a2-b745-4ff5da12937c)]
