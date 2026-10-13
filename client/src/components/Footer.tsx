@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { OmniAdsSlot } from "@/components/OmniAdsSlot";
 
 function ProjectDomainBadge({ domain }: { domain: string }) {
   const extensionStart = domain.lastIndexOf(".");
@@ -87,6 +88,7 @@ const projects = [
     <footer
       className={`footer-mystical bg-background/50 backdrop-blur-sm relative${isAuthenticated ? " lg:pl-14" : ""}`}
     >
+      <OmniAdsSlot placement="content-tail" format="image" className="container relative z-20 px-4" />
       {/* Mystical sacred geometry decoration */}
       <div className="absolute inset-0 bg-sacred-geometry pointer-events-none opacity-50" />
       <div className="container py-12 relative z-10">
