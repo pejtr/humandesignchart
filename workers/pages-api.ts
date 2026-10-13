@@ -20,6 +20,7 @@ import {
 import { BLOG_ARTICLES_EN } from "../server/data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
 import { withServerRenderedSeoMeta } from "./social-meta";
+import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
 
 type Env = {
   ASSETS: {
@@ -125,6 +126,13 @@ const appRouter = router({
   publicStats: publicStatsRouter,
   blog: blogRouter,
   content: contentRouter,
+  // Safe read-only catalog: the public pricing page needs this exact procedure.
+  // Authenticated checkout stays blocked until a real payment backend exists.
+  subscription: router({
+    blueprintOffer: publicProcedure
+      .input(z.object({ locale: z.enum(["cs", "en"]) }))
+      .query(({ input }) => getBlueprintOffer(input.locale)),
+  }),
 });
 
 const sitemapStaticPages = [
