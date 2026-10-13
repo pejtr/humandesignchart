@@ -12,7 +12,7 @@ import {
   lookupIanaTimezone,
   TimezoneResolutionError,
 } from "../server/humandesign/timezone";
-import { BLOG_ARTICLES } from "../server/data/blogArticles";
+import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../server/data/blogArticles";
 import { BLOG_ARTICLES_EN } from "../server/data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
 import { withServerRenderedSeoMeta } from "./social-meta";
@@ -68,9 +68,32 @@ const publicStatsRouter = router({
   chartCount: publicProcedure.query(() => ({ count: 0 })),
 });
 
+const blogRouter = router({
+  list: publicProcedure
+    .input(z.object({
+      category: z.string().optional(),
+      locale: z.string().optional(),
+    }).optional())
+    .query(({ input }) => {
+      const entries = (input?.locale === "en" ? BLOG_ARTICLES_EN : BLOG_ARTICLES)
+        .filter((article) => !input?.category || article.category === input.category);
+      return {
+        articles: entries.map(({ content, ...summary }) => summary),
+        categories: BLOG_CATEGORIES,
+      };
+    }),
+  getBySlug: publicProcedure
+    .input(z.object({ slug: z.string(), locale: z.string().optional() }))
+    .query(({ input }) =>
+      (input.locale === "en" ? BLOG_ARTICLES_EN : BLOG_ARTICLES)
+        .find((article) => article.slug === input.slug) ?? null
+    ),
+});
+
 const appRouter = router({
   chart: chartRouter,
   publicStats: publicStatsRouter,
+  blog: blogRouter,
 });
 
 const sitemapStaticPages = [
