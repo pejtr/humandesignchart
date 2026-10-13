@@ -122,6 +122,9 @@ const contentRouter = router({
 });
 
 const appRouter = router({
+  auth: router({
+    me: publicProcedure.query(() => null),
+  }),
   chart: chartRouter,
   publicStats: publicStatsRouter,
   blog: blogRouter,
