@@ -28,7 +28,7 @@ function SellerBlock() {
       <br />
       <S field="registry" />
       <br />
-      E-mail: <S field="email" />, tel.: <S field="phone" />
+      E-mail: <S field="email" />
     </span>
   );
 }
@@ -73,8 +73,8 @@ function termsEn(path: (p: string) => string): LegalContent {
   };
 }
 
-const PROCESSORS_CS = "Stripe a Comgate (platby); Google, Meta (Facebook) a Apple (přihlášení); Google Analytics, Google Ads, Meta Pixel a Conversions API, Reddit a Seznam Sklik (měření a reklama, jen se souhlasem); poskytovatel AI modelu pro generování výkladů (Google Gemini nebo jiný nastavený model); ElevenLabs (audio); Brevo (e-maily); Fakturoid (fakturace); CRM LeadOS / Optimateo; úložiště souborů; hosting.";
-const PROCESSORS_EN = "Stripe and Comgate (payments); Google, Meta (Facebook) and Apple (sign-in); Google Analytics, Google Ads, Meta Pixel and Conversions API, Reddit and Seznam Sklik (measurement and advertising, only with consent); the AI model provider used for readings (Google Gemini or another configured model); ElevenLabs (audio); Brevo (e-mail); Fakturoid (invoicing); LeadOS / Optimateo CRM; file storage; hosting.";
+const PROCESSORS_CS = "Podle skutečně aktivovaných integrací: Stripe a Comgate (platby); Google, Meta (Facebook) a Apple (přihlášení); Google Analytics, Google Ads, Meta Pixel a Conversions API, Reddit a Seznam Sklik (měření a reklama, jen se souhlasem); poskytovatel AI modelu pro generování výkladů (Google Gemini nebo jiný nastavený model); ElevenLabs (audio); Brevo (e-maily); Fakturoid (fakturace); CRM LeadOS / Optimateo; úložiště souborů; hosting.";
+const PROCESSORS_EN = "Subject to integrations actually enabled: Stripe and Comgate (payments); Google, Meta (Facebook) and Apple (sign-in); Google Analytics, Google Ads, Meta Pixel and Conversions API, Reddit and Seznam Sklik (measurement and advertising, only with consent); the AI model provider used for readings (Google Gemini or another configured model); ElevenLabs (audio); Brevo (e-mail); Fakturoid (invoicing); LeadOS / Optimateo CRM; file storage; hosting.";
 
 function privacyCs(path: (p: string) => string): LegalContent {
   return {
@@ -84,7 +84,7 @@ function privacyCs(path: (p: string) => string): LegalContent {
       { heading: "1. Správce", body: [<SellerBlock key="s" />] },
       { heading: "2. Jaké údaje zpracováváme", body: ["Údaje účtu (jméno, e-mail, identifikátor poskytovatele přihlášení), údaje o narození zadané pro výpočet mapy (datum, čas, místo), obsah výkladů a konverzací s AI průvodcem, údaje o objednávkách a platbách (bez čísel karet), technické údaje (IP adresa, prohlížeč, cookies) a údaje o používání webu."] },
       { heading: "3. Účely a právní základy", body: ["Plnění smlouvy: účet, výpočet mapy, dodání zakoupeného obsahu, zákaznická podpora. Právní povinnost: účetnictví a daně. Oprávněný zájem: bezpečnost, prevence podvodů, zlepšování služby. Souhlas: analytické a marketingové cookies, měření konverzí pro reklamu, newsletter. Souhlas lze kdykoli odvolat v nastavení cookies nebo odkazem v e-mailu."] },
-      { heading: "4. Příjemci a zpracovatelé", body: [PROCESSORS_CS, <>Hosting: <S field="hosting" />. Někteří zpracovatelé sídlí mimo EU (zejména v USA); předávání probíhá na základě rámce EU–USA pro ochranu údajů nebo standardních smluvních doložek.</>] },
+      { heading: "4. Příjemci a zpracovatelé", body: [PROCESSORS_CS, <>Hosting: <S field="hosting" />. Případná předání mimo EHP vyžadují ověření konkrétního příjemce a použitelného mechanismu podle kapitoly V GDPR.</>] },
       { heading: "5. Doba uložení", body: ["Údaje účtu po dobu jeho existence; po zrušení účtu je smažeme nebo anonymizujeme do 30 dnů, pokud je nemusíme uchovat ze zákona. Účetní doklady 10 let. Údaje zpracovávané na základě souhlasu do jeho odvolání."] },
       { heading: "6. Vaše práva", body: [<>Máte právo na přístup, opravu, výmaz, omezení zpracování, přenositelnost, vznést námitku a odvolat souhlas. Žádosti zasílejte na <S field="email" />. Máte také právo podat stížnost u Úřadu pro ochranu osobních údajů, <L href="https://uoou.gov.cz">uoou.gov.cz</L>.</>] },
       { heading: "7. Cookies", body: ["Nezbytné cookies používáme vždy. Analytické a marketingové cookies a pixely se načítají až po vašem souhlasu v liště cookies, kterou můžete kdykoli znovu otevřít a souhlas změnit."] },
@@ -101,7 +101,7 @@ function privacyEn(path: (p: string) => string): LegalContent {
       { heading: "1. Controller", body: [<SellerBlock key="s" />] },
       { heading: "2. Data we process", body: ["Account data (name, e-mail, sign-in provider identifier), birth data you enter to calculate a chart (date, time, place), readings and conversations with the AI guide, order and payment data (never card numbers), technical data (IP address, browser, cookies) and usage data."] },
       { heading: "3. Purposes and legal bases", body: ["Contract: your account, chart calculation, delivery of purchases, support. Legal obligation: accounting and tax. Legitimate interest: security, fraud prevention, improving the service. Consent: analytics and marketing cookies, ad conversion measurement, newsletter. You can withdraw consent at any time in the cookie settings or via the link in any e-mail."] },
-      { heading: "4. Recipients and processors", body: [PROCESSORS_EN, <>Hosting: <S field="hosting" />. Some processors are outside the EU (mainly the USA); transfers rely on the EU–US Data Privacy Framework or standard contractual clauses.</>] },
+      { heading: "4. Recipients and processors", body: [PROCESSORS_EN, <>Hosting: <S field="hosting" />. Any transfer outside the EEA requires verification of the specific recipient and an applicable Chapter V GDPR transfer mechanism.</>] },
       { heading: "5. Retention", body: ["Account data for as long as the account exists; deleted or anonymised within 30 days after the account is closed unless the law requires otherwise. Accounting records for 10 years. Consent-based data until consent is withdrawn."] },
       { heading: "6. Your rights", body: [<>You have the right of access, rectification, erasure, restriction, portability, objection and to withdraw consent. Send requests to <S field="email" />. You can also complain to the Czech data protection authority, <L href="https://uoou.gov.cz/en">uoou.gov.cz</L>, or your local authority.</>] },
       { heading: "7. Cookies", body: ["Essential cookies are always used. Analytics and marketing cookies and pixels load only after you consent in the cookie banner, which you can reopen to change your choice."] },
