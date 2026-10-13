@@ -107,13 +107,29 @@ function detectPreferredLocale(): Locale {
 }
 
 /**
- * Root redirect: / → /cs or /en based on browser language.
+ * Two distinct storefronts share this SPA. The commercial EN domain must not
+ * silently send visitors from English campaigns to a Czech landing page.
+ * Explicit /en and /cs routes remain unaffected.
+ */
+function defaultLocaleForHost(): Locale {
+  const hostname = window.location.hostname.toLowerCase();
+  if (hostname === "humandesignchart.app" || hostname === "www.humandesignchart.app") {
+    return "en";
+  }
+  if (hostname === "humandesignmapa.cz" || hostname === "www.humandesignmapa.cz") {
+    return "cs";
+  }
+  return detectPreferredLocale();
+}
+
+/**
+ * Root redirect: / → /cs or /en based on storefront hostname.
  * Also handles legacy routes without locale prefix.
  */
 function RootRedirect() {
   const [, setLocation] = useLocation();
   useEffect(() => {
-    const locale = detectPreferredLocale();
+    const locale = defaultLocaleForHost();
     setLocation(`/${locale}`, { replace: true });
   }, [setLocation]);
   return <HDLoader />;

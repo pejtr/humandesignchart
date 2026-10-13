@@ -687,7 +687,7 @@ export default function Home() {
             >
               <Button
                 size="lg"
-                className="text-white text-base px-8 py-6 shadow-lg transition-all hover:scale-105 rounded-lg"
+                className="omni-cta-pulse text-white text-base px-8 py-6 shadow-lg transition-all hover:scale-105 rounded-lg"
                 style={{ background: "#2a9d8f", border: "none" }}
                 asChild
               >
@@ -1318,7 +1318,7 @@ export default function Home() {
             </p>
             <Button
               size="lg"
-              className="btn-mystical bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg shadow-primary/20 transition-all hover:scale-105 rounded-full"
+              className="omni-cta-pulse btn-mystical bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-lg shadow-primary/20 transition-all hover:scale-105 rounded-full"
               asChild
             >
               <Link href={localePath("/calculate")}>
