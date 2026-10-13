@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 
 const CONSENT_KEY = "hd-cookie-consent";
 const CONSENT_EVENT = "hd:marketing-consent-changed";
+const OPPREF_STORAGE_KEY = "hd:openai-ads-oppref";
 const PIXEL_SDK = "https://bzrcdn.openai.com/sdk/oaiq.min.js";
 
 type PixelFn = (...args: unknown[]) => void;
@@ -20,6 +21,24 @@ export function isOpenAIAdsConsentGranted(): boolean {
 
 function pixelId(): string {
   return String((import.meta as any).env?.VITE_OPENAI_ADS_PIXEL_ID || "").trim();
+}
+
+/** Capture the OpenAI Ads click reference only AFTER marketing consent.
+ * It is session-scoped, cleared on withdrawal and never forwarded with birth data.
+ */
+export function getOpenAIAdsClickRef(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  if (!isOpenAIAdsConsentGranted()) {
+    try { sessionStorage.removeItem(OPPREF_STORAGE_KEY); } catch { /* unavailable */ }
+    return undefined;
+  }
+  try {
+    const candidate = new URLSearchParams(window.location.search).get("oppref");
+    if (candidate && candidate.length <= 255 && !/[\r\n\x00-\x1F]/.test(candidate)) {
+      sessionStorage.setItem(OPPREF_STORAGE_KEY, candidate);
+    }
+    return sessionStorage.getItem(OPPREF_STORAGE_KEY) || undefined;
+  } catch { return undefined; }
 }
 
 /** Never load the SDK or submit measurement events before marketing consent. */
@@ -51,8 +70,10 @@ export function initOpenAIAdsPixelAfterConsent(): boolean {
 export function syncOpenAIAdsPixelConsent(): void {
   if (typeof window === "undefined") return;
   if (isOpenAIAdsConsentGranted()) {
+    getOpenAIAdsClickRef();
     initOpenAIAdsPixelAfterConsent();
   } else {
+    getOpenAIAdsClickRef(); // Clears persisted click reference on withdrawal.
     (window as WindowWithOaiq).oaiq?.("consent", false);
   }
 }
@@ -84,6 +105,7 @@ export function measureOpenAIAdsPage(path: string) {
 export function useOpenAIAdsPageViews() {
   const [location] = useLocation();
   useEffect(() => {
+    getOpenAIAdsClickRef();
     measureOpenAIAdsPage(location);
     const onConsentChange = () => {
       syncOpenAIAdsPixelConsent();
