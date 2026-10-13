@@ -19,6 +19,7 @@ import PageTransition from "./components/PageTransition";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
 import { useGA4PageViews } from "./hooks/useGA4";
+import { useOpenAIAdsPageViews } from "./hooks/useOpenAIAdsPixel";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { AuthSidebar } from "./components/AuthSidebar";
 const FloatingChatGuide = lazy(() => import("./components/FloatingChatGuide").then(m => ({ default: m.FloatingChatGuide })));
@@ -376,6 +377,7 @@ function App() {
   useUTM();
   useSklikPageViews();
   useGA4PageViews();
+  useOpenAIAdsPageViews();
   useRedditPageViews();
   return (
     <ErrorBoundary>
