@@ -14,6 +14,9 @@ export function useWelcomeModal() {
   const [shouldShow, setShouldShow] = useState(false);
 
   useEffect(() => {
+    // Do not obstruct the English acquisition landing with a Czech welcome wizard.
+    const host = window.location.hostname.toLowerCase();
+    if (host === "humandesignchart.app" || host.endsWith(".humandesignchart.app")) return;
     const seen = localStorage.getItem(STORAGE_KEY);
     if (!seen) {
       // Small delay so the page loads first
