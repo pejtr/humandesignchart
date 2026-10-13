@@ -15,6 +15,7 @@ import {
 import { BLOG_ARTICLES } from "../server/data/blogArticles";
 import { BLOG_ARTICLES_EN } from "../server/data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
+import { withServerRenderedSeoMeta } from "./social-meta";
 
 type Env = {
   ASSETS: {
@@ -189,6 +190,7 @@ export default {
       });
     }
 
-    return env.ASSETS.fetch(request);
+    const asset = await env.ASSETS.fetch(request);
+    return withServerRenderedSeoMeta(url, asset);
   },
 };
