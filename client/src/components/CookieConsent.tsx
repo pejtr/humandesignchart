@@ -40,6 +40,11 @@ export function CookieConsent() {
   });
 
   useEffect(() => {
+    // One-time cleanup of the old tracking shim: it created a two-year
+    // los_vid cookie *before* any consent and its ingest endpoint was broken.
+    // The current marketing and analytics integrations do not use these IDs.
+    document.cookie = "los_vid=; Max-Age=0; Path=/; SameSite=Lax";
+    try { sessionStorage.removeItem("los_sid"); } catch { /* storage blocked */ }
     const stored = localStorage.getItem(CONSENT_KEY);
     if (stored) {
       // Consent already given — initialize analytics on page load
