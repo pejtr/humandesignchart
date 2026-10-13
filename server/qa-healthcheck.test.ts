@@ -781,12 +781,12 @@ describe("12. SEO — URL audit", () => {
     expect(content).toContain("https://www.humandesignchart.app");
   });
 
-  it("seoMeta.ts uses www canonical URLs", () => {
+  it("seoMeta.ts uses the configured canonical domains", () => {
     const fs = require("fs");
     const path = require("path");
     const metaPath = path.resolve(process.cwd(), "server/_core/seoMeta.ts");
     const content = fs.readFileSync(metaPath, "utf-8");
-    expect(content).toContain('const CS = "https://www.humandesignmapa.cz"');
+    expect(content).toContain('const CS = "https://humandesignmapa.cz"');
     expect(content).toContain('const EN = "https://www.humandesignchart.app"');
   });
 });

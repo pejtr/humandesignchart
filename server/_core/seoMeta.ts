@@ -36,9 +36,12 @@ export function buildSeoHead(locale: string, pathname: string): string {
   const ogImage = meta.ogImage || `${base}/images/og-homepage.png`;
 
   // Build alternate hreflang links — cs always on CS domain, others on EN domain
-  const altPath = canonical.replace(CS, "").replace(EN, "");
-  const csAlt = CS + altPath;
-  const enAlt = EN + "/en" + altPath;
+  // hreflang siblings must have exactly one locale prefix. The old
+  // canonical-based concatenation emitted /en/en/ and CZ /en/ URLs.
+  const unprefixedPath = pathname.replace(/^\/(?:cs|en)(?=\/|$)/, "") || "/";
+  const suffix = unprefixedPath.startsWith("/") ? unprefixedPath : `/${unprefixedPath}`;
+  const csAlt = `${CS}/cs${suffix}`;
+  const enAlt = `${EN}/en${suffix}`;
 
   return [
     `<title>${escapeHtml(meta.title)}</title>`,
