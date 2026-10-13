@@ -7,6 +7,7 @@ on:
       - 'client/src/components/Footer.tsx'
       - 'client/src/pages/BlogArticle.tsx'
       - 'client/src/components/CookieConsent.tsx'
+      - 'client/index.html'
       - 'client/src/App.tsx'
       - 'workers/pages-api.ts'
       - '.github/workflows/hd-marketing-measurement.yml'
@@ -25,6 +26,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm build:cloudflare
+      - name: Assert OMNI ADS is not loaded before consent
+        run: |
+          if grep -q 'src="https://api.optihub.cz/omni-ads/runtime.js"' client/index.html; then
+            echo 'ERROR: consent-blind OMNI ADS static script detected'
+            exit 1
+          fi
       - name: Verify built edge worker and client
         run: test -f dist/public/index.html && test -s dist/public/_worker.js
       - uses: actions/upload-artifact@v4
