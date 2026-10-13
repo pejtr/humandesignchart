@@ -58,29 +58,12 @@
       "url": "https://humandesignmapa.cz",
       "applicationCategory": "LifestyleApplication",
       "operatingSystem": "Web",
-      "offers": [
-        {
-          "@type": "Offer",
-          "name": "HDLAB Free System Map",
-          "price": "0",
-          "priceCurrency": "CZK"
-        },
-        {
-          "@type": "Offer",
-          "name": "HDLAB Deep Reading",
-          "price": "390",
-          "priceCurrency": "CZK",
-          "description": "Osobní hluboký rozbor v PDF, webovém rozhraní a audiu"
-        },
-        {
-          "@type": "Offer",
-          "name": "HDLAB Marie Plus",
-          "price": "189",
-          "priceCurrency": "CZK",
-          "billingDuration": "P1M",
-          "description": "Členství pro denní planetární tranzity a reflexní deník"
-        }
-      ],
+      "offers": [{
+        "@type": "Offer",
+        "name": "Free Human Design Calculator",
+        "price": "0",
+        "priceCurrency": "CZK"
+      }],
       "inLanguage": ["cs", "en"],
       "availableLanguage": [
         { "@type": "Language", "name": "Czech", "alternateName": "cs" },
@@ -107,7 +90,7 @@
           "name": "Co je HDLAB Deep Reading?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "HDLAB Deep Reading je osobní hloubkový rozbor vašeho typu, autority, profilu, center a bran v přehledné textové, PDF a audio podobě za 390 Kč."
+            "text": "HDLAB Deep Reading je osobní hloubkový rozbor vašeho typu, autority, profilu, center a bran v přehledné textové, PDF a audio podobě dle aktuálního ceníku."
           }
         }
       ]
@@ -125,80 +108,9 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
-  <!-- Optimateo Universal Traffic Pixel (LeadOS-compatible ingest contract) -->
-  <script>
-  (function() {
-    const PROJECT_KEY = "proj_hdm"; // např. proj_hdm, proj_dsr, proj_italie
-    const INGEST_URL = "https://www.optimateo.com/api/ingest";
-
-    function hasTrackingConsent() {
-      try {
-        const consent = JSON.parse(localStorage.getItem("hd-cookie-consent") || "{}");
-        return Boolean(consent.analytics || consent.marketing);
-      } catch (_) {
-        return false;
-      }
-    }
-
-    // Persistentní Visitor ID & Session ID
-    function getCookie(name) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop().split(';').shift();
-    }
-    
-    let visitorId = getCookie("los_vid");
-    if (!visitorId) {
-      visitorId = 'v_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
-      document.cookie = "los_vid=" + visitorId + "; max-age=63072000; path=/; SameSite=Lax";
-    }
-    
-    let sessionId = sessionStorage.getItem("los_sid");
-    if (!sessionId) {
-      sessionId = 's_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
-      sessionStorage.setItem("los_sid", sessionId);
-    }
-
-    // Získání UTM parametrů
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    // Odeslání události
-    function trackEvent(eventName, eventData = {}) {
-      if (!hasTrackingConsent()) return;
-      const payload = {
-        eventType: eventName,
-        visitorId: visitorId,
-        sessionId: sessionId,
-        pageUrl: window.location.href,
-        path: window.location.pathname,
-        referrer: document.referrer || null,
-        deviceType: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-        utmSource: urlParams.get('utm_source') || null,
-        utmMedium: urlParams.get('utm_medium') || null,
-        utmCampaign: urlParams.get('utm_campaign') || null,
-        metadata: eventData
-      };
-
-      fetch(INGEST_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-project-key": PROJECT_KEY
-        },
-        body: JSON.stringify(payload),
-        keepalive: true
-      }).catch(err => console.warn("[Optimateo Analytics Error]", err));
-    }
-
-    // Automatické měření zobrazení stránky
-    window.addEventListener("DOMContentLoaded", () => trackEvent("page_view"));
-    
-    // Expozice pro vlastní události (nákup, registraci, proklik)
-    window.optimateoTrack = trackEvent;
-    window.losTrack = trackEvent; // temporary backwards-compatible alias
-  })();
-  </script>
-</head>
+  <!-- Analytics and advertising are initialized inside the app only after cookie consent.
+       Do not create persistent visitor identifiers in static HTML. -->
+  </head>
 
 <body>
   <div id="root"></div>
