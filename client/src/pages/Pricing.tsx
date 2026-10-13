@@ -15,6 +15,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { getRedditClickIdForCapi } from "@/hooks/useRedditPixel";
+import { getOpenAIAdsClickRef, isOpenAIAdsConsentGranted } from "@/hooks/useOpenAIAdsPixel";
 
 function formatPrice(amountMinor: number, currency: string, locale: string) {
   return new Intl.NumberFormat(locale === "cs" ? "cs-CZ" : "en-US", { style: "currency", currency: currency.toUpperCase(), maximumFractionDigits: 0 }).format(amountMinor / 100);
@@ -53,7 +54,7 @@ export default function Pricing() {
     if (hasBlueprintAccess) return navigate(`/${locale}/dashboard`);
     if (!offer) return;
     initiateCheckout(totalAmountMinor / 100, { content_name: "Personal Human Design Blueprint", content_category: "report", content_ids: includePartnerAddon ? ["blueprint", "blueprint_partner"] : ["blueprint"], content_type: "product", num_items: includePartnerAddon ? 2 : 1 });
-    checkout.mutate({ plan: "blueprint", locale, origin: window.location.origin, includePartnerAddon, voluntaryTopUpMinor, redditClickId: getRedditClickIdForCapi() });
+    checkout.mutate({ plan: "blueprint", locale, origin: window.location.origin, includePartnerAddon, voluntaryTopUpMinor, redditClickId: getRedditClickIdForCapi(), openAIAdsMarketingConsent: isOpenAIAdsConsentGranted(), openAIAdsOppref: getOpenAIAdsClickRef() });
   };
   const redeem = () => {
     if (!user) return window.location.assign(getLoginUrl());

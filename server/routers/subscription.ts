@@ -47,6 +47,8 @@ export const subscriptionRouter = router({
             senderName: z.string().optional(),
             personalMessage: z.string().optional(),
             redditClickId: z.string().max(255).optional(),
+            openAIAdsMarketingConsent: z.boolean().optional(),
+            openAIAdsOppref: z.string().max(255).optional(),
         }))
         .mutation(async ({ ctx, input }) => {
             const stripe = getStripe();
@@ -115,6 +117,12 @@ export const subscriptionRouter = router({
                 } : {}),
             };
             if (input.redditClickId) metadata.rdt_cid = input.redditClickId;
+            // Snapshot visitor's marketing consent at checkout; server CAPI
+            // must never infer consent from an eventual success-page visit.
+            if (input.openAIAdsMarketingConsent === true) {
+                metadata.openai_ads_marketing_consent = "true";
+                if (input.openAIAdsOppref) metadata.openai_ads_oppref = input.openAIAdsOppref;
+            }
             if (isGift) {
                 if (input.recipientEmail) metadata.recipient_email = input.recipientEmail;
                 if (input.recipientName) metadata.recipient_name = input.recipientName;
