@@ -5,7 +5,7 @@ export const SELLER_INFO = {
   vatStatus: "neplátce DPH / not VAT registered",
   address: "Mládeže 12/1477, 169 00 Praha 6, Česká republika",
   registry: "[DOPLNIT: přesné označení živnostenského rejstříku a evidujícího úřadu]",
-  email: "petr.matej@protonmail.com",
+  email: "petr.matej@gmail.com",
   phone: "[DOPLNIT: ověřený zákaznický telefon nebo upravit stránku tak, aby telefon nevyžadovala]",
   effectiveDate: "13. 10. 2026",
   hosting: "[DOPLNIT: ověřený seznam skutečných hostingových a dalších zpracovatelů, jejich lokací a transferů]",
