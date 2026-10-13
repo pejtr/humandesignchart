@@ -44,14 +44,20 @@ export function CookieConsent() {
       // Consent already given — initialize analytics on page load
       try {
         const parsed = JSON.parse(stored) as ConsentState;
-        if (parsed.marketing) { initPixelAfterConsent(); initSklikAfterConsent(); initRedditPixelAfterConsent(); }
-        if (parsed.analytics) { initGA4(); initClarity(); }
-      } catch { /* ignore */ }
-      return;
+        if (parsed.accepted && parsed.marketing) { initPixelAfterConsent(); initSklikAfterConsent(); initRedditPixelAfterConsent(); }
+        if (parsed.accepted && parsed.analytics) { initGA4(); initClarity(); }
+      } catch { localStorage.removeItem(CONSENT_KEY); }
+      if (localStorage.getItem(CONSENT_KEY)) return;
     }
     // Delay showing banner for better UX
     const timer = setTimeout(() => setShow(true), 1500);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const reopen = () => { setShowDetails(true); setShow(true); };
+    window.addEventListener("hd:cookie-settings", reopen);
+    return () => window.removeEventListener("hd:cookie-settings", reopen);
   }, []);
 
   const acceptAll = () => {
@@ -85,10 +91,14 @@ export function CookieConsent() {
   const rejectAll = () => {
     const state: ConsentState = { necessary: true, analytics: false, marketing: false, accepted: true };
     localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
+    setConsent(state);
     setShow(false);
+    // Previously loaded third-party scripts cannot be safely unloaded in place.
+    // Reload with consent-denied defaults to prevent further tracking.
+    window.location.reload();
   };
 
-  if (!show) return null;
+  if (!show) return <button type="button" onClick={() => { setShowDetails(true); setShow(true); }} className="fixed bottom-3 left-3 z-[100] rounded-full border border-border bg-card px-3 py-2 text-xs shadow-lg" aria-label={isCs ? "Změnit nastavení cookies" : "Change cookie settings"}>{isCs ? "Nastavení cookies" : "Cookie settings"}</button>;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[100] p-4 md:p-6">
