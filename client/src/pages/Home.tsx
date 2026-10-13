@@ -195,11 +195,13 @@ function getTypesData(isCs: boolean) {
 
 import { FastTypeQuizModal } from "@/components/FastTypeQuizModal";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
+import PremiumUSHome from "./PremiumUSHome";
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const { t, locale, localePath } = useLanguage();
   const isCs = locale === "cs";
+  const isPremiumUsDomain = typeof window !== "undefined" && window.location.hostname.endsWith("humandesignchart.app");
 
   const [showQuiz, setShowQuiz] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -285,9 +287,9 @@ export default function Home() {
         }
       : {
           title:
-            "✨ Free Human Design Chart Calculator & AI Reading 🔮 | Free Bodygraph",
+            "Free Human Design Chart — Type, Authority & Profile | HumanDesignChart.app",
           description:
-            "Calculate your free Human Design chart calculator & bodygraph. Get instant free Human Design readings, daily transit today & personality test interpretation. Available in 6 languages.",
+            "Calculate your Human Design chart free. Discover your type, strategy, authority and profile, then explore deeper personalized insights when you want them.",
           ogImage: OG_IMAGES.homepage,
           keywords:
             "human design calculator free, free human design chart, human design chart calculator, free human design reading, human design map, human design test free, human design transit today, human design chart, human design free, free human design chart reading",
@@ -577,6 +579,10 @@ export default function Home() {
           featured: false,
         },
       ];
+
+  if (!isCs && isPremiumUsDomain) {
+    return <PremiumUSHome localePath={localePath} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
