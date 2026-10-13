@@ -31,6 +31,11 @@ function refreshSharedRuntime() {
   if (!hasAdsConsent()) {
     activeScript?.remove();
     activeScript = null;
+    // Previously rendered placements must disappear immediately on withdrawal.
+    // Removing the script alone does not revoke the existing click handlers.
+    document.querySelectorAll("[data-omni-ads-slot]").forEach((slot) => {
+      slot.replaceChildren();
+    });
     return;
   }
   pendingReload = setTimeout(() => {
