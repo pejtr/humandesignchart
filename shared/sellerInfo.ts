@@ -3,7 +3,7 @@ export const SELLER_INFO = {
   name: "Petr Matěj",
   companyId: "02558220",
   vatStatus: "neplátce DPH / not VAT registered",
-  address: "[DOPLNIT: ověřená adresa sídla podnikatele podle veřejného rejstříku]",
+  address: "Mládeže 12/1477, 169 00 Praha 6, Česká republika",
   registry: "[DOPLNIT: přesné označení živnostenského rejstříku a evidujícího úřadu]",
   email: "petr.matej@protonmail.com",
   phone: "[DOPLNIT: ověřený zákaznický telefon nebo upravit stránku tak, aby telefon nevyžadovala]",
