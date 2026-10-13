@@ -4,6 +4,7 @@ import { initPixelAfterConsent } from "@/hooks/useMetaPixel";
 import { initSklikAfterConsent } from "@/hooks/useSklik";
 import { ga4PageView, initGA4 } from "@/hooks/useGA4";
 import { initRedditPixelAfterConsent } from "@/hooks/useRedditPixel";
+import { syncOpenAIAdsPixelConsent } from "@/hooks/useOpenAIAdsPixel";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const CONSENT_KEY = "hd-cookie-consent";
@@ -45,6 +46,7 @@ export function CookieConsent() {
       try {
         const parsed = JSON.parse(stored) as ConsentState;
         if (parsed.marketing) { initPixelAfterConsent(); initSklikAfterConsent(); initRedditPixelAfterConsent(); }
+        syncOpenAIAdsPixelConsent();
         if (parsed.analytics) { initGA4(); initClarity(); }
       } catch { /* ignore */ }
       return;
@@ -57,6 +59,7 @@ export function CookieConsent() {
   const acceptAll = () => {
     const state: ConsentState = { necessary: true, analytics: true, marketing: true, accepted: true };
     localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
+    window.dispatchEvent(new Event("hd:marketing-consent-changed"));
     setShow(false);
     initPixelAfterConsent();
     initSklikAfterConsent();
@@ -70,6 +73,7 @@ export function CookieConsent() {
   const acceptSelected = () => {
     const state: ConsentState = { ...consent, accepted: true };
     localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
+    window.dispatchEvent(new Event("hd:marketing-consent-changed"));
     setShow(false);
     if (state.marketing) { initPixelAfterConsent(); initSklikAfterConsent(); initRedditPixelAfterConsent(); }
     if (state.analytics) {
@@ -85,6 +89,7 @@ export function CookieConsent() {
   const rejectAll = () => {
     const state: ConsentState = { necessary: true, analytics: false, marketing: false, accepted: true };
     localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
+    window.dispatchEvent(new Event("hd:marketing-consent-changed"));
     setShow(false);
   };
 
