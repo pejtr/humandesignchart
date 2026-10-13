@@ -8,6 +8,7 @@ on:
       - 'client/src/pages/BlogArticle.tsx'
       - 'client/src/components/CookieConsent.tsx'
       - 'client/src/App.tsx'
+      - 'workers/pages-api.ts'
       - '.github/workflows/hd-marketing-measurement.yml'
   workflow_dispatch:
 
