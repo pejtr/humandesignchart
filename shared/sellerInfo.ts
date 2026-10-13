@@ -1,21 +1,14 @@
-/**
- * Seller identification used by the legal pages (Terms, Privacy, Withdrawal).
- *
- * Every value starting with "[DOPLNIT" is a placeholder: the pages render it
- * highlighted so an unfinished page is obvious. Replace each one with the real
- * details of the operator before the pages go live, and have the texts
- * reviewed by a lawyer.
- */
+/** Seller details shared by CZ/EN legal documents. Unverified fields remain visibly blocked. */
 export const SELLER_INFO = {
-  name: "[DOPLNIT: obchodní firma / jméno a příjmení podnikatele]",
-  companyId: "[DOPLNIT: IČO]",
-  vatStatus: "[DOPLNIT: DIČ, nebo „neplátce DPH“]",
-  address: "[DOPLNIT: sídlo / místo podnikání]",
-  registry: "[DOPLNIT: zápis v obchodním / živnostenském rejstříku]",
-  email: "[DOPLNIT: kontaktní e-mail]",
-  phone: "[DOPLNIT: telefon (nepovinné)]",
-  effectiveDate: "[DOPLNIT: datum účinnosti]",
-  hosting: "[DOPLNIT: poskytovatel hostingu a umístění serverů]",
+  name: "Petr Matěj",
+  companyId: "02558220",
+  vatStatus: "neplátce DPH / not VAT registered",
+  address: "[DOPLNIT: ověřená adresa sídla podnikatele podle veřejného rejstříku]",
+  registry: "[DOPLNIT: přesné označení živnostenského rejstříku a evidujícího úřadu]",
+  email: "petr.matej@protonmail.com",
+  phone: "[DOPLNIT: ověřený zákaznický telefon nebo upravit stránku tak, aby telefon nevyžadovala]",
+  effectiveDate: "13. 10. 2026",
+  hosting: "[DOPLNIT: ověřený seznam skutečných hostingových a dalších zpracovatelů, jejich lokací a transferů]",
 } as const;
 
 export function isPlaceholder(value: string) {
