@@ -10,6 +10,7 @@ on:
       - 'client/index.html'
       - 'client/src/App.tsx'
       - 'workers/pages-api.ts'
+      - 'workers/social-meta.ts'
       - 'server/openaiConversionsApi.ts'
       - 'server/openaiConversionsApi.test.ts'
       - 'server/stripeWebhook.ts'
