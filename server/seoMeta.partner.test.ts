@@ -7,8 +7,8 @@ describe("partner invite SEO preview", () => {
 
     expect(head).toContain("Pojďme porovnat naše Human Design mapy");
     expect(head).toContain('property="og:description"');
-    expect(head).toContain('property="og:image" content="https://www.humandesignmapa.cz/images/og-homepage.png"');
+    expect(head).toContain('property="og:image" content="https://humandesignmapa.cz/images/og-homepage.png"');
     expect(head).toContain('name="twitter:card" content="summary_large_image"');
-    expect(head).toContain('rel="canonical" href="https://www.humandesignmapa.cz/cs/partner/HDM2026"');
+    expect(head).toContain('rel="canonical" href="https://humandesignmapa.cz/cs/partner/HDM2026"');
   });
 });
