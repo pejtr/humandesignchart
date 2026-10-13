@@ -10,7 +10,9 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
     return asset;
   }
   const locale = url.pathname.match(/^\/(cs|en)(?:\/|$)/)?.[1];
-  // The public Cloudflare edge workers reverse-proxy the Pages origin: the\n  // Pages worker sees a *.pages.dev host. Route locale remains trustworthy.\n  const enHost = locale === "en" || (!locale && ["humandesignchart.app", "www.humandesignchart.app"].includes(url.hostname.toLowerCase()));
+  // The public Cloudflare edge workers reverse-proxy the Pages origin: the
+  // Pages worker sees a *.pages.dev host. Route locale remains trustworthy.
+  const enHost = locale === "en" || (!locale && ["humandesignchart.app", "www.humandesignchart.app"].includes(url.hostname.toLowerCase()));
   const meta = locale ? buildSeoHead(locale, url.pathname) : "";
   if (!meta && !enHost) return asset;
 
