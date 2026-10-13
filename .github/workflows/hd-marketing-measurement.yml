@@ -10,6 +10,12 @@ on:
       - 'client/index.html'
       - 'client/src/App.tsx'
       - 'workers/pages-api.ts'
+      - 'server/openaiConversionsApi.ts'
+      - 'server/openaiConversionsApi.test.ts'
+      - 'server/stripeWebhook.ts'
+      - 'server/routers/subscription.ts'
+      - 'client/src/pages/Pricing.tsx'
+      - 'client/src/pages/PaymentSuccess.tsx'
       - '.github/workflows/hd-marketing-measurement.yml'
   workflow_dispatch:
 
@@ -25,6 +31,7 @@ jobs:
           node-version: 22
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+      - run: pnpm exec vitest run server/openaiConversionsApi.test.ts
       - run: pnpm build:cloudflare
       - name: Assert OMNI ADS is not loaded before consent
         run: |
