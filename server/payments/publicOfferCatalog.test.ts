@@ -11,6 +11,14 @@ describe("public Blueprint offer catalog", () => {
     expect(offer.delivery).toBe("Přístup po potvrzení platby");
   });
 
+  it("keeps English checkout amounts and currency aligned with the canonical payment catalog", () => {
+    const offer = getBlueprintOffer("en");
+    expect(offer.currency).toBe("EUR");
+    expect(offer.amountMinor).toBe(getOfferAmountMinor("blueprint", "EUR"));
+    expect(offer.amountMinor + offer.partnerAddon.amountMinor).toBe(getOfferAmountMinor("blueprint", "EUR", true));
+    expect(offer.delivery).toBe("Access after payment confirmation");
+  });
+
   it("keeps proposed Marie tiers out of checkout until price IDs are configured", () => {
     expect(PROPOSED_MARIE_TIERS.map(tier => tier.key)).toEqual(["pulse", "plus", "circle"]);
     expect(PROPOSED_MARIE_TIERS.every(tier => tier.monthlyCzk > 0 && tier.annualCzk > tier.monthlyCzk)).toBe(true);

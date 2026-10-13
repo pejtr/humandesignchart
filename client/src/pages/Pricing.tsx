@@ -55,8 +55,11 @@ export default function Pricing() {
     if (!offer) return;
     if (!user) return window.location.assign(getLoginUrl());
     if (hasBlueprintAccess) return navigate(`/${locale}/dashboard`);
-    initiateCheckout(totalAmountMinor / 100, { content_name: "Personal Human Design Blueprint", content_category: "report", content_ids: includePartnerAddon ? ["blueprint", "blueprint_partner"] : ["blueprint"], content_type: "product", num_items: includePartnerAddon ? 2 : 1 });
-    checkout.mutate({ plan: "blueprint", locale, origin: window.location.origin, includePartnerAddon, voluntaryTopUpMinor, redditClickId: getRedditClickIdForCapi(), openAIAdsMarketingConsent: isOpenAIAdsConsentGranted(), openAIAdsOppref: getOpenAIAdsClickRef() });
+    checkout.mutate({ plan: "blueprint", locale, origin: window.location.origin, includePartnerAddon, voluntaryTopUpMinor, redditClickId: getRedditClickIdForCapi(), openAIAdsMarketingConsent: isOpenAIAdsConsentGranted(), openAIAdsOppref: getOpenAIAdsClickRef() }, {
+      onSuccess: ({ url }) => {
+        if (url) initiateCheckout(totalAmountMinor / 100, { content_name: "Personal Human Design Blueprint", content_category: "report", content_ids: includePartnerAddon ? ["blueprint", "blueprint_partner"] : ["blueprint"], content_type: "product", num_items: includePartnerAddon ? 2 : 1 });
+      },
+    });
   };
   const redeem = () => {
     if (!user) return window.location.assign(getLoginUrl());
