@@ -1,0 +1,48 @@
+name: HD marketing measurement and contextual ads
+on:
+  pull_request:
+    paths:
+      - 'client/src/hooks/useOpenAIAdsPixel.ts'
+      - 'client/src/components/OmniAdsSlot.tsx'
+      - 'client/src/components/Footer.tsx'
+      - 'client/src/pages/BlogArticle.tsx'
+      - 'client/src/components/CookieConsent.tsx'
+      - 'client/index.html'
+      - 'client/src/App.tsx'
+      - 'workers/pages-api.ts'
+      - 'server/openaiConversionsApi.ts'
+      - 'server/openaiConversionsApi.test.ts'
+      - 'server/stripeWebhook.ts'
+      - 'server/routers/subscription.ts'
+      - 'client/src/pages/Pricing.tsx'
+      - 'client/src/pages/PaymentSuccess.tsx'
+      - '.github/workflows/hd-marketing-measurement.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm exec vitest run server/openaiConversionsApi.test.ts
+      - run: pnpm build:cloudflare
+      - name: Assert OMNI ADS is not loaded before consent
+        run: |
+          if grep -q 'src="https://api.optihub.cz/omni-ads/runtime.js"' client/index.html; then
+            echo 'ERROR: consent-blind OMNI ADS static script detected'
+            exit 1
+          fi
+      - name: Verify built edge worker and client
+        run: test -f dist/public/index.html && test -s dist/public/_worker.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hd-measurement-cloudflare-preview
+          path: dist/public
+          if-no-files-found: error

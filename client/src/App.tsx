@@ -21,6 +21,7 @@ import PageTransition from "./components/PageTransition";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
 import { useGA4PageViews } from "./hooks/useGA4";
+import { useOpenAIAdsPageViews } from "./hooks/useOpenAIAdsPixel";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { AuthSidebar } from "./components/AuthSidebar";
 const FloatingChatGuide = lazy(() => import("./components/FloatingChatGuide").then(m => ({ default: m.FloatingChatGuide })));
@@ -111,13 +112,29 @@ function detectPreferredLocale(): Locale {
 }
 
 /**
- * Root redirect: / → /cs or /en based on browser language.
+ * Two distinct storefronts share this SPA. The commercial EN domain must not
+ * silently send visitors from English campaigns to a Czech landing page.
+ * Explicit /en and /cs routes remain unaffected.
+ */
+function defaultLocaleForHost(): Locale {
+  const hostname = window.location.hostname.toLowerCase();
+  if (hostname === "humandesignchart.app" || hostname === "www.humandesignchart.app") {
+    return "en";
+  }
+  if (hostname === "humandesignmapa.cz" || hostname === "www.humandesignmapa.cz") {
+    return "cs";
+  }
+  return detectPreferredLocale();
+}
+
+/**
+ * Root redirect: / → /cs or /en based on storefront hostname.
  * Also handles legacy routes without locale prefix.
  */
 function RootRedirect() {
   const [, setLocation] = useLocation();
   useEffect(() => {
-    const locale = detectPreferredLocale();
+    const locale = defaultLocaleForHost();
     setLocation(`/${locale}`, { replace: true });
   }, [setLocation]);
   return <HDLoader />;
@@ -394,6 +411,7 @@ function App() {
   useUTM();
   useSklikPageViews();
   useGA4PageViews();
+  useOpenAIAdsPageViews();
   useRedditPageViews();
   return (
     <ErrorBoundary>

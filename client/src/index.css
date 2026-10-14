@@ -1390,3 +1390,23 @@
   will-change: transform;
 }
 
+
+/* OMNI CRO: one gentle attention cue for the primary conversion action.
+   Double beat lasts <0.8s followed by >8s of stillness; no motion on hover,
+   keyboard focus, or when the visitor requests reduced motion. */
+@keyframes omni-cta-attention {
+  0%, 10%, 14%, 18%, 100% { transform: scale(1); }
+  12%, 16% { transform: scale(1.025); }
+}
+.omni-cta-pulse:not(:disabled):not([aria-disabled="true"]) {
+  animation: omni-cta-attention 9s ease-in-out 1s infinite;
+  transform-origin: center;
+}
+.omni-cta-pulse:hover,
+.omni-cta-pulse:focus-visible,
+.omni-cta-pulse:active {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .omni-cta-pulse { animation: none !important; }
+}

@@ -29,7 +29,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: pnpm
+      # setup-node's pnpm cache post-job step previously failed with
+      # "Path Validation Error" after all accuracy tests passed.
+      # Keep this release gate deterministic instead of relying on a cache.
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
       - name: Verify reference charts and timezone mechanics

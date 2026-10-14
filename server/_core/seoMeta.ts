@@ -33,12 +33,15 @@ export function buildSeoHead(locale: string, pathname: string): string {
   const base = isEn ? EN : CS;
   const lang = isEn ? "en" : locale;
   const canonical = meta.canonical;
-  const ogImage = meta.ogImage || `${CS}/images/og-homepage.png`;
+  const ogImage = meta.ogImage || `${base}/images/og-homepage.png`;
 
   // Build alternate hreflang links — cs always on CS domain, others on EN domain
-  const altPath = canonical.replace(CS, "").replace(EN, "");
-  const csAlt = CS + altPath;
-  const enAlt = EN + "/en" + altPath;
+  // hreflang siblings must have exactly one locale prefix. The old
+  // canonical-based concatenation emitted /en/en/ and CZ /en/ URLs.
+  const unprefixedPath = pathname.replace(/^\/(?:cs|en)(?=\/|$)/, "") || "/";
+  const suffix = unprefixedPath.startsWith("/") ? unprefixedPath : `/${unprefixedPath}`;
+  const csAlt = `${CS}/cs${suffix}`;
+  const enAlt = `${EN}/en${suffix}`;
 
   return [
     `<title>${escapeHtml(meta.title)}</title>`,
@@ -48,6 +51,9 @@ export function buildSeoHead(locale: string, pathname: string): string {
     `<meta property="og:type" content="${meta.ogType || "website"}" />`,
     `<meta property="og:url" content="${canonical}" />`,
     `<meta property="og:image" content="${ogImage}" />`,
+    `<meta property="og:image:secure_url" content="${ogImage}" />`,
+    `<meta property="og:image:type" content="image/png" />`,
+    `<meta property="og:image:alt" content="${isEn ? "Your Human Design chart — discover your design" : "Human Design Mapa — poznej svůj design"}" />`,
     `<meta property="og:image:width" content="1200" />`,
     `<meta property="og:image:height" content="630" />`,
     `<meta property="og:locale" content="${isEn ? "en_US" : "cs_CZ"}" />`,

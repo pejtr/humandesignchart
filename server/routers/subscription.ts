@@ -52,6 +52,8 @@ export const subscriptionRouter = router({
             // Consumer's express consent to immediate delivery of digital
             // content (§ 1837 l) OZ). Recorded on the order as evidence.
             digitalDeliveryConsent: z.boolean().default(false),
+            openAIAdsMarketingConsent: z.boolean().optional(),
+            openAIAdsOppref: z.string().max(255).optional(),
         }))
         .mutation(async ({ ctx, input }) => {
             const user = ctx.user;
@@ -119,6 +121,12 @@ export const subscriptionRouter = router({
             if (input.digitalDeliveryConsent) {
                 metadata.digital_delivery_consent = "true";
                 metadata.digital_delivery_consent_at = new Date().toISOString();
+            }
+            // Snapshot visitor's marketing consent at checkout; server CAPI
+            // must never infer consent from an eventual success-page visit.
+            if (input.openAIAdsMarketingConsent === true) {
+                metadata.openai_ads_marketing_consent = "true";
+                if (input.openAIAdsOppref) metadata.openai_ads_oppref = input.openAIAdsOppref;
             }
             if (isGift) {
                 if (input.recipientEmail) metadata.recipient_email = input.recipientEmail;

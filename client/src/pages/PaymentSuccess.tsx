@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
+import { trackGA4Event } from "@/hooks/useGA4";
 import { getRedditClickIdForCapi } from "@/hooks/useRedditPixel";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -23,7 +24,6 @@ import {
   Clock3,
 } from "lucide-react";
 import { Link } from "wouter";
-import { CHECKOUT_PRICES_MINOR, isCheckoutPlan } from "@shared/checkoutPrices";
 
 export default function PaymentSuccess() {
   const { locale, localePath } = useLanguage();
@@ -71,26 +71,23 @@ export default function PaymentSuccess() {
       ? "✨ Payment Successful — Welcome to Premium!"
       : "✨ Platba úspěšná — Vítejte v Premium!";
 
-    // Track Purchase event (META Pixel + Conversions API) — fires once per mount
+    // The customer can open this return URL without completing a payment.
+    // Only a signed Stripe/Comgate webhook + fulfilled ledger entry can emit
+    // Purchase/order_created to ad platforms. This non-conversion diagnostic
+    // is safe to send to GA4 only when analytics consent exists.
     const searchParams = new URLSearchParams(window.location.search);
-    // Stripe returns session_id; a Comgate return URL can carry the transaction as id.
-    const sessionId = searchParams.get("session_id") || searchParams.get("id");
-    const trackingKey = sessionId ? `hd-purchase-tracked:${sessionId}` : null;
-    // Report what was actually charged, in the charged currency (cs → CZK,
-    // otherwise EUR, mirroring subscription.createCheckout).
-    const currency = locale === "cs" ? "CZK" : "EUR";
-    const planValue = isCheckoutPlan(plan) ? CHECKOUT_PRICES_MINOR[plan][currency] / 100 : undefined;
-    if (planValue !== undefined && (!trackingKey || localStorage.getItem(trackingKey) !== "true")) {
-      meta.purchase(planValue, {
-        content_ids: [plan as string],
-        content_type: "product",
-        currency,
-        order_id: sessionId || undefined,
-        predicted_ltv: plan === "blueprint" ? CHECKOUT_PRICES_MINOR.annual[currency] / 100 : planValue,
-      });
-      if (trackingKey) localStorage.setItem(trackingKey, "true");
+    const providerReference = searchParams.get("session_id") || searchParams.get("id");
+    if (providerReference) {
+      const trackingKey = `hd-return-viewed:${providerReference}`;
+      if (sessionStorage.getItem(trackingKey) !== "true") {
+        trackGA4Event("payment_return_viewed", {
+          payment_provider: searchParams.has("session_id") ? "stripe" : "comgate",
+          payment_verified: false,
+        });
+        sessionStorage.setItem(trackingKey, "true");
+      }
     }
-  }, [isEn, locale, plan]);
+  }, [isEn, plan]);
 
   const nextSteps = isEn
     ? [

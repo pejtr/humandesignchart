@@ -1,7 +1,7 @@
 export const goldenCharts = [
   {
     id: "ra-uru-hu",
-    verification: "regression-baseline",
+    verification: "regression-baseline-v2.1",
     input: {
       name: "Ra Uru Hu",
       birthDate: "1948-04-09",
@@ -12,7 +12,7 @@ export const goldenCharts = [
       timezone: "America/Toronto",
     },
     expected: {
-      calculationVersion: "2.0.0-iana",
+      calculationVersion: "2.1.0-reference-verified",
       birthUtc: "1948-04-09T05:05:00Z",
       utcOffsetSeconds: -18000,
       type: "Manifestor",
@@ -20,13 +20,13 @@ export const goldenCharts = [
       authority: "Splenic",
       profile: "5/1",
       definition: "Single Definition",
-      activatedGates: [1, 2, 4, 7, 10, 12, 20, 23, 25, 26, 29, 40, 41, 43, 48, 49, 51, 57, 60, 61, 62],
+      activatedGates: [1, 2, 4, 7, 10, 12, 20, 23, 25, 26, 33, 40, 41, 43, 48, 49, 51, 57, 60, 61, 62],
       channels: [[43, 23], [57, 20], [10, 20], [10, 57], [25, 51]],
     },
   },
   {
     id: "einstein-historical-lmt",
-    verification: "regression-baseline",
+    verification: "regression-baseline-v2.1",
     input: {
       name: "Albert Einstein",
       birthDate: "1879-03-14",
@@ -37,7 +37,7 @@ export const goldenCharts = [
       timezone: "Europe/Berlin",
     },
     expected: {
-      calculationVersion: "2.0.0-iana",
+      calculationVersion: "2.1.0-reference-verified",
       birthUtc: "1879-03-14T10:36:32Z",
       utcOffsetSeconds: 3208,
       type: "Generator",
@@ -45,13 +45,13 @@ export const goldenCharts = [
       authority: "Emotional (Solar Plexus)",
       profile: "1/4",
       definition: "Split Definition",
-      activatedGates: [5, 6, 10, 11, 12, 14, 17, 19, 20, 24, 30, 31, 36, 38, 40, 41, 46, 51, 56, 59, 60],
-      channels: [[11, 56], [10, 20], [59, 6], [41, 30]],
+      activatedGates: [5, 6, 8, 10, 11, 12, 14, 17, 24, 25, 27, 30, 31, 36, 38, 41, 46, 51, 59, 60],
+      channels: [[25, 51], [59, 6], [41, 30]],
     },
   },
   {
     id: "prague-summer",
-    verification: "regression-baseline",
+    verification: "regression-baseline-v2.1",
     input: {
       name: "Prague baseline",
       birthDate: "1990-06-15",
@@ -62,16 +62,16 @@ export const goldenCharts = [
       timezone: "Europe/Prague",
     },
     expected: {
-      calculationVersion: "2.0.0-iana",
+      calculationVersion: "2.1.0-reference-verified",
       birthUtc: "1990-06-15T12:30:00Z",
       utcOffsetSeconds: 7200,
-      type: "Projector",
-      strategy: "Wait for the Invitation",
-      authority: "Self-Projected",
+      type: "Manifesting Generator",
+      strategy: "To Respond, Then Inform",
+      authority: "Sacral",
       profile: "2/4",
       definition: "Single Definition",
-      activatedGates: [1, 6, 7, 11, 12, 13, 14, 15, 16, 19, 21, 23, 33, 36, 38, 41, 53, 58, 61, 63],
-      channels: [[13, 33]],
+      activatedGates: [1, 2, 6, 7, 11, 12, 13, 14, 15, 19, 20, 21, 33, 36, 38, 41, 53, 58, 61, 63],
+      channels: [[13, 33], [2, 14]],
     },
   },
 ] as const;

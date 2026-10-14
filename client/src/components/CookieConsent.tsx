@@ -4,6 +4,7 @@ import { initPixelAfterConsent } from "@/hooks/useMetaPixel";
 import { initSklikAfterConsent } from "@/hooks/useSklik";
 import { ga4PageView, initGA4 } from "@/hooks/useGA4";
 import { initRedditPixelAfterConsent } from "@/hooks/useRedditPixel";
+import { syncOpenAIAdsPixelConsent } from "@/hooks/useOpenAIAdsPixel";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const CONSENT_KEY = "hd-cookie-consent";
@@ -39,12 +40,18 @@ export function CookieConsent() {
   });
 
   useEffect(() => {
+    // One-time cleanup of the old tracking shim: it created a two-year
+    // los_vid cookie *before* any consent and its ingest endpoint was broken.
+    // The current marketing and analytics integrations do not use these IDs.
+    document.cookie = "los_vid=; Max-Age=0; Path=/; SameSite=Lax";
+    try { sessionStorage.removeItem("los_sid"); } catch { /* storage blocked */ }
     const stored = localStorage.getItem(CONSENT_KEY);
     if (stored) {
       // Consent already given — initialize analytics on page load
       try {
         const parsed = JSON.parse(stored) as ConsentState;
         if (parsed.accepted && parsed.marketing) { initPixelAfterConsent(); initSklikAfterConsent(); initRedditPixelAfterConsent(); }
+        syncOpenAIAdsPixelConsent();
         if (parsed.accepted && parsed.analytics) { initGA4(); initClarity(); }
       } catch { localStorage.removeItem(CONSENT_KEY); }
       if (localStorage.getItem(CONSENT_KEY)) return;
@@ -63,6 +70,7 @@ export function CookieConsent() {
   const acceptAll = () => {
     const state: ConsentState = { necessary: true, analytics: true, marketing: true, accepted: true };
     localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
+    window.dispatchEvent(new Event("hd:marketing-consent-changed"));
     setShow(false);
     initPixelAfterConsent();
     initSklikAfterConsent();
@@ -76,6 +84,7 @@ export function CookieConsent() {
   const acceptSelected = () => {
     const state: ConsentState = { ...consent, accepted: true };
     localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
+    window.dispatchEvent(new Event("hd:marketing-consent-changed"));
     setShow(false);
     if (state.marketing) { initPixelAfterConsent(); initSklikAfterConsent(); initRedditPixelAfterConsent(); }
     if (state.analytics) {
@@ -92,6 +101,7 @@ export function CookieConsent() {
     const state: ConsentState = { necessary: true, analytics: false, marketing: false, accepted: true };
     localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
     setConsent(state);
+    window.dispatchEvent(new Event("hd:marketing-consent-changed"));
     setShow(false);
     // Previously loaded third-party scripts cannot be safely unloaded in place.
     // Reload with consent-denied defaults to prevent further tracking.

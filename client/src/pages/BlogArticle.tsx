@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import HDLoader from "@/components/HDLoader";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { OmniAdsSlot } from "@/components/OmniAdsSlot";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 
 const CATEGORY_STYLES: Record<string, string> = {
@@ -306,10 +307,24 @@ export default function BlogArticle({ slug: propSlug }: { slug?: string } = {}) 
       <section className="py-8">
         <div className="container max-w-4xl">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-10">
-            <article
-              className="prose-custom"
-              dangerouslySetInnerHTML={{ __html: renderMarkdown(article.content) }}
-            />
+            <article className="min-w-0 prose-custom">
+              {(() => {
+                const paragraphs = article.content.split(/\n\s*\n/);
+                const midpoint = Math.floor(paragraphs.length / 2);
+                // Short articles keep the slot after the text; longer articles
+                // show the clearly disclosed native unit between paragraphs.
+                const split = paragraphs.length >= 8 ? Math.max(3, midpoint) : paragraphs.length;
+                return (
+                  <>
+                    <div dangerouslySetInnerHTML={{ __html: renderMarkdown(paragraphs.slice(0, split).join("\n\n")) }} />
+                    <OmniAdsSlot placement="article-intext" format="text" className="my-8 not-prose" />
+                    {split < paragraphs.length && (
+                      <div dangerouslySetInnerHTML={{ __html: renderMarkdown(paragraphs.slice(split).join("\n\n")) }} />
+                    )}
+                  </>
+                );
+              })()}
+            </article>
 
             <aside className="hidden lg:block">
               <div className="sticky top-24 space-y-6">

@@ -12,9 +12,15 @@ import {
   lookupIanaTimezone,
   TimezoneResolutionError,
 } from "../server/humandesign/timezone";
-import { BLOG_ARTICLES } from "../server/data/blogArticles";
+import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../server/data/blogArticles";
+import {
+  GATE_DESCRIPTIONS, CHANNEL_DESCRIPTIONS, TYPE_DESCRIPTIONS,
+  AUTHORITY_DESCRIPTIONS, PROFILE_DESCRIPTIONS, CENTER_DESCRIPTIONS,
+} from "../server/data/hdContent";
 import { BLOG_ARTICLES_EN } from "../server/data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
+import { withServerRenderedSeoMeta } from "./social-meta";
+import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
 
 type Env = {
   ASSETS: {
@@ -67,9 +73,69 @@ const publicStatsRouter = router({
   chartCount: publicProcedure.query(() => ({ count: 0 })),
 });
 
+const blogRouter = router({
+  list: publicProcedure
+    .input(z.object({
+      category: z.string().optional(),
+      locale: z.string().optional(),
+    }).optional())
+    .query(({ input }) => {
+      const entries = (input?.locale === "en" ? BLOG_ARTICLES_EN : BLOG_ARTICLES)
+        .filter((article) => !input?.category || article.category === input.category);
+      return {
+        articles: entries.map(({ content, ...summary }) => summary),
+        categories: BLOG_CATEGORIES,
+      };
+    }),
+  getBySlug: publicProcedure
+    .input(z.object({ slug: z.string(), locale: z.string().optional() }))
+    .query(({ input }) =>
+      (input.locale === "en" ? BLOG_ARTICLES_EN : BLOG_ARTICLES)
+        .find((article) => article.slug === input.slug) ?? null
+    ),
+});
+
+// Legacy Express exposes content.blogList/content.blogPost. Keep the
+// existing blog.list/blog.getBySlug aliases but restore exact frontend API.
+const contentRouter = router({
+  getHdContent: publicProcedure.query(() => ({
+    gates: GATE_DESCRIPTIONS,
+    channels: CHANNEL_DESCRIPTIONS,
+    types: TYPE_DESCRIPTIONS,
+    authorities: AUTHORITY_DESCRIPTIONS,
+    profiles: PROFILE_DESCRIPTIONS,
+    centers: CENTER_DESCRIPTIONS,
+  })),
+  blogList: publicProcedure
+    .input(z.object({ category: z.string().optional(), locale: z.string().optional() }).optional())
+    .query(({ input }) => {
+      const entries = (input?.locale === "en" ? BLOG_ARTICLES_EN : BLOG_ARTICLES)
+        .filter((article) => !input?.category || article.category === input.category);
+      return { articles: entries.map(({ content, ...summary }) => summary), categories: BLOG_CATEGORIES };
+    }),
+  blogPost: publicProcedure
+    .input(z.object({ slug: z.string(), locale: z.string().optional() }))
+    .query(({ input }) =>
+      (input.locale === "en" ? BLOG_ARTICLES_EN : BLOG_ARTICLES)
+        .find((article) => article.slug === input.slug) ?? null
+    ),
+});
+
 const appRouter = router({
+  auth: router({
+    me: publicProcedure.query(() => null),
+  }),
   chart: chartRouter,
   publicStats: publicStatsRouter,
+  blog: blogRouter,
+  content: contentRouter,
+  // Safe read-only catalog: the public pricing page needs this exact procedure.
+  // Authenticated checkout stays blocked until a real payment backend exists.
+  subscription: router({
+    blueprintOffer: publicProcedure
+      .input(z.object({ locale: z.enum(["cs", "en"]) }))
+      .query(({ input }) => getBlueprintOffer(input.locale)),
+  }),
 });
 
 const sitemapStaticPages = [
@@ -189,6 +255,7 @@ export default {
       });
     }
 
-    return env.ASSETS.fetch(request);
+    const asset = await env.ASSETS.fetch(request);
+    return withServerRenderedSeoMeta(url, asset);
   },
 };
