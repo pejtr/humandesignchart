@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { CHECKOUT_PRICES_MINOR } from "@shared/checkoutPrices";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -223,10 +224,10 @@ export default function VslChatFunnel() {
 
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-white/10">
                 <div className="text-center sm:text-left">
-                  <div className="text-xs text-muted-foreground">{isEn ? "VSL Promo Price:" : "Akční Reklamní Cena:"}</div>
+                  {/* The real checkout price: no discount is applied at checkout, so none is advertised. */}
+                  <div className="text-xs text-muted-foreground">{isEn ? "One-time price:" : "Jednorázová cena:"}</div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-amber-300">199 Kč</span>
-                    <span className="text-xs text-muted-foreground line-through">390 Kč</span>
+                    <span className="text-3xl font-bold text-amber-300">{isEn ? `€${(CHECKOUT_PRICES_MINOR.blueprint.EUR / 100).toFixed(2)}` : `${CHECKOUT_PRICES_MINOR.blueprint.CZK / 100} Kč`}</span>
                   </div>
                 </div>
 
@@ -235,9 +236,9 @@ export default function VslChatFunnel() {
                   className="w-full sm:w-auto bg-gradient-to-r from-amber-400 via-purple-500 to-indigo-600 hover:scale-105 text-slate-950 font-extrabold text-sm h-12 px-8 rounded-2xl shadow-xl gap-2"
                   asChild
                 >
-                  <Link href={localePath("/honorace") + "?coupon=VSL50"}>
+                  <Link href={localePath("/honorace")}>
                     <Sparkles className="w-4 h-4 fill-current" />
-                    {isEn ? "Claim 50% Off Blueprint Now" : "Získat 50% Slevu a Stáhnout Blueprint"}
+                    {isEn ? "Get my Blueprint" : "Získat můj Blueprint"}
                   </Link>
                 </Button>
               </div>

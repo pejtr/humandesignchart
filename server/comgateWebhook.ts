@@ -3,6 +3,7 @@ import { checkComgateStatus } from "./_core/comgate";
 import { normalizedPaymentEventSchema } from "./payments/contracts";
 import { isPaymentProductKey } from "./payments/offers";
 import { processPaymentEvent, recordPaymentAuditEvent } from "./payments/mysqlStore";
+import { trackConversion } from "./metaConversionsApi";
 
 function decodeMetadata(refId: string): Record<string, unknown> | null {
   try {
@@ -60,7 +61,22 @@ export async function handleComgateWebhook(req: Request, res: Response) {
       personalMessage: typeof metadata.message === "string" ? metadata.message : undefined,
       rawPayload,
     });
-    await processPaymentEvent(normalized);
+    const result = await processPaymentEvent(normalized);
+    if (result.outcome === "fulfilled") {
+      // Same server-side Purchase the Stripe webhook sends, so CZ (Comgate)
+      // sales reach the ad platforms too.
+      void trackConversion({
+        eventName: "Purchase",
+        eventId: transId,
+        userId,
+        email: info.email || undefined,
+        value: amountMinor / 100,
+        currency,
+        contentIds: [productKey],
+        contentName: productKey,
+        contentCategory: "digital_product",
+      }).catch((error) => console.warn("[Comgate Webhook] Conversion telemetry failed", error));
+    }
     return res.status(200).send("code=0&message=OK");
   } catch (error) {
     console.error("[Comgate Webhook] Processing failed", error);

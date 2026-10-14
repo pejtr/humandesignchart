@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { X, Sparkles, Gift, Compass, Brain, ChevronRight, ChevronLeft, Star } from "lucide-react";
+import { X, Sparkles, Gift, Compass, ChevronRight, ChevronLeft, Star } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -44,8 +44,8 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
           icon: <Gift className="w-8 h-8" />,
           color: "#7c3aed",
           title: "Vítejte v Human Design!",
-          description: "Získali jste 5 bezplatných AI výkladů jako uvítací dárek. Použijte je k prozkoumání svého designu.",
-          highlight: "Váš kredit je připraven — klikněte na AI průvodce nebo vygenerujte svou mapu.",
+          description: "Vaše mapa je zdarma a první AI výklad k ní také. Stačí datum, čas a místo narození.",
+          highlight: "Bez platební karty — pro výklad se stačí zdarma přihlásit.",
           cta: null,
         },
         {
@@ -56,22 +56,14 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
           highlight: "Přesný čas narození je důležitý. Pokud ho neznáte, zkuste dopoledne (9:00).",
           cta: { label: "Vytvořit mapu zdarma", href: "/calculate" },
         },
-        {
-          icon: <Brain className="w-8 h-8" />,
-          color: "#d4af37",
-          title: "Denní odměny & Gamifikace",
-          description: "Přihlašujte se každý den a získávejte kredity. Čím déle jste aktivní, tím více odměn.",
-          highlight: "Denní přihlášení: +0,1 kreditu. Série 7 dní: bonus kredit. Pozvěte přítele: +1 kredit.",
-          cta: { label: "Přejít na dashboard", href: "/dashboard" },
-        },
       ]
     : [
         {
           icon: <Gift className="w-8 h-8" />,
           color: "#7c3aed",
           title: "Welcome to Human Design!",
-          description: "You've received 5 free AI readings as a welcome gift. Use them to explore your unique design.",
-          highlight: "Your credits are ready — click AI Guide or generate your chart to start.",
+          description: "Your chart is free, and so is your first AI reading of it. All you need is your birth date, time and place.",
+          highlight: "No card needed — just sign in for free to read it.",
           cta: null,
         },
         {
@@ -81,14 +73,6 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
           description: "Enter your date, time, and place of birth. The system generates your personal bodygraph — a map of your energy.",
           highlight: "Exact birth time matters. If unknown, try morning (9:00 AM).",
           cta: { label: "Create free chart", href: "/calculate" },
-        },
-        {
-          icon: <Brain className="w-8 h-8" />,
-          color: "#d4af37",
-          title: "Daily Rewards & Gamification",
-          description: "Log in every day and earn credits. The longer you stay active, the more rewards you unlock.",
-          highlight: "Daily login: +0.1 credit. 7-day streak: bonus credit. Invite a friend: +1 credit.",
-          cta: { label: "Go to dashboard", href: "/dashboard" },
         },
       ];
 
