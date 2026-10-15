@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import "@/styles/premiumUSExperience.css";
 import {
   ArrowRight,
   Brain,
@@ -20,7 +21,7 @@ function BodygraphPreview({ compact = false }: { compact?: boolean }) {
   return (
     <svg
       viewBox="0 0 260 420"
-      className={compact ? "h-[240px] w-full" : "h-[330px] w-full md:h-[390px]"}
+      className={compact ? "omni-hd-bodygraph h-[240px] w-full" : "omni-hd-bodygraph h-[330px] w-full md:h-[390px]"}
       role="img"
       aria-label="Stylized Human Design bodygraph preview"
     >
@@ -119,7 +120,7 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
 
   return (
     <div className="min-h-screen bg-[#F7F3EA] text-[#071426]">
-      <section className="relative overflow-hidden bg-[#071426] text-white">
+      <section className="omni-hd-hero relative overflow-hidden bg-[#071426] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_76%_34%,rgba(244,199,98,0.18),transparent_28%),radial-gradient(circle_at_34%_20%,rgba(139,92,246,0.14),transparent_34%),linear-gradient(135deg,#071426_0%,#0A1B31_58%,#111C35_100%)]" />
         <div className="absolute inset-0 opacity-[0.10] [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:44px_44px]" />
 
@@ -152,15 +153,15 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
         <div className="relative z-10 mx-auto grid w-full max-w-[1440px] gap-10 px-5 pb-14 pt-7 md:px-8 md:pb-20 lg:grid-cols-[0.94fr_1.06fr] lg:items-center lg:px-12 lg:pb-24 lg:pt-12">
           <div className="max-w-2xl">
             <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.34em] text-[#F4C762]/90">
-              Science · Wisdom · Self-discovery
+              Self-discovery · Personal reflection · Practical insights
             </p>
             <h1 className="max-w-[760px] font-serif text-[46px] font-semibold leading-[0.98] tracking-[-0.045em] text-white sm:text-6xl lg:text-[76px]">
-              Your Unique Design for a More{" "}
+              Explore Your Patterns for a More{" "}
               <em className="font-serif font-medium text-[#F4C762]">Aligned Life</em>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-white/72 md:text-lg">
-              Get your personalized Human Design chart and explore how your energy, decisions,
-              relationships, and life patterns may fit together — in a clear, practical format.
+              Turn your birth details into a visual Human Design chart. Explore its symbols, reflect on your choices,
+              and decide which insights feel useful to you — without the jargon.
             </p>
 
             <div className="mt-7 grid gap-4 sm:grid-cols-3">
@@ -172,7 +173,7 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
             <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
               <Link
                 href={localePath("/calculate")}
-                className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-[#FFE3A0] to-[#F4C762] px-7 py-4 text-base font-extrabold text-[#071426] shadow-[0_16px_44px_rgba(244,199,98,.28)] transition hover:-translate-y-0.5 sm:w-auto"
+                className="omni-hd-primary inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-[#FFE3A0] to-[#F4C762] px-7 py-4 text-base font-extrabold text-[#071426] shadow-[0_16px_44px_rgba(244,199,98,.28)] transition hover:-translate-y-0.5 sm:w-auto"
               >
                 Get My Free Chart <ArrowRight className="h-4 w-4" />
               </Link>
@@ -188,14 +189,17 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
               <div className="relative min-h-[560px] overflow-hidden sm:min-h-[610px]">
                 <img
                   src="/images/brand/marie-landing-v1.webp"
-                  alt="Human Design guide visual"
+                  alt="Illustrative Human Design guide artwork"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
                   className="absolute inset-0 h-full w-full object-cover opacity-72"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-[#071426]/90 via-[#071426]/45 to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#071426] via-transparent to-[#071426]/15" />
 
                 <div className="absolute bottom-5 left-5 right-5 grid gap-4 sm:grid-cols-[1.05fr_.95fr]">
-                  <div className="rounded-2xl border border-white/12 bg-[#08172B]/88 p-3 shadow-2xl backdrop-blur-md">
+                  <div className="omni-hd-chart-shell rounded-2xl border border-white/12 bg-[#08172B]/88 p-3 shadow-2xl backdrop-blur-md">
                     <BodygraphPreview />
                   </div>
                   <div className="self-end rounded-2xl border border-white/12 bg-[#08172B]/88 p-5 backdrop-blur-md">
@@ -306,7 +310,7 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
                 },
               ].map(card => (
                 <div key={card.title} className="group relative min-h-[180px] overflow-hidden rounded-[24px] border border-[#DDD6C8] bg-[#0D2442] shadow-sm">
-                  <img src={card.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-70 transition duration-700 group-hover:scale-105" />
+                  <img src={card.image} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover opacity-70 transition duration-700 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-r from-[#071426]/92 via-[#071426]/68 to-[#071426]/15" />
                   <div className="relative z-10 flex h-full min-h-[180px] max-w-sm flex-col justify-end p-6">
                     <p className="text-[10px] font-bold uppercase tracking-[0.23em] text-[#F4C762]">{card.eyebrow}</p>
