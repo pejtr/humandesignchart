@@ -252,6 +252,27 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
       </div>
     </div>
 
+    <!-- Premium practical integration workbook: grounded in the calculated chart. -->
+    <div class="section" style="break-before:page;page-break-before:always;padding:18px;border:1px solid #ddd6fe;border-radius:12px">
+      <div class="section-title" style="font-size:17px">Váš osobní integrační plán · 7 dní</div>
+      <p style="font-size:11px;line-height:1.65;color:#475569">Tento plán propojuje tři konkrétní prvky vaší mapy: energetický typ <strong>${czType}</strong>, strategii <strong>${czStrategy}</strong> a autoritu <strong>${chart.authority}</strong>. Berte jej jako prostor pro sebereflexi, nikoli jako vědeckou diagnózu či předpověď.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <tr><td style="padding:10px;vertical-align:top;width:19%;font-weight:700">Den 1 · Pozorování</td><td style="padding:10px">Všimněte si tří situací, kdy jste jednali automaticky. Kdy jste cítili energii a kdy tlak?</td></tr>
+        <tr><td style="padding:10px;vertical-align:top;font-weight:700">Den 2 · Strategie</td><td style="padding:10px">Vyberte jedno malé rozhodnutí a vědomě vyzkoušejte strategii „${czStrategy}“. Zapište si, co se změnilo.</td></tr>
+        <tr><td style="padding:10px;vertical-align:top;font-weight:700">Den 3 · Autorita</td><td style="padding:10px">Před dalším rozhodnutím si připomeňte svou autoritu „${chart.authority}“. Oddělte vlastní pocit od očekávání okolí.</td></tr>
+        <tr><td style="padding:10px;vertical-align:top;font-weight:700">Den 4 · Hranice</td><td style="padding:10px">Zaznamenejte jednu situaci, kdy jste řekli ano, ale chtěli jste říci ne. Co vám pomůže nastavit zdravou hranici?</td></tr>
+        <tr><td style="padding:10px;vertical-align:top;font-weight:700">Den 5 · Vztahy</td><td style="padding:10px">Vysvětlete blízkému člověku, jak vám vyhovuje dělat rozhodnutí. Požádejte o konkrétní podporu.</td></tr>
+        <tr><td style="padding:10px;vertical-align:top;font-weight:700">Den 6 · Energie</td><td style="padding:10px">Sledujte činnosti, po kterých se cítíte více a méně spokojení. Vytvořte si dva krátké seznamy.</td></tr>
+        <tr><td style="padding:10px;vertical-align:top;font-weight:700">Den 7 · Integrace</td><td style="padding:10px">Vyberte jeden návyk na dalších 30 dní. Určete jednoduchý signál pokroku a termín kontroly.</td></tr>
+      </table>
+      <div style="margin-top:14px;padding:12px;background:#f5f3ff;border-radius:8px;font-size:11px;line-height:1.6">
+        <strong>Vaše tři otázky:</strong><br/>
+        1. Kde ve svém životě nejvíce respektuji vlastní tempo?<br/>
+        2. Jak poznám, že rozhoduji ze své vůle, nikoli ze strachu?<br/>
+        3. Co mohu během příštího týdne udělat jinak?
+      </div>
+    </div>
+
     <!-- Full Width Sections below grid -->
     <div style="margin-top:20px">
       <!-- Centers -->
