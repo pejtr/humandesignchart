@@ -255,9 +255,41 @@ export default {
           event?.environment !== "REAL") {
         return Response.json({ ok: false, error: "INVALID_PAYMENT_EVENT" }, { status: 400 });
       }
-      // A captured payment is not a delivered Blueprint. Do not acknowledge
-      // fulfillment until actual personalized content and customer access exist.
-      return Response.json({ ok: false, status: "FULFILLMENT_PENDING", error: "BLUEPRINT_DELIVERY_NOT_CONFIGURED" }, { status: 503 });
+      // Strictly validate payment contract before persisting any personal data.
+      const expectedMoney = event.offerKey === "hd-blueprint-cz"
+        ? { currency: "CZK", amount: 29000 }
+        : { currency: "EUR", amount: 1590 };
+      if (event.currency !== expectedMoney.currency || event.amount !== expectedMoney.amount ||
+          typeof event.customerEmail !== "string" || event.customerEmail.length > 254 ||
+          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.customerEmail) ||
+          typeof event.eventId !== "string" || event.eventId.length > 200 ||
+          typeof event.refId !== "string" || event.refId.length > 200) {
+        return Response.json({ ok: false, error: "PAYMENT_CONTRACT_MISMATCH" }, { status: 400 });
+      }
+      try {
+        // The unique payment reference prevents repeated callback delivery from
+        // creating multiple orders. An event ID cannot be rebound to another ref.
+        const previous = await env.HD_ORDERS.prepare(
+          "SELECT event_id, payment_ref, offer_key, customer_email, status FROM blueprint_payment_receipts WHERE event_id = ? OR payment_ref = ? LIMIT 1"
+        ).bind(event.eventId, event.refId).first<{
+          event_id: string; payment_ref: string; offer_key: string; customer_email: string; status: string;
+        }>();
+        if (previous && (previous.event_id !== event.eventId || previous.payment_ref !== event.refId ||
+          previous.offer_key !== event.offerKey || previous.customer_email !== event.customerEmail)) {
+          return Response.json({ ok: false, error: "PAYMENT_RECEIPT_CONFLICT" }, { status: 409 });
+        }
+        if (!previous) {
+          await env.HD_ORDERS.prepare(
+            "INSERT INTO blueprint_payment_receipts (event_id,payment_ref,tenant_id,offer_key,customer_email,amount_minor,currency) VALUES (?,?,?,?,?,?,?) ON CONFLICT DO NOTHING"
+          ).bind(event.eventId, event.refId, event.tenant, event.offerKey, event.customerEmail, event.amount, event.currency).run();
+        }
+        // Do not return FULFILLED until actual customer access and 5 AI credits
+        // have been granted in the production entitlement store.
+        return Response.json({ ok: false, status: "PENDING_DELIVERY", error: "ENTITLEMENT_PROVIDER_NOT_CONFIGURED" }, { status: 503 });
+      } catch (error) {
+        console.error("[blueprint] receipt persistence failed", error);
+        return Response.json({ ok: false, error: "RECEIPT_PERSISTENCE_FAILED" }, { status: 503 });
+      }
     }
 
     if (url.pathname === "/sitemap.xml") {
