@@ -236,12 +236,17 @@ export default {
       const token = supplied.slice(7);
       const left = new TextEncoder().encode(token);
       const right = new TextEncoder().encode(expected);
-      {
-        // Workers WebCrypto does not expose a portable constant-time compare.
-        // Compare fixed-length SHA-256 digests instead.
-        const [a, b] = await Promise.all([crypto.subtle.digest("SHA-256", left), crypto.subtle.digest("SHA-256", right)]);
-        if (!Array.from(new Uint8Array(a)).every((v, i) => v === new Uint8Array(b)[i])) return new Response("Unauthorized", { status: 401 });
-      }
+      // Compare fixed-length SHA-256 digests without early exit. The previous
+      // implementation only checked credentials in a conditional branch.
+      const [digestA, digestB] = await Promise.all([
+        crypto.subtle.digest("SHA-256", left),
+        crypto.subtle.digest("SHA-256", right),
+      ]);
+      const bytesA = new Uint8Array(digestA);
+      const bytesB = new Uint8Array(digestB);
+      let difference = left.length ^ right.length;
+      for (let i = 0; i < bytesA.length; i++) difference |= bytesA[i] ^ bytesB[i];
+      if (difference !== 0) return new Response("Unauthorized", { status: 401 });
       if (!env.HD_ORDERS) return Response.json({ ok: false, error: "DELIVERY_STORE_NOT_CONFIGURED" }, { status: 503 });
       const event: any = await request.json().catch(() => null);
       if (event?.eventType !== "PAYMENT_CAPTURED" || event?.tenant !== "human-design" ||
