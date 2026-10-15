@@ -1,5 +1,5 @@
-const COMGATE_MERCHANT_ID = process.env.COMGATE_MERCHANT_ID || "DEMO_MERCHANT";
-const COMGATE_SECRET = process.env.COMGATE_SECRET || "DEMO_SECRET";
+const COMGATE_MERCHANT_ID = process.env.COMGATE_MERCHANT_ID;
+const COMGATE_SECRET = process.env.COMGATE_SECRET;
 const COMGATE_TEST_MODE = process.env.COMGATE_TEST_MODE !== "false"; // default test mode
 
 const COMGATE_API_URL = "https://payments.comgate.cz/v1.0";
@@ -26,6 +26,9 @@ export interface ComgatePaymentResponse {
  */
 export async function createComgatePayment(payload: CreateComgatePaymentPayload): Promise<ComgatePaymentResponse> {
   try {
+    if (!COMGATE_MERCHANT_ID || !COMGATE_SECRET) {
+      return { success: false, error: "Comgate credentials are not configured" };
+    }
     const params = new URLSearchParams({
       merchant: COMGATE_MERCHANT_ID,
       secret: COMGATE_SECRET,
@@ -66,12 +69,7 @@ export async function createComgatePayment(payload: CreateComgatePaymentPayload)
       };
     } else {
       console.warn(`[Comgate API Warning] Code ${code}: ${message}`);
-      // Fallback for Demo mode if merchant credentials are test placeholders
-      return {
-        success: true,
-        transId: `comgate_test_${Date.now()}`,
-        redirectUrl: `https://payments.comgate.cz/v1.0/redirect/${payload.refId}`,
-      };
+      return { success: false, error: `Comgate rejected payment creation (${code || "unknown"}): ${message || "unknown error"}` };
     }
   } catch (err: any) {
     console.error("[Comgate API Exception]", err);
