@@ -902,6 +902,26 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                           </Button>
                         </div>
                         {/* Reading type selector — always visible */}
+                        <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="text-sm font-semibold">{locale === "cs" ? "Blueprint · 5 navazujících AI výkladů" : "Blueprint · 5 follow-up AI readings"}</div>
+                            <div className="text-xs font-semibold text-primary">{locale === "cs" ? `Zbývající placené kredity: ${subStatus?.aiReadingCredits ?? 0}` : `Paid credits remaining: ${subStatus?.aiReadingCredits ?? 0}`}</div>
+                          </div>
+                          <p className="mt-1 text-xs text-muted-foreground">{locale === "cs" ? "Doporučená cesta: pět různých pohledů na vaši vypočítanou mapu. Každý nový výklad spotřebuje jeden kredit, pokud nemáte Premium nebo dostupný bezplatný výklad." : "Suggested journey: five perspectives grounded in your calculated chart. Each new reading uses one credit unless Premium or a free reading applies."}</p>
+                          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                            {[
+                              { key: "type_strategy", cs: "1 · Energie a strategie", en: "1 · Energy and strategy" },
+                              { key: "authority", cs: "2 · Rozhodování a autorita", en: "2 · Decisions and authority" },
+                              { key: "profile", cs: "3 · Silné stránky profilu", en: "3 · Profile strengths" },
+                              { key: "relationships", cs: "4 · Vztahy a komunikace", en: "4 · Relationships and communication" },
+                              { key: "career", cs: "5 · Práce a směřování", en: "5 · Work and direction" },
+                            ].map(topic => (
+                              <Button key={topic.key} variant="outline" size="sm" className="h-auto min-h-9 justify-start whitespace-normal text-left text-xs" disabled={aiStreaming || aiMutation.isPending || dailyTransitLoading} onClick={() => { setAiReadingType(topic.key); handleAiReading(topic.key); }}>
+                                {locale === "cs" ? topic.cs : topic.en}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
                         <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border/30">
                           {[
                             { key: "overview", label: "✨ Kompletní přehled" },
