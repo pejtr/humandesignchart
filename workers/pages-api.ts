@@ -229,6 +229,14 @@ export default {
 
     // The Pages runtime deliberately has no customer session provider.
     // Fail explicitly rather than silently returning the SPA HTML fallback.
+    // Pages cannot execute the legacy Express OAuth handlers. Return an
+    // explicit error instead of serving index.html to sign-in callbacks.
+    if (url.pathname.startsWith("/api/oauth/") || url.pathname === "/api/auth/logout") {
+      return Response.json({ ok: false, error: "OAUTH_PROVIDER_NOT_CONFIGURED" }, {
+        status: 503, headers: { "cache-control": "no-store" },
+      });
+    }
+
     if (url.pathname === "/api/auth/me") {
       return Response.json({ user: null, authenticated: false, reason: "CUSTOMER_AUTH_NOT_CONFIGURED" }, { status: 503, headers: { "cache-control": "no-store" } });
     }
