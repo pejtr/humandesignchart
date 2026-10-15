@@ -227,6 +227,12 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
+    // The Pages runtime deliberately has no customer session provider.
+    // Fail explicitly rather than silently returning the SPA HTML fallback.
+    if (url.pathname === "/api/auth/me") {
+      return Response.json({ user: null, authenticated: false, reason: "CUSTOMER_AUTH_NOT_CONFIGURED" }, { status: 503, headers: { "cache-control": "no-store" } });
+    }
+
     if (url.pathname === "/api/internal/onyxpay/fulfill") {
       if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
       const expected = env.HUMAN_DESIGN_FULFILLMENT_API_KEY;
