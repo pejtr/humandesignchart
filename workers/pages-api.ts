@@ -23,6 +23,8 @@ import { withServerRenderedSeoMeta } from "./social-meta";
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
 
 type Env = {
+  HUMAN_DESIGN_FULFILLMENT_API_KEY?: string;
+  HD_ORDERS?: D1Database;
   ASSETS: {
     fetch(request: Request): Promise<Response>;
   };
@@ -224,6 +226,34 @@ Sitemap: ${domain}/sitemap.xml
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === "/api/internal/onyxpay/fulfill") {
+      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
+      const expected = env.HUMAN_DESIGN_FULFILLMENT_API_KEY;
+      const supplied = request.headers.get("authorization") || "";
+      // Never accept payments based on a browser redirect or unverified request.
+      if (!expected || !supplied.startsWith("Bearer ")) return new Response("Unauthorized", { status: 401 });
+      const token = supplied.slice(7);
+      const left = new TextEncoder().encode(token);
+      const right = new TextEncoder().encode(expected);
+      {
+        // Workers WebCrypto does not expose a portable constant-time compare.
+        // Compare fixed-length SHA-256 digests instead.
+        const [a, b] = await Promise.all([crypto.subtle.digest("SHA-256", left), crypto.subtle.digest("SHA-256", right)]);
+        if (!Array.from(new Uint8Array(a)).every((v, i) => v === new Uint8Array(b)[i])) return new Response("Unauthorized", { status: 401 });
+      }
+      if (!env.HD_ORDERS) return Response.json({ ok: false, error: "DELIVERY_STORE_NOT_CONFIGURED" }, { status: 503 });
+      const event: any = await request.json().catch(() => null);
+      if (event?.eventType !== "PAYMENT_CAPTURED" || event?.tenant !== "human-design" ||
+          !["hd-blueprint-cz", "hd-blueprint-en"].includes(event?.offerKey) ||
+          !event?.refId || !event?.eventId || !event?.customerEmail ||
+          event?.environment !== "REAL") {
+        return Response.json({ ok: false, error: "INVALID_PAYMENT_EVENT" }, { status: 400 });
+      }
+      // A captured payment is not a delivered Blueprint. Do not acknowledge
+      // fulfillment until actual personalized content and customer access exist.
+      return Response.json({ ok: false, status: "FULFILLMENT_PENDING", error: "BLUEPRINT_DELIVERY_NOT_CONFIGURED" }, { status: 503 });
+    }
 
     if (url.pathname === "/sitemap.xml") {
       return new Response(makeSitemap(url), {
