@@ -259,7 +259,7 @@ export default {
       const expectedMoney = event.offerKey === "hd-blueprint-cz"
         ? { currency: "CZK", amount: 29000 }
         : { currency: "EUR", amount: 1590 };
-      if (event.currency !== expectedMoney.currency || event.amount !== expectedMoney.amount ||
+      if (event.currency !== expectedMoney.currency || !Number.isSafeInteger(event.amount) || event.amount < expectedMoney.amount || event.amount > expectedMoney.amount + 1_000_000 ||
           typeof event.customerEmail !== "string" || event.customerEmail.length > 254 ||
           !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.customerEmail) ||
           typeof event.eventId !== "string" || event.eventId.length > 200 ||
@@ -270,12 +270,13 @@ export default {
         // The unique payment reference prevents repeated callback delivery from
         // creating multiple orders. An event ID cannot be rebound to another ref.
         const previous = await env.HD_ORDERS.prepare(
-          "SELECT event_id, payment_ref, offer_key, customer_email, status FROM blueprint_payment_receipts WHERE event_id = ? OR payment_ref = ? LIMIT 1"
+          "SELECT event_id, payment_ref, offer_key, customer_email, amount_minor, currency, status FROM blueprint_payment_receipts WHERE event_id = ? OR payment_ref = ? LIMIT 1"
         ).bind(event.eventId, event.refId).first<{
-          event_id: string; payment_ref: string; offer_key: string; customer_email: string; status: string;
+          event_id: string; payment_ref: string; offer_key: string; customer_email: string; amount_minor: number; currency: string; status: string;
         }>();
         if (previous && (previous.event_id !== event.eventId || previous.payment_ref !== event.refId ||
-          previous.offer_key !== event.offerKey || previous.customer_email !== event.customerEmail)) {
+          previous.offer_key !== event.offerKey || previous.customer_email !== event.customerEmail ||
+          previous.amount_minor !== event.amount || previous.currency !== event.currency)) {
           return Response.json({ ok: false, error: "PAYMENT_RECEIPT_CONFLICT" }, { status: 409 });
         }
         if (!previous) {
