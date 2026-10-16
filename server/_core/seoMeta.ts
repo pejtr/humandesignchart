@@ -9,7 +9,7 @@ import { BLOG_ARTICLES_EN } from "../data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../data/angelNumbers";
 
 const CS = "https://humandesignmapa.cz";
-const EN = "https://www.humandesignchart.app";
+const EN = "https://humandesignchart.app";
 
 interface RouteMeta {
   title: string;
@@ -283,9 +283,10 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
     },
   };
 
-  // Check exact static match
-  if (staticRoutes[slug]) {
-    return staticRoutes[slug];
+  // Public SEO aliases keep their canonical route but share one metadata source.
+  const staticRouteKey = slug === "honorace" ? "pricing" : slug === "andelska-cisla" ? "andelska" : slug;
+  if (staticRoutes[staticRouteKey]) {
+    return staticRoutes[staticRouteKey];
   }
 
   // ── Dynamic: /partner/:referralCode ───────────────────────────────
