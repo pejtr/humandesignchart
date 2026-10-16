@@ -6,7 +6,7 @@ describe("localized SEO alternate links", () => {
     for (const [locale, path] of [["en", "/en/"], ["cs", "/cs/"]] as const) {
       const html = buildSeoHead(locale, path);
       expect(html).toContain('hreflang="cs" href="https://humandesignmapa.cz/cs/"');
-      expect(html).toContain('hreflang="en" href="https://www.humandesignchart.app/en/"');
+      expect(html).toContain('hreflang="en" href="https://humandesignchart.app/en/"');
       expect(html).not.toContain("/en/en/");
       expect(html).not.toContain("/cs/cs/");
     }
@@ -15,6 +15,29 @@ describe("localized SEO alternate links", () => {
   it("preserves the route slug when switching locale", () => {
     const html = buildSeoHead("en", "/en/blog");
     expect(html).toContain('hreflang="cs" href="https://humandesignmapa.cz/cs/blog"');
-    expect(html).toContain('hreflang="en" href="https://www.humandesignchart.app/en/blog"');
+    expect(html).toContain('hreflang="en" href="https://humandesignchart.app/en/blog"');
   });
+
+  it("renders complete indexable meta for the Honorace route", () => {
+    const html = buildSeoHead("cs", "/cs/honorace");
+    expect(html).toContain("<title>Honorace");
+    expect(html).toContain('name="description"');
+    expect(html).toContain('rel="canonical" href="https://humandesignmapa.cz/cs/honorace"');
+    expect(html).toContain('property="og:title"');
+  });
+
+  it("renders complete indexable meta for the Angel Numbers overview", () => {
+    const html = buildSeoHead("cs", "/cs/andelska-cisla");
+    expect(html).toContain("<title>Andělská Čísla");
+    expect(html).toContain('name="description"');
+    expect(html).toContain('rel="canonical" href="https://humandesignmapa.cz/cs/andelska-cisla"');
+    expect(html).toContain('property="og:title"');
+  });
+
+  it("uses the canonical EN host without www redirects", () => {
+    const html = buildSeoHead("cs", "/cs/calculate");
+    expect(html).toContain('hreflang="en" href="https://humandesignchart.app/en/calculate"');
+    expect(html).not.toContain("www.humandesignchart.app");
+  });
+
 });
