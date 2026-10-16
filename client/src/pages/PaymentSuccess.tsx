@@ -22,8 +22,13 @@ import {
   CheckCircle2,
   Moon,
   Clock3,
+  Download,
+  Loader2,
+  FileText,
 } from "lucide-react";
 import { Link } from "wouter";
+import { readChartDraft } from "@/lib/chartDraft";
+import { generateChartPDF } from "@/lib/pdfExport";
 
 export default function PaymentSuccess() {
   const { locale, localePath } = useLanguage();
@@ -41,6 +46,44 @@ export default function PaymentSuccess() {
     | "blueprint_annual_upgrade"
     | null;
   const isBlueprint = plan === "blueprint";
+
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
+  const refId =
+    searchParams.get("refId") ||
+    searchParams.get("id") ||
+    searchParams.get("session_id") ||
+    (typeof window !== "undefined" ? JSON.parse(sessionStorage.getItem("hd_pending_checkout") || "{}")?.refId : "") ||
+    "";
+
+  const contentQuery = trpc.content.getHdContent.useQuery();
+  const [generatingPdf, setGeneratingPdf] = useState(false);
+
+  const verifyPaymentQuery = trpc.subscription.verifyPayment.useQuery(
+    { refId },
+    {
+      enabled: Boolean(refId),
+      refetchInterval: (query) => (query.state.data?.verified ? false : 2500),
+    }
+  );
+
+  const chartDraft = typeof window !== "undefined" ? readChartDraft() : null;
+  const parsedChart = chartDraft?.chart ? JSON.parse(chartDraft.chart) : null;
+  const parsedMeta = chartDraft?.meta ? JSON.parse(chartDraft.meta) : null;
+
+  const handleDownloadBlueprint = async () => {
+    if (!parsedChart) {
+      navigate(localePath("/calculate"));
+      return;
+    }
+    setGeneratingPdf(true);
+    try {
+      await generateChartPDF(parsedChart, parsedMeta?.name || "Chart", contentQuery.data, undefined, isEn ? "en" : "cs");
+    } catch (err) {
+      console.error("PDF generation error:", err);
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
 
   const createCheckout = trpc.subscription.createCheckout.useMutation({
     onSuccess: data => data.url && window.location.assign(data.url),
@@ -65,29 +108,37 @@ export default function PaymentSuccess() {
   // Refetch subscription status after successful payment
   const utils = trpc.useUtils();
   useEffect(() => {
-    // Invalidate subscription status so it refreshes
     utils.subscription.status.invalidate();
     document.title = isEn
       ? "✨ Payment Successful — Welcome to Premium!"
       : "✨ Platba úspěšná — Vítejte v Premium!";
 
-    // The customer can open this return URL without completing a payment.
-    // Only a signed Stripe/Comgate webhook + fulfilled ledger entry can emit
-    // Purchase/order_created to ad platforms. This non-conversion diagnostic
-    // is safe to send to GA4 only when analytics consent exists.
-    const searchParams = new URLSearchParams(window.location.search);
-    const providerReference = searchParams.get("session_id") || searchParams.get("id");
-    if (providerReference) {
-      const trackingKey = `hd-return-viewed:${providerReference}`;
+    if (verifyPaymentQuery.data?.verified && refId) {
+      localStorage.setItem("hd_blueprint_access_" + refId, "true");
+      localStorage.setItem("hd_active_blueprint_ref", refId);
+
+      const trackingKey = `hd-purchase-tracked:${refId}`;
       if (sessionStorage.getItem(trackingKey) !== "true") {
-        trackGA4Event("payment_return_viewed", {
-          payment_provider: searchParams.has("session_id") ? "stripe" : "comgate",
-          payment_verified: false,
+        const val = (verifyPaymentQuery.data.amountMinor || (isEn ? 1590 : 29000)) / 100;
+        const cur = verifyPaymentQuery.data.currency || (isEn ? "EUR" : "CZK");
+        meta.trackCustom("Purchase", {
+          content_name: "Personal Human Design Blueprint",
+          content_category: "report",
+          content_ids: ["blueprint"],
+          content_type: "product",
+          value: val,
+          currency: cur,
+        });
+        trackGA4Event("purchase", {
+          transaction_id: refId,
+          value: val,
+          currency: cur,
+          items: [{ item_name: "Personal Human Design Blueprint", price: val, quantity: 1 }],
         });
         sessionStorage.setItem(trackingKey, "true");
       }
     }
-  }, [isEn, plan]);
+  }, [isEn, plan, verifyPaymentQuery.data?.verified, refId]);
 
   const nextSteps = isEn
     ? [
@@ -168,9 +219,18 @@ export default function PaymentSuccess() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Badge className="mb-4 bg-green-500/20 text-green-400 border-green-500/30 px-4 py-1.5 text-sm">
-              <CheckCircle2 className="w-4 h-4 mr-1.5" />
-              {isEn ? "Payment confirmed" : "Platba potvrzena"}
+            <Badge className={`mb-4 px-4 py-1.5 text-sm ${verifyPaymentQuery.data?.verified ? "bg-green-500/20 text-green-400 border-green-500/30" : "bg-amber-500/20 text-amber-400 border-amber-500/30"}`}>
+              {verifyPaymentQuery.data?.verified ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 mr-1.5 inline" />
+                  {isEn ? `Payment verified · ${refId}` : `Platba ověřena · ${refId}`}
+                </>
+              ) : (
+                <>
+                  <Loader2 className="w-4 h-4 mr-1.5 inline animate-spin" />
+                  {isEn ? "Verifying payment status…" : "Ověřujeme stav platby…"}
+                </>
+              )}
             </Badge>
 
             <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-violet-300 to-indigo-400 bg-clip-text text-transparent">
@@ -183,15 +243,60 @@ export default function PaymentSuccess() {
                   : "Vítejte v Premium! 🎉"}
             </h1>
 
-            <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
+            <p className="text-lg text-muted-foreground mb-6 max-w-xl mx-auto">
               {isBlueprint
                 ? isEn
-                  ? "Marie will guide you through your personal report. Open a saved chart to download your PDF and continue with five in-depth AI readings."
-                  : "Marie vás provede osobním reportem. Otevřete uloženou mapu, stáhněte si PDF a pokračujte pěti hloubkovými AI výklady."
+                  ? "Your personalized Blueprint with complete 7-day integration workbook has been prepared. Download your PDF below."
+                  : "Váš osobní Blueprint s kompletním 7denním integračním plánem je připraven. Stáhněte si své PDF níže."
                 : isEn
                   ? "Your Premium access is now active. You can use all AI readings, PDF reports, and premium tools."
                   : "Váš Premium přístup je nyní aktivní. Můžete využívat všechny AI výklady, PDF reporty a prémiové nástroje."}
             </p>
+
+            {isBlueprint && (
+              <Card className="my-6 border-2 border-emerald-500/40 bg-emerald-950/20 p-6 text-center shadow-xl">
+                <CardContent className="space-y-4 p-0">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+                    <FileText className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-serif font-bold text-foreground">
+                      {isEn ? "Download Your Blueprint PDF" : "Stáhnout Váš osobní Blueprint"}
+                    </h2>
+                    <p className="mt-1 text-xs text-muted-foreground max-w-md mx-auto">
+                      {isEn
+                        ? "Personalized analysis of centers, gates, channels + the full 7-day integration workbook."
+                        : "Osobní rozbor center, bran, drah + kompletní 7denní plán integrace do praxe."}
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                    <Button
+                      size="lg"
+                      onClick={handleDownloadBlueprint}
+                      disabled={generatingPdf}
+                      className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 px-8 rounded-xl shadow-md cursor-pointer"
+                    >
+                      {generatingPdf ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          {isEn ? "Generating PDF…" : "Generuji PDF…"}
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2 h-5 w-5" />
+                          {isEn ? "Download Personal Blueprint (PDF)" : "Stáhnout osobní Blueprint (PDF)"}
+                        </>
+                      )}
+                    </Button>
+                    <Link href={localePath("/calculate")}>
+                      <Button variant="outline" size="lg" className="w-full sm:w-auto py-6 rounded-xl">
+                        {isEn ? "Open Interactive Chart" : "Otevřít interaktivní mapu"}
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </motion.div>
 
           {/* What's unlocked */}
