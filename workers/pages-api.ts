@@ -22,6 +22,7 @@ import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
 import { withServerRenderedSeoMeta } from "./social-meta";
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
 import { getReadingPrompt, getSystemPrompt } from "../server/ai/prompts";
+type D1Database = any;
 
 type Env = {
   HUMAN_DESIGN_FULFILLMENT_API_KEY?: string;
@@ -248,7 +249,7 @@ async function sendTransactionalEmail(params: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: params.env.RESEND_FROM_EMAIL || "Human Design <noreply@dobra-cajovna.cz>",
+          from: params.env.RESEND_FROM_EMAIL || "Human Design <noreply@optihub.cz>",
           to: [params.toEmail],
           subject: title,
           html: htmlContent,
@@ -433,7 +434,7 @@ async function generateHumanDesignAiReading(params: {
   return { content: grounded, model: "canonical-hd-grounded-v1" };
 }
 
-const appRouter = router({
+export const appRouter = router({
   auth: router({
     me: publicProcedure.query(() => null),
   }),
@@ -878,9 +879,13 @@ const appRouter = router({
             .first();
 
           if (cached) {
+            const committed: any = await d1
+              .prepare(`SELECT ai_reading_credits FROM hd_orders WHERE id = ?`)
+              .bind(order.id)
+              .first();
             return {
               success: true,
-              remainingCredits: Number(order.ai_reading_credits ?? 0),
+              remainingCredits: Number(committed?.ai_reading_credits ?? order.ai_reading_credits ?? 0),
               reading: cached.reading_content,
               model: cached.model,
               cached: true,
@@ -923,46 +928,88 @@ const appRouter = router({
           });
         }
 
-        const updateRes = await d1
+        const readingId = `air_${crypto.randomUUID()}`;
+        const updateStmt = d1
           .prepare(
             `UPDATE hd_orders
              SET ai_reading_credits = ai_reading_credits - 1,
                  updated_at = CURRENT_TIMESTAMP
              WHERE id = ? AND ai_reading_credits > 0`
           )
-          .bind(order.id)
-          .run();
+          .bind(order.id);
 
-        if (!updateRes.success || (updateRes.meta && updateRes.meta.changes === 0)) {
+        const insertStmt = d1
+          .prepare(
+            `INSERT INTO hd_ai_readings (
+              id, order_id, token, idempotency_key, reading_type, prompt, reading_content, model, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
+          )
+          .bind(
+            readingId,
+            order.id,
+            input.token,
+            idemKey,
+            input.readingType || (input.prompt ? "custom" : "overview"),
+            input.prompt || null,
+            aiResult.content,
+            aiResult.model
+          );
+
+        let batchResults: any;
+        try {
+          batchResults = await d1.batch([updateStmt, insertStmt]);
+        } catch (dbErr: any) {
+          // If a concurrent request with the same idempotency key committed first,
+          // idx_hd_ai_readings_idem unique constraint rolls back the transaction.
+          if (idemKey) {
+            const cached: any = await d1
+              .prepare(
+                `SELECT reading_content, model
+                 FROM hd_ai_readings
+                 WHERE order_id = ? AND idempotency_key = ? LIMIT 1`
+              )
+              .bind(order.id, idemKey)
+              .first();
+            if (cached) {
+              const committed: any = await d1
+                .prepare(`SELECT ai_reading_credits FROM hd_orders WHERE id = ?`)
+                .bind(order.id)
+                .first();
+              return {
+                success: true,
+                remainingCredits: Number(committed?.ai_reading_credits ?? 0),
+                reading: cached.reading_content,
+                model: cached.model,
+                cached: true,
+              };
+            }
+          }
+          console.error("[redeemAiReading] Atomic credit transaction failed:", dbErr);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "READING_PERSISTENCE_FAILED",
+          });
+        }
+
+        const updateRes = batchResults?.[0];
+        if (!updateRes?.success || (updateRes.meta && updateRes.meta.changes === 0)) {
+          // In the edge case where credits reached 0 in a concurrent race,
+          // purge the uncharged reading and reject.
+          await d1.prepare(`DELETE FROM hd_ai_readings WHERE id = ?`).bind(readingId).run().catch(() => {});
           throw new TRPCError({ code: "FORBIDDEN", message: "NO_AI_CREDITS_REMAINING" });
         }
 
-        const readingId = `air_${crypto.randomUUID()}`;
-        try {
-          await d1
-            .prepare(
-              `INSERT INTO hd_ai_readings (
-                id, order_id, token, idempotency_key, reading_type, prompt, reading_content, model, created_at
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
-            )
-            .bind(
-              readingId,
-              order.id,
-              input.token,
-              idemKey,
-              input.readingType || (input.prompt ? "custom" : "overview"),
-              input.prompt || null,
-              aiResult.content,
-              aiResult.model
-            )
-            .run();
-        } catch (insertErr) {
-          console.warn("[redeemAiReading] Failed to store reading log:", insertErr);
-        }
+        // Return actual remaining credit count from committed database state
+        const committedOrder: any = await d1
+          .prepare(`SELECT ai_reading_credits FROM hd_orders WHERE id = ?`)
+          .bind(order.id)
+          .first();
+
+        const remainingCredits = Number(committedOrder?.ai_reading_credits ?? 0);
 
         return {
           success: true,
-          remainingCredits: currentCredits - 1,
+          remainingCredits,
           reading: aiResult.content,
           model: aiResult.model,
         };

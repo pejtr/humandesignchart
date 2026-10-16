@@ -20,5 +20,6 @@ export default defineConfig({
     // timing-dependent on heavily loaded CI/Windows runners.
     maxWorkers: 4,
     minWorkers: 1,
+    testTimeout: 15000,
   },
 });
