@@ -154,12 +154,11 @@ export default function PaymentSuccess() {
       ) {
         const val = (verifyPaymentQuery.data.amountMinor || (isEn ? 1590 : 29000)) / 100;
         const cur = verifyPaymentQuery.data.currency || (isEn ? "EUR" : "CZK");
-        meta.trackCustom("Purchase", {
+        meta.purchase(val, {
           content_name: "Personal Human Design Blueprint",
           content_category: "report",
           content_ids: ["blueprint"],
           content_type: "product",
-          value: val,
           currency: cur,
         });
         trackGA4Event("purchase", {
