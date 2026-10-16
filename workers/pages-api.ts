@@ -290,6 +290,15 @@ export default {
       });
     }
 
+    // API requests must never silently return the SPA HTML shell. Unknown
+    // authentication/payment routes are unavailable, not successful pages.
+    if (url.pathname.startsWith("/api/")) {
+      return Response.json(
+        { error: "API_ROUTE_NOT_AVAILABLE" },
+        { status: 404, headers: { "cache-control": "no-store" } },
+      );
+    }
+
     const asset = await env.ASSETS.fetch(request);
     return withServerRenderedSeoMeta(url, asset);
   },
