@@ -191,11 +191,11 @@ const appRouter = router({
           plan: z.string().default("blueprint"),
           locale: z.enum(["cs", "en"]).default("cs"),
           origin: z.string().url(),
-          customerEmail: z.string().email(),
-          customerName: z.string().optional(),
+          customerEmail: z.string().email().max(100),
+          customerName: z.string().max(100).optional(),
           digitalDeliveryConsent: z.boolean(),
           chartSnapshotId: z.string().optional(),
-          chartDataJson: z.string().optional(),
+          chartDataJson: z.string().max(300_000).optional(),
           redditClickId: z.string().optional(),
           openAIAdsMarketingConsent: z.boolean().optional(),
           openAIAdsOppref: z.string().optional(),
@@ -211,6 +211,28 @@ const appRouter = router({
                 : "Consent to immediate digital delivery and waiver of withdrawal right is required.",
           });
         }
+
+        // Validate origin against allowed domain patterns
+        try {
+          const originUrl = new URL(input.origin).origin;
+          const allowedPatterns = [
+            /^https:\/\/humandesignmapa\.cz$/,
+            /^https:\/\/www\.humandesignmapa\.cz$/,
+            /^https:\/\/humandesignchart\.app$/,
+            /^https:\/\/www\.humandesignchart\.app$/,
+            /^https:\/\/[a-z0-9-]+\.humandesignchart-web\.pages\.dev$/,
+            /^https:\/\/humandesignchart-web\.pages\.dev$/,
+            /^http:\/\/localhost(:\d+)?$/,
+            /^http:\/\/127\.0.0\.1(:\d+)?$/,
+          ];
+          if (!allowedPatterns.some((p) => p.test(originUrl))) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "INVALID_ORIGIN_REDIRECT" });
+          }
+        } catch (urlErr) {
+          if (urlErr instanceof TRPCError) throw urlErr;
+          throw new TRPCError({ code: "BAD_REQUEST", message: "MALFORMED_ORIGIN_URL" });
+        }
+
         const s2sKey = ctx.env?.PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN;
         if (!s2sKey) {
           throw new TRPCError({
@@ -286,8 +308,8 @@ const appRouter = router({
                   id, payment_ref, customer_email, customer_name, offer_key,
                   amount_minor, currency, locale, chart_snapshot_id,
                   payment_status, fulfillment_status, delivery_status,
-                  consent_record_json, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'CREATED', 'PENDING', 'PENDING', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                  ai_reading_credits, consent_record_json, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'CREATED', 'PENDING', 'PENDING', 5, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 ON CONFLICT(payment_ref) DO NOTHING`
               )
               .bind(
@@ -327,7 +349,7 @@ const appRouter = router({
     verifyPayment: publicProcedure
       .input(
         z.object({
-          refId: z.string().min(1),
+          refId: z.string().min(1).max(100),
         })
       )
       .query(async ({ input, ctx }: { input: { refId: string }; ctx: Context }) => {
@@ -348,24 +370,16 @@ const appRouter = router({
         }
 
         let localOrder: any = null;
-        let chartData: any = null;
         if (d1) {
           try {
             localOrder = await d1
               .prepare(
-                `SELECT o.*, s.chart_data_json
-                 FROM hd_orders o
-                 LEFT JOIN hd_chart_snapshots s ON o.chart_snapshot_id = s.id
-                 WHERE o.payment_ref = ? LIMIT 1`
+                `SELECT payment_status, fulfillment_status, delivery_status, amount_minor, currency, offer_key, download_token
+                 FROM hd_orders
+                 WHERE payment_ref = ? LIMIT 1`
               )
               .bind(input.refId)
               .first();
-
-            if (localOrder?.chart_data_json) {
-              try {
-                chartData = JSON.parse(localOrder.chart_data_json);
-              } catch {}
-            }
           } catch (err) {
             console.warn("[verifyPayment] local order lookup error:", err);
           }
@@ -392,58 +406,63 @@ const appRouter = router({
           }
         }
 
+        // Return authoritative status without leaking PII, chart data, or download tokens
         return {
           verified: isPaid,
           status: payData?.status || localOrder?.payment_status || "NOT_FOUND",
           refId: input.refId,
           amountMinor: payData?.amountMinor || localOrder?.amount_minor || 0,
           currency: payData?.currency || localOrder?.currency || "CZK",
-          paidAt: payData?.paidAt || localOrder?.delivered_at || null,
+          paidAt: payData?.paidAt || null,
           offerKey: payData?.offerKey || localOrder?.offer_key || null,
-          downloadToken: localOrder?.download_token || null,
-          customerName: localOrder?.customer_name || null,
-          chartData: chartData || null,
+          hasToken: Boolean(localOrder?.download_token),
         };
       }),
 
     getOrder: publicProcedure
       .input(
         z.object({
-          refId: z.string().optional(),
-          downloadToken: z.string().optional(),
+          token: z.string().min(16).max(128),
+          refId: z.string().max(100).optional(),
         })
       )
-      .query(async ({ input, ctx }: { input: { refId?: string; downloadToken?: string }; ctx: Context }) => {
-        if (!input.refId && !input.downloadToken) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: "refId or downloadToken is required" });
-        }
+      .query(async ({ input, ctx }: { input: { token: string; refId?: string }; ctx: Context }) => {
         const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
-        if (!d1) return null;
+        if (!d1) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DATABASE_UNAVAILABLE" });
 
-        let order: any = null;
-        if (input.refId) {
-          order = await d1
-            .prepare(
-              `SELECT o.*, s.chart_data_json
-               FROM hd_orders o
-               LEFT JOIN hd_chart_snapshots s ON o.chart_snapshot_id = s.id
-               WHERE o.payment_ref = ? LIMIT 1`
-            )
-            .bind(input.refId)
-            .first();
-        } else if (input.downloadToken) {
-          order = await d1
-            .prepare(
-              `SELECT o.*, s.chart_data_json
-               FROM hd_orders o
-               LEFT JOIN hd_chart_snapshots s ON o.chart_snapshot_id = s.id
-               WHERE o.download_token = ? LIMIT 1`
-            )
-            .bind(input.downloadToken)
-            .first();
+        const order: any = await d1
+          .prepare(
+            `SELECT o.id, o.payment_ref, o.offer_key, o.payment_status, o.fulfillment_status,
+                    o.delivery_status, o.delivered_at, o.download_token_expires_at,
+                    o.customer_name, o.ai_reading_credits, s.chart_data_json
+             FROM hd_orders o
+             LEFT JOIN hd_chart_snapshots s ON o.chart_snapshot_id = s.id
+             WHERE o.download_token = ? LIMIT 1`
+          )
+          .bind(input.token)
+          .first();
+
+        if (!order) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "INVALID_ACCESS_TOKEN" });
         }
 
-        if (!order) return null;
+        // If a refId was supplied, ensure correlation
+        if (input.refId && order.payment_ref !== input.refId) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "TOKEN_MISMATCH" });
+        }
+
+        // Enforce token expiration
+        if (order.download_token_expires_at) {
+          const expiresAt = new Date(order.download_token_expires_at).getTime();
+          if (Date.now() > expiresAt) {
+            throw new TRPCError({ code: "FORBIDDEN", message: "ACCESS_TOKEN_EXPIRED" });
+          }
+        }
+
+        // Enforce payment status
+        if (order.payment_status !== "PAID") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "ORDER_NOT_PAID" });
+        }
 
         let chartData: any = null;
         if (order.chart_data_json) {
@@ -454,16 +473,60 @@ const appRouter = router({
 
         return {
           refId: order.payment_ref,
-          customerEmail: order.customer_email,
-          customerName: order.customer_name,
           offerKey: order.offer_key,
           paymentStatus: order.payment_status,
           fulfillmentStatus: order.fulfillment_status,
           deliveryStatus: order.delivery_status,
           deliveredAt: order.delivered_at,
-          downloadToken: order.download_token,
+          aiReadingCredits: order.ai_reading_credits || 5,
+          customerName: order.customer_name || null,
           chartData,
         };
+      }),
+
+    recordDownload: publicProcedure
+      .input(
+        z.object({
+          token: z.string().min(16).max(128),
+        })
+      )
+      .mutation(async ({ input, ctx }: { input: { token: string }; ctx: Context }) => {
+        const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+        if (!d1) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DATABASE_UNAVAILABLE" });
+
+        const order: any = await d1
+          .prepare(
+            `SELECT id, payment_status, download_token_expires_at FROM hd_orders WHERE download_token = ? LIMIT 1`
+          )
+          .bind(input.token)
+          .first();
+
+        if (!order) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "INVALID_ACCESS_TOKEN" });
+        }
+
+        if (order.download_token_expires_at && Date.now() > new Date(order.download_token_expires_at).getTime()) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "ACCESS_TOKEN_EXPIRED" });
+        }
+
+        if (order.payment_status !== "PAID") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "ORDER_NOT_PAID" });
+        }
+
+        await d1
+          .prepare(
+            `UPDATE hd_orders
+             SET delivery_status = 'DOWNLOADED',
+                 download_count = COALESCE(download_count, 0) + 1,
+                 last_downloaded_at = CURRENT_TIMESTAMP,
+                 delivered_at = COALESCE(delivered_at, CURRENT_TIMESTAMP),
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = ?`
+          )
+          .bind(order.id)
+          .run();
+
+        return { success: true };
       }),
   }),
 });
@@ -590,6 +653,46 @@ export default {
         return Response.json({ ok: false, error: "INVALID_PAYMENT_EVENT" }, { status: 400 });
       }
 
+      // Authoritative independent verification against ONYX PAY
+      const payBase = (env.PAY_BASE_URL || "https://pay.optimateo.com").replace(/\/$/, "");
+      const s2sKey = env.PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN;
+      let payData: any = null;
+      try {
+        const payRes = await fetch(`${payBase}/api/payments/${encodeURIComponent(event.refId)}/status`, {
+          headers: {
+            "cache-control": "no-store",
+            ...(s2sKey ? { Authorization: `Bearer ${s2sKey}` } : {}),
+          },
+        });
+        if (!payRes.ok) {
+          console.error(`[onyxpay-fulfill] Gateway lookup failed with HTTP ${payRes.status} for ${event.refId}`);
+          return Response.json({ ok: false, error: "PAYMENT_NOT_FOUND_ON_GATEWAY" }, { status: 422 });
+        }
+        payData = await payRes.json();
+      } catch (fetchErr: any) {
+        console.error("[onyxpay-fulfill] Gateway communication error:", fetchErr);
+        return Response.json({ ok: false, error: "GATEWAY_VERIFICATION_FAILED" }, { status: 502 });
+      }
+
+      const isActuallyPaid = payData?.status === "PAID" || payData?.status === "FULFILLED";
+      if (!isActuallyPaid) {
+        console.error(`[onyxpay-fulfill] Gateway reports uncaptured status ${payData?.status} for ${event.refId}`);
+        return Response.json(
+          { ok: false, error: "PAYMENT_NOT_CAPTURED_ON_GATEWAY", gatewayStatus: payData?.status },
+          { status: 422 }
+        );
+      }
+
+      if (payData.amountMinor !== undefined && Number(payData.amountMinor) !== Number(event.amount)) {
+        console.error(`[onyxpay-fulfill] Amount mismatch: event=${event.amount}, gateway=${payData.amountMinor}`);
+        return Response.json({ ok: false, error: "PAYMENT_AMOUNT_MISMATCH" }, { status: 422 });
+      }
+
+      if (payData.currency && payData.currency.toUpperCase() !== event.currency.toUpperCase()) {
+        console.error(`[onyxpay-fulfill] Currency mismatch: event=${event.currency}, gateway=${payData.currency}`);
+        return Response.json({ ok: false, error: "PAYMENT_CURRENCY_MISMATCH" }, { status: 422 });
+      }
+
       const d1 = env.HD_ORDERS || env.DB;
       if (!d1) {
         console.error("[onyxpay-fulfill] D1 database not bound");
@@ -603,7 +706,7 @@ export default {
       try {
         const existing: any = await d1
           .prepare(
-            `SELECT id, payment_status, fulfillment_status, download_token FROM hd_orders WHERE payment_ref = ? LIMIT 1`
+            `SELECT id, payment_status, fulfillment_status, delivery_status, download_token FROM hd_orders WHERE payment_ref = ? LIMIT 1`
           )
           .bind(event.refId)
           .first();
@@ -633,19 +736,19 @@ export default {
               id, payment_ref, event_id, customer_email, customer_name, offer_key,
               amount_minor, currency, locale,
               payment_status, fulfillment_status, delivery_status, delivered_at,
-              download_token, download_token_expires_at, created_at, updated_at
+              ai_reading_credits, download_token, download_token_expires_at, created_at, updated_at
             ) VALUES (
               ?, ?, ?, ?, ?, ?,
               ?, ?, ?,
-              'PAID', 'FULFILLED', 'DELIVERED', CURRENT_TIMESTAMP,
-              ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+              'PAID', 'FULFILLED', 'READY', NULL,
+              5, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
             )
             ON CONFLICT(payment_ref) DO UPDATE SET
               event_id = excluded.event_id,
               payment_status = 'PAID',
               fulfillment_status = 'FULFILLED',
-              delivery_status = 'DELIVERED',
-              delivered_at = CURRENT_TIMESTAMP,
+              delivery_status = CASE WHEN hd_orders.delivery_status = 'DOWNLOADED' THEN 'DOWNLOADED' ELSE 'READY' END,
+              ai_reading_credits = 5,
               download_token = COALESCE(hd_orders.download_token, excluded.download_token),
               download_token_expires_at = COALESCE(hd_orders.download_token_expires_at, excluded.download_token_expires_at),
               updated_at = CURRENT_TIMESTAMP`

@@ -9,6 +9,7 @@ import { getRedditClickIdForCapi } from "@/hooks/useRedditPixel";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
@@ -55,6 +56,20 @@ export default function PaymentSuccess() {
     (typeof window !== "undefined" ? JSON.parse(sessionStorage.getItem("hd_pending_checkout") || "{}")?.refId : "") ||
     "";
 
+  const urlToken = searchParams.get("token") || "";
+  const [tokenInput, setTokenInput] = useState("");
+  const [enteredToken, setEnteredToken] = useState("");
+  const activeToken =
+    urlToken ||
+    enteredToken ||
+    (typeof window !== "undefined" && refId ? sessionStorage.getItem("hd_download_token_" + refId) || "" : "");
+
+  useEffect(() => {
+    if (urlToken && refId && typeof window !== "undefined") {
+      sessionStorage.setItem("hd_download_token_" + refId, urlToken);
+    }
+  }, [urlToken, refId]);
+
   const contentQuery = trpc.content.getHdContent.useQuery();
   const [generatingPdf, setGeneratingPdf] = useState(false);
 
@@ -66,12 +81,19 @@ export default function PaymentSuccess() {
     }
   );
 
+  const orderQuery = trpc.subscription.getOrder.useQuery(
+    { token: activeToken, refId: refId || undefined },
+    { enabled: Boolean(activeToken && activeToken.length >= 16) }
+  );
+
+  const recordDownloadMutation = trpc.subscription.recordDownload.useMutation();
+
   const chartDraft = typeof window !== "undefined" ? readChartDraft() : null;
   const parsedChart = chartDraft?.chart ? JSON.parse(chartDraft.chart) : null;
   const parsedMeta = chartDraft?.meta ? JSON.parse(chartDraft.meta) : null;
+  const activeChart = parsedChart || orderQuery.data?.chartData;
 
   const handleDownloadBlueprint = async () => {
-    const activeChart = parsedChart || verifyPaymentQuery.data?.chartData;
     if (!activeChart) {
       navigate(localePath("/calculate"));
       return;
@@ -80,9 +102,12 @@ export default function PaymentSuccess() {
     try {
       const customerName =
         parsedMeta?.name ||
-        verifyPaymentQuery.data?.customerName ||
+        orderQuery.data?.customerName ||
         (isEn ? "Personal Blueprint" : "Osobní Blueprint");
       await generateChartPDF(activeChart, customerName, contentQuery.data, undefined, isEn ? "en" : "cs");
+      if (activeToken && activeToken.length >= 16) {
+        recordDownloadMutation.mutate({ token: activeToken });
+      }
     } catch (err) {
       console.error("PDF generation error:", err);
     } finally {
@@ -278,31 +303,71 @@ export default function PaymentSuccess() {
                         : "Osobní rozbor center, bran, drah + kompletní 7denní plán integrace do praxe."}
                     </p>
                   </div>
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                    <Button
-                      size="lg"
-                      onClick={handleDownloadBlueprint}
-                      disabled={generatingPdf}
-                      className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 px-8 rounded-xl shadow-md cursor-pointer"
-                    >
-                      {generatingPdf ? (
-                        <>
-                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          {isEn ? "Generating PDF…" : "Generuji PDF…"}
-                        </>
-                      ) : (
-                        <>
-                          <Download className="mr-2 h-5 w-5" />
-                          {isEn ? "Download Personal Blueprint (PDF)" : "Stáhnout osobní Blueprint (PDF)"}
-                        </>
-                      )}
-                    </Button>
-                    <Link href={localePath("/calculate")}>
-                      <Button variant="outline" size="lg" className="w-full sm:w-auto py-6 rounded-xl">
-                        {isEn ? "Open Interactive Chart" : "Otevřít interaktivní mapu"}
+                  {activeChart ? (
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                      <Button
+                        size="lg"
+                        onClick={handleDownloadBlueprint}
+                        disabled={generatingPdf}
+                        className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 px-8 rounded-xl shadow-md cursor-pointer"
+                      >
+                        {generatingPdf ? (
+                          <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            {isEn ? "Generating PDF…" : "Generuji PDF…"}
+                          </>
+                        ) : (
+                          <>
+                            <Download className="mr-2 h-5 w-5" />
+                            {isEn ? "Download Personal Blueprint (PDF)" : "Stáhnout osobní Blueprint (PDF)"}
+                          </>
+                        )}
                       </Button>
-                    </Link>
-                  </div>
+                      <Link href={localePath("/calculate")}>
+                        <Button variant="outline" size="lg" className="w-full sm:w-auto py-6 rounded-xl">
+                          {isEn ? "Open Interactive Chart" : "Otevřít interaktivní mapu"}
+                        </Button>
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="pt-2 max-w-sm mx-auto space-y-3">
+                      <p className="text-xs text-muted-foreground">
+                        {isEn
+                          ? "Downloading on another device? Enter the secure access token from your confirmation email:"
+                          : "Stahujete na jiném zařízení? Zadejte bezpečnostní přístupový kód z potvrzení objednávky:"}
+                      </p>
+                      <div className="flex gap-2">
+                        <Input
+                          type="text"
+                          placeholder="tok_..."
+                          value={tokenInput}
+                          onChange={(e) => setTokenInput(e.target.value)}
+                          className="text-xs"
+                        />
+                        <Button
+                          size="sm"
+                          onClick={() => setEnteredToken(tokenInput.trim())}
+                          disabled={tokenInput.trim().length < 16 || orderQuery.isFetching}
+                        >
+                          {orderQuery.isFetching ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : isEn ? (
+                            "Unlock"
+                          ) : (
+                            "Odemknout"
+                          )}
+                        </Button>
+                      </div>
+                      {orderQuery.isError && (
+                        <p className="text-xs text-red-500">{orderQuery.error.message}</p>
+                      )}
+                      <Link href={localePath("/calculate")}>
+                        <Button variant="outline" size="sm" className="w-full mt-2">
+                          {isEn ? "Calculate New Chart" : "Vypočítat novou mapu"}
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
