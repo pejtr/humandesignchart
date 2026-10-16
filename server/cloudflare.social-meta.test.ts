@@ -32,7 +32,7 @@ describe("Cloudflare WhatsApp preview metadata", () => {
       assetResponse(),
     );
     expect(await response.text()).toContain(
-      'property="og:image" content="https://www.humandesignchart.app/images/og-homepage.png"',
+      'property="og:image" content="https://humandesignchart.app/images/og-homepage.png"',
     );
   });
 
