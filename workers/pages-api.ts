@@ -21,11 +21,19 @@ import { BLOG_ARTICLES_EN } from "../server/data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
 import { withServerRenderedSeoMeta } from "./social-meta";
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
+import { getReadingPrompt, getSystemPrompt } from "../server/ai/prompts";
 
 type Env = {
   HUMAN_DESIGN_FULFILLMENT_API_KEY?: string;
   PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN?: string;
   PAY_BASE_URL?: string;
+  BREVO_API_KEY?: string;
+  BREVO_SENDER_EMAIL?: string;
+  RESEND_API_KEY?: string;
+  RESEND_FROM_EMAIL?: string;
+  OPENROUTER_API_KEY?: string;
+  GEMINI_API_KEY?: string;
+  LLM_MODEL?: string;
   HD_ORDERS?: D1Database;
   DB?: D1Database;
   ASSETS: {
@@ -127,6 +135,303 @@ const contentRouter = router({
         .find((article) => article.slug === input.slug) ?? null
     ),
 });
+
+async function sendTransactionalEmail(params: {
+  toEmail: string;
+  customerName?: string;
+  locale: string;
+  refId: string;
+  token: string;
+  accessUrl: string;
+  isRecovery?: boolean;
+  env: Env;
+}): Promise<{ ok: boolean; provider: string; messageId?: string; error?: string }> {
+  const isEn = params.locale === "en";
+  const title = params.isRecovery
+    ? (isEn ? "Your Blueprint Access Link & Secure Token" : "Váš přístupový odkaz a bezpečnostní kód k Blueprintu")
+    : (isEn ? "Your Personal Human Design Blueprint is Ready" : "Váš osobní Human Design Blueprint je připraven");
+
+  const greeting = params.customerName
+    ? (isEn ? `Dear ${params.customerName},` : `Dobrý den ${params.customerName},`)
+    : (isEn ? "Dear Customer," : "Dobrý den,");
+
+  const message = params.isRecovery
+    ? (isEn
+        ? "Here is your requested access token and recovery link for your purchased Blueprint."
+        : "Zde je váš vyžádaný bezpečnostní přístupový kód a odkaz k vašemu zakoupenému Blueprintu.")
+    : (isEn
+        ? "Thank you for your purchase. Your personalized Human Design Blueprint with 7-day integration workbook and 5 AI reading credits is now unlocked and ready for you."
+        : "Děkujeme za vaši objednávku. Váš osobní Human Design Blueprint se 7denním integračním plánem a 5 AI výklady je odemčen a připraven ke stažení.");
+
+  const ctaText = isEn ? "Open & Download Blueprint (PDF)" : "Otevřít a stáhnout Blueprint (PDF)";
+  const codeHeading = isEn ? "Your Secure Access Token:" : "Váš bezpečnostní přístupový kód:";
+  const note = isEn
+    ? "Tip: You can reopen and download your Blueprint on any device by clicking the button above or entering your access token."
+    : "Tip: Blueprint můžete kdykoliv znovu otevřít a stáhnout na jakémkoliv zařízení kliknutím na tlačítko výše nebo zadáním tohoto přístupového kódu.";
+
+  const htmlContent = `<!doctype html>
+<html lang="${params.locale}">
+  <body style="margin:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;color:#0f172a;padding:24px 12px;">
+    <div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+      <div style="background:linear-gradient(135deg,#059669,#047857);padding:32px 24px;text-align:center;color:#ffffff;">
+        <h1 style="margin:0;font-size:24px;font-weight:700;">${title}</h1>
+        <p style="margin:8px 0 0;font-size:14px;opacity:0.9;">${isEn ? "Human Design Blueprint" : "Osobní Human Design Blueprint"}</p>
+      </div>
+      <div style="padding:32px 24px;line-height:1.6;">
+        <p style="margin:0 0 16px;font-size:16px;font-weight:600;">${greeting}</p>
+        <p style="margin:0 0 24px;color:#334155;font-size:15px;">${message}</p>
+        <div style="text-align:center;margin:32px 0;">
+          <a href="${params.accessUrl}" style="background:#059669;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:700;font-size:16px;display:inline-block;box-shadow:0 4px 6px rgba(5,150,105,0.2);">${ctaText}</a>
+        </div>
+        <div style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:8px;padding:16px;margin:24px 0;text-align:center;">
+          <div style="font-size:12px;text-transform:uppercase;color:#64748b;font-weight:700;letter-spacing:1px;margin-bottom:8px;">${codeHeading}</div>
+          <code style="font-size:16px;font-weight:700;color:#0f172a;letter-spacing:1px;background:#ffffff;padding:6px 12px;border-radius:6px;border:1px solid #e2e8f0;display:inline-block;">${params.token}</code>
+        </div>
+        <p style="margin:24px 0 0;color:#64748b;font-size:13px;line-height:1.5;">${note}</p>
+        <hr style="border:none;border-top:1px solid #e2e8f0;margin:28px 0;" />
+        <p style="margin:0;color:#94a3b8;font-size:12px;text-align:center;">
+          ${isEn ? "Human Design" : "Human Design Mapa"} · <a href="${isEn ? "https://humandesignchart.app" : "https://humandesignmapa.cz"}" style="color:#059669;text-decoration:none;">${isEn ? "humandesignchart.app" : "humandesignmapa.cz"}</a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>`;
+
+  let lastError = "";
+
+  // Provider 1: Brevo API (verified sender on active account)
+  const brevoKey = params.env.BREVO_API_KEY;
+  const brevoSenderEmail = params.env.BREVO_SENDER_EMAIL || "noreply@optihub.cz";
+  const brevoSenderName = isEn ? "Human Design Blueprint" : "Human Design Mapa";
+
+  if (brevoKey) {
+    try {
+      const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "api-key": brevoKey,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          sender: {
+            name: brevoSenderName,
+            email: brevoSenderEmail,
+          },
+          to: [{ email: params.toEmail, name: params.customerName || params.toEmail }],
+          subject: title,
+          htmlContent,
+          tags: ["hd-blueprint-delivery", isEn ? "locale-en" : "locale-cs"],
+        }),
+      });
+
+      const data: any = await res.json().catch(() => null);
+      if (res.ok && data?.messageId) {
+        return { ok: true, provider: "brevo", messageId: data.messageId };
+      } else {
+        lastError = `Brevo HTTP ${res.status}: ${data?.message || JSON.stringify(data)}`;
+        console.error("[sendTransactionalEmail] Brevo error:", lastError);
+      }
+    } catch (e: any) {
+      lastError = `Brevo exception: ${e.message}`;
+      console.error("[sendTransactionalEmail] Brevo exception:", lastError);
+    }
+  }
+
+  // Provider 2: Resend API (if configured)
+  if (params.env.RESEND_API_KEY) {
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${params.env.RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: params.env.RESEND_FROM_EMAIL || "Human Design <noreply@dobra-cajovna.cz>",
+          to: [params.toEmail],
+          subject: title,
+          html: htmlContent,
+        }),
+      });
+      const data: any = await res.json().catch(() => null);
+      if (res.ok && data?.id) {
+        return { ok: true, provider: "resend", messageId: data.id };
+      } else {
+        lastError = `Resend HTTP ${res.status}: ${data?.message || JSON.stringify(data)}`;
+      }
+    } catch (e: any) {
+      lastError = `Resend exception: ${e.message}`;
+    }
+  }
+
+  // Provider 3: MailChannels direct worker egress
+  try {
+    const res = await fetch("https://api.mailchannels.net/tx/v1/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: params.toEmail, name: params.customerName || params.toEmail }] }],
+        from: {
+          email: "noreply@optihub.cz",
+          name: isEn ? "Human Design Blueprint" : "Human Design Mapa",
+        },
+        subject: title,
+        content: [{ type: "text/html", value: htmlContent }],
+      }),
+    });
+    if (res.ok) {
+      return { ok: true, provider: "mailchannels", messageId: `mc_${Date.now()}` };
+    } else {
+      const mcText = await res.text().catch(() => "");
+      lastError = `Mailchannels HTTP ${res.status}: ${mcText}`;
+    }
+  } catch (e: any) {
+    lastError = `Mailchannels exception: ${e.message}`;
+  }
+
+  // Fail closed! Never return ok: true when all providers fail!
+  return { ok: false, provider: "none", error: lastError || "ALL_EMAIL_PROVIDERS_FAILED" };
+}
+
+function formatGroundedFallbackReading(chart: any, readingType: string, prompt?: string, isEn?: boolean): string {
+  const type = chart.type || (isEn ? "Generator" : "Generátor");
+  const profile = chart.profile || "1/3";
+  const authority = chart.authority || (isEn ? "Sacral" : "Sakrální");
+  const strategy = chart.strategy || (isEn ? "To Respond" : "Reagovat");
+  const cross = chart.incarnationCross?.name || (isEn ? "Right Angle Cross of the Sphinx" : "Kříž Sfingy");
+
+  const definedCenters = (chart.centers || []).filter((c: any) => c.defined).map((c: any) => c.name).join(", ");
+  const openCenters = (chart.centers || []).filter((c: any) => !c.defined).map((c: any) => c.name).join(", ");
+
+  if (isEn) {
+    return `### Personalized Human Design Reading
+
+**Core Mechanics:**
+- **Energy Type:** ${type} — Your primary operational frequency and energetic signature.
+- **Decision Authority:** ${authority} — Your reliable compass for decision-making. Never rely on mental pressure for critical choices; align with your ${authority} clarity.
+- **Strategy:** ${strategy} — How your aura engages friction-free with life.
+- **Profile:** ${profile} — Your archetypal role and life navigation style.
+- **Incarnation Cross:** ${cross} — The overarching theme and purpose of your life journey.
+
+**Energetic Architecture:**
+- **Defined Centers (Consistent Energy):** ${definedCenters || "Integrated channels"}. These are your dependable strengths where you broadcast your authentic self to the world.
+- **Open Centers (Wisdom & Sensitivity):** ${openCenters || "Open perception"}. These are your areas of deep empathy and receptivity. Beware of conditioned pressure here.
+
+${prompt ? `**Response to Your Focus ("${prompt}"):**\nBased on your ${type} aura and ${authority} authority, the key is to allow clarity to arise before committing your life energy. Trust your inner response rather than mental pressure.` : "Focus on observing your natural response over the next 7 days. Living your design starts with trusting your body's wisdom."}`;
+  }
+
+  return `### Osobní výklad Human Design mapy
+
+**Základní mechanika:**
+- **Typ energie:** ${type} — Váš přirozený způsob vyzařování a fungování ve světě.
+- **Autorita rozhodování:** ${authority} — Váš vnitřní spolehlivý kompas. Nikdy nenechávejte klíčová rozhodnutí na tlaku mysli; řiďte se svým tělesným vedením skrze ${authority} autoritu.
+- **Strategie:** ${strategy} — Způsob, jakým se bez odporu propojujete s příležitostmi a životem.
+- **Profil:** ${profile} — Vaše archetypální role a styl procházení životními zkušenostmi.
+- **Inkarnační kříž:** ${cross} — Hlubší poslání a životní téma vaší cesty.
+
+**Energetická architektura:**
+- **Definovaná centra (stálá síla):** ${definedCenters || "Propojené dráhy"}. Zde máte spolehlivou vlastní energii, kterou působíte na své okolí.
+- **Otevřená centra (moudrost a vnímavost):** ${openCenters || "Otevřené vnímání"}. Zde jste citliví k energiím druhých a získáváte moudrost, ale je třeba hlídat podmiňování zvenčí.
+
+${prompt ? `**Odpověď k vaší otázce („${prompt}“):**\nVzhledem k vašemu typu (${type}) a autoritě (${authority}) je klíčem netlačit na mentální odpovědi. Dejte svému tělu čas zareagovat a teprve poté uvolněte svou energii k realizaci.` : "Zaměřte se na pozorování své přirozené reakce během následujících 7 dní. Žití svého designu začíná důvěrou ve vlastní tělesnou moudrost."}`;
+}
+
+async function generateHumanDesignAiReading(params: {
+  chart: any;
+  readingType?: string;
+  prompt?: string;
+  locale?: string;
+  env: Env;
+}): Promise<{ content: string; model: string }> {
+  const isEn = params.locale === "en";
+  const readingType = params.readingType || (params.prompt ? "custom" : "overview");
+  const systemPrompt = getSystemPrompt(isEn);
+
+  let userPrompt = "";
+  if (params.prompt) {
+    const baseOverview = getReadingPrompt(params.chart, "overview", isEn);
+    userPrompt = `${baseOverview}\n\nUser Question/Focus:\n${params.prompt}\n\nProvide a deeply personalized, clear, and actionable interpretation based strictly on this chart.`;
+  } else {
+    userPrompt = getReadingPrompt(params.chart, readingType, isEn);
+  }
+
+  // 1. OpenRouter Provider
+  const openRouterKey = params.env.OPENROUTER_API_KEY || (typeof process !== "undefined" ? process.env?.OPENROUTER_API_KEY : undefined);
+  if (openRouterKey) {
+    try {
+      const model = params.env.LLM_MODEL || "google/gemini-2.5-flash";
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${openRouterKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": isEn ? "https://humandesignchart.app" : "https://humandesignmapa.cz",
+          "X-Title": isEn ? "Human Design Blueprint" : "Human Design Mapa",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          max_tokens: 1500,
+          temperature: 0.7,
+        }),
+      });
+
+      if (res.ok) {
+        const data: any = await res.json();
+        const text = data?.choices?.[0]?.message?.content;
+        if (text && typeof text === "string" && text.trim().length > 50) {
+          return { content: text.trim(), model };
+        }
+      } else {
+        console.warn("[ai-reading] OpenRouter non-ok response:", res.status);
+      }
+    } catch (e: any) {
+      console.warn("[ai-reading] OpenRouter fetch exception:", e.message);
+    }
+  }
+
+  // 2. Direct Gemini Provider
+  const geminiKey = params.env.GEMINI_API_KEY || (typeof process !== "undefined" ? process.env?.GEMINI_API_KEY : undefined);
+  if (geminiKey) {
+    try {
+      const model = "gemini-2.5-flash";
+      const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${geminiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          max_tokens: 1500,
+          temperature: 0.7,
+        }),
+      });
+
+      if (res.ok) {
+        const data: any = await res.json();
+        const text = data?.choices?.[0]?.message?.content;
+        if (text && typeof text === "string" && text.trim().length > 50) {
+          return { content: text.trim(), model };
+        }
+      }
+    } catch (e: any) {
+      console.warn("[ai-reading] Gemini fetch exception:", e.message);
+    }
+  }
+
+  // 3. Fallback Grounded Engine
+  const grounded = formatGroundedFallbackReading(params.chart, readingType, params.prompt, isEn);
+  return { content: grounded, model: "canonical-hd-grounded-v1" };
+}
 
 const appRouter = router({
   auth: router({
@@ -242,20 +547,41 @@ const appRouter = router({
         }
 
         const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+        if (!d1) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "DATABASE_UNAVAILABLE",
+          });
+        }
+
         let snapshotId = input.chartSnapshotId;
 
-        if (!snapshotId && input.chartDataJson && d1) {
+        if (input.plan === "blueprint" && !snapshotId && !input.chartDataJson) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "CHART_SNAPSHOT_REQUIRED",
+          });
+        }
+
+        if (!snapshotId && input.chartDataJson) {
           snapshotId = `snap_${crypto.randomUUID()}`;
           try {
-            await d1
+            const snapRes = await d1
               .prepare(
                 `INSERT INTO hd_chart_snapshots (id, email, locale, chart_data_json, created_at)
                  VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
               )
               .bind(snapshotId, input.customerEmail, input.locale, input.chartDataJson)
               .run();
-          } catch (err) {
-            console.warn("[createCheckout] Could not save chart snapshot:", err);
+            if (!snapRes.success) {
+              throw new Error(snapRes.error || "SNAPSHOT_INSERT_FAILED");
+            }
+          } catch (err: any) {
+            console.error("[createCheckout] Critical: could not save chart snapshot:", err);
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "CHART_SNAPSHOT_PERSISTENCE_FAILED",
+            });
           }
         }
 
@@ -298,40 +624,54 @@ const appRouter = router({
 
         const data: any = await res.json();
         const refId = data.publicId || data.orderId;
+        if (!refId) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "GATEWAY_REFERENCE_MISSING",
+          });
+        }
 
-        if (d1 && refId) {
-          try {
-            const orderId = `ord_${crypto.randomUUID()}`;
-            await d1
-              .prepare(
-                `INSERT INTO hd_orders (
-                  id, payment_ref, customer_email, customer_name, offer_key,
-                  amount_minor, currency, locale, chart_snapshot_id,
-                  payment_status, fulfillment_status, delivery_status,
-                  ai_reading_credits, consent_record_json, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'CREATED', 'PENDING', 'PENDING', 5, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                ON CONFLICT(payment_ref) DO NOTHING`
-              )
-              .bind(
-                orderId,
-                refId,
-                input.customerEmail,
-                input.customerName || null,
-                offerKey,
-                data.amountMinor || (isCzech ? 29000 : 1590),
-                data.currency || (isCzech ? "CZK" : "EUR"),
-                input.locale,
-                snapshotId || null,
-                JSON.stringify({
-                  digitalDeliveryConsent: true,
-                  consentedAt: new Date().toISOString(),
-                  redditClickId: input.redditClickId || null,
-                })
-              )
-              .run();
-          } catch (dbErr) {
-            console.warn("[createCheckout] Could not insert hd_orders:", dbErr);
+        const initialToken = `tok_${crypto.randomUUID().replace(/-/g, "")}`;
+        const orderId = `ord_${crypto.randomUUID()}`;
+        try {
+          const insertRes = await d1
+            .prepare(
+              `INSERT INTO hd_orders (
+                id, payment_ref, customer_email, customer_name, offer_key,
+                amount_minor, currency, locale, chart_snapshot_id,
+                payment_status, fulfillment_status, delivery_status,
+                ai_reading_credits, download_token, consent_record_json, created_at, updated_at
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'CREATED', 'PENDING', 'PENDING', 5, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+              ON CONFLICT(payment_ref) DO UPDATE SET updated_at = CURRENT_TIMESTAMP`
+            )
+            .bind(
+              orderId,
+              refId,
+              input.customerEmail,
+              input.customerName || null,
+              offerKey,
+              data.amountMinor || (isCzech ? 29000 : 1590),
+              data.currency || (isCzech ? "CZK" : "EUR"),
+              input.locale,
+              snapshotId || null,
+              initialToken,
+              JSON.stringify({
+                digitalDeliveryConsent: true,
+                consentedAt: new Date().toISOString(),
+                redditClickId: input.redditClickId || null,
+              })
+            )
+            .run();
+
+          if (!insertRes.success) {
+            throw new Error(insertRes.error || "ORDER_INSERT_FAILED");
           }
+        } catch (dbErr: any) {
+          console.error("[createCheckout] Critical: failed to persist durable hd_orders:", dbErr);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "ORDER_PERSISTENCE_FAILED",
+          });
         }
 
         return {
@@ -343,6 +683,7 @@ const appRouter = router({
           amountMinor: data.amountMinor,
           currency: data.currency,
           chartSnapshotId: snapshotId,
+          token: initialToken,
         };
       }),
 
@@ -434,7 +775,9 @@ const appRouter = router({
           .prepare(
             `SELECT o.id, o.payment_ref, o.offer_key, o.payment_status, o.fulfillment_status,
                     o.delivery_status, o.delivered_at, o.download_token_expires_at,
-                    o.customer_name, o.ai_reading_credits, s.chart_data_json
+                    o.customer_name, o.ai_reading_credits, o.email_delivery_status, o.email_delivered_at,
+                    o.email_sent_at,
+                    s.chart_data_json
              FROM hd_orders o
              LEFT JOIN hd_chart_snapshots s ON o.chart_snapshot_id = s.id
              WHERE o.download_token = ? LIMIT 1`
@@ -478,9 +821,384 @@ const appRouter = router({
           fulfillmentStatus: order.fulfillment_status,
           deliveryStatus: order.delivery_status,
           deliveredAt: order.delivered_at,
-          aiReadingCredits: order.ai_reading_credits || 5,
+          aiReadingCredits: order.ai_reading_credits !== null && order.ai_reading_credits !== undefined ? Number(order.ai_reading_credits) : 5,
+          emailDeliveryStatus: order.email_delivery_status || "PENDING",
+          emailDeliveredAt: order.email_delivered_at || null,
+          emailSentAt: order.email_sent_at || null,
           customerName: order.customer_name || null,
           chartData,
+        };
+      }),
+
+    redeemAiReading: publicProcedure
+      .input(
+        z.object({
+          token: z.string().min(16).max(128),
+          prompt: z.string().max(1000).optional(),
+          readingType: z.string().optional(),
+          idempotencyKey: z.string().max(128).optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }: { input: { token: string; prompt?: string; readingType?: string; idempotencyKey?: string }; ctx: Context }) => {
+        const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+        if (!d1) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DATABASE_UNAVAILABLE" });
+
+        const order: any = await d1
+          .prepare(
+            `SELECT o.id, o.payment_status, o.ai_reading_credits, o.download_token_expires_at,
+                    o.locale, o.offer_key, s.chart_data_json
+             FROM hd_orders o
+             LEFT JOIN hd_chart_snapshots s ON o.chart_snapshot_id = s.id
+             WHERE o.download_token = ? LIMIT 1`
+          )
+          .bind(input.token)
+          .first();
+
+        if (!order) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "INVALID_ACCESS_TOKEN" });
+        }
+
+        if (order.download_token_expires_at && Date.now() > new Date(order.download_token_expires_at).getTime()) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "ACCESS_TOKEN_EXPIRED" });
+        }
+
+        if (order.payment_status !== "PAID") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "ORDER_NOT_PAID" });
+        }
+
+        const idemKey = input.idempotencyKey?.trim() || null;
+        if (idemKey) {
+          const cached: any = await d1
+            .prepare(
+              `SELECT reading_content, model, created_at
+               FROM hd_ai_readings
+               WHERE order_id = ? AND idempotency_key = ? LIMIT 1`
+            )
+            .bind(order.id, idemKey)
+            .first();
+
+          if (cached) {
+            return {
+              success: true,
+              remainingCredits: Number(order.ai_reading_credits ?? 0),
+              reading: cached.reading_content,
+              model: cached.model,
+              cached: true,
+            };
+          }
+        }
+
+        const currentCredits = Number(order.ai_reading_credits ?? 0);
+        if (currentCredits <= 0) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "NO_AI_CREDITS_REMAINING" });
+        }
+
+        let chartData: any = null;
+        if (order.chart_data_json) {
+          try {
+            chartData = JSON.parse(order.chart_data_json);
+          } catch (e) {
+            console.warn("[redeemAiReading] chart_data_json parse error:", e);
+          }
+        }
+        if (!chartData) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "CHART_DATA_NOT_FOUND" });
+        }
+
+        const isEn = order.locale === "en" || order.offer_key === "hd-blueprint-en";
+        let aiResult: { content: string; model: string };
+        try {
+          aiResult = await generateHumanDesignAiReading({
+            chart: chartData,
+            readingType: input.readingType,
+            prompt: input.prompt,
+            locale: isEn ? "en" : "cs",
+            env: ctx.env,
+          });
+        } catch (genErr: any) {
+          console.error("[redeemAiReading] AI generation error:", genErr);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "AI_GENERATION_FAILED",
+          });
+        }
+
+        const updateRes = await d1
+          .prepare(
+            `UPDATE hd_orders
+             SET ai_reading_credits = ai_reading_credits - 1,
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = ? AND ai_reading_credits > 0`
+          )
+          .bind(order.id)
+          .run();
+
+        if (!updateRes.success || (updateRes.meta && updateRes.meta.changes === 0)) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "NO_AI_CREDITS_REMAINING" });
+        }
+
+        const readingId = `air_${crypto.randomUUID()}`;
+        try {
+          await d1
+            .prepare(
+              `INSERT INTO hd_ai_readings (
+                id, order_id, token, idempotency_key, reading_type, prompt, reading_content, model, created_at
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
+            )
+            .bind(
+              readingId,
+              order.id,
+              input.token,
+              idemKey,
+              input.readingType || (input.prompt ? "custom" : "overview"),
+              input.prompt || null,
+              aiResult.content,
+              aiResult.model
+            )
+            .run();
+        } catch (insertErr) {
+          console.warn("[redeemAiReading] Failed to store reading log:", insertErr);
+        }
+
+        return {
+          success: true,
+          remainingCredits: currentCredits - 1,
+          reading: aiResult.content,
+          model: aiResult.model,
+        };
+      }),
+
+    checkEmailDelivery: publicProcedure
+      .input(
+        z.object({
+          token: z.string().min(16).max(128),
+        })
+      )
+      .query(async ({ input, ctx }: { input: { token: string }; ctx: Context }) => {
+        const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+        if (!d1) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DATABASE_UNAVAILABLE" });
+
+        const order: any = await d1
+          .prepare(
+            `SELECT id, email_delivery_status, email_delivered_at, email_provider_message_id, email_sent_at, email_last_error
+             FROM hd_orders WHERE download_token = ? LIMIT 1`
+          )
+          .bind(input.token)
+          .first();
+
+        if (!order) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "INVALID_ACCESS_TOKEN" });
+        }
+
+        if (order.email_delivery_status === "SENT" && order.email_provider_message_id) {
+          const brevoKey = ctx.env?.BREVO_API_KEY;
+          if (brevoKey) {
+            try {
+              const res = await fetch(
+                `https://api.brevo.com/v3/smtp/statistics/events?messageId=${encodeURIComponent(order.email_provider_message_id)}&limit=10`,
+                {
+                  headers: { "api-key": brevoKey, Accept: "application/json" },
+                }
+              );
+              if (res.ok) {
+                const data: any = await res.json();
+                const events = data?.events || [];
+                const deliveredEvent = events.find((ev: any) => ev.event === "delivered");
+                if (deliveredEvent) {
+                  const deliveredAt = deliveredEvent.date || new Date().toISOString();
+                  await d1
+                    .prepare(
+                      `UPDATE hd_orders
+                       SET email_delivery_status = 'DELIVERED', email_delivered_at = ?, updated_at = CURRENT_TIMESTAMP
+                       WHERE id = ?`
+                    )
+                    .bind(deliveredAt, order.id)
+                    .run();
+                  return {
+                    status: "DELIVERED",
+                    deliveredAt,
+                    messageId: order.email_provider_message_id,
+                  };
+                }
+              }
+            } catch (checkErr) {
+              console.warn("[checkEmailDelivery] Brevo check error:", checkErr);
+            }
+          }
+        }
+
+        return {
+          status: order.email_delivery_status || "PENDING",
+          deliveredAt: order.email_delivered_at || null,
+          sentAt: order.email_sent_at || null,
+          messageId: order.email_provider_message_id || null,
+          lastError: order.email_last_error || null,
+        };
+      }),
+
+    retryEmailDelivery: publicProcedure
+      .input(
+        z.object({
+          token: z.string().min(16).max(128),
+        })
+      )
+      .mutation(async ({ input, ctx }: { input: { token: string }; ctx: Context }) => {
+        const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+        if (!d1) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DATABASE_UNAVAILABLE" });
+
+        const order: any = await d1
+          .prepare(
+            `SELECT id, payment_ref, customer_email, customer_name, offer_key, download_token, payment_status, locale, email_retry_count
+             FROM hd_orders WHERE download_token = ? LIMIT 1`
+          )
+          .bind(input.token)
+          .first();
+
+        if (!order) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "INVALID_ACCESS_TOKEN" });
+        }
+
+        if (order.payment_status !== "PAID") {
+          throw new TRPCError({ code: "FORBIDDEN", message: "ORDER_NOT_PAID" });
+        }
+
+        if (Number(order.email_retry_count ?? 0) >= 5) {
+          throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "MAX_EMAIL_RETRIES_EXCEEDED" });
+        }
+
+        const isEn = order.locale === "en" || order.offer_key === "hd-blueprint-en";
+        const domain = isEn ? "https://humandesignchart.app" : "https://humandesignmapa.cz";
+        const loc = isEn ? "en" : "cs";
+        const accessUrl = `${domain}/${loc}/payment/success?plan=blueprint&refId=${encodeURIComponent(order.payment_ref)}&token=${order.download_token}`;
+
+        const emailRes = await sendTransactionalEmail({
+          env: ctx.env,
+          toEmail: order.customer_email,
+          customerName: order.customer_name,
+          accessUrl,
+          token: order.download_token,
+          refId: order.payment_ref,
+          locale: loc,
+        });
+
+        if (emailRes.ok) {
+          await d1
+            .prepare(
+              `UPDATE hd_orders
+               SET email_delivery_status = 'SENT',
+                   email_provider_message_id = ?,
+                   email_sent_at = CURRENT_TIMESTAMP,
+                   email_retry_count = COALESCE(email_retry_count, 0) + 1,
+                   updated_at = CURRENT_TIMESTAMP
+               WHERE id = ?`
+            )
+            .bind(emailRes.messageId || null, order.id)
+            .run();
+          return { success: true, status: "SENT", messageId: emailRes.messageId };
+        } else {
+          await d1
+            .prepare(
+              `UPDATE hd_orders
+               SET email_delivery_status = 'FAILED',
+                   email_last_error = ?,
+                   email_retry_count = COALESCE(email_retry_count, 0) + 1,
+                   updated_at = CURRENT_TIMESTAMP
+               WHERE id = ?`
+            )
+            .bind(emailRes.error || "EMAIL_SEND_FAILED", order.id)
+            .run();
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: emailRes.error || "EMAIL_SEND_FAILED" });
+        }
+      }),
+
+    requestAccessRecovery: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          refId: z.string().optional(),
+          locale: z.string().optional().default("cs"),
+        })
+      )
+      .mutation(async ({ input, ctx }: { input: { email: string; refId?: string; locale?: string }; ctx: Context }) => {
+        const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+        if (!d1) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DATABASE_UNAVAILABLE" });
+
+        const searchEmail = input.email.trim();
+        let query = `SELECT id, payment_ref, customer_email, customer_name, offer_key, download_token, payment_status, locale
+                     FROM hd_orders
+                     WHERE LOWER(customer_email) = LOWER(?) AND payment_status = 'PAID'`;
+        const params: any[] = [searchEmail];
+
+        if (input.refId) {
+          query += ` AND payment_ref = ?`;
+          params.push(input.refId.trim());
+        }
+        query += ` ORDER BY created_at DESC LIMIT 1`;
+
+        const order: any = await d1.prepare(query).bind(...params).first();
+
+        if (order && order.download_token) {
+          const isEn = order.locale === "en" || input.locale === "en" || order.offer_key === "hd-blueprint-en";
+          const domain = isEn ? "https://humandesignchart.app" : "https://humandesignmapa.cz";
+          const loc = isEn ? "en" : "cs";
+          const accessUrl = `${domain}/${loc}/payment/success?plan=blueprint&refId=${encodeURIComponent(order.payment_ref)}&token=${order.download_token}`;
+
+          try {
+            const emailRes = await sendTransactionalEmail({
+              env: ctx.env,
+              toEmail: order.customer_email,
+              customerName: order.customer_name,
+              accessUrl,
+              token: order.download_token,
+              refId: order.payment_ref,
+              locale: loc,
+              isRecovery: true,
+            });
+
+            if (emailRes.ok) {
+              await d1
+                .prepare(
+                  `UPDATE hd_orders
+                   SET email_delivery_status = 'SENT',
+                       email_provider_message_id = ?,
+                       email_sent_at = CURRENT_TIMESTAMP,
+                       updated_at = CURRENT_TIMESTAMP
+                   WHERE id = ?`
+                )
+                .bind(emailRes.messageId || null, order.id)
+                .run();
+            } else {
+              await d1
+                .prepare(
+                  `UPDATE hd_orders
+                   SET email_delivery_status = 'FAILED',
+                       email_last_error = ?,
+                       email_retry_count = COALESCE(email_retry_count, 0) + 1,
+                       updated_at = CURRENT_TIMESTAMP
+                   WHERE id = ?`
+                )
+                .bind(emailRes.error || "EMAIL_SEND_FAILED", order.id)
+                .run();
+            }
+          } catch (e: any) {
+            console.warn("[requestAccessRecovery] email failed:", e?.message);
+            await d1
+              .prepare(
+                `UPDATE hd_orders
+                 SET email_delivery_status = 'FAILED',
+                     email_last_error = ?,
+                     email_retry_count = COALESCE(email_retry_count, 0) + 1,
+                     updated_at = CURRENT_TIMESTAMP
+                 WHERE id = ?`
+              )
+              .bind(e?.message || "EMAIL_EXCEPTION", order.id)
+              .run();
+          }
+        }
+
+        return {
+          success: true,
+          message: "If a paid order matching that email was found, a recovery link has been sent.",
         };
       }),
 
@@ -748,7 +1466,7 @@ export default {
               payment_status = 'PAID',
               fulfillment_status = 'FULFILLED',
               delivery_status = CASE WHEN hd_orders.delivery_status = 'DOWNLOADED' THEN 'DOWNLOADED' ELSE 'READY' END,
-              ai_reading_credits = 5,
+              ai_reading_credits = COALESCE(hd_orders.ai_reading_credits, 5),
               download_token = COALESCE(hd_orders.download_token, excluded.download_token),
               download_token_expires_at = COALESCE(hd_orders.download_token_expires_at, excluded.download_token_expires_at),
               updated_at = CURRENT_TIMESTAMP`
@@ -768,12 +1486,69 @@ export default {
           )
           .run();
 
+        const accessUrl = `${domain}/${locale}/payment/success?plan=blueprint&refId=${encodeURIComponent(event.refId)}&token=${downloadToken}`;
+
+        let emailDeliveryStatus = "PENDING";
+        try {
+          const emailRes = await sendTransactionalEmail({
+            env,
+            toEmail: event.customerEmail,
+            customerName: event.customerName,
+            accessUrl,
+            token: downloadToken,
+            refId: event.refId,
+            locale,
+          });
+          if (emailRes.ok) {
+            emailDeliveryStatus = "SENT";
+            await d1
+              .prepare(
+                `UPDATE hd_orders
+                 SET email_delivery_status = 'SENT',
+                     email_provider_message_id = ?,
+                     email_sent_at = CURRENT_TIMESTAMP,
+                     updated_at = CURRENT_TIMESTAMP
+                 WHERE payment_ref = ?`
+              )
+              .bind(emailRes.messageId || null, event.refId)
+              .run();
+          } else {
+            emailDeliveryStatus = "FAILED";
+            await d1
+              .prepare(
+                `UPDATE hd_orders
+                 SET email_delivery_status = 'FAILED',
+                     email_last_error = ?,
+                     email_retry_count = COALESCE(email_retry_count, 0) + 1,
+                     updated_at = CURRENT_TIMESTAMP
+                 WHERE payment_ref = ?`
+              )
+              .bind(emailRes.error || "EMAIL_SEND_FAILED", event.refId)
+              .run();
+          }
+        } catch (mailErr: any) {
+          emailDeliveryStatus = "FAILED";
+          console.warn("[onyxpay-fulfill] Email dispatch error:", mailErr?.message);
+          await d1
+            .prepare(
+              `UPDATE hd_orders
+               SET email_delivery_status = 'FAILED',
+                   email_last_error = ?,
+                   email_retry_count = COALESCE(email_retry_count, 0) + 1,
+                   updated_at = CURRENT_TIMESTAMP
+               WHERE payment_ref = ?`
+            )
+            .bind(mailErr?.message || "EMAIL_EXCEPTION", event.refId)
+            .run();
+        }
+
         return Response.json({
           ok: true,
           status: "FULFILLED",
           refId: event.refId,
           publicToken: downloadToken,
-          reportAccessUrl: `${domain}/${locale}/payment/success?plan=blueprint&refId=${encodeURIComponent(event.refId)}&token=${downloadToken}`,
+          reportAccessUrl: accessUrl,
+          emailDeliveryStatus,
           fulfilledAt: new Date().toISOString(),
         });
       } catch (dbErr: any) {
