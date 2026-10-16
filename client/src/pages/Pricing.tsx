@@ -29,8 +29,6 @@ export default function Pricing() {
   const [, navigate] = useLocation();
   const { viewContent, initiateCheckout } = useMetaPixel();
   const isCs = locale === "cs";
-  const [includePartnerAddon, setIncludePartnerAddon] = useState(false);
-  const [voluntaryTopUpMinor, setVoluntaryTopUpMinor] = useState(0);
   const [voucherCode, setVoucherCode] = useState("");
   const [showVoucher, setShowVoucher] = useState(false);
   const offerQuery = trpc.subscription.blueprintOffer.useQuery({ locale: isCs ? "cs" : "en" });
@@ -48,9 +46,7 @@ export default function Pricing() {
   const offer = offerQuery.data;
   const hasBlueprintAccess = Boolean(statusQuery.data?.isPremium || (statusQuery.data?.blueprintPdfCredits ?? 0) > 0);
   const price = offer ? formatPrice(offer.amountMinor, offer.currency, locale) : "…";
-  const addonPrice = offer ? formatPrice(offer.partnerAddon.amountMinor, offer.currency, locale) : "…";
-  const totalAmountMinor = offer ? offer.amountMinor + (includePartnerAddon ? offer.partnerAddon.amountMinor : 0) + voluntaryTopUpMinor : 0;
-  const totalPrice = offer ? formatPrice(totalAmountMinor, offer.currency, locale) : "…";
+  const totalAmountMinor = offer ? offer.amountMinor : 0;
 
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [customerEmail, setCustomerEmail] = useState("");
