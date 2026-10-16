@@ -46,18 +46,28 @@ function createMockD1(initialOrder: MockOrder, options?: { failInsert?: boolean 
           return stmt;
         },
         async first<T = any>(): Promise<T | null> {
-          if (sql.includes("FROM hd_orders o") && sql.includes("WHERE o.download_token = ?")) {
+          if (sql.includes("FROM hd_orders") && sql.includes("download_token = ?")) {
             const token = boundParams[0];
             for (const ord of orders.values()) {
               if (ord.download_token === token) {
                 return {
                   id: ord.id,
+                  payment_ref: ord.payment_ref,
+                  customer_email: (ord as any).customer_email || "test@example.com",
+                  customer_name: (ord as any).customer_name || "Test Buyer",
                   payment_status: ord.payment_status,
                   ai_reading_credits: ord.ai_reading_credits,
+                  download_token: ord.download_token,
                   download_token_expires_at: ord.download_token_expires_at,
                   locale: ord.locale,
                   offer_key: ord.offer_key,
                   chart_data_json: ord.chart_data_json,
+                  email_delivery_status: (ord as any).email_delivery_status || "PENDING",
+                  email_delivered_at: (ord as any).email_delivered_at || null,
+                  email_sent_at: (ord as any).email_sent_at || null,
+                  email_provider_message_id: (ord as any).email_provider_message_id || null,
+                  email_last_error: (ord as any).email_last_error || null,
+                  email_retry_count: (ord as any).email_retry_count ?? 0,
                 } as any;
               }
             }
@@ -81,6 +91,27 @@ function createMockD1(initialOrder: MockOrder, options?: { failInsert?: boolean 
           if (sql.includes("DELETE FROM hd_ai_readings WHERE id = ?")) {
             const id = boundParams[0];
             readings = readings.filter((r) => r.id !== id);
+            return { success: true, meta: { changes: 1 } };
+          }
+          if (sql.includes("UPDATE hd_orders") && sql.includes("email_delivery_status = 'SENT'")) {
+            const [messageId, orderId] = boundParams;
+            const ord = orders.get(orderId);
+            if (ord) {
+              (ord as any).email_delivery_status = "SENT";
+              (ord as any).email_provider_message_id = messageId;
+              (ord as any).email_sent_at = new Date().toISOString();
+              (ord as any).email_retry_count = ((ord as any).email_retry_count || 0) + 1;
+            }
+            return { success: true, meta: { changes: 1 } };
+          }
+          if (sql.includes("UPDATE hd_orders") && sql.includes("email_delivery_status = 'FAILED'")) {
+            const [lastError, orderId] = boundParams;
+            const ord = orders.get(orderId);
+            if (ord) {
+              (ord as any).email_delivery_status = "FAILED";
+              (ord as any).email_last_error = lastError;
+              (ord as any).email_retry_count = ((ord as any).email_retry_count || 0) + 1;
+            }
             return { success: true, meta: { changes: 1 } };
           }
           return { success: true, meta: { changes: 1 } };
@@ -111,6 +142,12 @@ function createMockD1(initialOrder: MockOrder, options?: { failInsert?: boolean 
           } else if (sql.includes("INSERT INTO hd_ai_readings")) {
             if (failInsert) {
               throw new Error("Simulated D1 Disk/Database Failure on INSERT");
+            }
+            const lastChanges = results.length > 0 ? (results[results.length - 1].meta?.changes ?? 0) : 1;
+            if (sql.includes("WHERE changes() > 0") && lastChanges === 0) {
+              // Condition not met: zero rows inserted without throwing
+              results.push({ success: true, meta: { changes: 0 } });
+              continue;
             }
             const [id, order_id, token, idempotency_key, reading_type, prompt, reading_content, model] = s.boundParams;
             // Check UNIQUE index on (order_id, idempotency_key)
@@ -349,6 +386,52 @@ describe("Atomic AI Reading Credit Transactions", () => {
     expect(mockD1._readings.length).toBe(5);
   });
 
+  it("concurrent requests with different idempotency keys competing for the last credit: exactly one wins, loser inserts zero rows", async () => {
+    // Order has exactly 1 credit remaining
+    const singleCreditOrder: MockOrder = {
+      ...validPaidOrder,
+      id: "ord_single_credit",
+      ai_reading_credits: 1,
+      download_token: "tok_single_credit_1234567890123456",
+    };
+    const mockD1 = createMockD1(singleCreditOrder);
+    const caller = appRouter.createCaller({
+      env: { HD_ORDERS: mockD1 } as any,
+      request: new Request("https://humandesignmapa.cz"),
+    });
+
+    const results = await Promise.allSettled([
+      caller.subscription.redeemAiReading({
+        token: singleCreditOrder.download_token,
+        readingType: "overview",
+        idempotencyKey: "competitor_A",
+      }),
+      caller.subscription.redeemAiReading({
+        token: singleCreditOrder.download_token,
+        readingType: "overview",
+        idempotencyKey: "competitor_B",
+      }),
+    ]);
+
+    const fulfilled = results.filter((r) => r.status === "fulfilled") as PromiseFulfilledResult<any>[];
+    const rejected = results.filter((r) => r.status === "rejected") as PromiseRejectedResult[];
+
+    expect(fulfilled.length).toBe(1);
+    expect(rejected.length).toBe(1);
+
+    expect(fulfilled[0].value.success).toBe(true);
+    expect(fulfilled[0].value.remainingCredits).toBe(0);
+
+    expect(rejected[0].reason).toMatchObject({
+      code: "FORBIDDEN",
+      message: "NO_AI_CREDITS_REMAINING",
+    });
+
+    // Database state: exactly 0 credits left, and EXACTLY 1 reading inserted (loser inserted 0 rows without compensating DELETE)
+    expect(mockD1._orders.get(singleCreditOrder.id)?.ai_reading_credits).toBe(0);
+    expect(mockD1._readings.length).toBe(1);
+  });
+
   it("rejects unpaid orders and expired tokens", async () => {
     const unpaidOrder: MockOrder = {
       ...validPaidOrder,
@@ -391,6 +474,100 @@ describe("Atomic AI Reading Credit Transactions", () => {
     ).rejects.toMatchObject({
       code: "FORBIDDEN",
       message: "ACCESS_TOKEN_EXPIRED",
+    });
+  });
+
+  it("checkEmailDelivery returns current order delivery status and metadata", async () => {
+    const deliveredOrder: MockOrder = {
+      ...validPaidOrder,
+      id: "ord_delivered",
+      download_token: "tok_delivered_1234567890123456",
+    };
+    const mockD1 = createMockD1(deliveredOrder);
+    (mockD1._orders.get(deliveredOrder.id) as any).email_delivery_status = "SENT";
+    (mockD1._orders.get(deliveredOrder.id) as any).email_provider_message_id = "msg_12345";
+    (mockD1._orders.get(deliveredOrder.id) as any).email_sent_at = "2026-10-17T00:00:00Z";
+
+    const caller = appRouter.createCaller({
+      env: { HD_ORDERS: mockD1 } as any,
+      request: new Request("https://humandesignmapa.cz"),
+    });
+
+    const status = await caller.subscription.checkEmailDelivery({
+      token: deliveredOrder.download_token,
+    });
+
+    expect(status.status).toBe("SENT");
+    expect(status.messageId).toBe("msg_12345");
+    expect(status.sentAt).toBe("2026-10-17T00:00:00Z");
+  });
+
+  it("retryEmailDelivery verifies sender domain noreply@optihub.cz, updates status to SENT, and increments retry count", async () => {
+    const mockD1 = createMockD1(validPaidOrder);
+    let capturedFrom: string | null = null;
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation(async (url: any, init?: any) => {
+        const urlStr = typeof url === "string" ? url : url?.url || "";
+        if (urlStr.includes("api.brevo.com")) {
+          const body = JSON.parse(init?.body || "{}");
+          capturedFrom = body.sender?.email;
+          return new Response(JSON.stringify({ messageId: "brevo_msg_retry_999" }), {
+            status: 200,
+            headers: { "content-type": "application/json" },
+          });
+        }
+        return new Response("Not found", { status: 404 });
+      })
+    );
+
+    const caller = appRouter.createCaller({
+      env: {
+        HD_ORDERS: mockD1,
+        BREVO_API_KEY: "mock_test_brevo_key",
+        BREVO_SENDER_EMAIL: "noreply@optihub.cz",
+      } as any,
+      request: new Request("https://humandesignmapa.cz"),
+    });
+
+    const res = await caller.subscription.retryEmailDelivery({
+      token: validPaidOrder.download_token,
+    });
+
+    expect(res.success).toBe(true);
+    expect(res.status).toBe("SENT");
+    expect(res.messageId).toBe("brevo_msg_retry_999");
+    expect(capturedFrom).toBe("noreply@optihub.cz");
+
+    // Database state updated
+    const updated = mockD1._orders.get(validPaidOrder.id) as any;
+    expect(updated.email_delivery_status).toBe("SENT");
+    expect(updated.email_provider_message_id).toBe("brevo_msg_retry_999");
+    expect(updated.email_retry_count).toBe(1);
+  });
+
+  it("retryEmailDelivery enforces max retry limit of 5", async () => {
+    const maxRetriedOrder: MockOrder = {
+      ...validPaidOrder,
+      id: "ord_max_retried",
+      download_token: "tok_max_retried_1234567890123456",
+    };
+    const mockD1 = createMockD1(maxRetriedOrder);
+    (mockD1._orders.get(maxRetriedOrder.id) as any).email_retry_count = 5;
+
+    const caller = appRouter.createCaller({
+      env: { HD_ORDERS: mockD1 } as any,
+      request: new Request("https://humandesignmapa.cz"),
+    });
+
+    await expect(
+      caller.subscription.retryEmailDelivery({
+        token: maxRetriedOrder.download_token,
+      })
+    ).rejects.toMatchObject({
+      code: "TOO_MANY_REQUESTS",
+      message: "MAX_EMAIL_RETRIES_EXCEEDED",
     });
   });
 });

@@ -787,7 +787,7 @@ describe("12. SEO — URL audit", () => {
     const metaPath = path.resolve(process.cwd(), "server/_core/seoMeta.ts");
     const content = fs.readFileSync(metaPath, "utf-8");
     expect(content).toContain('const CS = "https://humandesignmapa.cz"');
-    expect(content).toContain('const EN = "https://www.humandesignchart.app"');
+    expect(content).toContain('const EN = "https://humandesignchart.app"');
   });
 });
 

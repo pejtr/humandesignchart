@@ -942,7 +942,9 @@ export const appRouter = router({
           .prepare(
             `INSERT INTO hd_ai_readings (
               id, order_id, token, idempotency_key, reading_type, prompt, reading_content, model, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
+            )
+            SELECT ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
+            WHERE changes() > 0`
           )
           .bind(
             readingId,
@@ -993,9 +995,8 @@ export const appRouter = router({
 
         const updateRes = batchResults?.[0];
         if (!updateRes?.success || (updateRes.meta && updateRes.meta.changes === 0)) {
-          // In the edge case where credits reached 0 in a concurrent race,
-          // purge the uncharged reading and reject.
-          await d1.prepare(`DELETE FROM hd_ai_readings WHERE id = ?`).bind(readingId).run().catch(() => {});
+          // When credit deduction affects zero rows, no reading record was inserted
+          // (guaranteed by WHERE changes() > 0 in the batch without compensating DELETE).
           throw new TRPCError({ code: "FORBIDDEN", message: "NO_AI_CREDITS_REMAINING" });
         }
 
