@@ -27,6 +27,7 @@ type Env = {
   PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN?: string;
   PAY_BASE_URL?: string;
   HD_ORDERS?: D1Database;
+  DB?: D1Database;
   ASSETS: {
     fetch(request: Request): Promise<Response>;
   };
@@ -156,6 +157,34 @@ const appRouter = router({
       };
     }),
 
+    saveChartSnapshot: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          locale: z.enum(["cs", "en"]).default("cs"),
+          chartDataJson: z.string().min(2),
+          metaJson: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }: { input: any; ctx: Context }) => {
+        const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+        const snapshotId = `snap_${crypto.randomUUID()}`;
+        if (d1) {
+          try {
+            await d1
+              .prepare(
+                `INSERT INTO hd_chart_snapshots (id, email, locale, chart_data_json, created_at)
+                 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
+              )
+              .bind(snapshotId, input.email, input.locale, input.chartDataJson)
+              .run();
+          } catch (err) {
+            console.error("[saveChartSnapshot] D1 error:", err);
+          }
+        }
+        return { snapshotId };
+      }),
+
     createCheckout: publicProcedure
       .input(
         z.object({
@@ -165,6 +194,8 @@ const appRouter = router({
           customerEmail: z.string().email(),
           customerName: z.string().optional(),
           digitalDeliveryConsent: z.boolean(),
+          chartSnapshotId: z.string().optional(),
+          chartDataJson: z.string().optional(),
           redditClickId: z.string().optional(),
           openAIAdsMarketingConsent: z.boolean().optional(),
           openAIAdsOppref: z.string().optional(),
@@ -180,12 +211,35 @@ const appRouter = router({
                 : "Consent to immediate digital delivery and waiver of withdrawal right is required.",
           });
         }
+        const s2sKey = ctx.env?.PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN;
+        if (!s2sKey) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "PAYGATE_CHECKOUT_API_KEY_NOT_CONFIGURED",
+          });
+        }
+
+        const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+        let snapshotId = input.chartSnapshotId;
+
+        if (!snapshotId && input.chartDataJson && d1) {
+          snapshotId = `snap_${crypto.randomUUID()}`;
+          try {
+            await d1
+              .prepare(
+                `INSERT INTO hd_chart_snapshots (id, email, locale, chart_data_json, created_at)
+                 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
+              )
+              .bind(snapshotId, input.customerEmail, input.locale, input.chartDataJson)
+              .run();
+          } catch (err) {
+            console.warn("[createCheckout] Could not save chart snapshot:", err);
+          }
+        }
+
         const isCzech = input.locale === "cs";
         const offerKey = isCzech ? "hd-blueprint-cz" : "hd-blueprint-en";
         const payBase = (ctx.env?.PAY_BASE_URL || "https://pay.optimateo.com").replace(/\/$/, "");
-        const s2sKey =
-          ctx.env?.PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN ||
-          "8b908a96cac781f1bd35e1b260c7dd97445f1391cb6a510485ba924499afdff6";
 
         const payload = {
           tenant: "human-design",
@@ -199,6 +253,7 @@ const appRouter = router({
             source: "humandesignchart",
             locale: input.locale,
             redditClickId: input.redditClickId,
+            chartSnapshotId: snapshotId || undefined,
           },
         };
 
@@ -220,14 +275,52 @@ const appRouter = router({
         }
 
         const data: any = await res.json();
+        const refId = data.publicId || data.orderId;
+
+        if (d1 && refId) {
+          try {
+            const orderId = `ord_${crypto.randomUUID()}`;
+            await d1
+              .prepare(
+                `INSERT INTO hd_orders (
+                  id, payment_ref, customer_email, customer_name, offer_key,
+                  amount_minor, currency, locale, chart_snapshot_id,
+                  payment_status, fulfillment_status, delivery_status,
+                  consent_record_json, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'CREATED', 'PENDING', 'PENDING', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                ON CONFLICT(payment_ref) DO NOTHING`
+              )
+              .bind(
+                orderId,
+                refId,
+                input.customerEmail,
+                input.customerName || null,
+                offerKey,
+                data.amountMinor || (isCzech ? 29000 : 1590),
+                data.currency || (isCzech ? "CZK" : "EUR"),
+                input.locale,
+                snapshotId || null,
+                JSON.stringify({
+                  digitalDeliveryConsent: true,
+                  consentedAt: new Date().toISOString(),
+                  redditClickId: input.redditClickId || null,
+                })
+              )
+              .run();
+          } catch (dbErr) {
+            console.warn("[createCheckout] Could not insert hd_orders:", dbErr);
+          }
+        }
+
         return {
           url: data.checkoutUrl,
           checkoutUrl: data.checkoutUrl,
           sessionId: data.sessionId,
-          refId: data.publicId || data.orderId,
+          refId,
           publicId: data.publicId,
           amountMinor: data.amountMinor,
           currency: data.currency,
+          chartSnapshotId: snapshotId,
         };
       }),
 
@@ -239,29 +332,137 @@ const appRouter = router({
       )
       .query(async ({ input, ctx }: { input: { refId: string }; ctx: Context }) => {
         const payBase = (ctx.env?.PAY_BASE_URL || "https://pay.optimateo.com").replace(/\/$/, "");
-        const res = await fetch(
-          `${payBase}/api/payments/${encodeURIComponent(input.refId)}/status`,
-          { headers: { "cache-control": "no-store" } }
-        );
-        if (!res.ok) {
-          return {
-            verified: false,
-            status: "NOT_FOUND",
-            refId: input.refId,
-            amountMinor: 0,
-            currency: "CZK",
-          };
+        const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+
+        let payData: any = null;
+        try {
+          const res = await fetch(
+            `${payBase}/api/payments/${encodeURIComponent(input.refId)}/status`,
+            { headers: { "cache-control": "no-store" } }
+          );
+          if (res.ok) {
+            payData = await res.json();
+          }
+        } catch (err) {
+          console.warn("[verifyPayment] ONYX PAY status fetch error:", err);
         }
-        const data: any = await res.json();
-        const isPaid = data.status === "PAID" || data.status === "FULFILLED";
+
+        let localOrder: any = null;
+        let chartData: any = null;
+        if (d1) {
+          try {
+            localOrder = await d1
+              .prepare(
+                `SELECT o.*, s.chart_data_json
+                 FROM hd_orders o
+                 LEFT JOIN hd_chart_snapshots s ON o.chart_snapshot_id = s.id
+                 WHERE o.payment_ref = ? LIMIT 1`
+              )
+              .bind(input.refId)
+              .first();
+
+            if (localOrder?.chart_data_json) {
+              try {
+                chartData = JSON.parse(localOrder.chart_data_json);
+              } catch {}
+            }
+          } catch (err) {
+            console.warn("[verifyPayment] local order lookup error:", err);
+          }
+        }
+
+        const isPaid =
+          payData?.status === "PAID" ||
+          payData?.status === "FULFILLED" ||
+          localOrder?.payment_status === "PAID" ||
+          localOrder?.fulfillment_status === "FULFILLED";
+
+        if (isPaid && localOrder && localOrder.payment_status !== "PAID" && d1) {
+          try {
+            await d1
+              .prepare(
+                `UPDATE hd_orders
+                 SET payment_status = 'PAID', updated_at = CURRENT_TIMESTAMP
+                 WHERE payment_ref = ?`
+              )
+              .bind(input.refId)
+              .run();
+          } catch (err) {
+            console.warn("[verifyPayment] failed to update payment_status:", err);
+          }
+        }
+
         return {
           verified: isPaid,
-          status: data.status,
-          refId: data.refId || input.refId,
-          amountMinor: data.amountMinor,
-          currency: data.currency,
-          paidAt: data.paidAt,
-          offerKey: data.offerKey,
+          status: payData?.status || localOrder?.payment_status || "NOT_FOUND",
+          refId: input.refId,
+          amountMinor: payData?.amountMinor || localOrder?.amount_minor || 0,
+          currency: payData?.currency || localOrder?.currency || "CZK",
+          paidAt: payData?.paidAt || localOrder?.delivered_at || null,
+          offerKey: payData?.offerKey || localOrder?.offer_key || null,
+          downloadToken: localOrder?.download_token || null,
+          customerName: localOrder?.customer_name || null,
+          chartData: chartData || null,
+        };
+      }),
+
+    getOrder: publicProcedure
+      .input(
+        z.object({
+          refId: z.string().optional(),
+          downloadToken: z.string().optional(),
+        })
+      )
+      .query(async ({ input, ctx }: { input: { refId?: string; downloadToken?: string }; ctx: Context }) => {
+        if (!input.refId && !input.downloadToken) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "refId or downloadToken is required" });
+        }
+        const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+        if (!d1) return null;
+
+        let order: any = null;
+        if (input.refId) {
+          order = await d1
+            .prepare(
+              `SELECT o.*, s.chart_data_json
+               FROM hd_orders o
+               LEFT JOIN hd_chart_snapshots s ON o.chart_snapshot_id = s.id
+               WHERE o.payment_ref = ? LIMIT 1`
+            )
+            .bind(input.refId)
+            .first();
+        } else if (input.downloadToken) {
+          order = await d1
+            .prepare(
+              `SELECT o.*, s.chart_data_json
+               FROM hd_orders o
+               LEFT JOIN hd_chart_snapshots s ON o.chart_snapshot_id = s.id
+               WHERE o.download_token = ? LIMIT 1`
+            )
+            .bind(input.downloadToken)
+            .first();
+        }
+
+        if (!order) return null;
+
+        let chartData: any = null;
+        if (order.chart_data_json) {
+          try {
+            chartData = JSON.parse(order.chart_data_json);
+          } catch {}
+        }
+
+        return {
+          refId: order.payment_ref,
+          customerEmail: order.customer_email,
+          customerName: order.customer_name,
+          offerKey: order.offer_key,
+          paymentStatus: order.payment_status,
+          fulfillmentStatus: order.fulfillment_status,
+          deliveryStatus: order.delivery_status,
+          deliveredAt: order.delivered_at,
+          downloadToken: order.download_token,
+          chartData,
         };
       }),
   }),
@@ -356,14 +557,17 @@ export default {
 
     if (url.pathname === "/api/internal/onyxpay/fulfill") {
       if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
-      const expected = env.HUMAN_DESIGN_FULFILLMENT_API_KEY || "8b908a96cac781f1bd35e1b260c7dd97445f1391cb6a510485ba924499afdff6";
+      const expected = env.HUMAN_DESIGN_FULFILLMENT_API_KEY;
+      if (!expected) {
+        console.error("[onyxpay-fulfill] HUMAN_DESIGN_FULFILLMENT_API_KEY not configured");
+        return new Response("Service misconfigured", { status: 500 });
+      }
+
       const supplied = request.headers.get("authorization") || "";
-      // Never accept payments based on a browser redirect or unverified request.
-      if (!expected || !supplied.startsWith("Bearer ")) return new Response("Unauthorized", { status: 401 });
+      if (!supplied.startsWith("Bearer ")) return new Response("Unauthorized", { status: 401 });
       const token = supplied.slice(7);
       const left = new TextEncoder().encode(token);
       const right = new TextEncoder().encode(expected);
-      // Compare fixed-length SHA-256 digests without early exit.
       const [digestA, digestB] = await Promise.all([
         crypto.subtle.digest("SHA-256", left),
         crypto.subtle.digest("SHA-256", right),
@@ -375,30 +579,104 @@ export default {
       if (difference !== 0) return new Response("Unauthorized", { status: 401 });
 
       const event: any = await request.json().catch(() => null);
-      if (event?.eventType !== "PAYMENT_CAPTURED" || event?.tenant !== "human-design" ||
-          !["hd-blueprint-cz", "hd-blueprint-en"].includes(event?.offerKey) ||
-          !event?.refId || !event?.eventId || !event?.customerEmail) {
+      if (
+        event?.eventType !== "PAYMENT_CAPTURED" ||
+        event?.tenant !== "human-design" ||
+        !["hd-blueprint-cz", "hd-blueprint-en"].includes(event?.offerKey) ||
+        !event?.refId ||
+        !event?.eventId ||
+        !event?.customerEmail
+      ) {
         return Response.json({ ok: false, error: "INVALID_PAYMENT_EVENT" }, { status: 400 });
       }
 
-      if (env.HD_ORDERS) {
-        try {
-          await env.HD_ORDERS.prepare(
-            `INSERT INTO blueprint_payment_receipts (event_id,payment_ref,tenant_id,offer_key,customer_email,amount_minor,currency,status,fulfilled_at)
-             VALUES (?,?,?,?,?,?,?,'FULFILLED',CURRENT_TIMESTAMP)
-             ON CONFLICT(event_id) DO UPDATE SET status = 'FULFILLED', fulfilled_at = CURRENT_TIMESTAMP`
-          ).bind(event.eventId, event.refId, event.tenant, event.offerKey, event.customerEmail, event.amount, event.currency).run();
-        } catch (dbErr) {
-          console.warn("[blueprint] HD_ORDERS insert warning:", dbErr);
-        }
+      const d1 = env.HD_ORDERS || env.DB;
+      if (!d1) {
+        console.error("[onyxpay-fulfill] D1 database not bound");
+        return Response.json({ ok: false, error: "D1_DATABASE_UNAVAILABLE" }, { status: 500 });
       }
 
-      return Response.json({
-        ok: true,
-        status: "FULFILLED",
-        refId: event.refId,
-        fulfilledAt: new Date().toISOString(),
-      });
+      const isEn = event.offerKey === "hd-blueprint-en";
+      const domain = isEn ? "https://humandesignchart.app" : "https://humandesignmapa.cz";
+      const locale = isEn ? "en" : "cs";
+
+      try {
+        const existing: any = await d1
+          .prepare(
+            `SELECT id, payment_status, fulfillment_status, download_token FROM hd_orders WHERE payment_ref = ? LIMIT 1`
+          )
+          .bind(event.refId)
+          .first();
+
+        let downloadToken = existing?.download_token;
+        if (!downloadToken) {
+          downloadToken = `tok_${crypto.randomUUID().replace(/-/g, "")}`;
+        }
+
+        if (existing?.fulfillment_status === "FULFILLED") {
+          return Response.json({
+            ok: true,
+            status: "ALREADY_FULFILLED",
+            refId: event.refId,
+            publicToken: downloadToken,
+            reportAccessUrl: `${domain}/${locale}/payment/success?plan=blueprint&refId=${encodeURIComponent(event.refId)}&token=${downloadToken}`,
+            fulfilledAt: new Date().toISOString(),
+          });
+        }
+
+        const orderId = existing?.id || `ord_${crypto.randomUUID()}`;
+        const tokenExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+        await d1
+          .prepare(
+            `INSERT INTO hd_orders (
+              id, payment_ref, event_id, customer_email, customer_name, offer_key,
+              amount_minor, currency, locale,
+              payment_status, fulfillment_status, delivery_status, delivered_at,
+              download_token, download_token_expires_at, created_at, updated_at
+            ) VALUES (
+              ?, ?, ?, ?, ?, ?,
+              ?, ?, ?,
+              'PAID', 'FULFILLED', 'DELIVERED', CURRENT_TIMESTAMP,
+              ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+            )
+            ON CONFLICT(payment_ref) DO UPDATE SET
+              event_id = excluded.event_id,
+              payment_status = 'PAID',
+              fulfillment_status = 'FULFILLED',
+              delivery_status = 'DELIVERED',
+              delivered_at = CURRENT_TIMESTAMP,
+              download_token = COALESCE(hd_orders.download_token, excluded.download_token),
+              download_token_expires_at = COALESCE(hd_orders.download_token_expires_at, excluded.download_token_expires_at),
+              updated_at = CURRENT_TIMESTAMP`
+          )
+          .bind(
+            orderId,
+            event.refId,
+            event.eventId,
+            event.customerEmail,
+            event.customerName || null,
+            event.offerKey,
+            event.amount,
+            event.currency,
+            locale,
+            downloadToken,
+            tokenExpiresAt
+          )
+          .run();
+
+        return Response.json({
+          ok: true,
+          status: "FULFILLED",
+          refId: event.refId,
+          publicToken: downloadToken,
+          reportAccessUrl: `${domain}/${locale}/payment/success?plan=blueprint&refId=${encodeURIComponent(event.refId)}&token=${downloadToken}`,
+          fulfilledAt: new Date().toISOString(),
+        });
+      } catch (dbErr: any) {
+        console.error("[onyxpay-fulfill] HD_ORDERS persistence error:", dbErr);
+        return Response.json({ ok: false, error: "DB_PERSISTENCE_FAILED", message: dbErr?.message }, { status: 500 });
+      }
     }
 
     if (url.pathname === "/sitemap.xml") {

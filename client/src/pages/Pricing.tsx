@@ -16,6 +16,7 @@ import Footer from "@/components/Footer";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { getRedditClickIdForCapi } from "@/hooks/useRedditPixel";
 import { getOpenAIAdsClickRef, isOpenAIAdsConsentGranted } from "@/hooks/useOpenAIAdsPixel";
+import { readChartDraft } from "@/lib/chartDraft";
 
 function formatPrice(amountMinor: number, currency: string, locale: string) {
   const digits = amountMinor % 100 === 0 ? 0 : 2;
@@ -72,6 +73,7 @@ export default function Pricing() {
       toast.error(isCs ? "Pro okamžité doručení je nutný souhlas se zánikem práva na odstoupení" : "Consent to immediate digital delivery is required");
       return;
     }
+    const chartDraft = readChartDraft();
     checkout.mutate({
       plan: "blueprint",
       locale: isCs ? "cs" : "en",
@@ -79,12 +81,16 @@ export default function Pricing() {
       customerEmail: customerEmail.trim(),
       customerName: customerName.trim() || undefined,
       digitalDeliveryConsent: true,
+      chartDataJson: chartDraft?.chart || undefined,
       redditClickId: getRedditClickIdForCapi(),
       openAIAdsMarketingConsent: isOpenAIAdsConsentGranted(),
       openAIAdsOppref: getOpenAIAdsClickRef(),
     }, {
-      onSuccess: ({ url, sessionId, refId }) => {
-        sessionStorage.setItem("hd_pending_checkout", JSON.stringify({ refId, sessionId, customerEmail, timestamp: Date.now() }));
+      onSuccess: ({ url, sessionId, refId, chartSnapshotId }) => {
+        sessionStorage.setItem(
+          "hd_pending_checkout",
+          JSON.stringify({ refId, sessionId, customerEmail, chartSnapshotId, timestamp: Date.now() })
+        );
         initiateCheckout(totalAmountMinor / 100, {
           content_name: "Personal Human Design Blueprint",
           content_category: "report",

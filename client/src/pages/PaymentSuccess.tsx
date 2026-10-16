@@ -71,13 +71,18 @@ export default function PaymentSuccess() {
   const parsedMeta = chartDraft?.meta ? JSON.parse(chartDraft.meta) : null;
 
   const handleDownloadBlueprint = async () => {
-    if (!parsedChart) {
+    const activeChart = parsedChart || verifyPaymentQuery.data?.chartData;
+    if (!activeChart) {
       navigate(localePath("/calculate"));
       return;
     }
     setGeneratingPdf(true);
     try {
-      await generateChartPDF(parsedChart, parsedMeta?.name || "Chart", contentQuery.data, undefined, isEn ? "en" : "cs");
+      const customerName =
+        parsedMeta?.name ||
+        verifyPaymentQuery.data?.customerName ||
+        (isEn ? "Personal Blueprint" : "Osobní Blueprint");
+      await generateChartPDF(activeChart, customerName, contentQuery.data, undefined, isEn ? "en" : "cs");
     } catch (err) {
       console.error("PDF generation error:", err);
     } finally {
@@ -118,7 +123,10 @@ export default function PaymentSuccess() {
       localStorage.setItem("hd_active_blueprint_ref", refId);
 
       const trackingKey = `hd-purchase-tracked:${refId}`;
-      if (sessionStorage.getItem(trackingKey) !== "true") {
+      if (
+        sessionStorage.getItem(trackingKey) !== "true" &&
+        localStorage.getItem(trackingKey) !== "true"
+      ) {
         const val = (verifyPaymentQuery.data.amountMinor || (isEn ? 1590 : 29000)) / 100;
         const cur = verifyPaymentQuery.data.currency || (isEn ? "EUR" : "CZK");
         meta.trackCustom("Purchase", {
@@ -136,6 +144,7 @@ export default function PaymentSuccess() {
           items: [{ item_name: "Personal Human Design Blueprint", price: val, quantity: 1 }],
         });
         sessionStorage.setItem(trackingKey, "true");
+        localStorage.setItem(trackingKey, "true");
       }
     }
   }, [isEn, plan, verifyPaymentQuery.data?.verified, refId]);
