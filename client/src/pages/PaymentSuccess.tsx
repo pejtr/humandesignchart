@@ -83,18 +83,42 @@ export default function PaymentSuccess() {
 
   const orderQuery = trpc.subscription.getOrder.useQuery(
     { token: activeToken, refId: refId || undefined },
-    { enabled: Boolean(activeToken && activeToken.length >= 16) }
+    {
+      enabled: Boolean(activeToken && activeToken.length >= 16),
+      refetchInterval: (query) => (query.state.data?.paymentStatus === "PAID" ? false : 2500),
+      retry: false,
+    }
   );
+
+  const isEntitled = Boolean(orderQuery.data?.paymentStatus === "PAID");
+
+  const [recoveryEmail, setRecoveryEmail] = useState("");
+  const [recoverySent, setRecoverySent] = useState(false);
+  const [aiReadingPrompt, setAiReadingPrompt] = useState("");
+  const [aiReadingResult, setAiReadingResult] = useState<string | null>(null);
+
+  const requestRecoveryMutation = trpc.subscription.requestAccessRecovery.useMutation({
+    onSuccess: () => setRecoverySent(true),
+  });
+
+  const redeemAiMutation = trpc.subscription.redeemAiReading.useMutation({
+    onSuccess: (data) => {
+      setAiReadingResult(data.reading);
+      orderQuery.refetch();
+    },
+  });
 
   const recordDownloadMutation = trpc.subscription.recordDownload.useMutation();
 
   const chartDraft = typeof window !== "undefined" ? readChartDraft() : null;
   const parsedChart = chartDraft?.chart ? JSON.parse(chartDraft.chart) : null;
   const parsedMeta = chartDraft?.meta ? JSON.parse(chartDraft.meta) : null;
-  const activeChart = parsedChart || orderQuery.data?.chartData;
+
+  // STRICT ENTITLEMENT GATE: activeChart is ONLY populated when the order is authoritatively PAID
+  const activeChart = isEntitled ? (orderQuery.data?.chartData || parsedChart) : null;
 
   const handleDownloadBlueprint = async () => {
-    if (!activeChart) {
+    if (!isEntitled || !activeChart || !activeToken) {
       navigate(localePath("/calculate"));
       return;
     }
@@ -252,25 +276,34 @@ export default function PaymentSuccess() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Badge className={`mb-4 px-4 py-1.5 text-sm ${verifyPaymentQuery.data?.verified ? "bg-green-500/20 text-green-400 border-green-500/30" : "bg-amber-500/20 text-amber-400 border-amber-500/30"}`}>
-              {verifyPaymentQuery.data?.verified ? (
+            <Badge className={`mb-4 px-4 py-1.5 text-sm ${isEntitled ? "bg-green-500/20 text-green-400 border-green-500/30" : "bg-amber-500/20 text-amber-400 border-amber-500/30"}`}>
+              {isEntitled ? (
                 <>
                   <CheckCircle2 className="w-4 h-4 mr-1.5 inline" />
-                  {isEn ? `Payment verified · ${refId}` : `Platba ověřena · ${refId}`}
+                  {isEn ? `Access verified · ${refId || activeToken.slice(0, 8)}` : `Přístup ověřen · ${refId || activeToken.slice(0, 8)}`}
                 </>
-              ) : (
+              ) : activeToken ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-1.5 inline animate-spin" />
                   {isEn ? "Verifying payment status…" : "Ověřujeme stav platby…"}
+                </>
+              ) : (
+                <>
+                  <Clock3 className="w-4 h-4 mr-1.5 inline" />
+                  {isEn ? "Verification required" : "Vyžadováno ověření"}
                 </>
               )}
             </Badge>
 
             <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-violet-300 to-indigo-400 bg-clip-text text-transparent">
               {isBlueprint
-                ? isEn
-                  ? "Your Blueprint is unlocked"
-                  : "Váš Blueprint je odemčený"
+                ? isEntitled
+                  ? isEn
+                    ? "Your Blueprint is unlocked"
+                    : "Váš Blueprint je odemčený"
+                  : isEn
+                    ? "Blueprint Access Verification"
+                    : "Ověření přístupu k Blueprintu"
                 : isEn
                   ? "Welcome to Premium! 🎉"
                   : "Vítejte v Premium! 🎉"}
@@ -278,91 +311,206 @@ export default function PaymentSuccess() {
 
             <p className="text-lg text-muted-foreground mb-6 max-w-xl mx-auto">
               {isBlueprint
-                ? isEn
-                  ? "Your personalized Blueprint with complete 7-day integration workbook has been prepared. Download your PDF below."
-                  : "Váš osobní Blueprint s kompletním 7denním integračním plánem je připraven. Stáhněte si své PDF níže."
+                ? isEntitled
+                  ? isEn
+                    ? "Your personalized Blueprint with complete 7-day integration workbook has been prepared. Download your PDF below."
+                    : "Váš osobní Blueprint s kompletním 7denním integračním plánem je připraven. Stáhněte si své PDF níže."
+                  : isEn
+                    ? "A confirmed paid order is required to access your Personal Blueprint and generate the PDF report."
+                    : "Pro stažení osobního Blueprintu a vygenerování PDF reportu je vyžadována potvrzená zaplacená objednávka."
                 : isEn
                   ? "Your Premium access is now active. You can use all AI readings, PDF reports, and premium tools."
                   : "Váš Premium přístup je nyní aktivní. Můžete využívat všechny AI výklady, PDF reporty a prémiové nástroje."}
             </p>
 
             {isBlueprint && (
-              <Card className="my-6 border-2 border-emerald-500/40 bg-emerald-950/20 p-6 text-center shadow-xl">
+              <Card className={`my-6 border-2 p-6 text-center shadow-xl ${isEntitled ? "border-emerald-500/40 bg-emerald-950/20" : "border-amber-500/40 bg-amber-950/20"}`}>
                 <CardContent className="space-y-4 p-0">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+                  <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full ${isEntitled ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"}`}>
                     <FileText className="h-7 w-7" />
                   </div>
                   <div>
                     <h2 className="text-2xl font-serif font-bold text-foreground">
-                      {isEn ? "Download Your Blueprint PDF" : "Stáhnout Váš osobní Blueprint"}
+                      {isEntitled
+                        ? isEn ? "Download Your Blueprint PDF" : "Stáhnout Váš osobní Blueprint"
+                        : isEn ? "Unlock Your Blueprint" : "Odemknout Váš osobní Blueprint"}
                     </h2>
                     <p className="mt-1 text-xs text-muted-foreground max-w-md mx-auto">
-                      {isEn
-                        ? "Personalized analysis of centers, gates, channels + the full 7-day integration workbook."
-                        : "Osobní rozbor center, bran, drah + kompletní 7denní plán integrace do praxe."}
+                      {isEntitled
+                        ? isEn
+                          ? "Personalized analysis of centers, gates, channels + the full 7-day integration workbook."
+                          : "Osobní rozbor center, bran, drah + kompletní 7denní plán integrace do praxe."
+                        : isEn
+                          ? "Enter your secure access token from your confirmation email or request a recovery link."
+                          : "Zadejte svůj bezpečnostní přístupový kód z potvrzovacího e-mailu nebo si nechte poslat odkaz."}
                     </p>
                   </div>
-                  {activeChart ? (
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                      <Button
-                        size="lg"
-                        onClick={handleDownloadBlueprint}
-                        disabled={generatingPdf}
-                        className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 px-8 rounded-xl shadow-md cursor-pointer"
-                      >
-                        {generatingPdf ? (
-                          <>
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            {isEn ? "Generating PDF…" : "Generuji PDF…"}
-                          </>
-                        ) : (
-                          <>
-                            <Download className="mr-2 h-5 w-5" />
-                            {isEn ? "Download Personal Blueprint (PDF)" : "Stáhnout osobní Blueprint (PDF)"}
-                          </>
-                        )}
-                      </Button>
-                      <Link href={localePath("/calculate")}>
-                        <Button variant="outline" size="lg" className="w-full sm:w-auto py-6 rounded-xl">
-                          {isEn ? "Open Interactive Chart" : "Otevřít interaktivní mapu"}
-                        </Button>
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="pt-2 max-w-sm mx-auto space-y-3">
-                      <p className="text-xs text-muted-foreground">
-                        {isEn
-                          ? "Downloading on another device? Enter the secure access token from your confirmation email:"
-                          : "Stahujete na jiném zařízení? Zadejte bezpečnostní přístupový kód z potvrzení objednávky:"}
-                      </p>
-                      <div className="flex gap-2">
-                        <Input
-                          type="text"
-                          placeholder="tok_..."
-                          value={tokenInput}
-                          onChange={(e) => setTokenInput(e.target.value)}
-                          className="text-xs"
-                        />
+                  {isEntitled && activeChart ? (
+                    <div className="space-y-6 pt-2">
+                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                         <Button
-                          size="sm"
-                          onClick={() => setEnteredToken(tokenInput.trim())}
-                          disabled={tokenInput.trim().length < 16 || orderQuery.isFetching}
+                          size="lg"
+                          onClick={handleDownloadBlueprint}
+                          disabled={generatingPdf}
+                          className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 px-8 rounded-xl shadow-md cursor-pointer"
                         >
-                          {orderQuery.isFetching ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : isEn ? (
-                            "Unlock"
+                          {generatingPdf ? (
+                            <>
+                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                              {isEn ? "Generating PDF…" : "Generuji PDF…"}
+                            </>
                           ) : (
-                            "Odemknout"
+                            <>
+                              <Download className="mr-2 h-5 w-5" />
+                              {isEn ? "Download Personal Blueprint (PDF)" : "Stáhnout osobní Blueprint (PDF)"}
+                            </>
                           )}
                         </Button>
+                        <Link href={localePath("/calculate")}>
+                          <Button variant="outline" size="lg" className="w-full sm:w-auto py-6 rounded-xl">
+                            {isEn ? "Open Interactive Chart" : "Otevřít interaktivní mapu"}
+                          </Button>
+                        </Link>
                       </div>
-                      {orderQuery.isError && (
-                        <p className="text-xs text-red-500">{orderQuery.error.message}</p>
-                      )}
+
+                      {/* 5 AI Readings Redemption Widget */}
+                      <div className="mt-6 border-t border-emerald-500/20 pt-6 text-left max-w-lg mx-auto">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-sm font-semibold flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-amber-400" />
+                            {isEn ? "Included AI Readings" : "Zahrnuté AI výklady"}
+                          </h3>
+                          <Badge variant="outline" className="border-amber-400/40 text-amber-300">
+                            {orderQuery.data?.aiReadingCredits ?? 5} / 5 {isEn ? "credits left" : "kreditů zbývá"}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-3">
+                          {isEn
+                            ? "Ask your personalized AI guide a question about your centers, authority, or life purpose."
+                            : "Položte svému osobnímu AI průvodci otázku k vašim centrům, autoritě nebo životnímu poslání."}
+                        </p>
+                        {(orderQuery.data?.aiReadingCredits ?? 5) > 0 ? (
+                          <div className="space-y-2">
+                            <div className="flex gap-2">
+                              <Input
+                                type="text"
+                                placeholder={isEn ? "What does my emotional authority mean in relationships?" : "Co znamená moje emoční autorita ve vztazích?"}
+                                value={aiReadingPrompt}
+                                onChange={(e) => setAiReadingPrompt(e.target.value)}
+                                className="text-xs"
+                              />
+                              <Button
+                                size="sm"
+                                onClick={() => redeemAiMutation.mutate({ token: activeToken, prompt: aiReadingPrompt })}
+                                disabled={redeemAiMutation.isPending}
+                                className="whitespace-nowrap"
+                              >
+                                {redeemAiMutation.isPending ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : isEn ? (
+                                  "Ask AI"
+                                ) : (
+                                  "Získat výklad"
+                                )}
+                              </Button>
+                            </div>
+                            {redeemAiMutation.isError && (
+                              <p className="text-xs text-red-400">{redeemAiMutation.error.message}</p>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-xs text-amber-400 font-medium">
+                            {isEn
+                              ? "All 5 included AI readings have been used. Upgrade to Annual Premium for unlimited access."
+                              : "Všech 5 zahrnutých AI výkladů bylo vyčerpáno. Přejděte na Roční Premium pro neomezený přístup."}
+                          </p>
+                        )}
+                        {aiReadingResult && (
+                          <div className="mt-3 p-3 rounded-lg bg-background/80 border border-violet-500/30 text-xs text-foreground">
+                            <div className="font-semibold text-violet-300 mb-1">
+                              {isEn ? "AI Guide Interpretation:" : "Výklad AI průvodce:"}
+                            </div>
+                            {aiReadingResult}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="pt-2 max-w-sm mx-auto space-y-4">
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">
+                          {isEn
+                            ? "Enter the secure access token from your confirmation email:"
+                            : "Zadejte bezpečnostní přístupový kód z potvrzovacího e-mailu:"}
+                        </p>
+                        <div className="flex gap-2">
+                          <Input
+                            type="text"
+                            placeholder="tok_..."
+                            value={tokenInput}
+                            onChange={(e) => setTokenInput(e.target.value)}
+                            className="text-xs"
+                          />
+                          <Button
+                            size="sm"
+                            onClick={() => setEnteredToken(tokenInput.trim())}
+                            disabled={tokenInput.trim().length < 16 || orderQuery.isFetching}
+                          >
+                            {orderQuery.isFetching ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : isEn ? (
+                              "Unlock"
+                            ) : (
+                              "Odemknout"
+                            )}
+                          </Button>
+                        </div>
+                        {orderQuery.isError && (
+                          <p className="text-xs text-red-500">{orderQuery.error.message}</p>
+                        )}
+                      </div>
+
+                      <div className="border-t border-border/40 pt-3 space-y-2">
+                        <p className="text-xs text-muted-foreground">
+                          {isEn
+                            ? "Lost your access link or viewing on another browser?"
+                            : "Nemáte přístupový odkaz nebo jste v jiném prohlížeči?"}
+                        </p>
+                        <div className="flex gap-2">
+                          <Input
+                            type="email"
+                            placeholder={isEn ? "buyer@example.com" : "vas@email.cz"}
+                            value={recoveryEmail}
+                            onChange={(e) => setRecoveryEmail(e.target.value)}
+                            className="text-xs"
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => requestRecoveryMutation.mutate({ email: recoveryEmail.trim(), refId: refId || undefined, locale })}
+                            disabled={!recoveryEmail.includes("@") || requestRecoveryMutation.isPending}
+                          >
+                            {requestRecoveryMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : isEn ? (
+                              "Send Link"
+                            ) : (
+                              "Zaslat odkaz"
+                            )}
+                          </Button>
+                        </div>
+                        {recoverySent && (
+                          <p className="text-xs text-green-400">
+                            {isEn
+                              ? "If a paid order was found, a recovery link was sent to your email."
+                              : "Pokud byla nalezena zaplacená objednávka, odkaz byl odeslán na váš e-mail."}
+                          </p>
+                        )}
+                      </div>
+
                       <Link href={localePath("/calculate")}>
-                        <Button variant="outline" size="sm" className="w-full mt-2">
-                          {isEn ? "Calculate New Chart" : "Vypočítat novou mapu"}
+                        <Button variant="ghost" size="sm" className="w-full text-xs">
+                          {isEn ? "Calculate New Chart / Order Blueprint" : "Vypočítat mapu / Objednat Blueprint"}
                         </Button>
                       </Link>
                     </div>

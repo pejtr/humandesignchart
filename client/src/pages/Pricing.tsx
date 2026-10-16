@@ -82,11 +82,14 @@ export default function Pricing() {
       openAIAdsMarketingConsent: isOpenAIAdsConsentGranted(),
       openAIAdsOppref: getOpenAIAdsClickRef(),
     }, {
-      onSuccess: ({ url, sessionId, refId, chartSnapshotId }) => {
+      onSuccess: ({ url, sessionId, refId, chartSnapshotId, token }) => {
         sessionStorage.setItem(
           "hd_pending_checkout",
           JSON.stringify({ refId, sessionId, customerEmail, chartSnapshotId, timestamp: Date.now() })
         );
+        if (token && refId) {
+          sessionStorage.setItem("hd_download_token_" + refId, token);
+        }
         initiateCheckout(totalAmountMinor / 100, {
           content_name: "Personal Human Design Blueprint",
           content_category: "report",

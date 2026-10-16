@@ -43,6 +43,7 @@ export const subscriptionRouter = router({
             customerEmail: z.string().email().optional(),
             customerName: z.string().optional(),
             chartDataJson: z.string().optional(),
+            chartSnapshotId: z.string().optional(),
             digitalDeliveryConsent: z.boolean().optional(),
             includePartnerAddon: z.boolean().default(false),
             voluntaryTopUpMinor: z.number().int().min(0).max(1_000_000).default(0),
@@ -278,6 +279,7 @@ export const subscriptionRouter = router({
                     sessionId: session.id,
                     refId: session.id,
                     chartSnapshotId: undefined as string | undefined,
+                    token: undefined as string | undefined,
                 };
             }
         }),
@@ -364,6 +366,73 @@ export const subscriptionRouter = router({
                 aiReadingCredits: 5,
                 customerName: null as string | null,
                 chartData: null as any,
+                emailDeliveryStatus: "SENT" as string | null,
+                emailDeliveredAt: null as string | null,
+                emailSentAt: null as string | null,
+            };
+        }),
+
+    redeemAiReading: publicProcedure
+        .input(
+            z.object({
+                token: z.string().min(16).max(128),
+                prompt: z.string().max(1000).optional(),
+                readingType: z.string().optional(),
+                idempotencyKey: z.string().max(128).optional(),
+            })
+        )
+        .mutation(async () => {
+            return {
+                success: true,
+                remainingCredits: 4,
+                reading: "AI Reading insight.",
+                model: "google/gemini-2.5-flash",
+                cached: false,
+            };
+        }),
+
+    checkEmailDelivery: publicProcedure
+        .input(
+            z.object({
+                token: z.string().min(16).max(128),
+            })
+        )
+        .query(async () => {
+            return {
+                status: "DELIVERED",
+                deliveredAt: null as string | null,
+                sentAt: null as string | null,
+                messageId: null as string | null,
+                lastError: null as string | null,
+            };
+        }),
+
+    retryEmailDelivery: publicProcedure
+        .input(
+            z.object({
+                token: z.string().min(16).max(128),
+            })
+        )
+        .mutation(async () => {
+            return {
+                success: true,
+                status: "SENT",
+                messageId: "mock_msg_id",
+            };
+        }),
+
+    requestAccessRecovery: publicProcedure
+        .input(
+            z.object({
+                email: z.string().email(),
+                refId: z.string().optional(),
+                locale: z.string().optional().default("cs"),
+            })
+        )
+        .mutation(async () => {
+            return {
+                success: true,
+                message: "If a paid order matching that email was found, a recovery link has been sent.",
             };
         }),
 
