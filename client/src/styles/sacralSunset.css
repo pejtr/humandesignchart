@@ -322,10 +322,113 @@
   100% { opacity: 0; }
 }
 
+
+/* ORACULUM+ footer: coherent monochrome violet twilight, responsive and legible. */
+.oraculum-footer.sacral-sunset-field {
+  background: linear-gradient(118deg, hsl(272 70% 96%), hsl(272 63% 92%) 54%, hsl(272 70% 96%));
+}
+.oraculum-footer.sacral-sunset-field::before {
+  background: radial-gradient(ellipse 40% 60% at 20% 52%,hsl(272 90% 71% / .27),transparent 81%),
+    radial-gradient(ellipse 38% 62% at 85% 26%,hsl(272 80% 76% / .27),transparent 85%);
+  opacity: .8;
+}
+.oraculum-footer.sacral-sunset-field::after {
+  background: radial-gradient(ellipse 36% 64% at 63% 67%,hsl(272 87% 81% / .26),transparent 85%);
+}
+.oraculum-footer-core {
+  isolation: isolate;
+  background: radial-gradient(circle at 42% 36%,hsl(272 89% 76%),hsl(272 73% 36%) 54%,hsl(272 72% 18%) 82%);
+  box-shadow: 0 0 0 8px hsl(272 77% 69% / .14),
+    0 0 45px hsl(272 76% 58% / .25),
+    inset 0 0 32px hsl(272 85% 93% / .30);
+}
+.oraculum-footer-core-ring {
+  transform-origin: 50% 50%;
+  box-shadow: 0 0 20px hsl(272 91% 86% / .18);
+  animation: sacral-machine-turn 24s linear infinite;
+}
+.oraculum-footer-core-ring--reverse { animation-direction: reverse; animation-duration: 30s; }
+.oraculum-footer-ripple {
+  width: min(34vw, 340px);
+  left: 13%;
+  top: 54%;
+  border-color: hsl(272 83% 65% / .32);
+  background: radial-gradient(circle, transparent 53%,hsl(272 81% 78% / .09) 65%,transparent 78%);
+}
+@media (max-width: 1023px) {
+  .oraculum-footer-ripple { left: 50%; top: 23%; width: min(67vw, 380px); }
+}
+
+
+/* Human-free ORACULUM+ consciousness visualization, not a stock portrait. */
+.hd-wow-oraculum-consciousness {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 27px;
+  border: 1px solid hsl(272 61% 76% / .40);
+  background:
+    radial-gradient(circle at 50% 43%, hsl(272 88% 70% / .53), transparent 23%),
+    radial-gradient(ellipse at 50% 49%, hsl(272 71% 41% / .45), transparent 57%),
+    linear-gradient(135deg, hsl(272 61% 18%), hsl(272 60% 29%) 50%, hsl(272 67% 16%));
+  box-shadow: 0 18px 50px hsl(272 63% 34% / .24);
+}
+.hd-wow-oraculum-consciousness::before,
+.hd-wow-oraculum-consciousness::after {
+  content: "";
+  position: absolute;
+  inset: -27%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 48% 53%, hsl(272 91% 82% / .23), transparent 51%);
+  animation: sacral-sunset-breathe 17s ease-in-out infinite alternate;
+}
+.hd-wow-oraculum-consciousness::after { animation: sacral-sunset-shimmer 23s ease-in-out infinite alternate; }
+.hd-wow-oraculum-consciousness-ring {
+  position: absolute;
+  width: min(69%, 245px);
+  aspect-ratio: 1;
+  border: 1px solid hsl(272 85% 86% / .60);
+  border-radius: 999px;
+  box-shadow: 0 0 32px hsl(272 91% 79% / .18), inset 0 0 28px hsl(272 84% 70% / .12);
+  animation: sacral-machine-turn 28s linear infinite;
+}
+.hd-wow-oraculum-consciousness-ring::before,
+.hd-wow-oraculum-consciousness-ring::after {
+  content: "";
+  position: absolute;
+  inset: -9%;
+  border: 1px dashed hsl(272 90% 88% / .29);
+  border-radius: 50%;
+}
+.hd-wow-oraculum-consciousness-ring::after { inset: 25%; border-style: dotted; }
+.hd-wow-oraculum-consciousness-ring--inner { width: min(43%, 155px); animation-direction: reverse; animation-duration: 33s; }
+.hd-wow-oraculum-consciousness-core {
+  position: relative;
+  z-index: 2;
+  font-family: Georgia, serif;
+  font-size: 86px;
+  color: hsl(272 97% 93%);
+  text-shadow: 0 0 22px hsl(272 90% 89% / .80), 0 0 55px hsl(272 88% 70% / .46);
+  animation: sacral-orb-breathe 9s ease-in-out infinite;
+}
+.oraculum-chat-symbol {
+  color: hsl(272 94% 93%);
+  text-shadow: 0 0 20px hsl(272 95% 82% / .7);
+  background: radial-gradient(circle, hsl(272 82% 65% / .24), transparent 75%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sacral-route-veil,
   .sacral-route-veil__aura,
   .sacral-route-machine__ring,
+  .oraculum-footer-core-ring,
+  .hd-wow-oraculum-consciousness::before,
+  .hd-wow-oraculum-consciousness::after,
+  .hd-wow-oraculum-consciousness-ring,
+  .hd-wow-oraculum-consciousness-core,
   .sacral-sunset-field::before,
   .sacral-sunset-field::after,
   .sacral-chat-launcher::before,
