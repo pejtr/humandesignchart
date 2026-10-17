@@ -1,4 +1,5 @@
 import { useLocation } from "wouter";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useLayoutEffect, useRef, useState } from "react";
 
 interface PageTransitionProps {
@@ -12,6 +13,7 @@ interface PageTransitionProps {
  */
 export default function PageTransition({ children }: PageTransitionProps) {
   const [location] = useLocation();
+  const { locale } = useLanguage();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const previousLocation = useRef(location);
 
@@ -44,7 +46,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
             <span className="sacral-route-machine__ring sacral-route-machine__ring--inner" />
             <span className="sacral-route-machine__core">✧</span>
           </div>
-          <span className="sacral-route-label">UNFOLDING</span>
+          <span className="sacral-route-label">{locale === "cs" ? "ODHALUJEME" : "UNFOLDING"}</span>
         </div>
       )}
     </div>
