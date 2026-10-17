@@ -1,0 +1,339 @@
+/*
+ * Monochrome Sacral Sunset — one violet hue, changing only luminance & opacity.
+ * Shared by the exit popup, assistant launcher/chat, and ORACULUM homepage.
+ * Animation is decorative; it never conveys status or blocks interaction.
+ */
+.sacral-sunset-field {
+  --sacral-hue: 272;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(130deg,
+    hsl(var(--sacral-hue) 70% 18%),
+    hsl(var(--sacral-hue) 69% 32%) 51%,
+    hsl(var(--sacral-hue) 70% 21%));
+}
+.sacral-sunset-field::before,
+.sacral-sunset-field::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+  inset: -30%;
+  opacity: .72;
+  transform: translate3d(0, 0, 0);
+}
+.sacral-sunset-field::before {
+  background:
+    radial-gradient(ellipse 36% 42% at 26% 66%,
+      hsl(var(--sacral-hue) 91% 70% / .52), transparent 82%),
+    radial-gradient(ellipse 42% 49% at 83% 26%,
+      hsl(var(--sacral-hue) 93% 62% / .55), transparent 79%);
+  animation: sacral-sunset-breathe 17s ease-in-out infinite alternate;
+}
+.sacral-sunset-field::after {
+  background:
+    radial-gradient(ellipse 35% 65% at 51% 50%,
+      hsl(var(--sacral-hue) 85% 56% / .38), transparent 80%),
+    radial-gradient(ellipse 28% 40% at 74% 84%,
+      hsl(var(--sacral-hue) 88% 75% / .32), transparent 78%);
+  animation: sacral-sunset-shimmer 23s ease-in-out infinite alternate;
+}
+.sacral-sunset-field > * {
+  position: relative;
+  z-index: 1;
+}
+@keyframes sacral-sunset-breathe {
+  0%   { transform: translate3d(-6%, 5%, 0) scale(.93); opacity: .37; }
+  27%  { transform: translate3d(2%, -1%, 0) scale(1.02); opacity: .61; }
+  58%  { transform: translate3d(5%, 2%, 0) scale(1.10); opacity: .47; }
+  82%  { transform: translate3d(-2%, -3%, 0) scale(1.04); opacity: .68; }
+  100% { transform: translate3d(4%, -6%, 0) scale(.97); opacity: .42; }
+}
+@keyframes sacral-sunset-shimmer {
+  0%   { transform: translate3d(4%, -5%, 0) scale(1.03); opacity: .26; }
+  32%  { transform: translate3d(-3%, 2%, 0) scale(1.06); opacity: .55; }
+  64%  { transform: translate3d(-6%, 5%, 0) scale(.98); opacity: .38; }
+  100% { transform: translate3d(3%, -2%, 0) scale(1.11); opacity: .58; }
+}
+
+/* Popup: both header and body reveal the same animated violet atmosphere. */
+.sacral-sunset-field--popup {
+  box-shadow: 0 35px 110px hsl(272 64% 12% / .52),
+    0 0 0 1px hsl(272 85% 80% / .38);
+}
+.sacral-popup-header { background: transparent; }
+.sacral-popup-content {
+  background: hsl(272 68% 19% / .42);
+  border-top: 1px solid hsl(272 85% 82% / .24);
+  backdrop-filter: blur(8px);
+}
+.sacral-popup-orb {
+  box-shadow: 0 0 0 8px hsl(272 82% 81% / .10),
+    0 0 35px hsl(272 90% 79% / .46);
+  animation: sacral-orb-breathe 8s ease-in-out infinite;
+}
+.sacral-popup-geometry {
+  animation: sacral-geometry-drift 35s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+.sacral-popup-cta {
+  background: linear-gradient(115deg,hsl(272 95% 87%),hsl(272 95% 75%),hsl(272 92% 85%));
+  color: hsl(272 72% 18%);
+  box-shadow: 0 9px 28px hsl(272 86% 70% / .27);
+}
+.sacral-popup-cta:hover { filter: brightness(1.06); box-shadow: 0 12px 32px hsl(272 86% 76% / .42); }
+@keyframes sacral-orb-breathe {
+  0%,100% { box-shadow: 0 0 0 6px hsl(272 82% 81% / .09),0 0 24px hsl(272 90% 79% / .28); }
+  50% { box-shadow: 0 0 0 11px hsl(272 82% 81% / .16),0 0 40px hsl(272 90% 79% / .48); }
+}
+@keyframes sacral-geometry-drift {
+  from { transform: rotate(-4deg) scale(.96); }
+  to { transform: rotate(7deg) scale(1.06); }
+}
+
+/* Assistant: one ambient field, never opaque rainbow/neon overlays. */
+.sacral-chat-shell {
+  border-color: hsl(272 64% 69% / .40);
+  color: #fbf5ff;
+}
+.sacral-chat-header {
+  background: hsl(272 70% 17% / .60);
+  border-color: hsl(272 80% 82% / .20);
+  backdrop-filter: blur(8px);
+}
+.sacral-chat-shell .sacral-chat-header h3 { color: #f9efff; }
+.sacral-chat-shell .sacral-chat-header p { color: #d8c1e9; }
+.sacral-chat-shell .sacral-chat-header button { color: #e9d7f8; }
+.sacral-chat-shell .sacral-chat-header button:hover { color: white; background: hsl(272 73% 62% / .22); }
+.sacral-chat-shell .sacral-chat-body {
+  background: hsl(272 60% 13% / .42);
+  color: #f7edff;
+}
+.sacral-chat-shell .sacral-chat-body > form {
+  background: hsl(272 62% 15% / .78);
+  border-color: hsl(272 67% 80% / .18);
+}
+.sacral-chat-shell.is-thinking::before { animation-duration: 11s; }
+.sacral-chat-launcher {
+  isolation: isolate;
+  background: hsl(272 68% 22%);
+  box-shadow: 0 0 0 4px hsl(272 75% 65% / .12),
+    0 8px 30px hsl(272 85% 52% / .26);
+}
+.sacral-chat-launcher::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:-12px;
+  border-radius:50%;
+  background: radial-gradient(circle, hsl(272 95% 80% / .45) 9%,hsl(272 93% 60% / .22) 55%,transparent 75%);
+  animation: sacral-orb-breathe 8s ease-in-out infinite;
+  pointer-events:none;
+}
+
+/* ORACULUM landing: pale violet shades keep the existing dark copy legible. */
+.hd-wow-oraculum.sacral-sunset-field {
+  --sacral-hue:272;
+  background: linear-gradient(115deg,hsl(272 65% 96%),hsl(272 66% 91%) 52%,hsl(272 63% 96%));
+}
+.hd-wow-oraculum.sacral-sunset-field::before {
+  background: radial-gradient(ellipse 41% 64% at 21% 57%,hsl(272 83% 75% / .36),transparent 82%),
+    radial-gradient(ellipse 49% 62% at 83% 30%,hsl(272 79% 80% / .52),transparent 81%);
+}
+.hd-wow-oraculum.sacral-sunset-field::after {
+  background: radial-gradient(ellipse 44% 70% at 52% 55%,hsl(272 85% 76% / .22),transparent 80%);
+}
+.hd-wow-oraculum.sacral-sunset-field .hd-wow-oraculum-layout {
+  position:relative;
+  z-index:1;
+}
+.hd-wow-oraculum .hd-wow-oraculum-visual {
+  isolation:isolate;
+}
+.hd-wow-oraculum .hd-wow-oraculum-visual::after {
+  content:"";
+  position:absolute;
+  z-index:1;
+  inset:0;
+  border-radius:27px;
+  pointer-events:none;
+  background: radial-gradient(ellipse at 68% 32%, hsl(272 90% 85% / .27),transparent 72%);
+  animation: sacral-sunset-shimmer 23s ease-in-out infinite alternate;
+}
+.hd-wow-oraculum .hd-wow-chat-bubble {
+  z-index:2;
+}
+
+
+/* Soft water-droplet ripples: two expanding, dissolving concentric rings. */
+.sacral-ripple-ring {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  left: 50%;
+  top: 50%;
+  width: min(75%, 400px);
+  aspect-ratio: 1;
+  border: 1px solid hsl(272 93% 83% / .44);
+  border-radius: 9999px;
+  background: radial-gradient(circle, transparent 54%, hsl(272 89% 78% / .075) 67%, transparent 74%);
+  box-shadow: 0 0 26px hsl(272 88% 80% / .10), inset 0 0 24px hsl(272 88% 80% / .065);
+  transform: translate(-50%, -50%) scale(.35);
+  opacity: 0;
+  animation: sacral-water-ripple 11s cubic-bezier(.22,.46,.38,.85) infinite;
+}
+.sacral-ripple-ring--two { animation-delay: -5.5s; }
+@keyframes sacral-water-ripple {
+  0%, 5% { transform: translate(-50%,-50%) scale(.35); opacity: 0; }
+  14% { opacity: .34; }
+  46% { opacity: .20; }
+  78%, 100% { transform: translate(-50%,-50%) scale(1.46); opacity: 0; }
+}
+.sacral-sunset-field > .sacral-ripple-ring { z-index: 0; }
+.sacral-popup-ripple {
+  width: min(80%, 460px);
+  border-color: hsl(272 92% 90% / .35);
+}
+.sacral-chat-ripple {
+  width: 83px;
+  height: 83px;
+  top: 50%;
+  left: 50%;
+  border-color: hsl(272 91% 82% / .53);
+}
+.sacral-chat-shell > .sacral-ripple-ring {
+  width: min(75%, 280px);
+  top: 48%;
+}
+/* Larger ORACULUM waves: noticeable in motion, but with feathered edges. */
+.sacral-oraculum-ripple {
+  left: 27%;
+  top: 48%;
+  width: min(44vw, 500px);
+  border: 1px solid hsl(272 75% 65% / .44);
+  background: radial-gradient(circle,
+    transparent 48%,
+    hsl(272 81% 71% / .045) 56%,
+    hsl(272 82% 74% / .20) 62%,
+    hsl(272 85% 78% / .065) 68%,
+    transparent 78%);
+  box-shadow: 0 0 20px hsl(272 78% 70% / .18),
+    0 0 52px hsl(272 88% 82% / .13),
+    inset 0 0 28px hsl(272 84% 76% / .12);
+  animation: sacral-oraculum-water-ripple 13s cubic-bezier(.25,.40,.37,.86) infinite;
+}
+.sacral-oraculum-ripple.sacral-ripple-ring--two { animation-delay: -6.5s; }
+@keyframes sacral-oraculum-water-ripple {
+  0%, 6% { transform:translate(-50%,-50%) scale(.38); opacity:0; }
+  20% { opacity:.58; }
+  43% { opacity:.47; }
+  68% { opacity:.20; }
+  89%, 100% { transform:translate(-50%,-50%) scale(1.76); opacity:0; }
+}
+@media (max-width: 800px) {
+  .sacral-oraculum-ripple { left: 50%; top: 32%; width: min(83vw, 420px); }
+}
+
+
+/* Cross-page mystical mechanism — short, nonblocking route transition. */
+.sacral-route-veil {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 21px;
+  overflow: hidden;
+  pointer-events: none;
+  color: hsl(272 94% 89%);
+  background: hsl(272 68% 9% / .89);
+  animation: sacral-route-veil .66s ease-in-out both;
+}
+.sacral-route-veil__aura {
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(ellipse 30% 38% at 48% 53%,hsl(272 88% 69% / .25),transparent 86%),
+    radial-gradient(ellipse 34% 42% at 72% 36%,hsl(272 86% 52% / .21),transparent 86%);
+  animation: sacral-sunset-breathe 7s ease-in-out infinite alternate;
+}
+.sacral-route-machine {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  height: clamp(154px, 21vw, 240px);
+  aspect-ratio: 1;
+  place-items: center;
+}
+.sacral-route-machine__ring {
+  position: absolute;
+  border: 1px solid hsl(272 91% 86% / .40);
+  border-radius: 50%;
+  inset: 0;
+  box-shadow: 0 0 27px hsl(272 90% 74% / .16), inset 0 0 22px hsl(272 90% 74% / .11);
+}
+.sacral-route-machine__ring::before,
+.sacral-route-machine__ring::after {
+  content: "";
+  position: absolute;
+  inset: -7%;
+  border-radius: 50%;
+  border: 1px dashed hsl(272 91% 85% / .32);
+}
+.sacral-route-machine__ring::after { inset: 12%; border-style: dotted; opacity: .58; }
+.sacral-route-machine__ring--outer {
+  animation: sacral-machine-turn 11s linear infinite;
+}
+.sacral-route-machine__ring--middle {
+  inset: 15%;
+  border-width: 2px;
+  opacity: .88;
+  animation: sacral-machine-turn 8s linear infinite reverse;
+}
+.sacral-route-machine__ring--inner {
+  inset: 32%;
+  opacity: .77;
+  background: hsl(272 88% 67% / .12);
+  animation: sacral-machine-turn 6s linear infinite;
+}
+.sacral-route-machine__core {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(42px, 6vw, 64px);
+  font-family: Georgia, serif;
+  font-weight: 400;
+  color: hsl(272 92% 89%);
+  text-shadow: 0 0 32px hsl(272 95% 84% / .48);
+}
+.sacral-route-label {
+  position: relative;
+  z-index: 1;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .32em;
+  color: hsl(272 85% 88% / .85);
+}
+@keyframes sacral-machine-turn { to { transform: rotate(360deg); } }
+@keyframes sacral-route-veil {
+  0% { opacity: 0; }
+  18%, 72% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sacral-route-veil,
+  .sacral-route-veil__aura,
+  .sacral-route-machine__ring,
+  .sacral-sunset-field::before,
+  .sacral-sunset-field::after,
+  .sacral-chat-launcher::before,
+  .sacral-popup-orb,
+  .sacral-popup-geometry,
+  .sacral-ripple-ring,
+  .hd-wow-oraculum .hd-wow-oraculum-visual::after {
+    animation:none !important;
+    transform:none !important;
+  }
+}
