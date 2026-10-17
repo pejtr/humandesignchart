@@ -594,7 +594,9 @@ export default function Home() {
         </div>
       </div>
 
-      <section className="hd-wow-oraculum" aria-labelledby="hd-wow-oraculum-title">
+      <section className="hd-wow-oraculum sacral-sunset-field" aria-labelledby="hd-wow-oraculum-title">
+        <span className="sacral-ripple-ring sacral-oraculum-ripple" aria-hidden="true" />
+        <span className="sacral-ripple-ring sacral-oraculum-ripple sacral-ripple-ring--two" aria-hidden="true" />
         <div className="hd-wow-oraculum-layout">
           <div className="hd-wow-oraculum-visual">
             <img src="/images/brand/marie-landing-v1.webp" alt={isCs ? "Digitální průvodkyně ORACULUM+" : "ORACULUM+ digital guide"} loading="lazy" decoding="async" />
