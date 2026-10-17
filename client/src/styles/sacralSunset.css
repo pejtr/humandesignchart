@@ -1,0 +1,178 @@
+/*
+ * Monochrome Sacral Sunset — one violet hue, changing only luminance & opacity.
+ * Shared by the exit popup, assistant launcher/chat, and ORACULUM homepage.
+ * Animation is decorative; it never conveys status or blocks interaction.
+ */
+.sacral-sunset-field {
+  --sacral-hue: 272;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(130deg,
+    hsl(var(--sacral-hue) 70% 18%),
+    hsl(var(--sacral-hue) 69% 32%) 51%,
+    hsl(var(--sacral-hue) 70% 21%));
+}
+.sacral-sunset-field::before,
+.sacral-sunset-field::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+  inset: -30%;
+  opacity: .72;
+  transform: translate3d(0, 0, 0);
+}
+.sacral-sunset-field::before {
+  background:
+    radial-gradient(ellipse 36% 42% at 26% 66%,
+      hsl(var(--sacral-hue) 91% 70% / .52), transparent 82%),
+    radial-gradient(ellipse 42% 49% at 83% 26%,
+      hsl(var(--sacral-hue) 93% 62% / .55), transparent 79%);
+  animation: sacral-sunset-breathe 17s ease-in-out infinite alternate;
+}
+.sacral-sunset-field::after {
+  background:
+    radial-gradient(ellipse 35% 65% at 51% 50%,
+      hsl(var(--sacral-hue) 85% 56% / .38), transparent 80%),
+    radial-gradient(ellipse 28% 40% at 74% 84%,
+      hsl(var(--sacral-hue) 88% 75% / .32), transparent 78%);
+  animation: sacral-sunset-shimmer 23s ease-in-out infinite alternate;
+}
+.sacral-sunset-field > * {
+  position: relative;
+  z-index: 1;
+}
+@keyframes sacral-sunset-breathe {
+  0%   { transform: translate3d(-6%, 5%, 0) scale(.93); opacity: .37; }
+  27%  { transform: translate3d(2%, -1%, 0) scale(1.02); opacity: .61; }
+  58%  { transform: translate3d(5%, 2%, 0) scale(1.10); opacity: .47; }
+  82%  { transform: translate3d(-2%, -3%, 0) scale(1.04); opacity: .68; }
+  100% { transform: translate3d(4%, -6%, 0) scale(.97); opacity: .42; }
+}
+@keyframes sacral-sunset-shimmer {
+  0%   { transform: translate3d(4%, -5%, 0) scale(1.03); opacity: .26; }
+  32%  { transform: translate3d(-3%, 2%, 0) scale(1.06); opacity: .55; }
+  64%  { transform: translate3d(-6%, 5%, 0) scale(.98); opacity: .38; }
+  100% { transform: translate3d(3%, -2%, 0) scale(1.11); opacity: .58; }
+}
+
+/* Popup: both header and body reveal the same animated violet atmosphere. */
+.sacral-sunset-field--popup {
+  box-shadow: 0 35px 110px hsl(272 64% 12% / .52),
+    0 0 0 1px hsl(272 85% 80% / .38);
+}
+.sacral-popup-header { background: transparent; }
+.sacral-popup-content {
+  background: hsl(272 68% 19% / .42);
+  border-top: 1px solid hsl(272 85% 82% / .24);
+  backdrop-filter: blur(8px);
+}
+.sacral-popup-orb {
+  box-shadow: 0 0 0 8px hsl(272 82% 81% / .10),
+    0 0 35px hsl(272 90% 79% / .46);
+  animation: sacral-orb-breathe 8s ease-in-out infinite;
+}
+.sacral-popup-geometry {
+  animation: sacral-geometry-drift 35s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+.sacral-popup-cta {
+  background: linear-gradient(115deg,hsl(272 95% 87%),hsl(272 95% 75%),hsl(272 92% 85%));
+  color: hsl(272 72% 18%);
+  box-shadow: 0 9px 28px hsl(272 86% 70% / .27);
+}
+.sacral-popup-cta:hover { filter: brightness(1.06); box-shadow: 0 12px 32px hsl(272 86% 76% / .42); }
+@keyframes sacral-orb-breathe {
+  0%,100% { box-shadow: 0 0 0 6px hsl(272 82% 81% / .09),0 0 24px hsl(272 90% 79% / .28); }
+  50% { box-shadow: 0 0 0 11px hsl(272 82% 81% / .16),0 0 40px hsl(272 90% 79% / .48); }
+}
+@keyframes sacral-geometry-drift {
+  from { transform: rotate(-4deg) scale(.96); }
+  to { transform: rotate(7deg) scale(1.06); }
+}
+
+/* Assistant: one ambient field, never opaque rainbow/neon overlays. */
+.sacral-chat-shell {
+  border-color: hsl(272 64% 69% / .40);
+  color: #fbf5ff;
+}
+.sacral-chat-header {
+  background: hsl(272 70% 17% / .60);
+  border-color: hsl(272 80% 82% / .20);
+  backdrop-filter: blur(8px);
+}
+.sacral-chat-shell .sacral-chat-header h3 { color: #f9efff; }
+.sacral-chat-shell .sacral-chat-header p { color: #d8c1e9; }
+.sacral-chat-shell .sacral-chat-header button { color: #e9d7f8; }
+.sacral-chat-shell .sacral-chat-header button:hover { color: white; background: hsl(272 73% 62% / .22); }
+.sacral-chat-shell .sacral-chat-body {
+  background: hsl(272 60% 13% / .42);
+  color: #f7edff;
+}
+.sacral-chat-shell .sacral-chat-body > form {
+  background: hsl(272 62% 15% / .78);
+  border-color: hsl(272 67% 80% / .18);
+}
+.sacral-chat-shell.is-thinking::before { animation-duration: 11s; }
+.sacral-chat-launcher {
+  isolation: isolate;
+  background: hsl(272 68% 22%);
+  box-shadow: 0 0 0 4px hsl(272 75% 65% / .12),
+    0 8px 30px hsl(272 85% 52% / .26);
+}
+.sacral-chat-launcher::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:-12px;
+  border-radius:50%;
+  background: radial-gradient(circle, hsl(272 95% 80% / .45) 9%,hsl(272 93% 60% / .22) 55%,transparent 75%);
+  animation: sacral-orb-breathe 8s ease-in-out infinite;
+  pointer-events:none;
+}
+
+/* ORACULUM landing: pale violet shades keep the existing dark copy legible. */
+.hd-wow-oraculum.sacral-sunset-field {
+  --sacral-hue:272;
+  background: linear-gradient(115deg,hsl(272 65% 96%),hsl(272 66% 91%) 52%,hsl(272 63% 96%));
+}
+.hd-wow-oraculum.sacral-sunset-field::before {
+  background: radial-gradient(ellipse 41% 64% at 21% 57%,hsl(272 83% 75% / .36),transparent 82%),
+    radial-gradient(ellipse 49% 62% at 83% 30%,hsl(272 79% 80% / .52),transparent 81%);
+}
+.hd-wow-oraculum.sacral-sunset-field::after {
+  background: radial-gradient(ellipse 44% 70% at 52% 55%,hsl(272 85% 76% / .22),transparent 80%);
+}
+.hd-wow-oraculum.sacral-sunset-field .hd-wow-oraculum-layout {
+  position:relative;
+  z-index:1;
+}
+.hd-wow-oraculum .hd-wow-oraculum-visual {
+  isolation:isolate;
+}
+.hd-wow-oraculum .hd-wow-oraculum-visual::after {
+  content:"";
+  position:absolute;
+  z-index:1;
+  inset:0;
+  border-radius:27px;
+  pointer-events:none;
+  background: radial-gradient(ellipse at 68% 32%, hsl(272 90% 85% / .27),transparent 72%);
+  animation: sacral-sunset-shimmer 23s ease-in-out infinite alternate;
+}
+.hd-wow-oraculum .hd-wow-chat-bubble {
+  z-index:2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sacral-sunset-field::before,
+  .sacral-sunset-field::after,
+  .sacral-chat-launcher::before,
+  .sacral-popup-orb,
+  .sacral-popup-geometry,
+  .hd-wow-oraculum .hd-wow-oraculum-visual::after {
+    animation:none !important;
+    transform:none !important;
+  }
+}
