@@ -20,8 +20,8 @@ export function FloatingChatGuide() {
   const [isLoading, setIsLoading] = useState(false);
 
   const welcomeMessage = isEn
-    ? "Welcome. I am Marie, your personal Human Design guide. Ask me about your chart, decisions, relationships or current energy."
-    : "Vítejte. Jsem Marie, vaše osobní průvodkyně Human Designem. Zeptejte se mě na svou mapu, rozhodování, vztahy nebo dnešní energii.";
+    ? "Welcome. I am ORACULUM+, your Human Design AI guide. Ask me about your chart, decisions, relationships or current energy."
+    : "Vítejte. Jsem ORACULUM+, váš AI průvodce Human Designem. Zeptejte se mě na svou mapu, rozhodování, vztahy nebo dnešní energii.";
 
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: welcomeMessage },
@@ -159,11 +159,7 @@ export function FloatingChatGuide() {
             >
               <span className="sacral-ripple-ring sacral-chat-ripple" aria-hidden="true" />
               <span className="sacral-ripple-ring sacral-chat-ripple sacral-ripple-ring--two" aria-hidden="true" />
-              <img
-                src="/images/brand/veleknezka-master-v1.png"
-                alt=""
-                className="relative z-10 h-full w-full rounded-full object-cover object-[center_16%]"
-              />
+              <span className="oraculum-chat-symbol relative z-10 grid h-full w-full place-items-center rounded-full text-3xl" aria-hidden="true">✧</span>
               <span className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-full border border-violet-200/70 bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-900 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block">
                 {isEn ? "Ask ORACULUM+" : "Zeptat se ORACULUM+"}
               </span>
@@ -192,11 +188,7 @@ export function FloatingChatGuide() {
             <div className="sacral-chat-header flex items-center justify-between border-b p-3">
               <div className="flex items-center gap-2">
                 <div className="sacral-popup-orb h-9 w-9 shrink-0 overflow-hidden rounded-full border border-violet-200/70 bg-[#2b1643]">
-                  <img
-                    src="/images/brand/veleknezka-master-v1.png"
-                    alt=""
-                    className="h-full w-full object-cover object-[center_16%]"
-                  />
+                  <span className="oraculum-chat-symbol grid h-full w-full place-items-center text-xl" aria-hidden="true">✧</span>
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold leading-none text-foreground">ORACULUM+</h3>
@@ -234,8 +226,8 @@ export function FloatingChatGuide() {
                 <Sparkles className="mb-4 h-12 w-12 text-violet-200" />
                 <p className="mb-4 text-sm text-violet-100/90">
                   {isEn
-                    ? "Please sign in to chat with Marie."
-                    : "Pro rozhovor s Marií se prosím přihlaste."}
+                    ? "Please sign in to chat with ORACULUM+."
+                    : "Pro rozhovor s ORACULUM+ se prosím přihlaste."}
                 </p>
                 <Button onClick={() => (window.location.href = getLoginUrl())}>
                   {isEn ? "Sign in" : "Přihlásit se"}
@@ -246,10 +238,10 @@ export function FloatingChatGuide() {
                 messages={messages}
                 onSendMessage={handleSendMessage}
                 isLoading={isLoading}
-                placeholder={isEn ? "Ask Marie..." : "Zeptejte se Marie..."}
+                placeholder={isEn ? "Ask ORACULUM+..." : "Zeptejte se ORACULUM+..."}
                 className="sacral-chat-body min-h-0 flex-1 rounded-none border-none shadow-none"
                 height="auto"
-                emptyStateMessage={isEn ? "Ask Marie your first question" : "Zeptejte se Marie na první otázku"}
+                emptyStateMessage={isEn ? "Ask ORACULUM+ your first question" : "Položte ORACULUM+ první otázku"}
                 suggestedPrompts={
                   isEn
                     ? [
