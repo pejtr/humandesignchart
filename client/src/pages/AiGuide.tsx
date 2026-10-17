@@ -358,6 +358,17 @@ export default function AiGuide() {
   const [isLoading, setIsLoading] = useState(false);
   const [isChatMinimized, setIsChatMinimized] = useState(false);
 
+  // Prefill question from URL query param (e.g. from ORACULUM+ sections or footer)
+  useEffect(() => {
+    try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const queryParam = searchParams.get("q");
+      if (queryParam && queryParam.trim()) {
+        setInput(queryParam.trim());
+      }
+    } catch {}
+  }, []);
+
   // --- Chat persistence & threads ---
   const [selectedChartId, setSelectedChartId] = useState<number | null>(null);
   const [conversationId, setConversationId] = useState<number | null>(null);
@@ -553,12 +564,12 @@ export default function AiGuide() {
                 <Bot className="w-10 h-10 text-primary" />
               </div>
               <h1 className="text-3xl font-serif font-bold mb-4">
-                {isEn ? "AI Human Design Guide" : "AI průvodce Human Designem"}
+                {isEn ? "ORACULUM+ · AI Human Design Guide" : "ORACULUM+ · AI průvodkyně Human Designem"}
               </h1>
               <p className="text-muted-foreground mb-8">
                 {isEn
-                  ? "Sign in to access the AI guide that will answer any questions about Human Design."
-                  : "Přihlaste se pro přístup k AI průvodci, který vám zodpoví jakékoliv otázky o Human Designu."}
+                  ? "Sign in to access ORACULUM+, your personal AI guide answering any questions about Human Design."
+                  : "Přihlaste se pro přístup k ORACULUM+, vaší osobní AI průvodkyni, která zodpoví jakékoliv otázky o Human Designu."}
               </p>
               <a href={getLoginUrl()}>
                 <Button size="lg" className="gap-2">
@@ -624,7 +635,7 @@ export default function AiGuide() {
                   </div>
                   <div>
                     <h1 className="text-sm font-serif font-semibold">
-                      {isEn ? "AI Human Design Guide" : "AI průvodce Human Designem"}
+                      {isEn ? "ORACULUM+ · AI Human Design Guide" : "ORACULUM+ · AI průvodkyně Human Designem"}
                     </h1>
                     <p className="text-xs text-muted-foreground">
                       {isEn ? "Ask anything about Human Design" : "Zeptejte se na cokoliv o Human Designu"}

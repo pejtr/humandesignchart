@@ -290,6 +290,9 @@ function LocaleRoutes() {
             <Route path="/:locale/chat-reading">
               {() => <SafeRoute><VslChatFunnel /></SafeRoute>}
             </Route>
+            <Route path="/:locale/vsl-chat">
+              {() => <SafeRoute><VslChatFunnel /></SafeRoute>}
+            </Route>
             <Route path="/:locale/ugc-factory">
               {() => <SafeRoute><UgcFactory /></SafeRoute>}
             </Route>
@@ -366,6 +369,7 @@ function LocaleRoutes() {
             <Route path="/payment/cancel"><LegacyRedirect path="/payment/cancel" /></Route>
             <Route path="/composite"><LegacyRedirect path="/composite" /></Route>
             <Route path="/crm-dashboard"><LegacyRedirect path="/crm-dashboard" /></Route>
+            <Route path="/vsl-chat"><LegacyRedirect path="/vsl-chat" /></Route>
 
             {/* 404 */}
             <Route path="/404" component={NotFound} />
