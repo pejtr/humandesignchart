@@ -235,7 +235,97 @@
   .sacral-oraculum-ripple { left: 50%; top: 32%; width: min(83vw, 420px); }
 }
 
+
+/* Cross-page mystical mechanism — short, nonblocking route transition. */
+.sacral-route-veil {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 21px;
+  overflow: hidden;
+  pointer-events: none;
+  color: hsl(272 94% 89%);
+  background: hsl(272 68% 9% / .89);
+  animation: sacral-route-veil .66s ease-in-out both;
+}
+.sacral-route-veil__aura {
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(ellipse 30% 38% at 48% 53%,hsl(272 88% 69% / .25),transparent 86%),
+    radial-gradient(ellipse 34% 42% at 72% 36%,hsl(272 86% 52% / .21),transparent 86%);
+  animation: sacral-sunset-breathe 7s ease-in-out infinite alternate;
+}
+.sacral-route-machine {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  height: clamp(154px, 21vw, 240px);
+  aspect-ratio: 1;
+  place-items: center;
+}
+.sacral-route-machine__ring {
+  position: absolute;
+  border: 1px solid hsl(272 91% 86% / .40);
+  border-radius: 50%;
+  inset: 0;
+  box-shadow: 0 0 27px hsl(272 90% 74% / .16), inset 0 0 22px hsl(272 90% 74% / .11);
+}
+.sacral-route-machine__ring::before,
+.sacral-route-machine__ring::after {
+  content: "";
+  position: absolute;
+  inset: -7%;
+  border-radius: 50%;
+  border: 1px dashed hsl(272 91% 85% / .32);
+}
+.sacral-route-machine__ring::after { inset: 12%; border-style: dotted; opacity: .58; }
+.sacral-route-machine__ring--outer {
+  animation: sacral-machine-turn 11s linear infinite;
+}
+.sacral-route-machine__ring--middle {
+  inset: 15%;
+  border-width: 2px;
+  opacity: .88;
+  animation: sacral-machine-turn 8s linear infinite reverse;
+}
+.sacral-route-machine__ring--inner {
+  inset: 32%;
+  opacity: .77;
+  background: hsl(272 88% 67% / .12);
+  animation: sacral-machine-turn 6s linear infinite;
+}
+.sacral-route-machine__core {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(42px, 6vw, 64px);
+  font-family: Georgia, serif;
+  font-weight: 400;
+  color: hsl(272 92% 89%);
+  text-shadow: 0 0 32px hsl(272 95% 84% / .48);
+}
+.sacral-route-label {
+  position: relative;
+  z-index: 1;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .32em;
+  color: hsl(272 85% 88% / .85);
+}
+@keyframes sacral-machine-turn { to { transform: rotate(360deg); } }
+@keyframes sacral-route-veil {
+  0% { opacity: 0; }
+  18%, 72% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .sacral-route-veil,
+  .sacral-route-veil__aura,
+  .sacral-route-machine__ring,
   .sacral-sunset-field::before,
   .sacral-sunset-field::after,
   .sacral-chat-launcher::before,
