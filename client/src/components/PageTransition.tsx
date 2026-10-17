@@ -1,49 +1,52 @@
 import { useLocation } from "wouter";
-import { useEffect, useState, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 interface PageTransitionProps {
   children: React.ReactNode;
 }
 
 /**
- * Wraps page content with a fade-in animation on route changes.
- * Uses CSS transitions for smooth, performant page transitions.
+ * A short, decorative page-change ritual, not a fake loading operation:
+ * route content is never held hostage by the animation. Payment, login,
+ * checkout and account routes skip the effect entirely.
  */
 export default function PageTransition({ children }: PageTransitionProps) {
   const [location] = useLocation();
-  const [isVisible, setIsVisible] = useState(true);
-  const [displayChildren, setDisplayChildren] = useState(children);
-  const prevLocation = useRef(location);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const previousLocation = useRef(location);
 
-  useEffect(() => {
-    if (location !== prevLocation.current) {
-      // Fade out
-      setIsVisible(false);
+  useLayoutEffect(() => {
+    if (previousLocation.current === location) return;
+    const previous = previousLocation.current;
+    previousLocation.current = location;
 
-      const timeout = setTimeout(() => {
-        // Update content and fade in
-        setDisplayChildren(children);
-        setIsVisible(true);
-        prevLocation.current = location;
-      }, 150); // Short fade-out duration
-
-      return () => clearTimeout(timeout);
-    } else {
-      // Same location, just update children (e.g. data loaded)
-      setDisplayChildren(children);
+    const sensitivePath = /(?:^|\\/)(?:payment|checkout|login|portal)(?:\\/|$)/i;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion || sensitivePath.test(location) || sensitivePath.test(previous)) {
+      setIsTransitioning(false);
+      return;
     }
-  }, [location, children]);
+
+    setIsTransitioning(true);
+    const timeout = window.setTimeout(() => setIsTransitioning(false), 660);
+    return () => window.clearTimeout(timeout);
+  }, [location]);
 
   return (
-    <div
-      className="page-transition"
-      style={{
-        opacity: isVisible ? 1 : 0,
-        transition: "opacity 250ms ease-out",
-        willChange: "opacity",
-      }}
-    >
-      {displayChildren}
+    <div className="page-transition">
+      {children}
+      {isTransitioning && (
+        <div className="sacral-route-veil" aria-hidden="true">
+          <div className="sacral-route-veil__aura" />
+          <div className="sacral-route-machine">
+            <span className="sacral-route-machine__ring sacral-route-machine__ring--outer" />
+            <span className="sacral-route-machine__ring sacral-route-machine__ring--middle" />
+            <span className="sacral-route-machine__ring sacral-route-machine__ring--inner" />
+            <span className="sacral-route-machine__core">✧</span>
+          </div>
+          <span className="sacral-route-label">UNFOLDING</span>
+        </div>
+      )}
     </div>
   );
 }
