@@ -344,7 +344,7 @@ const projects = [
           </div>
         </div>
 
-        {/* Footer Embedded ARACULUM Chatbot */}
+        {/* Footer Embedded ORACULUM+ Chatbot */}
         <div className="mt-10 p-6 rounded-3xl bg-gradient-to-r from-amber-900/10 via-slate-900/10 to-amber-900/10 border border-amber-500/20 backdrop-blur-xl shadow-lg relative overflow-hidden">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
@@ -353,9 +353,9 @@ const projects = [
               </div>
               <div>
                 <h3 className="font-serif font-bold text-base text-foreground flex items-center gap-2">
-                  <span>{locale === "cs" ? "Zeptat se ARACULUM" : "Ask ARACULUM"}</span>
+                  <span>{locale === "cs" ? "Zeptat se ORACULUM+" : "Ask ORACULUM+"}</span>
                   <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 text-[10px] font-mono font-bold border border-amber-500/20">
-                    ARACULUM
+                    ORACULUM+
                   </span>
                 </h3>
                 <p className="text-xs text-muted-foreground">
@@ -370,7 +370,7 @@ const projects = [
                 locale === "cs" ? "Co znamená Sakrál?" : "What is Sacral?",
                 locale === "cs" ? "Jak fungují tranzity?" : "How do transits work?",
               ].map((q, idx) => (
-                <Link key={idx} href={localePath(`/vsl-chat?q=${encodeURIComponent(q)}`)}>
+                <Link key={idx} href={localePath(`/ai-guide?q=${encodeURIComponent(q)}`)}>
                   <button className="px-3 py-1.5 rounded-xl bg-background/80 hover:bg-primary/10 border border-border text-xs text-foreground transition-all hover:scale-[1.02]">
                     ✨ {q}
                   </button>
@@ -382,10 +382,10 @@ const projects = [
           <div className="flex items-center gap-2 pt-2">
             <input
               type="text"
-              placeholder={locale === "cs" ? "Zadejte svůj dotaz pro ARACULUM..." : "Type your question for ARACULUM..."}
+              placeholder={locale === "cs" ? "Zadejte svůj dotaz pro ORACULUM+..." : "Type your question for ORACULUM+..."}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
-                  window.location.href = localePath(`/vsl-chat?q=${encodeURIComponent((e.target as HTMLInputElement).value.trim())}`);
+                  window.location.href = localePath(`/ai-guide?q=${encodeURIComponent((e.target as HTMLInputElement).value.trim())}`);
                 }
               }}
               className="flex-1 px-4 py-3 rounded-2xl bg-background/90 border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/30"
@@ -394,7 +394,7 @@ const projects = [
               onClick={(e) => {
                 const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
                 if (input && input.value.trim()) {
-                  window.location.href = localePath(`/vsl-chat?q=${encodeURIComponent(input.value.trim())}`);
+                  window.location.href = localePath(`/ai-guide?q=${encodeURIComponent(input.value.trim())}`);
                 }
               }}
               className="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-bold shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5"

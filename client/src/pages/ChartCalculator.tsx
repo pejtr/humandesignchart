@@ -8,7 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Compass, Loader2, MapPin, Calendar, Clock, Info, User, Heart, Users, Briefcase, Baby, Star, UserCheck, HelpCircle, Lock, Code2, Copy, Check, Globe, Palette, Sparkles } from "lucide-react";
+import {
+  Compass, Loader2, MapPin, Calendar, Clock, User, Heart, Users,
+  Briefcase, Baby, Star, Lock, Code2, Copy, Check, Globe, Palette,
+  Sparkles, Send, ShieldCheck, ArrowRight
+} from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -55,15 +59,23 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [birthTime, setBirthTime] = useState("");
+  const [isUnknownTime, setIsUnknownTime] = useState(false);
   const [disambiguation, setDisambiguation] = useState<TimeDisambiguation>("");
   const [birthPlace, setBirthPlace] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [locationResolved, setLocationResolved] = useState(false);
+  const [isSearchingPlace, setIsSearchingPlace] = useState(false);
   const [category, setCategory] = useState<string>("self");
   const heroVisual = CALCULATOR_HERO_VISUALS[category as keyof typeof CALCULATOR_HERO_VISUALS] ?? CALCULATOR_HERO_VISUALS.self;
 
+  // ORACULUM+ quick question
+  const [oraculumQuestion, setOraculumQuestion] = useState("");
+
+  // Embed widget section state
+  const [showEmbedCode, setShowEmbedCode] = useState(false);
   const [embedCopied, setEmbedCopied] = useState(false);
+
   const handleCopyEmbed = () => {
     const domain = isEn ? "https://www.humandesignchart.app" : "https://www.humandesignmapa.cz";
     const brandName = isEn ? "Human Design Chart" : "Human Design Mapa";
@@ -77,14 +89,14 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
 
   const RELATIONSHIP_OPTIONS = [
     { value: "self", labelCs: "Já", labelEn: "Myself", icon: User },
-    { value: "friend", labelCs: "Partner", labelEn: "Partner", icon: Heart },
-    { value: "family", labelCs: "Rodič", labelEn: "Parent", icon: Users },
-    { value: "client", labelCs: "Šéf / práce", labelEn: "Boss / Work", icon: Briefcase },
-    { value: "other", labelCs: "Potomek", labelEn: "Child", icon: Baby },
-    { value: "celebrity", labelCs: "Kamarád", labelEn: "Friend", icon: Star },
+    { value: "friend", labelCs: "Partner / Partnerka", labelEn: "Partner", icon: Heart },
+    { value: "family", labelCs: "Rodina / Rodič", labelEn: "Family / Parent", icon: Users },
+    { value: "other", labelCs: "Dítě", labelEn: "Child", icon: Baby },
+    { value: "client", labelCs: "Kolega / Práce", labelEn: "Colleague / Work", icon: Briefcase },
+    { value: "celebrity", labelCs: "Přítel / Ostatní", labelEn: "Friend / Other", icon: Star },
   ];
 
-  // Track ViewContent on page mount (the main funnel entry — key for retargeting)
+  // Track ViewContent on page mount (funnel entry)
   useEffect(() => {
     const pageType = seoType ?? "calculator";
     meta.viewContent({
@@ -106,36 +118,16 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
     },
   });
 
-  const handlePlaceSearch = async () => {
-    if (!birthPlace.trim()) return;
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(birthPlace)}&limit=1`
-      );
-      const results = await response.json();
-      if (results && results.length > 0) {
-        const result = results[0];
-        setLatitude(result.lat);
-        setLongitude(result.lon);
-        setBirthPlace(result.display_name);
-        setLocationResolved(true);
-        toast.success(t.calculator.locationFound);
-      } else {
-        toast.error(t.calculator.locationNotFound);
-      }
-    } catch {
-      toast.error(t.calculator.locationSearchFailed);
+  const handleUnknownTimeToggle = (checked: boolean) => {
+    setIsUnknownTime(checked);
+    if (checked) {
+      setBirthTime("12:00");
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name || !birthDate || !birthTime || !locationResolved) {
-      toast.error(isEn ? "Please fill in all fields and search for a location." : "Vyplňte prosím všechna pole a vyhledejte lokaci.");
-      return;
-    }
+  const triggerCalculation = (lat: string, lon: string, place: string) => {
+    if (!name || !birthDate || !birthTime) return;
 
-    // If not authenticated, track registration intent before redirect to login
     if (!isAuthenticated) {
       meta.completeRegistration({
         content_name: "Chart Calculation Started",
@@ -147,11 +139,80 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
       name,
       birthDate,
       birthTime,
-      birthPlace,
-      latitude: parseFloat(latitude),
-      longitude: parseFloat(longitude),
+      birthPlace: place,
+      latitude: parseFloat(lat),
+      longitude: parseFloat(lon),
       ...(disambiguation ? { disambiguation } : {}),
     });
+  };
+
+  const handlePlaceSearch = async (autoProceed = false) => {
+    if (!birthPlace.trim()) return false;
+    setIsSearchingPlace(true);
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(birthPlace)}&limit=1`
+      );
+      const results = await response.json();
+      if (results && results.length > 0) {
+        const result = results[0];
+        setLatitude(result.lat);
+        setLongitude(result.lon);
+        setBirthPlace(result.display_name);
+        setLocationResolved(true);
+        setIsSearchingPlace(false);
+        toast.success(t.calculator.locationFound);
+
+        if (autoProceed) {
+          triggerCalculation(result.lat, result.lon, result.display_name);
+        }
+        return true;
+      } else {
+        setIsSearchingPlace(false);
+        toast.error(t.calculator.locationNotFound);
+        return false;
+      }
+    } catch {
+      setIsSearchingPlace(false);
+      toast.error(t.calculator.locationSearchFailed);
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      toast.error(isEn ? "Please enter your name." : "Zadejte prosím své jméno.");
+      return;
+    }
+    if (!birthDate) {
+      toast.error(isEn ? "Please select your date of birth." : "Vyberte prosím datum narození.");
+      return;
+    }
+    if (!birthTime) {
+      toast.error(isEn ? "Please enter your birth time or select 'I don't know my exact time'." : "Zadejte prosím čas narození nebo zaškrtněte 'Neznám přesný čas'.");
+      return;
+    }
+
+    if (!locationResolved) {
+      if (birthPlace.trim()) {
+        await handlePlaceSearch(true);
+        return;
+      }
+      toast.error(isEn ? "Please enter and find your birth place." : "Zadejte a vyhledejte prosím místo narození.");
+      return;
+    }
+
+    triggerCalculation(latitude, longitude, birthPlace);
+  };
+
+  const handleAskOraculum = (query?: string) => {
+    const q = (query ?? oraculumQuestion).trim();
+    if (!q) {
+      navigate(localePath("/ai-guide"));
+      return;
+    }
+    navigate(localePath(`/ai-guide?q=${encodeURIComponent(q)}`));
   };
 
   return (
@@ -159,7 +220,6 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
       <div className="absolute inset-x-0 top-16 h-[34rem] pointer-events-none z-0 transition-opacity duration-500" style={{ background: heroVisual.background }} aria-hidden="true" />
       {/* Mystical Background Decorations */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Large faint logo icon in the background */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] dark:opacity-[0.05] animate-slow-spin">
           <svg viewBox="0 0 24 24" className="w-[800px] h-[800px] text-primary" fill="none" stroke="currentColor" strokeWidth="0.5">
             <circle cx="12" cy="4" r="2" />
@@ -173,7 +233,6 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
             <line x1="16.8" y1="7" x2="14" y2="10.5" />
           </svg>
         </div>
-        {/* Floating glow spots */}
         <div className="absolute top-[20%] left-[10%] w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] animate-pulse" />
         <div className="absolute bottom-[20%] right-[10%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
@@ -182,52 +241,83 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
 
       <main className="flex-1 pt-24 pb-16">
         <div className="container max-w-2xl relative">
+          {/* Top Hero Section */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border bg-white/70 text-sm mb-4 transition-colors duration-500" style={{ borderColor: `${heroVisual.accent}55`, color: heroVisual.accent }}>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border bg-white/70 dark:bg-card/70 text-sm mb-4 transition-colors duration-500 shadow-xs" style={{ borderColor: `${heroVisual.accent}55`, color: heroVisual.accent }}>
               <Compass className="w-4 h-4" />
               {isEn ? heroVisual.eyebrowEn : heroVisual.eyebrowCs}
             </div>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold mb-3">
+            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold mb-3 tracking-tight">
               {seoType === "kalkulacka" && isEn === false ? "Human Design Kalkulačka Zdarma" :
                 seoType === "test" && isEn === false ? "Human Design Test Osobnosti Zdarma" :
-                  seoType === "typy" && isEn === false ? "Human Design Typy (Vypočítejte svůj typ)" :
+                  seoType === "typy" && isEn === false ? "Human Design Typy — Vypočítejte svůj typ" :
                     t.calculator.title}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto leading-relaxed">
               {seoType === "kalkulacka" && isEn === false ? "Využijte nejkomplexnější přesnou Human Design kalkulačku v češtině. Zjistěte ihned, jak byla vaše energetická mapa poskládána v momentě narození." :
-                seoType === "test" && isEn === false ? "Na rozdíl od jiných psychologických testů vychází Human design test z přesného výpočtu hvězd a vaší DNA v čase zrození. Udělejte si svůj test zdarma." :
-                  seoType === "typy" && isEn === false ? "Generátor, Projektor, Manifestor nebo Reflektor? Použijte náš výpočet a objevte svůj přesný typ a strategii pro lepší život." :
+                seoType === "test" && isEn === false ? "Na rozdíl od jiných psychologických testů vychází Human design z přesného postavení planet a vaší DNA v čase zrození. Získejte svůj rozbor zdarma." :
+                  seoType === "typy" && isEn === false ? "Generátor, Projektor, Manifestor nebo Reflektor? Použijte náš výpočet a objevte svůj přesný typ a strategii pro život v lehkosti." :
                     t.calculator.description}
             </p>
-            <p className="mt-3 text-sm font-medium transition-colors duration-500" style={{ color: heroVisual.accent }}>{isEn ? heroVisual.headlineEn : heroVisual.headlineCs}</p>
+
+            {/* Instant Value / Benefit Badges */}
+            <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
+              <div className="flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 shrink-0 text-xs font-bold">⚡</span>
+                <span className="text-[11px] font-medium leading-tight text-foreground">{isEn ? "100% Free & Instant" : "100% Zdarma & Ihned"}</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/15 text-purple-600 dark:text-purple-400 shrink-0 text-xs font-bold">🎯</span>
+                <span className="text-[11px] font-medium leading-tight text-foreground">{isEn ? "Type & Inner Authority" : "Typ, strategie & autorita"}</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 shrink-0 text-xs font-bold">🔮</span>
+                <span className="text-[11px] font-medium leading-tight text-foreground">{isEn ? "9 Centers & Channels" : "9 center, kanály a brány"}</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 shrink-0 text-xs font-bold">🇨🇿</span>
+                <span className="text-[11px] font-medium leading-tight text-foreground">{isEn ? "Deep English Analysis" : "Kompletní výklad v češtině"}</span>
+              </div>
+            </div>
+
+            <p className="mt-3 text-xs md:text-sm font-medium transition-colors duration-500" style={{ color: heroVisual.accent }}>
+              {isEn ? heroVisual.headlineEn : heroVisual.headlineCs}
+            </p>
           </div>
 
-          <Card className="bg-card border-border/50 shadow-sm">
-            <CardHeader>
-              <CardTitle className="font-serif text-xl text-foreground">{t.calculator.birthDataTitle}</CardTitle>
-              <CardDescription>
+          {/* Main Calculation Card */}
+          <Card className="bg-card/95 backdrop-blur-sm border-border/70 shadow-lg rounded-2xl md:rounded-3xl overflow-hidden">
+            <CardHeader className="pb-4">
+              <CardTitle className="font-serif text-xl md:text-2xl text-foreground flex items-center justify-between">
+                <span>{t.calculator.birthDataTitle}</span>
+                <span className="text-xs font-sans font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                  {isEn ? "Free & Confidential" : "Zdarma & Důvěrné"}
+                </span>
+              </CardTitle>
+              <CardDescription className="text-xs md:text-sm">
                 {t.calculator.birthTimeNote}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="name">{t.calculator.name}</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="name" className="text-sm font-semibold">{t.calculator.name}</Label>
                   <Input
                     id="name"
                     placeholder={t.calculator.namePlaceholder}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
+                    className="h-11 rounded-xl text-sm"
                   />
                 </div>
 
                 {/* Birth Date & Time */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="birthDate" className="flex items-center gap-1.5">
-                      <Calendar className="w-4 h-4" />
+                  <div className="space-y-1.5">
+                    <Label htmlFor="birthDate" className="flex items-center gap-1.5 text-sm font-semibold">
+                      <Calendar className="w-4 h-4 text-primary" />
                       {t.calculator.birthDate}
                     </Label>
                     <Input
@@ -236,11 +326,12 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                       value={birthDate}
                       onChange={(e) => setBirthDate(e.target.value)}
                       required
+                      className="h-11 rounded-xl text-sm"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="birthTime" className="flex items-center gap-1.5">
-                      <Clock className="w-4 h-4" />
+                  <div className="space-y-1.5">
+                    <Label htmlFor="birthTime" className="flex items-center gap-1.5 text-sm font-semibold">
+                      <Clock className="w-4 h-4 text-primary" />
                       {t.calculator.birthTime}
                     </Label>
                     <Input
@@ -248,9 +339,30 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                       type="time"
                       value={birthTime}
                       onChange={(e) => setBirthTime(e.target.value)}
-                      required
+                      disabled={isUnknownTime}
+                      required={!isUnknownTime}
+                      className={`h-11 rounded-xl text-sm transition-opacity ${isUnknownTime ? "opacity-60 bg-muted cursor-not-allowed" : ""}`}
                     />
                   </div>
+                </div>
+
+                {/* Unknown birth time option */}
+                <div className="rounded-xl border border-border/60 bg-muted/20 p-3 space-y-2">
+                  <label className="inline-flex items-center gap-2.5 text-xs md:text-sm font-medium text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={isUnknownTime}
+                      onChange={(e) => handleUnknownTimeToggle(e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary/20 w-4 h-4 cursor-pointer"
+                    />
+                    <span>{t.calculator.unknownTimeLabel}</span>
+                  </label>
+                  {isUnknownTime && (
+                    <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/25 text-xs text-amber-900 dark:text-amber-200 leading-relaxed animate-in fade-in duration-200">
+                      <p className="font-semibold mb-0.5">{isEn ? "Standard 12:00 (Noon) time selected" : "Nastaven standardní čas 12:00 (poledne)"}</p>
+                      <p>{t.calculator.unknownTimeHelp}</p>
+                    </div>
+                  )}
                 </div>
 
                 <TimeDisambiguationField
@@ -260,10 +372,10 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                 />
 
                 {/* Relationship Category */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Label className="text-sm font-medium">
-                      {isEn ? "Who is this chart for?" : "Pro koho generuješ mapu?"}
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-semibold">
+                      {isEn ? "Who is this chart for?" : "Pro koho je tato mapa?"}
                     </Label>
                     {!isAuthenticated && (
                       <Tooltip>
@@ -290,25 +402,33 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                           type="button"
                           onClick={() => setCategory(opt.value)}
                           aria-pressed={active}
-                          className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-xs font-medium transition-all duration-150 ${active
-                            ? 'border-primary bg-primary/10 text-primary'
-                            : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                          className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border text-xs font-medium transition-all duration-150 ${active
+                            ? 'border-primary bg-primary/10 text-primary shadow-xs ring-1 ring-primary/30'
+                            : 'border-border/70 bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
                             }`}
                         >
                           <Icon className="w-4 h-4" />
-                          {label}
+                          <span className="truncate">{label}</span>
                         </button>
                       );
                     })}
                   </div>
                 </div>
 
-                {/* Birth Place */}
+                {/* Birth Place with robust search & auto-resolver */}
                 <div className="space-y-2">
-                  <Label htmlFor="birthPlace" className="flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4" />
-                    {t.calculator.birthPlace}
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="birthPlace" className="flex items-center gap-1.5 text-sm font-semibold">
+                      <MapPin className="w-4 h-4 text-primary" />
+                      {t.calculator.birthPlace}
+                    </Label>
+                    {locationResolved && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                        <Check className="w-3 h-3" />
+                        {isEn ? "Timezone verified" : "Časové pásmo ověřeno"}
+                      </span>
+                    )}
+                  </div>
                   <div className="flex gap-2">
                     <Input
                       id="birthPlace"
@@ -321,44 +441,67 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
-                          handlePlaceSearch();
+                          handlePlaceSearch(false);
                         }
                       }}
                       required
+                      className="h-11 rounded-xl text-sm"
                     />
                     <Button
                       type="button"
-                      variant="secondary"
-                      onClick={handlePlaceSearch}
-                      disabled={!birthPlace.trim()}
+                      variant={locationResolved ? "outline" : "secondary"}
+                      onClick={() => handlePlaceSearch(false)}
+                      disabled={!birthPlace.trim() || isSearchingPlace}
+                      className="h-11 px-4 rounded-xl shrink-0"
                     >
-                      <MapPin className="w-4 h-4 mr-1" />
-                      {t.calculator.findLocation}
+                      {isSearchingPlace ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                          <span className="text-xs">{t.calculator.searchingLocation}</span>
+                        </>
+                      ) : (
+                        <>
+                          <MapPin className="w-4 h-4 mr-1.5" />
+                          <span className="text-xs">{t.calculator.findLocation}</span>
+                        </>
+                      )}
                     </Button>
                   </div>
-                  {locationResolved && (
-                    <div className="flex items-center gap-2 text-sm text-green-600">
-                      <Info className="w-3.5 h-3.5" />
-                      {t.calculator.coordinates}: {latitude}, {longitude}
+                  {locationResolved ? (
+                    <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-800 dark:text-emerald-300 flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 truncate">
+                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span className="truncate">{birthPlace}</span>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground ml-2 shrink-0 font-mono">
+                        {Number(latitude).toFixed(2)}°, {Number(longitude).toFixed(2)}°
+                      </span>
                     </div>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground">
+                      {isEn
+                        ? "Enter city (e.g. London, New York, Prague) and click Find to detect timezone & coordinates."
+                        : "Zadejte město (např. Praha, Brno, Londýn) a klikněte na Najít pro automatické určení časového pásma."}
+                    </p>
                   )}
                 </div>
 
+                {/* Primary CTA Submit Button */}
                 <Button
                   type="submit"
                   size="lg"
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={calculateMutation.isPending || !locationResolved}
+                  className="w-full h-13 text-base font-semibold bg-gradient-to-r from-purple-600 via-primary to-indigo-600 text-primary-foreground hover:brightness-105 shadow-lg shadow-purple-500/20 transition-all rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={calculateMutation.isPending || isSearchingPlace}
                 >
                   {calculateMutation.isPending ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                       {t.calculator.calculating}
                     </>
-                  ) : !locationResolved ? (
+                  ) : isSearchingPlace ? (
                     <>
-                      <MapPin className="w-5 h-5 mr-2" />
-                      {isEn ? 'First click "Find" for Birth Place' : 'Nejprve klikněte na "Najít" u Místa narození'}
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      {t.calculator.searchingLocation}
                     </>
                   ) : (
                     <>
@@ -367,64 +510,146 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                     </>
                   )}
                 </Button>
+
+                {/* Trust Signals */}
+                <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground pt-1">
+                  <span className="inline-flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    {isEn ? "100% Free · No spam" : "100% Zdarma · Bez spamu"}
+                  </span>
+                  <span>•</span>
+                  <span className="inline-flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    {isEn ? "Instant Bodygraph" : "Okamžitý výsledek"}
+                  </span>
+                  <span>•</span>
+                  <span className="inline-flex items-center gap-1">
+                    <Lock className="w-3.5 h-3.5 text-primary" />
+                    {isEn ? "Private & Secure" : "Data v bezpečí"}
+                  </span>
+                </div>
               </form>
             </CardContent>
           </Card>
-          <div className="mt-12 mb-8">
-            <div className="rounded-2xl border border-purple-200 bg-gradient-to-br from-purple-50 via-white to-indigo-50 shadow-sm overflow-hidden">
-              <div className="p-6 md:p-8">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
-                    <Globe className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-serif text-lg font-bold text-slate-900">
-                      {isEn ? "Embed Free Calculator on Your Site" : "Vložte si kalkulačku zdarma na web"}
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      {isEn ? "No registration required" : "Bez registrace"}
-                    </p>
-                  </div>
+
+          {/* ORACULUM+ Dedicated Smart Assistant Section */}
+          <section className="mt-12 rounded-3xl border border-amber-300/40 bg-gradient-to-br from-amber-500/10 via-purple-900/5 to-amber-500/5 backdrop-blur-xl p-6 md:p-8 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-5">
+              <div className="flex items-center gap-3.5">
+                <div className="relative w-12 h-12 rounded-2xl overflow-hidden border-2 border-amber-300/70 bg-[#160b2f] shrink-0 shadow-md">
+                  <img
+                    src="/images/brand/veleknezka-master-v1.png"
+                    alt="ORACULUM+"
+                    className="w-full h-full object-cover object-[center_16%]"
+                  />
                 </div>
-                <p className="text-sm text-slate-600 mb-6 max-w-lg">
-                  {isEn
-                    ? "Astrologers, coaches, and bloggers — engage your audience with a professional Human Design calculator. Just paste the code:"
-                    : "Astrologové, koučové a blogeři — zaujměte své návštěvníky profesionální Human Design kalkulačkou. Stačí vložit kód:"}
-                </p>
-
-                <div className="grid md:grid-cols-2 gap-6 items-start">
-                  <div className="relative order-2 md:order-1">
-                    <div className="relative rounded-xl border border-slate-200 bg-white shadow-md overflow-hidden">
-                      <div className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 border-b border-slate-200">
-                        <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                        <span className="ml-2 text-[10px] text-slate-400 font-mono truncate">vase-web.cz</span>
-                      </div>
-                      <div className="p-4 bg-gradient-to-b from-purple-50 to-slate-50 min-h-[180px] flex flex-col items-center justify-center text-center">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center mb-3">
-                          <Sparkles className="w-6 h-6 text-white" />
-                        </div>
-                        <p className="text-sm font-bold text-slate-800 mb-1">Human Design Mapa</p>
-                        <p className="text-xs text-slate-500 mb-3">{isEn ? "Generate your chart for free" : "Vygenerujte si mapu zdarma"}</p>
-                        <div className="w-full max-w-[200px] space-y-2">
-                          <div className="h-7 rounded-lg bg-white border border-slate-200 shadow-sm" />
-                          <div className="flex gap-2">
-                            <div className="h-7 flex-1 rounded-lg bg-white border border-slate-200 shadow-sm" />
-                            <div className="h-7 flex-1 rounded-lg bg-white border border-slate-200 shadow-sm" />
-                          </div>
-                          <div className="h-8 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 shadow-sm" />
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-center text-[10px] text-slate-400 mt-2 italic">
-                      {isEn ? "Preview of the embedded widget" : "Náhled vloženého widgetu"}
-                    </p>
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 text-[11px] font-bold border border-amber-500/25 mb-1">
+                    <Sparkles className="w-3 h-3 text-amber-500" />
+                    ORACULUM+
                   </div>
+                  <h2 className="font-serif text-xl md:text-2xl font-bold text-foreground">
+                    {isEn ? "Smart AI Human Design Guide" : "Chytrá AI průvodkyně Human Designem"}
+                  </h2>
+                  <p className="text-xs md:text-sm text-muted-foreground mt-0.5 max-w-xl">
+                    {isEn
+                      ? "Have questions about your type, authority, or transits? ORACULUM+ translates complex Human Design knowledge into clear practical guidance."
+                      : "Máte otázky ke svému typu, autoritě nebo dnešním tranzitům? ORACULUM+ propojuje hluboké principy Human Designu s reálným životem."}
+                  </p>
+                </div>
+              </div>
 
-                  <div className="order-1 md:order-2 space-y-3">
-                    <div className="relative">
-                      <pre className="p-4 rounded-xl bg-slate-950 text-emerald-300 text-[11px] leading-relaxed overflow-x-auto font-mono shadow-inner">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full border-amber-300/60 hover:bg-amber-500/10 text-xs shrink-0 self-start md:self-center"
+                onClick={() => navigate(localePath("/ai-guide"))}
+              >
+                <span>{isEn ? "Open full AI Chat" : "Otevřít celého AI průvodce"}</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+              </Button>
+            </div>
+
+            {/* Prompt chips */}
+            <div className="mb-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                {isEn ? "Quick questions to ask:" : "Časté dotazy návštěvníků:"}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  isEn ? "What is my type and decision strategy?" : "Jaký je můj typ, strategie a rozhodování?",
+                  isEn ? "What does a defined vs. open Sacral center mean?" : "Co znamená definované vs. otevřené Sakrální centrum?",
+                  isEn ? "How do today's planetary transits affect my energy?" : "Jak dnešní tranzity ovlivňují moji energii?",
+                ].map((q, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleAskOraculum(q)}
+                    className="text-left px-3.5 py-2 rounded-xl bg-background/80 hover:bg-amber-500/10 border border-amber-300/30 hover:border-amber-400 text-xs font-medium text-foreground transition-all duration-150 hover:scale-[1.01]"
+                  >
+                    ✨ {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Direct Question Bar */}
+            <div className="flex items-center gap-2 pt-2">
+              <Input
+                type="text"
+                placeholder={isEn ? "Ask ORACULUM+ anything about Human Design..." : "Zeptejte se ORACULUM+ na cokoliv ohledně Human Designu..."}
+                value={oraculumQuestion}
+                onChange={(e) => setOraculumQuestion(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && oraculumQuestion.trim()) {
+                    handleAskOraculum();
+                  }
+                }}
+                className="flex-1 bg-background/90 text-sm border-amber-300/40 rounded-xl"
+              />
+              <Button
+                type="button"
+                onClick={() => handleAskOraculum()}
+                className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold rounded-xl text-xs sm:text-sm px-4 shadow-sm"
+              >
+                <span>{isEn ? "Ask" : "Položit dotaz"}</span>
+                <Send className="w-3.5 h-3.5 ml-1.5" />
+              </Button>
+            </div>
+          </section>
+
+          {/* B2B / Partner Embed Section (Secondary) */}
+          <section className="mt-8 mb-8 rounded-2xl border border-border/60 bg-muted/20 p-5 md:p-6 transition-all">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                  <Globe className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-base font-bold text-foreground">
+                    {isEn ? "For Astrologers & Coaches: Embed Free Calculator" : "Pro astrology a kouče: Vložte si kalkulačku zdarma na web"}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {isEn ? "Engage your visitors with an instant interactive bodygraph tool on your own website." : "Zaujměte své klienty a návštěvníky interaktivním výpočtem přímo na svých stránkách."}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowEmbedCode(!showEmbedCode)}
+                className="text-xs gap-1.5 shrink-0"
+              >
+                <Code2 className="w-3.5 h-3.5" />
+                {showEmbedCode ? (isEn ? "Hide Code" : "Skrýt kód") : (isEn ? "Show Embed Code" : "Zobrazit kód")}
+              </Button>
+            </div>
+
+            {showEmbedCode && (
+              <div className="mt-4 pt-4 border-t border-border/40 space-y-3">
+                <div className="relative">
+                  <pre className="p-4 rounded-xl bg-slate-950 text-emerald-300 text-[11px] leading-relaxed overflow-x-auto font-mono shadow-inner">
 {`<iframe
   src="${isEn ? 'https://www.humandesignchart.app' : 'https://www.humandesignmapa.cz'}/embed/calculator"
   width="100%"
@@ -434,33 +659,31 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
 <p style="text-align:center;font-size:12px;">
   Powered by <a href="${isEn ? 'https://www.humandesignchart.app' : 'https://www.humandesignmapa.cz'}">${isEn ? 'Human Design Chart' : 'Human Design Mapa'}</a>
 </p>`}
-                      </pre>
-                      <Button
-                        size="sm"
-                        className="absolute top-2 right-2 h-8 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md"
-                        onClick={handleCopyEmbed}
-                      >
-                        {embedCopied ? <Check className="w-3.5 h-3.5 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
-                        {isEn ? "Copy" : "Kopírovat"}
-                      </Button>
-                    </div>
+                  </pre>
+                  <Button
+                    size="sm"
+                    className="absolute top-2 right-2 h-7 px-2.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                    onClick={handleCopyEmbed}
+                  >
+                    {embedCopied ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                    {isEn ? "Copy" : "Kopírovat kód"}
+                  </Button>
+                </div>
 
-                    <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-purple-100 text-purple-700">
-                        <Palette className="w-3 h-3" /> {isEn ? "Responsive" : "Responzivní"}
-                      </span>
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-indigo-100 text-indigo-700">
-                        <Code2 className="w-3 h-3" /> {isEn ? "Copy & paste" : "Kopírovat a vložit"}
-                      </span>
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700">
-                        <Sparkles className="w-3 h-3" /> {isEn ? "Free forever" : "Zdarma navždy"}
-                      </span>
-                    </div>
-                  </div>
+                <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground pt-1">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                    <Palette className="w-3 h-3" /> {isEn ? "100% Responsive" : "Responzivní"}
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+                    <Sparkles className="w-3 h-3" /> {isEn ? "Free forever" : "Zdarma navždy"}
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-700 dark:text-purple-300">
+                    <Code2 className="w-3 h-3" /> {isEn ? "Zero setup required" : "Bez složité instalace"}
+                  </span>
                 </div>
               </div>
-            </div>
-          </div>
+            )}
+          </section>
         </div>
       </main>
 

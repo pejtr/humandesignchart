@@ -115,7 +115,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
     { ...primaryLinks[1], compactLabel: locale === "cs" ? "Tranzit" : "Transit" },
     { ...primaryLinks[2], compactLabel: locale === "cs" ? "Porovnání" : "Compare" },
     { ...primaryLinks[3], compactLabel: "Blog" },
-    { href: "/honorace", label: locale === "cs" ? "Honorace" : "Honorarium", compactLabel: locale === "cs" ? "Honorace" : "Honorarium", icon: CreditCard },
+    { href: "/honorace", label: locale === "cs" ? "Ceník" : "Pricing", compactLabel: locale === "cs" ? "Ceník" : "Pricing", icon: CreditCard },
   ];
 
   const toolsLinks = [
@@ -532,7 +532,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive("/honorace") ? "bg-primary/20" : "bg-muted"}`}>
                   <CreditCard className="w-4 h-4" />
                 </div>
-                <span>{locale === "cs" ? "Honorace" : "Honorarium"}</span>
+                <span>{locale === "cs" ? "Ceník" : "Pricing"}</span>
               </button>
             </Link>
           </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -9,6 +10,8 @@ import { Button } from "@/components/ui/button";
 const STORAGE_KEY = "hd_newsletter_dismissed";
 
 export default function NewsletterPopup() {
+  const [location] = useLocation();
+  const isCalculatePage = location.includes("/calculate") || location.includes("/kalkulacka");
   const { locale } = useLanguage();
   const isEn = locale === "en";
   const { isAuthenticated } = useAuth();
@@ -35,7 +38,7 @@ export default function NewsletterPopup() {
   });
 
   useEffect(() => {
-    if (isAuthenticated) return;
+    if (isAuthenticated || isCalculatePage) return;
     const dismissed = localStorage.getItem(STORAGE_KEY);
     if (dismissed) {
       // Check 90 days expiry
@@ -47,7 +50,7 @@ export default function NewsletterPopup() {
     // Calm down timer: wait 90 seconds (1.5 minutes) before showing
     const timer = setTimeout(() => setIsVisible(true), 90000);
     return () => clearTimeout(timer);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isCalculatePage]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +64,7 @@ export default function NewsletterPopup() {
     localStorage.setItem(STORAGE_KEY, String(Date.now()));
   };
 
-  if (isAuthenticated || !isVisible) return null;
+  if (isAuthenticated || !isVisible || isCalculatePage) return null;
 
   return (
     <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-[100] p-0 sm:p-0 w-full sm:w-[360px] animate-in fade-in slide-in-from-bottom-5 duration-300">

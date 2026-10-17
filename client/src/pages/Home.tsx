@@ -747,8 +747,8 @@ export default function Home() {
               src="/images/brand/marie-landing-v1.webp"
               alt={
                 isCs
-                  ? "ARACULUM, průvodkyně Human Designem"
-                  : "ARACULUM, Human Design guide"
+                  ? "ORACULUM+, průvodkyně Human Designem"
+                  : "ORACULUM+, Human Design guide"
               }
               className="h-full w-full object-cover object-center"
             />
@@ -759,25 +759,25 @@ export default function Home() {
           <div className="flex-1 text-center md:text-left">
             <div className="mb-2 flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700 md:justify-start dark:text-amber-300">
               <Sparkles className="h-4 w-4" />{" "}
-              {isCs ? "ARACULUM · osobní průvodkyně" : "ARACULUM · personal guide"}
+              {isCs ? "ORACULUM+ · osobní průvodkyně" : "ORACULUM+ · personal guide"}
             </div>
             <h2 className="font-serif text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
               {isCs
-                ? "ARACULUM pro osobní reflexi a každodenní rozhodování"
-                : "ARACULUM for personal reflection and everyday decisions"}
+                ? "ORACULUM+ pro osobní reflexi a každodenní rozhodování"
+                : "ORACULUM+ for personal reflection and everyday decisions"}
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
               {isCs
-                ? "ARACULUM propojuje vaši mapu, Lunu a aktuální tranzity do praktických odpovědí pro rozhodování, práci i vztahy."
-                : "ARACULUM connects your chart, the Moon and current transits into practical answers for your decisions, career, and relationships."}
+                ? "ORACULUM+ propojuje vaši mapu, Lunu a aktuální tranzity do praktických odpovědí pro rozhodování, práci i vztahy."
+                : "ORACULUM+ connects your chart, the Moon and current transits into practical answers for your decisions, career, and relationships."}
             </p>
           </div>
           <Button
             asChild
             className="shrink-0 bg-[#C59235] text-white hover:bg-[#B88326] shadow-md"
           >
-            <Link href={localePath("/honorace") + "#blueprint"}>
-              {isCs ? "Zeptat se ARACULUM" : "Ask ARACULUM"}
+            <Link href={localePath("/ai-guide")}>
+              {isCs ? "Zeptat se ORACULUM+" : "Ask ORACULUM+"}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

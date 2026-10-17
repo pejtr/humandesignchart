@@ -148,11 +148,11 @@ export function FloatingChatGuide() {
               onClick={() => setIsOpen(true)}
               aria-label={
                 isEn
-                  ? "Open ARACULUM"
-                  : "Otevřít ARACULUM"
+                  ? "Open ORACULUM+"
+                  : "Otevřít ORACULUM+"
               }
               title={
-                isEn ? "ARACULUM — personal guide" : "ARACULUM — osobní průvodkyně"
+                isEn ? "ORACULUM+ — personal guide" : "ORACULUM+ — osobní průvodkyně"
               }
               className="group relative w-16 h-16 overflow-visible rounded-full border-2 border-amber-100/90 bg-[#160b2f] p-0 text-white shadow-xl ring-4 ring-violet-500/10 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.03]"
             >
@@ -166,7 +166,7 @@ export function FloatingChatGuide() {
                 className="h-full w-full rounded-full object-cover object-[center_16%]"
               />
               <span className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-full border border-violet-200/70 bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-900 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block">
-                {isEn ? "Ask ARACULUM" : "Zeptat se ARACULUM"}
+                {isEn ? "Ask ORACULUM+" : "Zeptat se ORACULUM+"}
               </span>
             </Button>
           </motion.div>
@@ -199,7 +199,7 @@ export function FloatingChatGuide() {
                   />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold leading-none text-foreground">ARACULUM</h3>
+                  <h3 className="text-sm font-semibold leading-none text-foreground">ORACULUM+</h3>
                   <p className="text-[10px] text-muted-foreground mt-0.5">
                     {isEn ? "Personal guide" : "Osobní průvodkyně"}
                   </p>
