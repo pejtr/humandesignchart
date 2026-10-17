@@ -322,10 +322,48 @@
   100% { opacity: 0; }
 }
 
+
+/* ORACULUM+ footer: coherent monochrome violet twilight, responsive and legible. */
+.oraculum-footer.sacral-sunset-field {
+  background: linear-gradient(118deg, hsl(272 70% 96%), hsl(272 63% 92%) 54%, hsl(272 70% 96%));
+}
+.oraculum-footer.sacral-sunset-field::before {
+  background: radial-gradient(ellipse 40% 60% at 20% 52%,hsl(272 90% 71% / .27),transparent 81%),
+    radial-gradient(ellipse 38% 62% at 85% 26%,hsl(272 80% 76% / .27),transparent 85%);
+  opacity: .8;
+}
+.oraculum-footer.sacral-sunset-field::after {
+  background: radial-gradient(ellipse 36% 64% at 63% 67%,hsl(272 87% 81% / .26),transparent 85%);
+}
+.oraculum-footer-core {
+  isolation: isolate;
+  background: radial-gradient(circle at 42% 36%,hsl(272 89% 76%),hsl(272 73% 36%) 54%,hsl(272 72% 18%) 82%);
+  box-shadow: 0 0 0 8px hsl(272 77% 69% / .14),
+    0 0 45px hsl(272 76% 58% / .25),
+    inset 0 0 32px hsl(272 85% 93% / .30);
+}
+.oraculum-footer-core-ring {
+  transform-origin: 50% 50%;
+  box-shadow: 0 0 20px hsl(272 91% 86% / .18);
+  animation: sacral-machine-turn 24s linear infinite;
+}
+.oraculum-footer-core-ring--reverse { animation-direction: reverse; animation-duration: 30s; }
+.oraculum-footer-ripple {
+  width: min(34vw, 340px);
+  left: 13%;
+  top: 54%;
+  border-color: hsl(272 83% 65% / .32);
+  background: radial-gradient(circle, transparent 53%,hsl(272 81% 78% / .09) 65%,transparent 78%);
+}
+@media (max-width: 1023px) {
+  .oraculum-footer-ripple { left: 50%; top: 23%; width: min(67vw, 380px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sacral-route-veil,
   .sacral-route-veil__aura,
   .sacral-route-machine__ring,
+  .oraculum-footer-core-ring,
   .sacral-sunset-field::before,
   .sacral-sunset-field::after,
   .sacral-chat-launcher::before,
