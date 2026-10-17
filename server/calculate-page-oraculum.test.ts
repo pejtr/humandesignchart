@@ -41,7 +41,7 @@ describe("Calculate Page & ORACULUM+ Revamp Contracts", () => {
     const popup = source("client/src/components/NewsletterPopup.tsx");
     expect(popup).toContain("isCalculatePage");
     expect(popup).toContain('location.includes("/calculate")');
-    expect(popup).toContain("if (isAuthenticated || !isVisible || isCalculatePage) return null;");
+    expect(popup).toContain("if (isAuthenticated || !isVisible || isSuppressedPage) return null;");
   });
 
   it("provides unknown birth time ergonomics with transparent standard noon default", () => {
