@@ -20,7 +20,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
     const previous = previousLocation.current;
     previousLocation.current = location;
 
-    const sensitivePath = /(?:^|\\/)(?:payment|checkout|login|portal)(?:\\/|$)/i;
+    const sensitivePath = /(?:^|[/])(?:payment|checkout|login|portal)(?:[/]|$)/i;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion || sensitivePath.test(location) || sensitivePath.test(previous)) {
       setIsTransitioning(false);
