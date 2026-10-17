@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -10,6 +11,8 @@ const STORAGE_KEY = "hd_newsletter_dismissed";
 
 export default function NewsletterPopup() {
   const { locale } = useLanguage();
+  const [pathname] = useLocation();
+  const isPrimaryConversionPage = /^\/(cs|en)(\/calculate)?\/?$/.test(pathname);
   const isEn = locale === "en";
   const { isAuthenticated } = useAuth();
   const meta = useMetaPixel();
@@ -61,7 +64,7 @@ export default function NewsletterPopup() {
     localStorage.setItem(STORAGE_KEY, String(Date.now()));
   };
 
-  if (isAuthenticated || !isVisible) return null;
+  if (isAuthenticated || !isVisible || isPrimaryConversionPage) return null;
 
   return (
     <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-[100] p-0 sm:p-0 w-full sm:w-[360px] animate-in fade-in slide-in-from-bottom-5 duration-300">
