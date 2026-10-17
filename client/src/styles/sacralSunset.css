@@ -206,15 +206,33 @@
   width: min(75%, 280px);
   top: 48%;
 }
+/* Larger ORACULUM waves: noticeable in motion, but with feathered edges. */
 .sacral-oraculum-ripple {
   left: 27%;
-  top: 50%;
-  width: min(38vw, 440px);
-  border-color: hsl(272 79% 66% / .40);
-  background: radial-gradient(circle, transparent 53%,hsl(272 85% 75% / .08) 66%,transparent 76%);
+  top: 48%;
+  width: min(44vw, 500px);
+  border: 1px solid hsl(272 75% 65% / .44);
+  background: radial-gradient(circle,
+    transparent 48%,
+    hsl(272 81% 71% / .045) 56%,
+    hsl(272 82% 74% / .20) 62%,
+    hsl(272 85% 78% / .065) 68%,
+    transparent 78%);
+  box-shadow: 0 0 20px hsl(272 78% 70% / .18),
+    0 0 52px hsl(272 88% 82% / .13),
+    inset 0 0 28px hsl(272 84% 76% / .12);
+  animation: sacral-oraculum-water-ripple 13s cubic-bezier(.25,.40,.37,.86) infinite;
+}
+.sacral-oraculum-ripple.sacral-ripple-ring--two { animation-delay: -6.5s; }
+@keyframes sacral-oraculum-water-ripple {
+  0%, 6% { transform:translate(-50%,-50%) scale(.38); opacity:0; }
+  20% { opacity:.58; }
+  43% { opacity:.47; }
+  68% { opacity:.20; }
+  89%, 100% { transform:translate(-50%,-50%) scale(1.76); opacity:0; }
 }
 @media (max-width: 800px) {
-  .sacral-oraculum-ripple { left: 50%; top: 30%; width: min(74vw, 380px); }
+  .sacral-oraculum-ripple { left: 50%; top: 32%; width: min(83vw, 420px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
