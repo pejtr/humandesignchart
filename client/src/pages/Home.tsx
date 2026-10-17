@@ -599,7 +599,11 @@ export default function Home() {
         <span className="sacral-ripple-ring sacral-oraculum-ripple sacral-ripple-ring--two" aria-hidden="true" />
         <div className="hd-wow-oraculum-layout">
           <div className="hd-wow-oraculum-visual">
-            <img src="/images/brand/marie-landing-v1.webp" alt={isCs ? "Digitální průvodkyně ORACULUM+" : "ORACULUM+ digital guide"} loading="lazy" decoding="async" />
+            <div className="hd-wow-oraculum-consciousness" aria-hidden="true">
+              <span className="hd-wow-oraculum-consciousness-ring hd-wow-oraculum-consciousness-ring--outer" />
+              <span className="hd-wow-oraculum-consciousness-ring hd-wow-oraculum-consciousness-ring--inner" />
+              <span className="hd-wow-oraculum-consciousness-core">✧</span>
+            </div>
             <div className="hd-wow-chat-bubble hd-wow-chat-one">{isCs ? "Co bych dnes mohl/a prozkoumat?" : "What could I explore today?"}</div>
             <div className="hd-wow-chat-bubble hd-wow-chat-two"><Sparkles aria-hidden="true" className="h-4 w-4" /> ORACULUM+</div>
           </div>
