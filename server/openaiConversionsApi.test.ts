@@ -1,7 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { buildConfirmedOrderEvent } from "./openaiConversionsApi";
+import { buildConfirmedOrderEvent, isConfirmedPaidCheckout } from "./openaiConversionsApi";
 
 describe("OpenAI Ads confirmed purchase reporting", () => {
+  it("only sends for paid, fulfilled checkout with marketing consent", () => {
+    const eligible = { paymentStatus: "paid", fulfillmentOutcome: "fulfilled", marketingConsent: true };
+    expect(isConfirmedPaidCheckout(eligible)).toBe(true);
+    expect(isConfirmedPaidCheckout({ ...eligible, paymentStatus: "unpaid" })).toBe(false);
+    expect(isConfirmedPaidCheckout({ ...eligible, paymentStatus: "no_payment_required" })).toBe(false);
+    expect(isConfirmedPaidCheckout({ ...eligible, paymentStatus: null })).toBe(false);
+    expect(isConfirmedPaidCheckout({ ...eligible, fulfillmentOutcome: "duplicate" })).toBe(false);
+    expect(isConfirmedPaidCheckout({ ...eligible, marketingConsent: false })).toBe(false);
+  });
+
   const order = { id: "cs_test_verified_001", amountMinor: 1590, currency: "EUR" as const, consent: true };
   it("reports actual charged amount in minor units, not a landing-page estimate", () => {
     expect(buildConfirmedOrderEvent(order, 1_791_000_000_000)).toEqual({
