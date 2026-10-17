@@ -146,7 +146,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
         }`}>
         <nav className="w-full flex items-center justify-between h-16 px-3 sm:px-4 xl:px-8 relative gap-2 sm:gap-4 max-w-screen-2xl mx-auto">
           {/* Left: Logo */}
-          <div className="flex shrink-0 items-center justify-start gap-3 min-w-0 2xl:w-[28rem]">
+          <div className="flex shrink-0 items-center justify-start gap-3 min-w-0 max-w-[min(43vw,330px)] min-[1800px]:max-w-[320px]">
             <Link href={localePath("/")} aria-label={locale === "cs" ? "Human Design — domů" : "Human Design — home"} className="flex items-center gap-2.5 no-underline shrink-0 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600 via-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-red-500/20 group-hover:shadow-red-500/40 transition-shadow">
                 <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -163,18 +163,18 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
               </div>
               <div className="flex flex-col">
                 <span className="font-serif text-lg font-bold tracking-tight text-foreground hidden sm:block truncate">
-                  {locale === "cs" ? "HUMAN DESIGN MAPA" : "OMNI HD LAB"}
+                  {locale === "cs" ? "HUMAN DESIGN MAPA" : "HUMAN DESIGN CHARTS"}
                 </span>
                 
               </div>
             </Link>
-            {!offerMode && <div className="hidden lg:block min-w-0">
+            {!offerMode && <div className="hidden min-[1850px]:block min-w-0">
               <DailyInsightBadge />
             </div>}
           </div>
 
           {/* Center: Desktop nav links */}
-          {!offerMode && <div className="hidden 2xl:flex flex-1 items-center justify-center gap-1 2xl:gap-2 min-w-0 overflow-hidden">
+          {!offerMode && <div className="hidden min-[1800px]:flex flex-1 items-center justify-center gap-1 min-w-0 whitespace-nowrap">
             {primaryLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <Button
@@ -215,7 +215,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
             {/* Explore dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-sm px-2 gap-1 hidden 2xl:inline-flex">
+                <Button variant="ghost" size="sm" className="text-sm px-2 gap-1 hidden min-[1800px]:inline-flex">
                   <Sparkles className="w-4 h-4" />
                   {locale === "cs" ? "Prozkoumat" : "Explore"}
                   <ChevronDown className="w-3 h-3 opacity-60" />
@@ -239,7 +239,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
           </div>}
 
           {/* Compact primary nav: preserve the key actions before opening the menu. */}
-          <div className="hidden md:flex 2xl:hidden flex-1 items-center justify-center gap-1 min-w-0">
+          <div className="hidden md:flex min-[1800px]:hidden flex-1 items-center justify-center gap-1 min-w-0">
             {compactPrimaryLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <Button
@@ -260,7 +260,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
           {/* Right: Controls (Desktop + Mobile) */}
           <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop right section: premium + theme toggle + currency + language + user */}
-            <div className="hidden 2xl:flex items-center gap-1.5 shrink-0">
+            <div className="hidden min-[1800px]:flex items-center gap-1.5 shrink-0">
               {!offerMode && <Link href={localePath("/honorace")}>
                 <Button
                   variant={isActive("/honorace") ? "secondary" : "ghost"}
@@ -377,7 +377,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
             </div>
 
             {/* Compact navigation: keep sign-in visible, with the full menu one tap away. */}
-            <div className="flex 2xl:hidden items-center gap-1">
+            <div className="flex min-[1800px]:hidden items-center gap-1">
               {!isAuthenticated && (
                 <a href={getLoginUrl()} aria-label={t.common.signIn}>
                   <Button aria-label={t.common.signIn} size="sm" className="h-9 px-2 sm:px-3 bg-primary text-primary-foreground hover:bg-primary/90">
@@ -417,7 +417,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
       {/* Full-screen mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-[60] 2xl:hidden"
+          className="fixed inset-0 z-[60] min-[1800px]:hidden"
           style={{ animation: "fadeIn 0.2s ease-out" }}
           aria-hidden="true"
         >
@@ -436,7 +436,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
         role="dialog"
         aria-modal="true"
         aria-label={locale === "cs" ? "Navigační menu" : "Navigation menu"}
-        className="fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm z-[70] bg-background flex flex-col 2xl:hidden"
+        className="fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm z-[70] bg-background flex flex-col min-[1800px]:hidden"
         style={{
           transform: mobileOpen ? "translateX(0)" : "translateX(100%)",
           transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -461,7 +461,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
                 <line x1="16.8" y1="7" x2="14" y2="10.5" />
               </svg>
             </div>
-            <span className="font-serif text-lg font-bold tracking-tight text-foreground">Human Design</span>
+            <span className="font-serif text-lg font-bold tracking-tight text-foreground">{locale === "cs" ? "Human Design Mapa" : "Human Design Charts"}</span>
           </Link>
           <div className="flex items-center gap-1">
             {/* Theme toggle — mobile */}
