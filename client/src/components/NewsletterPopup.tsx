@@ -13,6 +13,9 @@ export default function NewsletterPopup() {
   const [location] = useLocation();
   const isCalculatePage = location.includes("/calculate") || location.includes("/kalkulacka");
   const { locale } = useLanguage();
+  const [pathname] = useLocation();
+  const isPrimaryConversionPage = /^\/(cs|en)(\/calculate)?\/?$/.test(pathname);
+  const isSuppressedPage = isCalculatePage || isPrimaryConversionPage;
   const isEn = locale === "en";
   const { isAuthenticated } = useAuth();
   const meta = useMetaPixel();
@@ -38,7 +41,7 @@ export default function NewsletterPopup() {
   });
 
   useEffect(() => {
-    if (isAuthenticated || isCalculatePage) return;
+    if (isAuthenticated || isSuppressedPage) return;
     const dismissed = localStorage.getItem(STORAGE_KEY);
     if (dismissed) {
       // Check 90 days expiry
@@ -50,7 +53,7 @@ export default function NewsletterPopup() {
     // Calm down timer: wait 90 seconds (1.5 minutes) before showing
     const timer = setTimeout(() => setIsVisible(true), 90000);
     return () => clearTimeout(timer);
-  }, [isAuthenticated, isCalculatePage]);
+  }, [isAuthenticated, isSuppressedPage]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +67,9 @@ export default function NewsletterPopup() {
     localStorage.setItem(STORAGE_KEY, String(Date.now()));
   };
 
-  if (isAuthenticated || !isVisible || isCalculatePage) return null;
+  const isSuppressedPage = isCalculatePage || isPrimaryConversionPage;
+
+  if (isAuthenticated || !isVisible || isSuppressedPage) return null;
 
   return (
     <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-[100] p-0 sm:p-0 w-full sm:w-[360px] animate-in fade-in slide-in-from-bottom-5 duration-300">

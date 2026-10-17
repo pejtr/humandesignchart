@@ -130,7 +130,8 @@ export function FloatingChatGuide() {
     }
   };
 
-  if (location.includes("/ai-guide")) {
+  // Keep conversion pages free of overlapping floating controls; the footer and ORACULUM+ section remain accessible.
+  if (location.includes("/ai-guide") || /^\/(cs|en)(\/calculate)?\/?$/.test(location)) {
     return null;
   }
 

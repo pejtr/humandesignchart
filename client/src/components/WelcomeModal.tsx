@@ -15,6 +15,8 @@ export function useWelcomeModal() {
 
   useEffect(() => {
     // Do not obstruct the English acquisition landing with a Czech welcome wizard.
+    const route = window.location.pathname;
+    if (/^\/(cs|en)(\/calculate)?\/?$/.test(route)) return;
     const host = window.location.hostname.toLowerCase();
     if (host === "humandesignchart.app" || host.endsWith(".humandesignchart.app")) return;
     const seen = localStorage.getItem(STORAGE_KEY);
