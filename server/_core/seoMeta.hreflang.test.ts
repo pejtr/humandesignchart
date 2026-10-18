@@ -34,24 +34,22 @@ describe("localized SEO alternate links", () => {
     expect(html).toContain('property="og:title"');
   });
 
-  it("emits hreflang only for complete cs, en, de locales and x-default", () => {
-    const html = buildSeoHead("de", "/de/calculate");
+  it("emits hreflang only for production-ready cs, en locales and x-default", () => {
+    const html = buildSeoHead("cs", "/cs/calculate");
     expect(html).toContain('hreflang="cs" href="https://humandesignmapa.cz/cs/calculate"');
     expect(html).toContain('hreflang="en" href="https://humandesignchart.app/en/calculate"');
-    expect(html).toContain('hreflang="de" href="https://humandesignchart.app/de/calculate"');
+    expect(html).not.toContain('hreflang="de"');
     expect(html).not.toContain('hreflang="fr"');
     expect(html).not.toContain('hreflang="es"');
     expect(html).not.toContain('hreflang="it"');
     expect(html).toContain('hreflang="x-default" href="https://humandesignchart.app/en/calculate"');
-    expect(html).toContain('property="og:locale" content="de_DE"');
   });
 
-  it("marks incomplete FR/ES/IT translation routes noindex until localized", () => {
-    for (const locale of ["fr", "es", "it"]) {
+  it("marks incomplete DE/FR/ES/IT translation routes noindex until localized", () => {
+    for (const locale of ["de", "fr", "es", "it"]) {
       const html = buildSeoHead(locale, `/${locale}/calculate`);
       expect(html).toContain('name="robots" content="noindex,follow"');
       expect(html).not.toContain(`hreflang="${locale}"`);
     }
-    expect(buildSeoHead("de", "/de/calculate")).not.toContain('name="robots" content="noindex,follow"');
   });
 });

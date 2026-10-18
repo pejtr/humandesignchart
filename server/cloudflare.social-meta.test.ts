@@ -66,13 +66,8 @@ describe("Cloudflare WhatsApp preview metadata", () => {
       );
       const text = await response.text();
       expect(text).toContain(`property="og:locale" content="${expectedLocale}"`);
-      if (locale === "de") {
-        expect(text).toContain(`hreflang="${locale}" href="https://humandesignchart.app/${locale}/calculate"`);
-        expect(text).not.toContain('name="robots" content="noindex,follow"');
-      } else {
-        expect(text).not.toContain(`hreflang="${locale}"`);
-        expect(text).toContain('name="robots" content="noindex,follow"');
-      }
+      expect(text).not.toContain(`hreflang="${locale}"`);
+      expect(text).toContain('name="robots" content="noindex,follow"');
     }
   });
 });
