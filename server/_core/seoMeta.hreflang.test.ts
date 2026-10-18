@@ -34,21 +34,24 @@ describe("localized SEO alternate links", () => {
     expect(html).toContain('property="og:title"');
   });
 
-  it("emits complete hreflang alternates for cs, en, de, fr, es, it, and x-default", () => {
+  it("emits hreflang only for complete cs, en, de locales and x-default", () => {
     const html = buildSeoHead("de", "/de/calculate");
     expect(html).toContain('hreflang="cs" href="https://humandesignmapa.cz/cs/calculate"');
     expect(html).toContain('hreflang="en" href="https://humandesignchart.app/en/calculate"');
     expect(html).toContain('hreflang="de" href="https://humandesignchart.app/de/calculate"');
-    expect(html).toContain('hreflang="fr" href="https://humandesignchart.app/fr/calculate"');
-    expect(html).toContain('hreflang="es" href="https://humandesignchart.app/es/calculate"');
-    expect(html).toContain('hreflang="it" href="https://humandesignchart.app/it/calculate"');
+    expect(html).not.toContain('hreflang="fr"');
+    expect(html).not.toContain('hreflang="es"');
+    expect(html).not.toContain('hreflang="it"');
     expect(html).toContain('hreflang="x-default" href="https://humandesignchart.app/en/calculate"');
     expect(html).toContain('property="og:locale" content="de_DE"');
   });
 
-  it("handles French, Spanish and Italian og:locale correctly", () => {
-    expect(buildSeoHead("fr", "/fr/calculate")).toContain('property="og:locale" content="fr_FR"');
-    expect(buildSeoHead("es", "/es/calculate")).toContain('property="og:locale" content="es_ES"');
-    expect(buildSeoHead("it", "/it/calculate")).toContain('property="og:locale" content="it_IT"');
+  it("marks incomplete FR/ES/IT translation routes noindex until localized", () => {
+    for (const locale of ["fr", "es", "it"]) {
+      const html = buildSeoHead(locale, `/${locale}/calculate`);
+      expect(html).toContain('name="robots" content="noindex,follow"');
+      expect(html).not.toContain(`hreflang="${locale}"`);
+    }
+    expect(buildSeoHead("de", "/de/calculate")).not.toContain('name="robots" content="noindex,follow"');
   });
 });

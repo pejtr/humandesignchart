@@ -20,7 +20,6 @@ import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import { TimeDisambiguationField, type TimeDisambiguation } from "@/components/TimeDisambiguationField";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { trackGA4Event } from "@/hooks/useGA4";
-import { measureOpenAIAdsEvent } from "@/hooks/useOpenAIAdsPixel";
 import { saveChartDraft } from "@/lib/chartDraft";
 
 const CALCULATOR_HERO_VISUALS = {
@@ -119,7 +118,6 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
         authority: data.authority,
         locale,
       });
-      measureOpenAIAdsEvent("registration_completed", { type: "customer_action" });
       const nextStep = new URLSearchParams(window.location.search).get("next");
       if (nextStep === "honorace" || nextStep === "pricing") {
         navigate(localePath("/honorace"));

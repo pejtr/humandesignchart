@@ -52,13 +52,13 @@ export function buildSeoHead(locale: string, pathname: string): string {
   const csAlt = `${CS}/cs${suffix}`;
   const enAlt = `${EN}/en${suffix}`;
   const deAlt = `${EN}/de${suffix}`;
-  const frAlt = `${EN}/fr${suffix}`;
-  const esAlt = `${EN}/es${suffix}`;
-  const itAlt = `${EN}/it${suffix}`;
 
   return [
     `<title>${escapeHtml(meta.title)}</title>`,
     `<meta name="description" content="${escapeHtml(meta.description)}" />`,
+    // FR/ES/IT currently inherit the full English dictionary and are not yet
+    // production-grade translations. Do not let search engines index these routes.
+    ["fr", "es", "it"].includes(locale) ? `<meta name="robots" content="noindex,follow" />` : "",
     `<meta property="og:title" content="${escapeHtml(meta.title)}" />`,
     `<meta property="og:description" content="${escapeHtml(meta.description)}" />`,
     `<meta property="og:type" content="${meta.ogType || "website"}" />`,
@@ -81,9 +81,6 @@ export function buildSeoHead(locale: string, pathname: string): string {
     `<link rel="alternate" hreflang="cs" href="${csAlt}" />`,
     `<link rel="alternate" hreflang="en" href="${enAlt}" />`,
     `<link rel="alternate" hreflang="de" href="${deAlt}" />`,
-    `<link rel="alternate" hreflang="fr" href="${frAlt}" />`,
-    `<link rel="alternate" hreflang="es" href="${esAlt}" />`,
-    `<link rel="alternate" hreflang="it" href="${itAlt}" />`,
     `<link rel="alternate" hreflang="x-default" href="${enAlt}" />`,
   ]
     .filter(Boolean)
