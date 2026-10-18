@@ -11,12 +11,21 @@ const STORAGE_KEY = "hd_newsletter_dismissed";
 
 export default function NewsletterPopup() {
   const [location] = useLocation();
-  const isCalculatePage = location.includes("/calculate") || location.includes("/kalkulacka");
+  const isCalculatePage =
+    location.includes("/calculate") ||
+    location.includes("/kalkulacka") ||
+    location.includes("/chart") ||
+    location.includes("/honorace") ||
+    location.includes("/pricing") ||
+    location.includes("/cenik") ||
+    location.includes("/payment") ||
+    location.includes("/vsl") ||
+    location.includes("/ai-guide");
   const { locale } = useLanguage();
   const [pathname] = useLocation();
-  const isPrimaryConversionPage = /^\/(cs|en)(\/calculate)?\/?$/.test(pathname);
+  const isPrimaryConversionPage = /^\/(cs|en|de|fr|es|it|ru|uk|hu)(\/calculate)?\/?$/.test(pathname);
   const isSuppressedPage = isCalculatePage || isPrimaryConversionPage;
-  const isEn = locale === "en";
+  const isEn = locale !== "cs";
   const { isAuthenticated } = useAuth();
   const meta = useMetaPixel();
   const [isVisible, setIsVisible] = useState(false);

@@ -29,23 +29,36 @@ export function buildSeoHead(locale: string, pathname: string): string {
   const meta = resolveMeta(locale, pathname);
   if (!meta) return "";
 
-  const isEn = locale === "en";
-  const base = isEn ? EN : CS;
-  const lang = isEn ? "en" : locale;
+  const isCs = locale === "cs";
+  const isEn = !isCs;
+  const base = isCs ? CS : EN;
+  const lang = locale || "en";
   const canonical = meta.canonical;
   const ogImage = meta.ogImage || `${base}/images/og-homepage.png`;
+  const ogLocaleMap: Record<string, string> = {
+    cs: "cs_CZ",
+    en: "en_US",
+    de: "de_DE",
+    fr: "fr_FR",
+    es: "es_ES",
+    it: "it_IT",
+  };
 
   // Build alternate hreflang links — cs always on CS domain, others on EN domain
   // hreflang siblings must have exactly one locale prefix. The old
   // canonical-based concatenation emitted /en/en/ and CZ /en/ URLs.
-  const unprefixedPath = pathname.replace(/^\/(?:cs|en)(?=\/|$)/, "") || "/";
+  const unprefixedPath = pathname.replace(/^\/(?:cs|en|de|fr|es|it)(?=\/|$)/, "") || "/";
   const suffix = unprefixedPath.startsWith("/") ? unprefixedPath : `/${unprefixedPath}`;
   const csAlt = `${CS}/cs${suffix}`;
   const enAlt = `${EN}/en${suffix}`;
+  const deAlt = `${EN}/de${suffix}`;
 
   return [
     `<title>${escapeHtml(meta.title)}</title>`,
     `<meta name="description" content="${escapeHtml(meta.description)}" />`,
+    // FR/ES/IT currently inherit the full English dictionary and are not yet
+    // production-grade translations. Do not let search engines index these routes.
+    ["fr", "es", "it"].includes(locale) ? `<meta name="robots" content="noindex,follow" />` : "",
     `<meta property="og:title" content="${escapeHtml(meta.title)}" />`,
     `<meta property="og:description" content="${escapeHtml(meta.description)}" />`,
     `<meta property="og:type" content="${meta.ogType || "website"}" />`,
@@ -56,7 +69,7 @@ export function buildSeoHead(locale: string, pathname: string): string {
     `<meta property="og:image:alt" content="${isEn ? "Your Human Design chart — discover your design" : "Human Design Mapa — poznej svůj design"}" />`,
     `<meta property="og:image:width" content="1200" />`,
     `<meta property="og:image:height" content="630" />`,
-    `<meta property="og:locale" content="${isEn ? "en_US" : "cs_CZ"}" />`,
+    `<meta property="og:locale" content="${ogLocaleMap[lang] || (isEn ? "en_US" : "cs_CZ")}" />`,
     `<meta property="og:site_name" content="${isEn ? "Human Design Chart" : "Human Design Mapa"}" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${escapeHtml(meta.title)}" />`,
@@ -67,6 +80,7 @@ export function buildSeoHead(locale: string, pathname: string): string {
     `<link rel="canonical" href="${canonical}" />`,
     `<link rel="alternate" hreflang="cs" href="${csAlt}" />`,
     `<link rel="alternate" hreflang="en" href="${enAlt}" />`,
+    `<link rel="alternate" hreflang="de" href="${deAlt}" />`,
     `<link rel="alternate" hreflang="x-default" href="${enAlt}" />`,
   ]
     .filter(Boolean)
@@ -74,8 +88,9 @@ export function buildSeoHead(locale: string, pathname: string): string {
 }
 
 function resolveMeta(locale: string, pathname: string): RouteMeta | null {
-  const isEn = locale === "en";
-  const base = isEn ? EN : CS;
+  const isCs = locale === "cs";
+  const isEn = !isCs;
+  const base = isCs ? CS : EN;
   const slug = pathname.replace(`/${locale}/`, "").replace(`/${locale}`, "").replace(/^\/+/, "");
 
   // ── Static routes ──────────────────────────────────────────────────

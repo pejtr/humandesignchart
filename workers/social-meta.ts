@@ -9,19 +9,20 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
   if (!asset.ok || !asset.headers.get("content-type")?.includes("text/html")) {
     return asset;
   }
-  const locale = url.pathname.match(/^\/(cs|en)(?:\/|$)/)?.[1];
+  const locale = url.pathname.match(/^\/(cs|en|de|fr|es|it)(?:\/|$)/)?.[1];
   const enHost = ["humandesignchart.app", "www.humandesignchart.app"].includes(url.hostname.toLowerCase());
   const meta = locale ? buildSeoHead(locale, url.pathname) : "";
   if (!meta && !enHost) return asset;
 
+  const htmlLang = locale || (enHost ? "en" : "cs");
   let html = await asset.text();
-  if (enHost) {
+  if (enHost || (locale && locale !== "cs")) {
     html = html
-      .replace('<html lang="cs">', '<html lang="en">')
+      .replace('<html lang="cs">', `<html lang="${htmlLang}">`)
       .replaceAll("https://www.humandesignmapa.cz", "https://www.humandesignchart.app")
       .replaceAll("https://humandesignmapa.cz", "https://humandesignchart.app")
       .replace('title="Blog o Human Design"', 'title="Human Design Blog"')
-      // Do not publish Czech-only FAQ markup on the English site.
+      // Do not publish Czech-only FAQ markup on the English/international site.
       .replace(/<!-- NotFair GEO[\s\S]*?<\/script>/, "");
   }
 
@@ -36,7 +37,7 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
   headers.delete("content-encoding");
   headers.delete("etag");
   headers.set("content-type", "text/html; charset=utf-8");
-  headers.set("content-language", enHost ? "en" : "cs");
+  headers.set("content-language", htmlLang);
 
   return new Response(rendered, {
     status: asset.status,

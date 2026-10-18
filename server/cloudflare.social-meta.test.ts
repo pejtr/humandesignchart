@@ -52,4 +52,27 @@ describe("Cloudflare WhatsApp preview metadata", () => {
     );
     expect(await response.text()).toContain('property="og:image"');
   });
+
+  it("handles European locale routes in Cloudflare social-meta worker", async () => {
+    for (const [locale, expectedLocale] of [
+      ["de", "de_DE"],
+      ["fr", "fr_FR"],
+      ["es", "es_ES"],
+      ["it", "it_IT"],
+    ] as const) {
+      const response = await withServerRenderedSeoMeta(
+        new URL(`https://humandesignchart.app/${locale}/calculate`),
+        assetResponse(),
+      );
+      const text = await response.text();
+      expect(text).toContain(`property="og:locale" content="${expectedLocale}"`);
+      if (locale === "de") {
+        expect(text).toContain(`hreflang="${locale}" href="https://humandesignchart.app/${locale}/calculate"`);
+        expect(text).not.toContain('name="robots" content="noindex,follow"');
+      } else {
+        expect(text).not.toContain(`hreflang="${locale}"`);
+        expect(text).toContain('name="robots" content="noindex,follow"');
+      }
+    }
+  });
 });

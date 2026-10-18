@@ -14,8 +14,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
+import { trackGA4Event } from "@/hooks/useGA4";
 import { getRedditClickIdForCapi } from "@/hooks/useRedditPixel";
-import { getOpenAIAdsClickRef, isOpenAIAdsConsentGranted } from "@/hooks/useOpenAIAdsPixel";
+import { getOpenAIAdsClickRef, isOpenAIAdsConsentGranted, measureOpenAIAdsEvent } from "@/hooks/useOpenAIAdsPixel";
 import { readChartDraft } from "@/lib/chartDraft";
 
 function formatPrice(amountMinor: number, currency: string, locale: string) {
@@ -56,6 +57,16 @@ export default function Pricing() {
   const beginCheckout = () => {
     if (!offer) return;
     if (hasBlueprintAccess) return navigate(`/${locale}/dashboard`);
+    const chartDraft = readChartDraft();
+    if (!chartDraft?.chart) {
+      toast.info(
+        isCs
+          ? "Nejprve prosím zadejte údaje narození pro výpočet vaší osobní mapy."
+          : "First enter your birth details so we can calculate your personal Blueprint."
+      );
+      navigate(`/${locale}/calculate?next=honorace`);
+      return;
+    }
     setShowCheckoutModal(true);
   };
 
@@ -70,6 +81,15 @@ export default function Pricing() {
       return;
     }
     const chartDraft = readChartDraft();
+    if (!chartDraft?.chart) {
+      toast.info(
+        isCs
+          ? "Nejprve prosím zadejte údaje narození pro výpočet vaší osobní mapy."
+          : "First enter your birth details so we can calculate your personal Blueprint."
+      );
+      navigate(`/${locale}/calculate?next=honorace`);
+      return;
+    }
     checkout.mutate({
       plan: "blueprint",
       locale: isCs ? "cs" : "en",
@@ -77,7 +97,7 @@ export default function Pricing() {
       customerEmail: customerEmail.trim(),
       customerName: customerName.trim() || undefined,
       digitalDeliveryConsent: true,
-      chartDataJson: chartDraft?.chart || undefined,
+      chartDataJson: chartDraft.chart,
       redditClickId: getRedditClickIdForCapi(),
       openAIAdsMarketingConsent: isOpenAIAdsConsentGranted(),
       openAIAdsOppref: getOpenAIAdsClickRef(),
@@ -90,12 +110,24 @@ export default function Pricing() {
         if (token && refId) {
           sessionStorage.setItem("hd_download_token_" + refId, token);
         }
-        initiateCheckout(totalAmountMinor / 100, {
+        const valueMajor = totalAmountMinor / 100;
+        const currencyCode = offer?.currency || (isCs ? "CZK" : "EUR");
+        initiateCheckout(valueMajor, {
           content_name: "Personal Human Design Blueprint",
           content_category: "report",
           content_ids: ["blueprint"],
           content_type: "product",
           num_items: 1,
+        });
+        trackGA4Event("CheckoutStarted", {
+          value: valueMajor,
+          currency: currencyCode,
+          offer_key: "blueprint",
+        });
+        measureOpenAIAdsEvent("checkout_started", {
+          type: "contents",
+          amount: valueMajor,
+          currency: currencyCode,
         });
         if (url) window.location.assign(url);
       },

@@ -4,4 +4,7 @@ export { ru } from "./ru";
 export { uk } from "./uk";
 export { de } from "./de";
 export { hu } from "./hu";
+export { fr } from "./fr";
+export { es } from "./es";
+export { it } from "./it";
 export type { TranslationKeys } from "./cs";

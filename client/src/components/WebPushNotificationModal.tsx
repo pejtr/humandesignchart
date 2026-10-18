@@ -1,17 +1,35 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Bell, Sparkles, Check, ShieldCheck, Sun } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+const SUPPRESSED_ROUTE_PATTERN = /^\/(?:(?:cs|en|de|fr|es|it|ru|uk|hu)(?:\/(?:calculate|human-design-kalkulacka|human-design-test|human-design-typy|chart|honorace|pricing|cenik|payment|vsl|vsl-chat|chat-reading|ai-guide))?)?\/?$/;
+
 export function WebPushNotificationModal() {
   const { locale } = useLanguage();
-  const isEn = locale === "en";
+  const [pathname] = useLocation();
+  const isEn = locale !== "cs";
   const [open, setOpen] = useState(false);
   const [enabled, setEnabled] = useState(false);
+  const isSuppressedPage =
+    SUPPRESSED_ROUTE_PATTERN.test(pathname) ||
+    pathname.includes("/calculate") ||
+    pathname.includes("/kalkulacka") ||
+    pathname.includes("/chart/") ||
+    pathname.includes("/honorace") ||
+    pathname.includes("/pricing") ||
+    pathname.includes("/payment/") ||
+    pathname.includes("/vsl") ||
+    pathname.includes("/ai-guide");
 
   useEffect(() => {
+    if (isSuppressedPage) {
+      setOpen(false);
+      return;
+    }
     // Check if user has already made a decision about notifications
     const promptSeen = localStorage.getItem("hd_push_prompt_seen");
     if (!promptSeen && typeof window !== "undefined" && "Notification" in window) {
@@ -20,7 +38,9 @@ export function WebPushNotificationModal() {
       }, 5000); // Prompt 5 seconds after page load
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [isSuppressedPage]);
+
+  if (isSuppressedPage) return null;
 
   const handleEnableNotifications = async () => {
     localStorage.setItem("hd_push_prompt_seen", "true");
