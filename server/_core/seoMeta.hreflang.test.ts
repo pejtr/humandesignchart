@@ -34,10 +34,21 @@ describe("localized SEO alternate links", () => {
     expect(html).toContain('property="og:title"');
   });
 
-  it("uses the canonical EN host without www redirects", () => {
-    const html = buildSeoHead("cs", "/cs/calculate");
+  it("emits complete hreflang alternates for cs, en, de, fr, es, it, and x-default", () => {
+    const html = buildSeoHead("de", "/de/calculate");
+    expect(html).toContain('hreflang="cs" href="https://humandesignmapa.cz/cs/calculate"');
     expect(html).toContain('hreflang="en" href="https://humandesignchart.app/en/calculate"');
-    expect(html).not.toContain("www.humandesignchart.app");
+    expect(html).toContain('hreflang="de" href="https://humandesignchart.app/de/calculate"');
+    expect(html).toContain('hreflang="fr" href="https://humandesignchart.app/fr/calculate"');
+    expect(html).toContain('hreflang="es" href="https://humandesignchart.app/es/calculate"');
+    expect(html).toContain('hreflang="it" href="https://humandesignchart.app/it/calculate"');
+    expect(html).toContain('hreflang="x-default" href="https://humandesignchart.app/en/calculate"');
+    expect(html).toContain('property="og:locale" content="de_DE"');
   });
 
+  it("handles French, Spanish and Italian og:locale correctly", () => {
+    expect(buildSeoHead("fr", "/fr/calculate")).toContain('property="og:locale" content="fr_FR"');
+    expect(buildSeoHead("es", "/es/calculate")).toContain('property="og:locale" content="es_ES"');
+    expect(buildSeoHead("it", "/it/calculate")).toContain('property="og:locale" content="it_IT"');
+  });
 });

@@ -19,6 +19,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import { TimeDisambiguationField, type TimeDisambiguation } from "@/components/TimeDisambiguationField";
 import { useMetaPixel } from "@/hooks/useMetaPixel";
+import { trackGA4Event } from "@/hooks/useGA4";
+import { measureOpenAIAdsEvent } from "@/hooks/useOpenAIAdsPixel";
 import { saveChartDraft } from "@/lib/chartDraft";
 
 const CALCULATOR_HERO_VISUALS = {
@@ -34,7 +36,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
   const [, navigate] = useLocation();
   const { isAuthenticated } = useAuth();
   const { t, localePath, locale } = useLanguage();
-  const isEn = locale === "en";
+  const isEn = locale !== "cs";
   const meta = useMetaPixel();
 
   useSEO(isEn ? {
@@ -111,6 +113,18 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
       saveChartDraft(data, {
         name, birthDate, birthTime, birthPlace, latitude, longitude, timezone: data.timezone, category,
       });
+      trackGA4Event("ChartGenerated", {
+        chart_type: data.type,
+        profile: data.profile,
+        authority: data.authority,
+        locale,
+      });
+      measureOpenAIAdsEvent("registration_completed", { type: "customer_action" });
+      const nextStep = new URLSearchParams(window.location.search).get("next");
+      if (nextStep === "honorace" || nextStep === "pricing") {
+        navigate(localePath("/honorace"));
+        return;
+      }
       navigate(localePath("/chart/new"));
     },
     onError: (err) => {

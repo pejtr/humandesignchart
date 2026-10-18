@@ -566,17 +566,33 @@ export default function AiGuide() {
               <h1 className="text-3xl font-serif font-bold mb-4">
                 {isEn ? "ORACULUM+ · AI Human Design Guide" : "ORACULUM+ · AI průvodkyně Human Designem"}
               </h1>
-              <p className="text-muted-foreground mb-8">
+              <p className="text-muted-foreground mb-6">
                 {isEn
-                  ? "Sign in to access ORACULUM+, your personal AI guide answering any questions about Human Design."
-                  : "Přihlaste se pro přístup k ORACULUM+, vaší osobní AI průvodkyni, která zodpoví jakékoliv otázky o Human Designu."}
+                  ? "Sign in to access ORACULUM+, your personal AI guide answering any questions about Human Design, or calculate your free Bodygraph chart first."
+                  : "Přihlaste se pro přístup k ORACULUM+, vaší osobní AI průvodkyni, která zodpoví jakékoliv otázky o Human Designu, nebo si nejprve spočítejte svou mapu zdarma."}
               </p>
-              <a href={getLoginUrl()}>
-                <Button size="lg" className="gap-2">
-                  <LogIn className="w-5 h-5" />
-                  {isEn ? "Sign in" : "Přihlásit se"}
+              {input && (
+                <div className="mb-6 mx-auto max-w-lg rounded-2xl border border-primary/25 bg-primary/5 px-4 py-3 text-left text-xs text-foreground">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-primary mb-1">
+                    {isEn ? "Your selected question:" : "Vaše vybraná otázka:"}
+                  </span>
+                  “{input}”
+                </div>
+              )}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a href={getLoginUrl()}>
+                  <Button size="lg" className="gap-2 w-full sm:w-auto">
+                    <LogIn className="w-5 h-5" />
+                    {isEn ? "Sign in to ORACULUM+" : "Přihlásit se do ORACULUM+"}
+                  </Button>
+                </a>
+                <Button size="lg" variant="outline" className="gap-2 w-full sm:w-auto" asChild>
+                  <Link href={localePath("/calculate")}>
+                    <Compass className="w-4 h-4" />
+                    {isEn ? "Calculate Free Chart" : "Spočítat mapu zdarma"}
+                  </Link>
                 </Button>
-              </a>
+              </div>
             </motion.div>
           </div>
         </main>

@@ -191,6 +191,12 @@ export default function PaymentSuccess() {
           currency: cur,
           items: [{ item_name: "Personal Human Design Blueprint", price: val, quantity: 1 }],
         });
+        trackGA4Event("Purchase", {
+          transaction_id: refId,
+          value: val,
+          currency: cur,
+          items: [{ item_name: "Personal Human Design Blueprint", price: val, quantity: 1 }],
+        });
         sessionStorage.setItem(trackingKey, "true");
         localStorage.setItem(trackingKey, "true");
       }

@@ -638,16 +638,20 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                 ) : (
                   <Button variant="outline" size="sm" onClick={handleShare} disabled={shareMutation.isPending} className="w-full min-w-0 lg:w-auto">
                     {shareMutation.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : copied ? <Check className="w-4 h-4 mr-1 text-green-500" /> : <Share2 className="w-4 h-4 mr-1" />}
-                    {shareMutation.isPending ? "Sdílení..." : copied ? "Zkopírováno!" : "Sdílet mapu"}
+                    {shareMutation.isPending
+                      ? (locale === "cs" ? "Sdílení..." : "Sharing...")
+                      : copied
+                        ? (locale === "cs" ? "Zkopírováno!" : "Copied!")
+                        : (locale === "cs" ? "Sdílet mapu" : "Share chart")}
                   </Button>
                 )}
                 <Button variant="outline" size="sm" className="w-full min-w-0 lg:w-auto" onClick={async () => {
                   const canUseBlueprintPdf = (subStatus?.blueprintPdfCredits ?? 0) > 0;
                   if (!subStatus?.isPremium && !canUseBlueprintPdf) {
-                    setShowPaywall(true);
                     toast.info(locale === "cs"
-                      ? "PDF report získáte v osobním Blueprintu nebo v Premium"
-                      : "Get the PDF report with a personal Blueprint or Premium");
+                      ? "PDF report a 5 AI výkladů získáte v osobním Blueprintu."
+                      : "Unlock your personal PDF report and 5 AI readings with the Personal Blueprint.");
+                    navigate(localePath("/honorace"));
                     return;
                   }
                   setGeneratingPdf(true);
@@ -662,7 +666,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                     }
                   } catch (e) {
                     console.error(e);
-                    toast.error("PDF generování selhalo");
+                    toast.error(locale === "cs" ? "PDF generování selhalo" : "PDF generation failed");
                   }
                   setGeneratingPdf(false);
                 }} disabled={generatingPdf}>
@@ -772,7 +776,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                       onClick={() => setShowTransits(!showTransits)}
                     >
                       <Globe className="w-3.5 h-3.5 mr-1.5" />
-                      {showTransits ? "Skrýt Tranzity" : t.transits.transitOverlay}
+                      {showTransits ? (locale === "cs" ? "Skrýt Tranzity" : "Hide Transits") : t.transits.transitOverlay}
                     </Button>
                     {showTransits && transitQuery.data && (
                       <div className="space-y-1 max-h-48 overflow-y-auto">
@@ -781,7 +785,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                           return (
                             <div key={i} className="flex items-center justify-between text-[10px] py-0.5 px-1">
                               <span className="text-cyan-600">{czPlanet}</span>
-                              <span className="text-muted-foreground font-mono">Brána {tg.gate}.{tg.line}</span>
+                              <span className="text-muted-foreground font-mono">{locale === "cs" ? "Brána" : "Gate"} {tg.gate}.{tg.line}</span>
                             </div>
                           );
                         })}
@@ -904,16 +908,16 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                         {/* Reading type selector — always visible */}
                         <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border/30">
                           {[
-                            { key: "overview", label: "✨ Kompletní přehled" },
-                            { key: "type_strategy", label: "💫 Typ & strategie" },
-                            { key: "profile", label: "🎭 Profil" },
-                            { key: "authority", label: "🧠 Autorita" },
-                            { key: "incarnation_cross", label: "★ Životní poslání" },
-                            { key: "career", label: "💼 Kariéra" },
-                            { key: "relationships", label: "❤️ Vztahy" },
-                            { key: "channels", label: "⚡ Kanály" },
-                            { key: "daily_transit", label: "🌟 Denní výklad" },
-                            { key: "moon", label: locale === "cs" ? "🌙 Výklad Luny" : "🌙 Moon reading" },
+                            { key: "overview", label: locale === "cs" ? "✨ Kompletní přehled" : "✨ Complete Overview" },
+                            { key: "type_strategy", label: locale === "cs" ? "💫 Typ & strategie" : "💫 Type & Strategy" },
+                            { key: "profile", label: locale === "cs" ? "🎭 Profil" : "🎭 Profile" },
+                            { key: "authority", label: locale === "cs" ? "🧠 Autorita" : "🧠 Authority" },
+                            { key: "incarnation_cross", label: locale === "cs" ? "★ Životní poslání" : "★ Life Purpose" },
+                            { key: "career", label: locale === "cs" ? "💼 Kariéra" : "💼 Career" },
+                            { key: "relationships", label: locale === "cs" ? "❤️ Vztahy" : "❤️ Relationships" },
+                            { key: "channels", label: locale === "cs" ? "⚡ Kanály" : "⚡ Channels" },
+                            { key: "daily_transit", label: locale === "cs" ? "🌟 Denní výklad" : "🌟 Daily Transit" },
+                            { key: "moon", label: locale === "cs" ? "🌙 Výklad Luny" : "🌙 Moon Reading" },
                           ].map(item => (
                             <Button
                               key={item.key}
@@ -984,17 +988,6 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                         </div>
                       </CardContent>
                     </Card>
-                    
-                    {/* Visual Teaser for locked chapters */}
-                    {!subStatus?.isPremium && (
-                      <LockedContentBlurTeaser
-                        titleCs="Osobní rozhodovací strategie v krizi & ne-já téma"
-                        titleEn="Personal Crisis Strategy & Not-Self Theme"
-                        previewSnippetCs="Váš typ a autorita ukazují přesný energetický mechanismus, jak předcházet pocitům hořkosti a vyhoření..."
-                        previewSnippetEn="Your type and authority reveal the exact energetic blueprint to overcome bitterness and burnout..."
-                        chapterNumber={4}
-                      />
-                    )}
                     </>
                   ) : (
                     <div className="relative overflow-hidden rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-violet-50 p-6 shadow-md">
@@ -1007,24 +1000,32 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <h2 className="font-serif text-xl font-bold text-foreground">AI výklad vaší mapy</h2>
-                              <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-medium">Nové</span>
+                              <h2 className="font-serif text-xl font-bold text-foreground">
+                                {locale === "cs" ? "ORACULUM+ · AI výklad vaší mapy" : "ORACULUM+ · AI Reading of Your Chart"}
+                              </h2>
+                              <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-medium">
+                                {locale === "cs" ? "Nové" : "New"}
+                              </span>
                             </div>
                             <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                              Získáte <strong>srozumitelný výklad v češtině</strong> — co váš typ znamená, jak využít svou autoritu a jaké je vaše životní poslání.
+                              {locale === "cs" ? (
+                                <>Získáte <strong>srozumitelný osobní výklad v češtině</strong> — co váš typ znamená, jak využít svou autoritu a jaké je vaše životní poslání.</>
+                              ) : (
+                                <>Get a <strong>clear, personalized reading in English</strong> — what your type means, how to trust your inner authority, and your life purpose.</>
+                              )}
                             </p>
                             <div className="flex flex-wrap gap-2 mb-5">
                               {[
-                                { key: "overview", label: "✨ Kompletní přehled", primary: true },
-                                { key: "type_strategy", label: "💫 Typ & strategie", primary: false },
-                                { key: "profile", label: "🎭 Profil", primary: false },
-                                { key: "authority", label: "🧠 Autorita", primary: false },
-                                { key: "incarnation_cross", label: "★ Životní poslání", primary: false },
-                                { key: "career", label: "💼 Kariéra", primary: false },
-                                { key: "relationships", label: "❤️ Vztahy", primary: false },
-                                { key: "channels", label: "⚡ Kanály", primary: false },
-                                { key: "daily_transit", label: "🌟 Denní výklad", primary: false },
-                                { key: "moon", label: locale === "cs" ? "🌙 Výklad Luny" : "🌙 Moon reading", primary: false },
+                                { key: "overview", label: locale === "cs" ? "✨ Kompletní přehled" : "✨ Complete Overview", primary: true },
+                                { key: "type_strategy", label: locale === "cs" ? "💫 Typ & strategie" : "💫 Type & Strategy", primary: false },
+                                { key: "profile", label: locale === "cs" ? "🎭 Profil" : "🎭 Profile", primary: false },
+                                { key: "authority", label: locale === "cs" ? "🧠 Autorita" : "🧠 Authority", primary: false },
+                                { key: "incarnation_cross", label: locale === "cs" ? "★ Životní poslání" : "★ Life Purpose", primary: false },
+                                { key: "career", label: locale === "cs" ? "💼 Kariéra" : "💼 Career", primary: false },
+                                { key: "relationships", label: locale === "cs" ? "❤️ Vztahy" : "❤️ Relationships", primary: false },
+                                { key: "channels", label: locale === "cs" ? "⚡ Kanály" : "⚡ Channels", primary: false },
+                                { key: "daily_transit", label: locale === "cs" ? "🌟 Denní výklad" : "🌟 Daily Transit", primary: false },
+                                { key: "moon", label: locale === "cs" ? "🌙 Výklad Luny" : "🌙 Moon Reading", primary: false },
                               ].map(item => (
                                 <Button
                                   key={item.key}
@@ -1045,11 +1046,38 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                               ))}
                             </div>
                             {!isAuthenticated && (
-                              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                                <Info className="w-3.5 h-3.5" />
-                                Pro AI výklad se prosím{" "}
-                                <a href={getLoginUrl()} className="text-primary underline underline-offset-2">přihlašte</a>.
-                              </p>
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-border/40">
+                                <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                  <Info className="w-3.5 h-3.5 shrink-0" />
+                                  {locale === "cs" ? (
+                                    <>
+                                      Pro okamžitý PDF report + 5 AI výkladů zvolte{" "}
+                                      <button type="button" onClick={() => navigate(localePath("/honorace"))} className="text-primary font-semibold underline underline-offset-2">
+                                        Osobní Blueprint
+                                      </button>{" "}
+                                      nebo se{" "}
+                                      <a href={getLoginUrl()} className="text-primary underline underline-offset-2">přihlaste</a>.
+                                    </>
+                                  ) : (
+                                    <>
+                                      Get your instant PDF report + 5 AI readings with{" "}
+                                      <button type="button" onClick={() => navigate(localePath("/honorace"))} className="text-primary font-semibold underline underline-offset-2">
+                                        Personal Blueprint
+                                      </button>{" "}
+                                      or{" "}
+                                      <a href={getLoginUrl()} className="text-primary underline underline-offset-2">sign in</a>.
+                                    </>
+                                  )}
+                                </p>
+                                <Button
+                                  size="sm"
+                                  onClick={() => navigate(localePath("/honorace"))}
+                                  className="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs rounded-xl shrink-0"
+                                >
+                                  <Crown className="w-3.5 h-3.5 mr-1.5" />
+                                  {locale === "cs" ? "Získat osobní Blueprint" : "Get Personal Blueprint"}
+                                </Button>
+                              </div>
                             )}
                           </div>
                         </div>
@@ -1057,6 +1085,19 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                     </div>
                   )}
                 </section>
+
+                {/* Visual Teaser for locked chapters & Personal Blueprint offer (#premium-outputs) */}
+                {!subStatus?.isPremium && (
+                  <div id="premium-outputs" className="scroll-mt-36">
+                    <LockedContentBlurTeaser
+                      titleCs="Osobní rozhodovací strategie v krizi & ne-já téma"
+                      titleEn="Personal Crisis Strategy & Not-Self Theme"
+                      previewSnippetCs="Váš typ a autorita ukazují přesný energetický mechanismus, jak předcházet pocitům hořkosti a vyhoření..."
+                      previewSnippetEn="Your type and authority reveal the exact energetic blueprint to overcome bitterness and burnout..."
+                      chapterNumber={4}
+                    />
+                  </div>
+                )}
 
                 <ChartInsightsVisuals
                   chart={chart}
@@ -1202,8 +1243,8 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                       <TabsTrigger value="centers" className="text-xs whitespace-nowrap">{t.chart.centers}</TabsTrigger>
                       <TabsTrigger value="variables" className="text-xs whitespace-nowrap">{t.chart.variables}</TabsTrigger>
                       <TabsTrigger value="gates" className="text-xs whitespace-nowrap">{t.chart.gates}</TabsTrigger>
-                      <TabsTrigger value="genekeys" className="text-xs whitespace-nowrap flex gap-1"><Sparkles className="w-3 h-3 text-amber-500" /> Zlatá Cesta</TabsTrigger>
-                      <TabsTrigger value="dreamrave" className="text-xs whitespace-nowrap flex gap-1"><Moon className="w-3 h-3 text-indigo-400" /> Spánek a Sny</TabsTrigger>
+                      <TabsTrigger value="genekeys" className="text-xs whitespace-nowrap flex gap-1"><Sparkles className="w-3 h-3 text-amber-500" /> {locale === "cs" ? "Zlatá Cesta" : "Golden Path"}</TabsTrigger>
+                      <TabsTrigger value="dreamrave" className="text-xs whitespace-nowrap flex gap-1"><Moon className="w-3 h-3 text-indigo-400" /> {locale === "cs" ? "Spánek a Sny" : "Dream Rave"}</TabsTrigger>
                     </TabsList>
                   </ScrollArea>
 
@@ -1228,7 +1269,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                                     <span className="text-muted-foreground text-xs">{czPlanet}</span>
                                   </span>
                                   <span className="flex items-center gap-2">
-                                    <span className="font-mono font-medium text-xs">Brána {a.gate}.{a.line}</span>
+                                    <span className="font-mono font-medium text-xs">{locale === "cs" ? "Brána" : "Gate"} {a.gate}.{a.line}</span>
                                     <span className="text-[10px] text-muted-foreground">B{a.color} T{a.tone}</span>
                                   </span>
                                 </button>
@@ -1256,7 +1297,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                                     <span className="text-muted-foreground text-xs">{czPlanet}</span>
                                   </span>
                                   <span className="flex items-center gap-2">
-                                    <span className="font-mono font-medium text-xs text-red-600">Brána {a.gate}.{a.line}</span>
+                                    <span className="font-mono font-medium text-xs text-red-600">{locale === "cs" ? "Brána" : "Gate"} {a.gate}.{a.line}</span>
                                     <span className="text-[10px] text-muted-foreground">B{a.color} T{a.tone}</span>
                                   </span>
                                 </button>
@@ -1273,7 +1314,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                     <Card className="bg-card border-border/50 shadow-sm">
                       <CardContent className="pt-6">
                         {(chart.channels || []).length === 0 ? (
-                          <p className="text-muted-foreground text-center py-8">Žádné definované kanály (typ Reflektor)</p>
+                          <p className="text-muted-foreground text-center py-8">{locale === "cs" ? "Žádné definované kanály (typ Reflektor)" : "No defined channels (Reflector type)"}</p>
                         ) : (
                           <div className="space-y-2">
                             {(chart.channels || []).map((ch, i) => {
@@ -1286,7 +1327,7 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2">
                                       <Zap className="w-4 h-4 text-primary shrink-0" />
-                                      <span className="font-medium text-sm">Kanál {ch.gate1}-{ch.gate2}</span>
+                                      <span className="font-medium text-sm">{locale === "cs" ? "Kanál" : "Channel"} {ch.gate1}-{ch.gate2}</span>
                                       {desc && <span className="text-xs text-muted-foreground truncate">({desc.name})</span>}
                                     </div>
                                     <p className="text-xs text-muted-foreground mt-0.5 ml-6">

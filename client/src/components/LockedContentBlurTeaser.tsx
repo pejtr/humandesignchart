@@ -21,7 +21,7 @@ export function LockedContentBlurTeaser({
   chapterNumber = 4,
 }: LockedContentBlurTeaserProps) {
   const { locale, localePath } = useLanguage();
-  const isEn = locale === "en";
+  const isEn = locale !== "cs";
 
   return (
     <Card className="relative overflow-hidden border border-purple-300/40 dark:border-purple-800/40 bg-card rounded-2xl shadow-lg my-6">
@@ -30,7 +30,7 @@ export function LockedContentBlurTeaser({
         <div className="flex items-center justify-between border-b border-border/40 pb-3">
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-bold bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full">
-              KAPITOLA {chapterNumber}
+              {isEn ? `CHAPTER ${chapterNumber}` : `KAPITOLA ${chapterNumber}`}
             </span>
             <h3 className="font-serif font-bold text-lg text-foreground">
               {isEn ? titleEn : titleCs}
@@ -47,10 +47,14 @@ export function LockedContentBlurTeaser({
         {/* Blurred Teaser Paragraphs */}
         <div className="relative space-y-3 select-none filter blur-[5px] opacity-40 pointer-events-none aria-hidden">
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Váš sakrální motor funguje na principu okamžité fyzické odezvy. Když vás vesmír osloví správnou nabídkou, pocítíte jemnou expanzi v břiše. Pokud se snažíte rozhodovat pouze hlavou, vzniká mentální odpor a následné vyhoření.
+            {isEn
+              ? "Your inner decision-making engine operates through immediate somatic response. When life presents the right opportunity, your body signals expansion rather than mental pressure."
+              : "Váš sakrální motor funguje na principu okamžité fyzické odezvy. Když vás vesmír osloví správnou nabídkou, pocítíte jemnou expanzi v břiše. Pokud se snažíte rozhodovat pouze hlavou, vzniká mentální odpor a následné vyhoření."}
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Tento profil 3/5 nese archetyp Mučedníka a Kacíře. Vaše životní cesta je zkoušení metodou pokus-omyl, ze kterého přinášíte neocenitelnou moudrost celému svému okolí...
+            {isEn
+              ? "Your profile lines combine experiential wisdom with practical leadership, turning lived lessons into clarity for your relationships and career..."
+              : "Tento profil nese archetyp praktické moudrosti a zkoušení v praxi, ze kterého přinášíte neocenitelnou jasnost celému svému okolí..."}
           </p>
         </div>
       </CardContent>
@@ -60,19 +64,19 @@ export function LockedContentBlurTeaser({
         <div className="max-w-md mx-auto space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 text-xs font-semibold">
             <Crown className="w-3.5 h-3.5" />
-            {isEn ? "Locked Premium Reading" : "Zamknutá kapitola rozboru"}
+            {isEn ? "Personal Human Design Blueprint" : "Osobní Human Design Blueprint"}
           </div>
 
           <h4 className="font-serif font-bold text-xl text-foreground">
             {isEn
-              ? "Unlock Your Full 40-Page Energetic Blueprint"
-              : "Odemkněte kompletní 40-stránkový rozbor mapy"}
+              ? "Unlock Your Complete Personal Blueprint & PDF Report"
+              : "Odemkněte kompletní osobní Blueprint a PDF rozbor"}
           </h4>
 
           <p className="text-xs text-muted-foreground">
             {isEn
-              ? "Gain instant access to all 8 deep AI chapters, decision strategy, and daily planetary transit guidance."
-              : "Získejte okamžitý přístup ke všem 8 AI kapitolám, rozhodovací strategii a osobním tranzitům."}
+              ? "Instant access to your personalized PDF Blueprint, decision strategy, relationship & career analysis, plus 5 ORACULUM+ AI readings."
+              : "Okamžitý přístup k osobnímu PDF Blueprintu, rozhodovací strategii, rozboru vztahů a práce + 5 AI výkladům ORACULUM+."}
           </p>
 
           <Button
@@ -82,7 +86,7 @@ export function LockedContentBlurTeaser({
           >
             <Link href={localePath("/honorace")}>
               <Sparkles className="w-4 h-4 text-amber-300" />
-              {isEn ? "Unlock Full Reading" : "Odemknout plný rozbor s Maríí"}
+              {isEn ? "Unlock Personal Blueprint" : "Odemknout osobní Blueprint"}
               <ArrowRight className="w-4 h-4 ml-auto" />
             </Link>
           </Button>
