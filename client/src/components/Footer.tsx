@@ -413,7 +413,7 @@ const projects = [
           <div className="flex flex-col items-center gap-1 md:items-end">
             <p className="text-xs text-muted-foreground">{t.footer.foundedBy}</p>
             <a
-              href="https://optimateo.com/business-audit-sprint?utm_source=humandesignchart&utm_medium=footer&utm_campaign=brand-attribution"
+              href="https://www.optimateo.com/?utm_source=humandesignchart&utm_medium=footer&utm_campaign=brand-attribution"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[11px] text-muted-foreground transition-colors hover:text-foreground"
