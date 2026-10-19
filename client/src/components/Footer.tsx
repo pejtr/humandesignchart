@@ -410,7 +410,17 @@ const projects = [
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} {t.footer.copyright}
           </p>
-          <p className="text-xs text-muted-foreground">{t.footer.foundedBy}</p>
+          <div className="flex flex-col items-center gap-1 md:items-end">
+            <p className="text-xs text-muted-foreground">{t.footer.foundedBy}</p>
+            <a
+              href="https://www.optimateo.com/?utm_source=humandesignchart&utm_medium=footer&utm_campaign=brand-attribution"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Engineered by <span className="font-semibold">OPTIMATEO</span>
+            </a>
+          </div>
         </div>
       </div>
 
