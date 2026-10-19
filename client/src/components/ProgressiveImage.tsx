@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type CSSProperties } from "react";
+import { useState, useEffect, type CSSProperties } from "react";
 
 interface ProgressiveImageProps {
   src: string;
@@ -16,7 +16,7 @@ interface ProgressiveImageProps {
 /**
  * Progressive image loading with blur-to-sharp transition.
  * Shows a colored placeholder with blur, then fades in the full image.
- * Uses IntersectionObserver for lazy loading.
+ * Uses the browser native lazy-loading scheduler (no double IntersectionObserver delay).
  *
  * Use `imgClassName` to control object-fit on the actual <img> element.
  * The default is `object-contain` which prevents portrait images from being cropped.
@@ -31,33 +31,15 @@ export function ProgressiveImage({
   fallbackSrc,
 }: ProgressiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
   const [activeSrc, setActiveSrc] = useState(src);
-  const imgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setActiveSrc(src);
     setIsLoaded(false);
   }, [src]);
 
-  useEffect(() => {
-    if (!imgRef.current) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "600px" } // Preload 600px before reaching viewport
-    );
-    observer.observe(imgRef.current);
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <div
-      ref={imgRef}
       className={`relative overflow-hidden ${className}`}
       style={{ ...style, backgroundColor: placeholderColor }}
     >
@@ -74,8 +56,7 @@ export function ProgressiveImage({
         </div>
       )}
       {/* Actual image */}
-      {isInView && (
-        <img
+      <img
           src={activeSrc}
           alt={alt}
           decoding="async"
@@ -98,7 +79,6 @@ export function ProgressiveImage({
           }}
           loading="lazy"
         />
-      )}
     </div>
   );
 }
