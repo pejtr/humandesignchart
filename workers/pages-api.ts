@@ -1623,6 +1623,42 @@ export default {
       });
     }
 
+    // Public Human Design calculation endpoint for GPT/MCP clients.
+    // This must be handled by the Cloudflare Pages worker: the legacy Express
+    // route is not deployed on this hosting target.
+    if (url.pathname === "/api/gpt/calculate") {
+      if (request.method !== "POST") {
+        return Response.json({ error: "METHOD_NOT_ALLOWED" }, { status: 405, headers: { Allow: "POST" } });
+      }
+      let payload: unknown;
+      try { payload = await request.json(); }
+      catch { return Response.json({ error: "INVALID_JSON" }, { status: 400 }); }
+      const parsed = z.object({
+        birthDate: z.string(), birthTime: z.string(),
+        latitude: z.number().finite().min(-90).max(90),
+        longitude: z.number().finite().min(-180).max(180),
+      }).safeParse(payload);
+      if (!parsed.success) return Response.json({ error: "INVALID_INPUT" }, { status: 400 });
+      try {
+        const { birthDate, birthTime, latitude, longitude } = parsed.data;
+        const canonical = ChartCalculationInputSchema.parse({
+          name: "API request", birthDate, birthTime, birthPlace: "API request",
+          latitude, longitude, timezone: lookupIanaTimezone(latitude, longitude),
+        });
+        const chart = ChartResultSchema.parse(calculateChart(canonical));
+        return Response.json({ success: true, type: chart.type, strategy: chart.strategy,
+          authority: chart.authority, profile: chart.profile,
+          credits: "Data provided by humandesignchart.app",
+          sponsorLink: "https://humandesignchart.app" },
+          { headers: { "cache-control": "no-store" } });
+      } catch (error) {
+        if (error instanceof z.ZodError || error instanceof TimezoneResolutionError)
+          return Response.json({ error: "INVALID_BIRTH_DATA" }, { status: 400 });
+        console.error("[gpt-calculate]", error);
+        return Response.json({ error: "CALCULATION_FAILED" }, { status: 500 });
+      }
+    }
+
     if (url.pathname.startsWith("/api/trpc")) {
       return fetchRequestHandler({
         endpoint: "/api/trpc",
