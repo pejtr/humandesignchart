@@ -163,7 +163,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
               </div>
               <div className="flex flex-col">
                 <span className="font-serif text-lg font-bold tracking-tight text-foreground hidden sm:block truncate">
-                  {locale === "cs" ? "HUMAN DESIGN MAPA" : "OMNI HD LAB"}
+                  {locale === "cs" ? "HUMAN DESIGN MAPA" : "HUMAN DESIGN CHART"}
                 </span>
                 
               </div>

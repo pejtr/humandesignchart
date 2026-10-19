@@ -18,6 +18,7 @@ import {
 import { Streamdown } from "streamdown";
 import { Link } from "wouter";
 import { useSEO } from "@/hooks/useSEO";
+import { localizeOraculumPresetQuestion } from "@/lib/oraculumPresetQuestions";
 
 type Message = {
   id: string;
@@ -364,10 +365,10 @@ export default function AiGuide() {
       const searchParams = new URLSearchParams(window.location.search);
       const queryParam = searchParams.get("q");
       if (queryParam && queryParam.trim()) {
-        setInput(queryParam.trim());
+        setInput(localizeOraculumPresetQuestion(queryParam.trim(), locale));
       }
     } catch {}
-  }, []);
+  }, [locale]);
 
   // --- Chat persistence & threads ---
   const [selectedChartId, setSelectedChartId] = useState<number | null>(null);

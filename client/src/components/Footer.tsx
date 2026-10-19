@@ -119,7 +119,7 @@ const projects = [
                 </svg>
               </div>
               <span className="font-serif text-lg font-bold tracking-tight text-foreground">
-                Human Design
+                {locale === "cs" ? "HUMAN DESIGN MAPA" : "HUMAN DESIGN CHART"}
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -266,8 +266,7 @@ const projects = [
                   Akční Letenky
                 </a>
                 <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-56 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Akční letenky do celého světa — tipy na levné letenky, výhodné
-                  nabídky a chybných tarifů.
+                  {locale === "cs" ? "Akční letenky do celého světa — tipy na levné letenky, výhodné nabídky a chybných tarifů." : "Find flight deals worldwide, including occasional mistake fares."}
                 </span>
               </li>
               <li className="relative group/tip">
@@ -280,8 +279,7 @@ const projects = [
                   Last Minute Dovolené
                 </a>
                 <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-56 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Nejlepší last minute zájezdy a vyhledávač výhodných dovolených
-                  u moře.
+                  {locale === "cs" ? "Nejlepší last minute zájezdy a vyhledávač výhodných dovolených u moře." : "Last-minute travel offers and affordable seaside holidays."}
                 </span>
               </li>
               <li className="relative group/tip">
@@ -294,8 +292,7 @@ const projects = [
                   Bezmasá Jídla
                 </a>
                 <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-52 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Recepty bez masa — zdravé, chutné a jednoduché vaření pro
-                  každý den.
+                  {locale === "cs" ? "Recepty bez masa — zdravé, chutné a jednoduché vaření pro každý den." : "Simple, delicious vegetarian recipes for everyday cooking."}
                 </span>
               </li>
               <li className="relative group/tip">
@@ -308,8 +305,7 @@ const projects = [
                   Katastr Online
                 </a>
                 <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-56 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Vyhledávání v katastru nemovitostí — parcely, vlastníci a
-                  listy vlastnictví online.
+                  {locale === "cs" ? "Vyhledávání v katastru nemovitostí — parcely, vlastníci a listy vlastnictví online." : "Find property and land registry information online."}
                 </span>
               </li>
               <li className="relative group/tip">
@@ -322,8 +318,7 @@ const projects = [
                   Čajovny Praha
                 </a>
                 <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-52 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Průvodce čajovnami v Praze — klidná místa pro relaxaci s
-                  výběrovým čajem.
+                  {locale === "cs" ? "Průvodce čajovnami v Praze — klidná místa pro relaxaci s výběrovým čajem." : "A guide to Prague tea rooms and places to unwind over tea."}
                 </span>
               </li>
               <li className="relative group/tip">
@@ -336,8 +331,7 @@ const projects = [
                   Do Itálie
                 </a>
                 <span className="pointer-events-none absolute left-0 bottom-full mb-1.5 w-56 rounded-md bg-popover text-popover-foreground text-xs px-2.5 py-1.5 shadow-lg border border-border/40 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 z-50">
-                  Průvodce cestováním po Itálii — destinace, tipy a inspirace na
-                  dovolenou.
+                  {locale === "cs" ? "Průvodce cestováním po Itálii — destinace, tipy a inspirace na dovolenou." : "Explore Italy with destination tips and travel inspiration."}
                 </span>
               </li>
             </ul>

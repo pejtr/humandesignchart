@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 import { useLocation } from "wouter";
 import { cs } from "@shared/i18n/cs";
 import { en } from "@shared/i18n/en";
@@ -63,6 +63,8 @@ function stripLocale(path: string): string {
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const locale = getLocaleFromPath(location);
+
+  useEffect(() => { document.documentElement.lang = locale; }, [locale]);
 
   const value = useMemo<LanguageContextValue>(() => ({
     locale,
