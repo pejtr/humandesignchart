@@ -45,7 +45,7 @@ export function buildConfirmedOrderEvent(
     source_url: host + "/" + locale + "/payment/success",
     data: { type: "contents", amount: order.amountMinor, currency: order.currency },
   };
-  if (order.oppref && order.oppref.length <= 255 && ![...order.oppref].some(char => char.charCodeAt(0) < 32)) {
+  if (order.oppref && order.oppref.length <= 255 && !Array.from(order.oppref).some(char => char.charCodeAt(0) < 32)) {
     event.oppref = order.oppref;
   }
   return event;
