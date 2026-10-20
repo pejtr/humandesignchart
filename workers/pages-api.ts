@@ -21,6 +21,7 @@ import { BLOG_ARTICLES_EN } from "../server/data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
 import { withServerRenderedSeoMeta } from "./social-meta";
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
+import { getBlueprintFulfillmentBlocker } from "../server/payments/blueprintFulfillmentGate";
 import { getReadingPrompt, getSystemPrompt } from "../server/ai/prompts";
 type D1Database = any;
 
@@ -46,6 +47,8 @@ type Context = { env: Env; request: Request };
 
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
+  // Cloudflare Pages must never expose server stack traces to checkout clients.
+  isDev: false,
 });
 
 const publicProcedure = t.procedure;
@@ -468,25 +471,26 @@ export const appRouter = router({
         z.object({
           email: z.string().email(),
           locale: z.enum(["cs", "en"]).default("cs"),
-          chartDataJson: z.string().min(2),
+          chartDataJson: z.string().min(2).max(300_000),
           metaJson: z.string().optional(),
         })
       )
       .mutation(async ({ input, ctx }: { input: any; ctx: Context }) => {
         const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+        if (!d1) throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHART_STORAGE_UNAVAILABLE" });
         const snapshotId = `snap_${crypto.randomUUID()}`;
-        if (d1) {
-          try {
-            await d1
-              .prepare(
-                `INSERT INTO hd_chart_snapshots (id, email, locale, chart_data_json, created_at)
-                 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
-              )
-              .bind(snapshotId, input.email, input.locale, input.chartDataJson)
-              .run();
-          } catch (err) {
-            console.error("[saveChartSnapshot] D1 error:", err);
-          }
+        try {
+          const result = await d1
+            .prepare(
+              `INSERT INTO hd_chart_snapshots (id, email, locale, chart_data_json, created_at)
+               VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
+            )
+            .bind(snapshotId, input.email, input.locale, input.chartDataJson)
+            .run();
+          if (!result.success) throw new Error("SNAPSHOT_INSERT_FAILED");
+        } catch (err) {
+          console.error("[saveChartSnapshot] Chart persistence failed");
+          throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHART_SNAPSHOT_PERSISTENCE_FAILED" });
         }
         return { snapshotId };
       }),
@@ -494,14 +498,14 @@ export const appRouter = router({
     createCheckout: publicProcedure
       .input(
         z.object({
-          plan: z.string().default("blueprint"),
+          plan: z.literal("blueprint").default("blueprint"),
           locale: z.enum(["cs", "en"]).default("cs"),
           origin: z.string().url(),
           customerEmail: z.string().email().max(100),
           customerName: z.string().max(100).optional(),
           digitalDeliveryConsent: z.boolean(),
           chartSnapshotId: z.string().optional(),
-          chartDataJson: z.string().max(300_000).optional(),
+          chartDataJson: z.string().min(2).max(300_000).optional(),
           redditClickId: z.string().optional(),
           openAIAdsMarketingConsent: z.boolean().optional(),
           openAIAdsOppref: z.string().optional(),
@@ -541,9 +545,10 @@ export const appRouter = router({
 
         const s2sKey = ctx.env?.PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN;
         if (!s2sKey) {
+          console.error("[createCheckout] Missing production paygate checkout credential");
           throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "PAYGATE_CHECKOUT_API_KEY_NOT_CONFIGURED",
+            code: "SERVICE_UNAVAILABLE",
+            message: "CHECKOUT_TEMPORARILY_UNAVAILABLE",
           });
         }
 
@@ -586,6 +591,19 @@ export const appRouter = router({
           }
         }
 
+        // A caller-supplied snapshot id is not proof that the personalized
+        // report exists or belongs to this customer. Fail before requesting payment.
+        const savedChart = snapshotId
+          ? await d1
+              .prepare("SELECT id FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) AND locale = ? LIMIT 1")
+              .bind(snapshotId, input.customerEmail.trim(), input.locale)
+              .first()
+              .catch(() => null)
+          : null;
+        if (!savedChart) {
+          throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHART_SNAPSHOT_REQUIRED" });
+        }
+
         const isCzech = input.locale === "cs";
         const offerKey = isCzech ? "hd-blueprint-cz" : "hd-blueprint-en";
         const payBase = (ctx.env?.PAY_BASE_URL || "https://pay.optimateo.com").replace(/\/$/, "");
@@ -625,11 +643,21 @@ export const appRouter = router({
 
         const data: any = await res.json();
         const refId = data.publicId || data.orderId;
-        if (!refId) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "GATEWAY_REFERENCE_MISSING",
-          });
+        const offer = getBlueprintOffer(input.locale);
+        let checkoutUrlValid = false;
+        try {
+          const checkoutUrl = new URL(data.checkoutUrl);
+          checkoutUrlValid = checkoutUrl.protocol === "https:" && checkoutUrl.origin === new URL(payBase).origin;
+        } catch { /* malformed gateway URL */ }
+        if (
+          typeof refId !== "string" || !refId ||
+          data.offerKey && data.offerKey !== offerKey ||
+          Number(data.amountMinor) !== offer.amountMinor ||
+          data.currency !== offer.currency ||
+          !checkoutUrlValid
+        ) {
+          console.error("[createCheckout] Gateway session does not match canonical Blueprint offer");
+          throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHECKOUT_TEMPORARILY_UNAVAILABLE" });
         }
 
         const initialToken = `tok_${crypto.randomUUID().replace(/-/g, "")}`;
@@ -651,8 +679,8 @@ export const appRouter = router({
               input.customerEmail,
               input.customerName || null,
               offerKey,
-              data.amountMinor || (isCzech ? 29000 : 1590),
-              data.currency || (isCzech ? "CZK" : "EUR"),
+              offer.amountMinor,
+              offer.currency,
               input.locale,
               snapshotId || null,
               initialToken,
@@ -1412,9 +1440,12 @@ export default {
         event?.eventType !== "PAYMENT_CAPTURED" ||
         event?.tenant !== "human-design" ||
         !["hd-blueprint-cz", "hd-blueprint-en"].includes(event?.offerKey) ||
-        !event?.refId ||
-        !event?.eventId ||
-        !event?.customerEmail
+        typeof event?.refId !== "string" ||
+        typeof event?.eventId !== "string" ||
+        typeof event?.customerEmail !== "string" ||
+        !Number.isInteger(Number(event?.amount)) ||
+        Number(event?.amount) <= 0 ||
+        !["CZK", "EUR"].includes(event?.currency)
       ) {
         return Response.json({ ok: false, error: "INVALID_PAYMENT_EVENT" }, { status: 400 });
       }
@@ -1472,17 +1503,33 @@ export default {
       try {
         const existing: any = await d1
           .prepare(
-            `SELECT id, payment_status, fulfillment_status, delivery_status, download_token FROM hd_orders WHERE payment_ref = ? LIMIT 1`
+            `SELECT id, payment_status, fulfillment_status, delivery_status, download_token,
+                    chart_snapshot_id, customer_email, offer_key, amount_minor, currency
+             FROM hd_orders WHERE payment_ref = ? LIMIT 1`
           )
           .bind(event.refId)
           .first();
 
-        let downloadToken = existing?.download_token;
-        if (!downloadToken) {
-          downloadToken = `tok_${crypto.randomUUID().replace(/-/g, "")}`;
+        // Reject a paid event when the original order or personalized chart is
+        // unavailable. Never create an empty paid order or issue an unusable PDF.
+        const snapshot = existing?.chart_snapshot_id
+          ? await d1
+              .prepare("SELECT id FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) LIMIT 1")
+              .bind(existing.chart_snapshot_id, existing.customer_email)
+              .first()
+          : null;
+        const blocked = getBlueprintFulfillmentBlocker(existing, event, Boolean(snapshot));
+        if (blocked) {
+          console.error("[onyxpay-fulfill] Cannot fulfill blueprint without valid order and chart:", blocked);
+          return Response.json(
+            { ok: false, error: blocked, retryable: blocked === "CHART_SNAPSHOT_REQUIRED" },
+            { status: blocked === "CHART_SNAPSHOT_REQUIRED" ? 503 : 422 }
+          );
         }
 
-        if (existing?.fulfillment_status === "FULFILLED") {
+        const downloadToken = existing.download_token || `tok_${crypto.randomUUID().replace(/-/g, "")}`;
+
+        if (existing.fulfillment_status === "FULFILLED") {
           return Response.json({
             ok: true,
             status: "ALREADY_FULFILLED",
@@ -1493,46 +1540,43 @@ export default {
           });
         }
 
-        const orderId = existing?.id || `ord_${crypto.randomUUID()}`;
         const tokenExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-        await d1
+        // UPDATE only: the chart-bearing order must be created before checkout.
+        // An INSERT here could claim a paid Blueprint was delivered without a chart.
+        const updateRes = await d1
           .prepare(
-            `INSERT INTO hd_orders (
-              id, payment_ref, event_id, customer_email, customer_name, offer_key,
-              amount_minor, currency, locale,
-              payment_status, fulfillment_status, delivery_status, delivered_at,
-              ai_reading_credits, download_token, download_token_expires_at, created_at, updated_at
-            ) VALUES (
-              ?, ?, ?, ?, ?, ?,
-              ?, ?, ?,
-              'PAID', 'FULFILLED', 'READY', NULL,
-              5, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-            )
-            ON CONFLICT(payment_ref) DO UPDATE SET
-              event_id = excluded.event_id,
-              payment_status = 'PAID',
-              fulfillment_status = 'FULFILLED',
-              delivery_status = CASE WHEN hd_orders.delivery_status = 'DOWNLOADED' THEN 'DOWNLOADED' ELSE 'READY' END,
-              ai_reading_credits = COALESCE(hd_orders.ai_reading_credits, 5),
-              download_token = COALESCE(hd_orders.download_token, excluded.download_token),
-              download_token_expires_at = COALESCE(hd_orders.download_token_expires_at, excluded.download_token_expires_at),
-              updated_at = CURRENT_TIMESTAMP`
+            `UPDATE hd_orders
+             SET event_id = ?, payment_status = 'PAID', fulfillment_status = 'FULFILLED',
+                 delivery_status = CASE WHEN delivery_status = 'DOWNLOADED' THEN 'DOWNLOADED' ELSE 'READY' END,
+                 ai_reading_credits = COALESCE(ai_reading_credits, 5),
+                 download_token = COALESCE(download_token, ?),
+                 download_token_expires_at = COALESCE(download_token_expires_at, ?),
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE payment_ref = ? AND fulfillment_status != 'FULFILLED'`
           )
-          .bind(
-            orderId,
-            event.refId,
-            event.eventId,
-            event.customerEmail,
-            event.customerName || null,
-            event.offerKey,
-            event.amount,
-            event.currency,
-            locale,
-            downloadToken,
-            tokenExpiresAt
-          )
+          .bind(event.eventId, downloadToken, tokenExpiresAt, event.refId)
           .run();
+
+        if (!updateRes.success) throw new Error("FULFILLMENT_UPDATE_FAILED");
+        if (updateRes.meta?.changes === 0) {
+          // Another authenticated callback committed first. Read the canonical
+          // persisted token and acknowledge idempotently without a second email.
+          const committed: any = await d1
+            .prepare("SELECT fulfillment_status, download_token FROM hd_orders WHERE payment_ref = ?")
+            .bind(event.refId)
+            .first();
+          if (committed?.fulfillment_status !== "FULFILLED" || !committed.download_token) {
+            return Response.json({ ok: false, error: "FULFILLMENT_CONFLICT" }, { status: 503 });
+          }
+          return Response.json({
+            ok: true,
+            status: "ALREADY_FULFILLED",
+            refId: event.refId,
+            publicToken: committed.download_token,
+            reportAccessUrl: `${domain}/${locale}/payment/success?plan=blueprint&refId=${encodeURIComponent(event.refId)}&token=${committed.download_token}`,
+          });
+        }
 
         const accessUrl = `${domain}/${locale}/payment/success?plan=blueprint&refId=${encodeURIComponent(event.refId)}&token=${downloadToken}`;
 

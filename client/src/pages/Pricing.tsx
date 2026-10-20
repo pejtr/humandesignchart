@@ -42,8 +42,20 @@ export default function Pricing() {
     viewContent({ content_name: "Personal Human Design Blueprint", content_category: "report", content_ids: ["blueprint"], content_type: "product", value: offerQuery.data.amountMinor / 100, currency: offerQuery.data.currency });
   }, [offerQuery.data?.amountMinor, offerQuery.data?.currency, viewContent]);
 
-  const checkout = trpc.subscription.createCheckout.useMutation({ onSuccess: ({ url }) => { if (url) window.location.assign(url); }, onError: error => toast.error(error.message) });
-  const redeemVoucher = trpc.giftVoucher.redeem.useMutation({ onSuccess: () => { toast.success(isCs ? "Dárkový kód byl uplatněn." : "Gift voucher redeemed."); setVoucherCode(""); }, onError: error => toast.error(error.message) });
+  const checkout = trpc.subscription.createCheckout.useMutation({ onSuccess: ({ url }) => { if (url) window.location.assign(url); }, onError: error => toast.error(
+    error.message === "CHECKOUT_TEMPORARILY_UNAVAILABLE"
+      ? isCs
+        ? "Bezpečná platba je momentálně nedostupná. Zkuste to prosím později."
+        : "Secure checkout is temporarily unavailable. Please try again later."
+      : error.message
+  ) });
+  const redeemVoucher = trpc.giftVoucher.redeem.useMutation({ onSuccess: () => { toast.success(isCs ? "Dárkový kód byl uplatněn." : "Gift voucher redeemed."); setVoucherCode(""); }, onError: error => toast.error(
+    error.message === "CHECKOUT_TEMPORARILY_UNAVAILABLE"
+      ? isCs
+        ? "Bezpečná platba je momentálně nedostupná. Zkuste to prosím později."
+        : "Secure checkout is temporarily unavailable. Please try again later."
+      : error.message
+  ) });
   const offer = offerQuery.data;
   const hasBlueprintAccess = Boolean(statusQuery.data?.isPremium || (statusQuery.data?.blueprintPdfCredits ?? 0) > 0);
   const price = offer ? formatPrice(offer.amountMinor, offer.currency, locale) : "…";

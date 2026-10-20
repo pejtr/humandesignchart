@@ -34,7 +34,7 @@ export function getOpenAIAdsClickRef(): string | undefined {
   }
   try {
     const candidate = new URLSearchParams(window.location.search).get("oppref");
-    if (candidate && candidate.length <= 255 && !/[\r\n\x00-\x1F]/.test(candidate)) {
+    if (candidate && candidate.length <= 255 && !Array.from(candidate).some(char => char.charCodeAt(0) < 32)) {
       sessionStorage.setItem(OPPREF_STORAGE_KEY, candidate);
     }
     return sessionStorage.getItem(OPPREF_STORAGE_KEY) || undefined;
