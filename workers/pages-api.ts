@@ -21,6 +21,7 @@ import { BLOG_ARTICLES_EN } from "../server/data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
 import { publicSeoUrlFromRequest, withServerRenderedSeoMeta } from "./social-meta";
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
+import { isVerifiedBlueprintPayment } from "../server/payments/blueprintPaymentVerification";
 import { getBlueprintFulfillmentBlocker } from "../server/payments/blueprintFulfillmentGate";
 import { getReadingPrompt, getSystemPrompt } from "../server/ai/prompts";
 type D1Database = any;
@@ -755,11 +756,9 @@ export const appRouter = router({
           }
         }
 
-        const isPaid =
-          payData?.status === "PAID" ||
-          payData?.status === "FULFILLED" ||
-          localOrder?.payment_status === "PAID" ||
-          localOrder?.fulfillment_status === "FULFILLED";
+        // Do not confirm a purchase without an existing, canonical D1 order.
+        // A gateway PAID flag is only trusted when amount, currency and offer match.
+        const isPaid = isVerifiedBlueprintPayment(localOrder, payData);
 
         if (isPaid && localOrder && localOrder.payment_status !== "PAID" && d1) {
           try {
@@ -779,12 +778,12 @@ export const appRouter = router({
         // Return authoritative status without leaking PII, chart data, or download tokens
         return {
           verified: isPaid,
-          status: payData?.status || localOrder?.payment_status || "NOT_FOUND",
+          status: isPaid ? "PAID" : (localOrder?.payment_status || "NOT_FOUND"),
           refId: input.refId,
-          amountMinor: payData?.amountMinor || localOrder?.amount_minor || 0,
-          currency: payData?.currency || localOrder?.currency || "CZK",
-          paidAt: payData?.paidAt || null,
-          offerKey: payData?.offerKey || localOrder?.offer_key || null,
+          amountMinor: localOrder?.amount_minor ?? 0,
+          currency: localOrder?.currency || "CZK",
+          paidAt: isPaid ? (payData?.paidAt || null) : null,
+          offerKey: localOrder?.offer_key || null,
           hasToken: Boolean(localOrder?.download_token),
         };
       }),
