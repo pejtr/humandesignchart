@@ -68,6 +68,7 @@ jobs:
       deployments: write
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/download-artifact@v4
         with:
           name: human-design-pages-dist
@@ -101,6 +102,7 @@ jobs:
       deployments: write
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/download-artifact@v4
         with:
           name: human-design-pages-dist
