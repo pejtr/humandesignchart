@@ -367,7 +367,7 @@ export default function AiGuide() {
       if (queryParam && queryParam.trim()) {
         setInput(localizeOraculumPresetQuestion(queryParam.trim(), locale));
       }
-    } catch {}
+    } catch { /* malformed URL: leave the prompt empty */ }
   }, [locale]);
 
   // --- Chat persistence & threads ---
