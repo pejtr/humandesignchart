@@ -36,6 +36,30 @@ describe("Cloudflare WhatsApp preview metadata", () => {
     );
   });
 
+  it("renders a Czech share card for the bare Czech domain", async () => {
+    const response = await withServerRenderedSeoMeta(
+      new URL("https://humandesignmapa.cz/"),
+      assetResponse(),
+    );
+    const text = await response.text();
+    expect(text).toContain('property="og:locale" content="cs_CZ"');
+    expect(text).toContain('property="og:image" content="https://humandesignmapa.cz/images/og-homepage.png"');
+    expect(text).toContain('rel="canonical" href="https://humandesignmapa.cz/cs/"');
+    expect(text).not.toContain("<!--SEO_META-->");
+  });
+
+  it("renders an English share card for the bare English domain", async () => {
+    const response = await withServerRenderedSeoMeta(
+      new URL("https://humandesignchart.app/"),
+      assetResponse(),
+    );
+    const text = await response.text();
+    expect(text).toContain('property="og:locale" content="en_US"');
+    expect(text).toContain('property="og:image" content="https://humandesignchart.app/images/og-homepage.png"');
+    expect(text).toContain('rel="canonical" href="https://humandesignchart.app/en/"');
+    expect(text).not.toContain("<!--SEO_META-->");
+  });
+
   it("keeps unrelated binary and API responses unchanged", async () => {
     const css = assetResponse("body {color:red}", "text/css");
     const response = await withServerRenderedSeoMeta(
