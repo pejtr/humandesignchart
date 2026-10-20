@@ -1,0 +1,120 @@
+name: Human Design | Cloudflare Pages (guarded)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/hd-pages-cicd.yml"
+      - "client/**"
+      - "server/**"
+      - "workers/**"
+      - "shared/**"
+      - "public/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "vite.config.*"
+      - "tsconfig*.json"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Preview first; production requires explicit selection"
+        required: true
+        default: preview
+        type: choice
+        options:
+          - preview
+          - production
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      # Keep workers limited to avoid local/CI timeout flakes.
+      - run: pnpm exec vitest run --maxWorkers=2 --minWorkers=1
+      - name: Build Cloudflare Pages assets and Worker
+        env:
+          VITE_OPENAI_ADS_PIXEL_ID: ${{ vars.HD_OPENAI_ADS_PIXEL_ID }}
+        run: pnpm build:cloudflare
+      - name: Assert artifact is deployable
+        run: test -s dist/public/index.html && test -s dist/public/_worker.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: human-design-pages-dist
+          path: dist/public/
+          if-no-files-found: error
+          retention-days: 5
+
+  deploy-preview:
+    name: Deploy preview only
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'preview'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: human-design-pages-dist
+          path: dist/public
+      - name: Check credentials safely
+        env:
+          CF_API: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CF_API" || { echo 'Missing repository secret CLOUDFLARE_API_TOKEN'; exit 1; }
+          test -n "$CF_ACCOUNT" || { echo 'Missing repository variable CLOUDFLARE_ACCOUNT_ID'; exit 1; }
+      - uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist/public --project-name=humandesignchart-web --branch=hd-ci-preview
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-production:
+    name: Deploy production (explicitly gated)
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.target == 'production')
+      || (github.event_name == 'push' && vars.HD_PAGES_DEPLOY_ENABLED == 'true')
+    needs: validate
+    runs-on: ubuntu-latest
+    concurrency:
+      group: human-design-cloudflare-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: human-design-pages-dist
+          path: dist/public
+      - name: Check credentials safely
+        env:
+          CF_API: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CF_API" || { echo 'Missing repository secret CLOUDFLARE_API_TOKEN'; exit 1; }
+          test -n "$CF_ACCOUNT" || { echo 'Missing repository variable CLOUDFLARE_ACCOUNT_ID'; exit 1; }
+      - uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist/public --project-name=humandesignchart-web --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
