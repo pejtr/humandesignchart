@@ -5,6 +5,31 @@
  */
 import { buildSeoHead } from "../server/_core/seoMeta";
 
+
+// An upstream Cloudflare reverse proxy can make request.url point to the
+// *.pages.dev origin, losing the original share URL's CZ/EN hostname.
+// Accept only our own known brand domains, never arbitrary forwarded hosts.
+const PUBLIC_BRAND_HOSTS = new Set([
+  "humandesignchart.app",
+  "www.humandesignchart.app",
+  "humandesignmapa.cz",
+  "www.humandesignmapa.cz",
+]);
+
+export function publicSeoUrlFromRequest(request: Request): URL {
+  const url = new URL(request.url);
+  if (!url.hostname.endsWith(".pages.dev")) return url;
+  for (const headerName of ["x-forwarded-host", "x-original-host", "host"]) {
+    const raw = request.headers.get(headerName);
+    const hostname = raw?.split(",")[0]?.trim().toLowerCase().replace(/:\d+$/, "");
+    if (hostname && PUBLIC_BRAND_HOSTS.has(hostname)) {
+      url.hostname = hostname;
+      return url;
+    }
+  }
+  return url;
+}
+
 export async function withServerRenderedSeoMeta(url: URL, asset: Response): Promise<Response> {
   if (!asset.ok || !asset.headers.get("content-type")?.includes("text/html")) {
     return asset;

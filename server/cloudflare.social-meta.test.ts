@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { withServerRenderedSeoMeta } from "../workers/social-meta";
+import { publicSeoUrlFromRequest, withServerRenderedSeoMeta } from "../workers/social-meta";
 
 const html = "<!doctype html><html><head><!--SEO_META--></head><body><div id=\"root\"></div></body></html>";
 
@@ -10,6 +10,28 @@ function assetResponse(body: string = html, type = "text/html"): Response {
 }
 
 describe("Cloudflare WhatsApp preview metadata", () => {
+  it("recovers the EN hostname forwarded through a Pages-origin proxy", async () => {
+    const request = new Request("https://humandesignchart-web.pages.dev/", {
+      headers: { "x-forwarded-host": "humandesignchart.app" },
+    });
+    const url = publicSeoUrlFromRequest(request);
+    expect(url.hostname).toBe("humandesignchart.app");
+    const response = await withServerRenderedSeoMeta(url, assetResponse());
+    expect(await response.text()).toContain('property="og:locale" content="en_US"');
+    expect(response.headers.get("content-language")).toBe("en");
+  });
+
+  it("never trusts unknown upstream host forwarding", () => {
+    const request = new Request("https://humandesignchart-web.pages.dev/", {
+      headers: { "x-forwarded-host": "attacker.invalid" },
+    });
+    expect(publicSeoUrlFromRequest(request).hostname).toBe("humandesignchart-web.pages.dev");
+    const direct = new Request("https://humandesignmapa.cz/", {
+      headers: { "x-forwarded-host": "humandesignchart.app" },
+    });
+    expect(publicSeoUrlFromRequest(direct).hostname).toBe("humandesignmapa.cz");
+  });
+
   it("injects a complete Czech share card into initial HTML for /cs", async () => {
     const response = await withServerRenderedSeoMeta(
       new URL("https://humandesignmapa.cz/cs"),
