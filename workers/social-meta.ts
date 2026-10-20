@@ -11,10 +11,10 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
   }
   const locale = url.pathname.match(/^\/(cs|en|de|fr|es|it)(?:\/|$)/)?.[1];
   const enHost = ["humandesignchart.app", "www.humandesignchart.app"].includes(url.hostname.toLowerCase());
-  const meta = locale ? buildSeoHead(locale, url.pathname) : "";
-  if (!meta && !enHost) return asset;
-
+  // Bare domains ("/") are the most shared URLs. Infer their language from
+  // the hostname; otherwise WhatsApp gets the unprocessed <!--SEO_META--> shell.
   const htmlLang = locale || (enHost ? "en" : "cs");
+  const meta = buildSeoHead(htmlLang, url.pathname);
   let html = await asset.text();
   if (enHost || (locale && locale !== "cs")) {
     html = html
