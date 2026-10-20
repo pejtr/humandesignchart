@@ -32,6 +32,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm exec vitest run server/openaiConversionsApi.test.ts
+      - name: Guard Blueprint checkout and paid fulfillment
+        run: pnpm exec vitest run server/payments/blueprintCheckoutRuntime.test.ts server/payments/blueprintFulfillmentGate.test.ts
       - run: pnpm build:cloudflare
       - name: Assert OMNI ADS is not loaded before consent
         run: |

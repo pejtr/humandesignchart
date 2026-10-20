@@ -471,25 +471,26 @@ export const appRouter = router({
         z.object({
           email: z.string().email(),
           locale: z.enum(["cs", "en"]).default("cs"),
-          chartDataJson: z.string().min(2),
+          chartDataJson: z.string().min(2).max(300_000),
           metaJson: z.string().optional(),
         })
       )
       .mutation(async ({ input, ctx }: { input: any; ctx: Context }) => {
         const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+        if (!d1) throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHART_STORAGE_UNAVAILABLE" });
         const snapshotId = `snap_${crypto.randomUUID()}`;
-        if (d1) {
-          try {
-            await d1
-              .prepare(
-                `INSERT INTO hd_chart_snapshots (id, email, locale, chart_data_json, created_at)
-                 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
-              )
-              .bind(snapshotId, input.email, input.locale, input.chartDataJson)
-              .run();
-          } catch (err) {
-            console.error("[saveChartSnapshot] D1 error:", err);
-          }
+        try {
+          const result = await d1
+            .prepare(
+              `INSERT INTO hd_chart_snapshots (id, email, locale, chart_data_json, created_at)
+               VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
+            )
+            .bind(snapshotId, input.email, input.locale, input.chartDataJson)
+            .run();
+          if (!result.success) throw new Error("SNAPSHOT_INSERT_FAILED");
+        } catch (err) {
+          console.error("[saveChartSnapshot] Chart persistence failed");
+          throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHART_SNAPSHOT_PERSISTENCE_FAILED" });
         }
         return { snapshotId };
       }),
@@ -497,14 +498,14 @@ export const appRouter = router({
     createCheckout: publicProcedure
       .input(
         z.object({
-          plan: z.string().default("blueprint"),
+          plan: z.literal("blueprint").default("blueprint"),
           locale: z.enum(["cs", "en"]).default("cs"),
           origin: z.string().url(),
           customerEmail: z.string().email().max(100),
           customerName: z.string().max(100).optional(),
           digitalDeliveryConsent: z.boolean(),
           chartSnapshotId: z.string().optional(),
-          chartDataJson: z.string().max(300_000).optional(),
+          chartDataJson: z.string().min(2).max(300_000).optional(),
           redditClickId: z.string().optional(),
           openAIAdsMarketingConsent: z.boolean().optional(),
           openAIAdsOppref: z.string().optional(),
@@ -590,6 +591,19 @@ export const appRouter = router({
           }
         }
 
+        // A caller-supplied snapshot id is not proof that the personalized
+        // report exists or belongs to this customer. Fail before requesting payment.
+        const savedChart = snapshotId
+          ? await d1
+              .prepare("SELECT id FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) AND locale = ? LIMIT 1")
+              .bind(snapshotId, input.customerEmail.trim(), input.locale)
+              .first()
+              .catch(() => null)
+          : null;
+        if (!savedChart) {
+          throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHART_SNAPSHOT_REQUIRED" });
+        }
+
         const isCzech = input.locale === "cs";
         const offerKey = isCzech ? "hd-blueprint-cz" : "hd-blueprint-en";
         const payBase = (ctx.env?.PAY_BASE_URL || "https://pay.optimateo.com").replace(/\/$/, "");
@@ -629,11 +643,21 @@ export const appRouter = router({
 
         const data: any = await res.json();
         const refId = data.publicId || data.orderId;
-        if (!refId) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "GATEWAY_REFERENCE_MISSING",
-          });
+        const offer = getBlueprintOffer(input.locale);
+        let checkoutUrlValid = false;
+        try {
+          const checkoutUrl = new URL(data.checkoutUrl);
+          checkoutUrlValid = checkoutUrl.protocol === "https:" && checkoutUrl.origin === new URL(payBase).origin;
+        } catch { /* malformed gateway URL */ }
+        if (
+          typeof refId !== "string" || !refId ||
+          data.offerKey && data.offerKey !== offerKey ||
+          Number(data.amountMinor) !== offer.amountMinor ||
+          data.currency !== offer.currency ||
+          !checkoutUrlValid
+        ) {
+          console.error("[createCheckout] Gateway session does not match canonical Blueprint offer");
+          throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHECKOUT_TEMPORARILY_UNAVAILABLE" });
         }
 
         const initialToken = `tok_${crypto.randomUUID().replace(/-/g, "")}`;
@@ -655,8 +679,8 @@ export const appRouter = router({
               input.customerEmail,
               input.customerName || null,
               offerKey,
-              data.amountMinor || (isCzech ? 29000 : 1590),
-              data.currency || (isCzech ? "CZK" : "EUR"),
+              offer.amountMinor,
+              offer.currency,
               input.locale,
               snapshotId || null,
               initialToken,
