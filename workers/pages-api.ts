@@ -19,7 +19,7 @@ import {
 } from "../server/data/hdContent";
 import { BLOG_ARTICLES_EN } from "../server/data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
-import { withServerRenderedSeoMeta } from "./social-meta";
+import { publicSeoUrlFromRequest, withServerRenderedSeoMeta } from "./social-meta";
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
 import { getBlueprintFulfillmentBlocker } from "../server/payments/blueprintFulfillmentGate";
 import { getReadingPrompt, getSystemPrompt } from "../server/ai/prompts";
@@ -1725,6 +1725,6 @@ export default {
     }
 
     const asset = await env.ASSETS.fetch(request);
-    return withServerRenderedSeoMeta(url, asset);
+    return withServerRenderedSeoMeta(publicSeoUrlFromRequest(request), asset);
   },
 };
