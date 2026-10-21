@@ -8,7 +8,7 @@ import { normalizedPaymentEventSchema } from "./payments/contracts";
 import { isPaymentProductKey } from "./payments/offers";
 import { processPaymentEvent, recordPaymentAuditEvent } from "./payments/mysqlStore";
 import { trackConversion } from "./metaConversionsApi";
-import { sendConfirmedOpenAIOrder } from "./openaiConversionsApi";
+import { isConfirmedPaidCheckout, sendConfirmedOpenAIOrder } from "./openaiConversionsApi";
 
 export function getStripe(): Stripe | null {
   if (!ENV.stripeSecretKey) return null;
@@ -162,13 +162,19 @@ async function processCheckout(event: Stripe.Event) {
   // Success-page redirects do not prove purchases. A fulfilled, signed
   // payment ledger entry plus consent captured at checkout is the only trigger
   // for advertising conversions (including Meta and OpenAI).
-  if (result.outcome === "fulfilled" && session.metadata?.openai_ads_marketing_consent === "true") {
+  if (isConfirmedPaidCheckout({
+    paymentStatus: session.payment_status,
+    fulfillmentOutcome: result.outcome,
+    marketingConsent: session.metadata?.openai_ads_marketing_consent === "true",
+  })) {
     void sendConfirmedOpenAIOrder({
       id: session.id,
       amountMinor: session.amount_total,
       currency,
       oppref: session.metadata?.openai_ads_oppref,
       consent: true,
+    }).then((accepted) => {
+      if (!accepted) console.warn("[Stripe Webhook] OpenAI CAPI event was not accepted or is not configured");
     }).catch((error) => console.warn("[Stripe Webhook] OpenAI CAPI delivery failed", error instanceof Error ? error.name : "unknown"));
     void trackConversion({
       eventName: "Purchase",

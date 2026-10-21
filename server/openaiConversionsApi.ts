@@ -9,6 +9,17 @@
  * Marketing consent is captured when the order is initiated; without it we
  * do not forward any ad-attribution events.
  */
+/** A completed checkout is not necessarily a paid checkout (delayed methods or trials). */
+export function isConfirmedPaidCheckout(input: {
+  paymentStatus: string | null;
+  fulfillmentOutcome: string;
+  marketingConsent: boolean;
+}): boolean {
+  return input.paymentStatus === "paid"
+    && input.fulfillmentOutcome === "fulfilled"
+    && input.marketingConsent;
+}
+
 export type OpenAIOrder = {
   id: string;
   amountMinor: number;
