@@ -1578,6 +1578,7 @@ export default {
         const downloadToken = existing.download_token || `tok_${crypto.randomUUID().replace(/-/g, "")}`;
 
         if (existing.fulfillment_status === "FULFILLED") {
+          await reportConversion();
           return Response.json({
             ok: true,
             status: "ALREADY_FULFILLED",
@@ -1617,6 +1618,7 @@ export default {
           if (committed?.fulfillment_status !== "FULFILLED" || !committed.download_token) {
             return Response.json({ ok: false, error: "FULFILLMENT_CONFLICT" }, { status: 503 });
           }
+          await reportConversion();
           return Response.json({
             ok: true,
             status: "ALREADY_FULFILLED",
@@ -1682,6 +1684,7 @@ export default {
             .run();
         }
 
+        await reportConversion();
         return Response.json({
           ok: true,
           status: "FULFILLED",
