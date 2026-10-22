@@ -698,7 +698,7 @@ export const appRouter = router({
                 openAIAdsOppref: input.openAIAdsMarketingConsent === true
                   && typeof input.openAIAdsOppref === "string"
                   && input.openAIAdsOppref.length <= 255
-                  && !/[\\r\\n]/.test(input.openAIAdsOppref)
+                  && !Array.from(input.openAIAdsOppref).some((char: string) => char.charCodeAt(0) < 32)
                     ? input.openAIAdsOppref : null,
               })
             )
