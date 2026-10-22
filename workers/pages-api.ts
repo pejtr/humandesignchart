@@ -1418,6 +1418,37 @@ Sitemap: ${domain}/sitemap.xml
 `;
 }
 
+/**
+ * Only ONYX PAY's independently verified, locally fulfilled order is eligible.
+ * Persist a receipt after CAPI acknowledges the event; replay uses the same
+ * order ID for de-duplication. Failure never revokes a paid customer's access.
+ */
+async function reportVerifiedBlueprintPurchase(d1: D1Database, env: Env, paymentRef: string): Promise<void> {
+  const order: any = await d1
+    .prepare(`SELECT id, payment_status, fulfillment_status, amount_minor, currency, consent_record_json
+              FROM hd_orders WHERE payment_ref = ? LIMIT 1`)
+    .bind(paymentRef).first();
+  if (!order) return;
+  let savedConsent: any = null;
+  try { savedConsent = JSON.parse(order.consent_record_json || "{}"); } catch { return; }
+  if (savedConsent?.openAIAdsCapiSentAt) return;
+  const conversion = buildVerifiedCloudflareOrderEvent(order);
+  if (!conversion) return;
+  const accepted = await sendVerifiedOpenAIEventWithSecrets(conversion, env);
+  if (!accepted) {
+    console.warn("[OpenAI CAPI] Confirmed order remains unreported; verify server secrets and retry callback");
+    return;
+  }
+  const result = await d1.prepare(
+    `UPDATE hd_orders
+       SET consent_record_json = json_set(consent_record_json, '$.openAIAdsCapiSentAt', CURRENT_TIMESTAMP),
+           updated_at = CURRENT_TIMESTAMP
+     WHERE payment_ref = ? AND payment_status = 'PAID' AND fulfillment_status = 'FULFILLED'
+       AND json_extract(consent_record_json, '$.openAIAdsCapiSentAt') IS NULL`
+  ).bind(paymentRef).run();
+  if (!result.success) throw new Error("OPENAI_CAPI_RECEIPT_PERSIST_FAILED");
+}
+
 export default {
   async fetch(request: Request, env: Env, execution?: { waitUntil(promise: Promise<unknown>): void }): Promise<Response> {
     const url = new URL(request.url);
