@@ -87,6 +87,27 @@ export function buildVerifiedCloudflareOrderEvent(
   }, timestampMs);
 }
 
+/** Used by the Cloudflare Pages runtime, which has env bindings (not process.env). */
+export async function sendVerifiedOpenAIEventWithSecrets(
+  event: NonNullable<ReturnType<typeof buildConfirmedOrderEvent>>,
+  secrets: { OPENAI_ADS_PIXEL_ID?: string; OPENAI_CONVERSIONS_API_KEY?: string },
+): Promise<boolean> {
+  const pid = secrets.OPENAI_ADS_PIXEL_ID?.trim();
+  const key = secrets.OPENAI_CONVERSIONS_API_KEY?.trim();
+  if (!pid || !key) return false;
+  const response = await fetch("https://bzr.openai.com/v1/events?pid=" + encodeURIComponent(pid), {
+    method: "POST",
+    headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+    body: JSON.stringify({ integration_source: "optimateo-hdm-cloudflare-v1", events: [event] }),
+    signal: AbortSignal.timeout(8_000),
+  });
+  if (!response.ok) {
+    console.warn("[OpenAI CAPI] Event rejected; HTTP", response.status);
+    return false;
+  }
+  return true;
+}
+
 export async function sendConfirmedOpenAIOrder(order: OpenAIOrder): Promise<boolean> {
   const event = buildConfirmedOrderEvent(order);
   if (!event) return false;
