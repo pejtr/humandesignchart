@@ -1540,6 +1540,13 @@ export default {
       const isEn = event.offerKey === "hd-blueprint-en";
       const domain = isEn ? "https://humandesignchart.app" : "https://humandesignmapa.cz";
       const locale = isEn ? "en" : "cs";
+      const reportConversion = async () => {
+        const job = reportVerifiedBlueprintPurchase(d1, env, event.refId).catch(() => {
+          console.warn("[OpenAI CAPI] Event could not be reported; paid fulfillment is unaffected");
+        });
+        if (execution?.waitUntil) execution.waitUntil(job);
+        else await job;
+      };
 
       try {
         const existing: any = await d1
