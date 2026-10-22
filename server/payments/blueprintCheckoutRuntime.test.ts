@@ -84,7 +84,7 @@ describe("Cloudflare Blueprint checkout: no real payment may precede a valid cha
     await caller({ HD_ORDERS: db, PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN: "unit_key" })
       .subscription.createCheckout({ ...input, openAIAdsMarketingConsent: true, openAIAdsOppref: "verified-click-ref" });
     const inserted = statements.find(entry => entry.sql.includes("INSERT INTO hd_orders"));
-    const consent = JSON.parse(String(inserted?.args[11]));
+    const consent = JSON.parse(String(inserted?.args.at(-1)));
     expect(consent.openAIAdsMarketingConsent).toBe(true);
     expect(consent.openAIAdsOppref).toBe("verified-click-ref");
   });
@@ -98,7 +98,7 @@ describe("Cloudflare Blueprint checkout: no real payment may precede a valid cha
     await caller({ HD_ORDERS: db, PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN: "unit_key" })
       .subscription.createCheckout({ ...input, openAIAdsMarketingConsent: false, openAIAdsOppref: "should-not-be-saved" });
     const inserted = statements.find(entry => entry.sql.includes("INSERT INTO hd_orders"));
-    const consent = JSON.parse(String(inserted?.args[11]));
+    const consent = JSON.parse(String(inserted?.args.at(-1)));
     expect(consent.openAIAdsMarketingConsent).toBe(false);
     expect(consent.openAIAdsOppref).toBeNull();
   });
