@@ -56,7 +56,7 @@ describe("OpenAI Ads confirmed purchase reporting", () => {
     const event = buildVerifiedCloudflareOrderEvent({
       ...verifiedOrder,
       consent_record_json: JSON.stringify({
-        openAIAdsMarketingConsent: true, openAIAdsOppref: "unsafe\\nclick",
+        openAIAdsMarketingConsent: true, openAIAdsOppref: ["unsafe", "click"].join(String.fromCharCode(10)),
         birthDate: "2000-01-01", customerEmail: "private@example.invalid",
       }),
     });
