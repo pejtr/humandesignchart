@@ -23,6 +23,7 @@ import { publicSeoUrlFromRequest, withServerRenderedSeoMeta } from "./social-met
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
 import { isVerifiedBlueprintPayment } from "../server/payments/blueprintPaymentVerification";
 import { getBlueprintFulfillmentBlocker } from "../server/payments/blueprintFulfillmentGate";
+import { buildVerifiedCloudflareOrderEvent, sendVerifiedOpenAIEventWithSecrets } from "../server/openaiConversionsApi";
 import { getReadingPrompt, getSystemPrompt } from "../server/ai/prompts";
 type D1Database = any;
 
@@ -30,6 +31,8 @@ type Env = {
   HUMAN_DESIGN_FULFILLMENT_API_KEY?: string;
   PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN?: string;
   PAY_BASE_URL?: string;
+  OPENAI_ADS_PIXEL_ID?: string;
+  OPENAI_CONVERSIONS_API_KEY?: string;
   BREVO_API_KEY?: string;
   BREVO_SENDER_EMAIL?: string;
   RESEND_API_KEY?: string;
@@ -1416,7 +1419,7 @@ Sitemap: ${domain}/sitemap.xml
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, execution?: { waitUntil(promise: Promise<unknown>): void }): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/api/internal/onyxpay/fulfill") {
