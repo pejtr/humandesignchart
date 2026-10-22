@@ -689,6 +689,14 @@ export const appRouter = router({
                 digitalDeliveryConsent: true,
                 consentedAt: new Date().toISOString(),
                 redditClickId: input.redditClickId || null,
+                // The paid gateway callback executes later, in another request.
+                // Preserve checkout-time marketing choice but never raw birth data.
+                openAIAdsMarketingConsent: input.openAIAdsMarketingConsent === true,
+                openAIAdsOppref: input.openAIAdsMarketingConsent === true
+                  && typeof input.openAIAdsOppref === "string"
+                  && input.openAIAdsOppref.length <= 255
+                  && !/[\\r\\n]/.test(input.openAIAdsOppref)
+                    ? input.openAIAdsOppref : null,
               })
             )
             .run();
