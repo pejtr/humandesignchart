@@ -51,6 +51,42 @@ export function buildConfirmedOrderEvent(
   return event;
 }
 
+export type VerifiedCloudflareBlueprint = {
+  id: string;
+  payment_status: string;
+  fulfillment_status: string;
+  amount_minor: number | string;
+  currency: string;
+  consent_record_json: string | null;
+};
+
+/** Only a persisted fulfilled order may become an ad conversion. */
+export function buildVerifiedCloudflareOrderEvent(
+  order: VerifiedCloudflareBlueprint,
+  timestampMs = Date.now(),
+): OpenAIOrderEvent | null {
+  if (order.payment_status !== "PAID" || order.fulfillment_status !== "FULFILLED") return null;
+  let consent: Record<string, unknown>;
+  try {
+    consent = JSON.parse(order.consent_record_json || "{}");
+    if (!consent || typeof consent !== "object" || Array.isArray(consent)) return null;
+  } catch {
+    return null;
+  }
+  if (consent.openAIAdsMarketingConsent !== true) return null;
+  if (order.currency !== "CZK" && order.currency !== "EUR") return null;
+  const ref = consent.openAIAdsOppref;
+  const oppref = typeof ref === "string" && ref.length <= 255 && !Array.from(ref).some(ch => ch.charCodeAt(0) < 32)
+    ? ref : undefined;
+  return buildConfirmedOrderEvent({
+    id: order.id,
+    amountMinor: Number(order.amount_minor),
+    currency: order.currency,
+    oppref,
+    consent: true,
+  }, timestampMs);
+}
+
 export async function sendConfirmedOpenAIOrder(order: OpenAIOrder): Promise<boolean> {
   const event = buildConfirmedOrderEvent(order);
   if (!event) return false;
