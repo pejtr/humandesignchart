@@ -72,7 +72,7 @@ describe("OpenAI Ads confirmed purchase reporting", () => {
     expect(request).not.toHaveBeenCalled();
   });
   it("sends a single server-side event using configured secret bindings", async () => {
-    const request = vi.fn(async () => new Response(null, { status: 200 }));
+    const request = vi.fn(async (_url: RequestInfo | URL, _init?: RequestInit) => new Response(null, { status: 200 }));
     vi.stubGlobal("fetch", request);
     const event = buildVerifiedCloudflareOrderEvent(verifiedOrder)!;
     expect(await sendVerifiedOpenAIEventWithSecrets(event, {
@@ -80,7 +80,7 @@ describe("OpenAI Ads confirmed purchase reporting", () => {
     })).toBe(true);
     const [url, options] = request.mock.calls[0];
     expect(String(url)).toContain("pid=pixel-test");
-    expect(JSON.parse(options.body).events).toEqual([event]);
+    expect(JSON.parse(String(options?.body)).events).toEqual([event]);
   });
   it("forwards only allowed matching reference and never personal data", () => {
     const event = buildConfirmedOrderEvent({ ...order, oppref: "click_ref_example" });
