@@ -23,6 +23,7 @@ import { publicSeoUrlFromRequest, withServerRenderedSeoMeta } from "./social-met
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
 import { isVerifiedBlueprintPayment } from "../server/payments/blueprintPaymentVerification";
 import { getBlueprintFulfillmentBlocker } from "../server/payments/blueprintFulfillmentGate";
+import { buildVerifiedCloudflareOrderEvent, sendVerifiedOpenAIEventWithSecrets } from "../server/openaiConversionsApi";
 import { getReadingPrompt, getSystemPrompt } from "../server/ai/prompts";
 type D1Database = any;
 
@@ -30,6 +31,8 @@ type Env = {
   HUMAN_DESIGN_FULFILLMENT_API_KEY?: string;
   PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN?: string;
   PAY_BASE_URL?: string;
+  OPENAI_ADS_PIXEL_ID?: string;
+  OPENAI_CONVERSIONS_API_KEY?: string;
   BREVO_API_KEY?: string;
   BREVO_SENDER_EMAIL?: string;
   RESEND_API_KEY?: string;
@@ -689,6 +692,14 @@ export const appRouter = router({
                 digitalDeliveryConsent: true,
                 consentedAt: new Date().toISOString(),
                 redditClickId: input.redditClickId || null,
+                // The paid gateway callback executes later, in another request.
+                // Preserve checkout-time marketing choice but never raw birth data.
+                openAIAdsMarketingConsent: input.openAIAdsMarketingConsent === true,
+                openAIAdsOppref: input.openAIAdsMarketingConsent === true
+                  && typeof input.openAIAdsOppref === "string"
+                  && input.openAIAdsOppref.length <= 255
+                  && !Array.from(input.openAIAdsOppref).some((char: string) => char.charCodeAt(0) < 32)
+                    ? input.openAIAdsOppref : null,
               })
             )
             .run();
@@ -1407,8 +1418,39 @@ Sitemap: ${domain}/sitemap.xml
 `;
 }
 
+/**
+ * Only ONYX PAY's independently verified, locally fulfilled order is eligible.
+ * Persist a receipt after CAPI acknowledges the event; replay uses the same
+ * order ID for de-duplication. Failure never revokes a paid customer's access.
+ */
+async function reportVerifiedBlueprintPurchase(d1: D1Database, env: Env, paymentRef: string): Promise<void> {
+  const order: any = await d1
+    .prepare(`SELECT id, payment_status, fulfillment_status, amount_minor, currency, consent_record_json
+              FROM hd_orders WHERE payment_ref = ? LIMIT 1`)
+    .bind(paymentRef).first();
+  if (!order) return;
+  let savedConsent: any = null;
+  try { savedConsent = JSON.parse(order.consent_record_json || "{}"); } catch { return; }
+  if (savedConsent?.openAIAdsCapiSentAt) return;
+  const conversion = buildVerifiedCloudflareOrderEvent(order);
+  if (!conversion) return;
+  const accepted = await sendVerifiedOpenAIEventWithSecrets(conversion, env);
+  if (!accepted) {
+    console.warn("[OpenAI CAPI] Confirmed order remains unreported; verify server secrets and retry callback");
+    return;
+  }
+  const result = await d1.prepare(
+    `UPDATE hd_orders
+       SET consent_record_json = json_set(consent_record_json, '$.openAIAdsCapiSentAt', CURRENT_TIMESTAMP),
+           updated_at = CURRENT_TIMESTAMP
+     WHERE payment_ref = ? AND payment_status = 'PAID' AND fulfillment_status = 'FULFILLED'
+       AND json_extract(consent_record_json, '$.openAIAdsCapiSentAt') IS NULL`
+  ).bind(paymentRef).run();
+  if (!result.success) throw new Error("OPENAI_CAPI_RECEIPT_PERSIST_FAILED");
+}
+
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, execution?: { waitUntil(promise: Promise<unknown>): void }): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/api/internal/onyxpay/fulfill") {
@@ -1498,6 +1540,13 @@ export default {
       const isEn = event.offerKey === "hd-blueprint-en";
       const domain = isEn ? "https://humandesignchart.app" : "https://humandesignmapa.cz";
       const locale = isEn ? "en" : "cs";
+      const reportConversion = async () => {
+        const job = reportVerifiedBlueprintPurchase(d1, env, event.refId).catch(() => {
+          console.warn("[OpenAI CAPI] Event could not be reported; paid fulfillment is unaffected");
+        });
+        if (execution?.waitUntil) execution.waitUntil(job);
+        else await job;
+      };
 
       try {
         const existing: any = await d1
@@ -1529,6 +1578,7 @@ export default {
         const downloadToken = existing.download_token || `tok_${crypto.randomUUID().replace(/-/g, "")}`;
 
         if (existing.fulfillment_status === "FULFILLED") {
+          await reportConversion();
           return Response.json({
             ok: true,
             status: "ALREADY_FULFILLED",
@@ -1568,6 +1618,7 @@ export default {
           if (committed?.fulfillment_status !== "FULFILLED" || !committed.download_token) {
             return Response.json({ ok: false, error: "FULFILLMENT_CONFLICT" }, { status: 503 });
           }
+          await reportConversion();
           return Response.json({
             ok: true,
             status: "ALREADY_FULFILLED",
@@ -1633,6 +1684,7 @@ export default {
             .run();
         }
 
+        await reportConversion();
         return Response.json({
           ok: true,
           status: "FULFILLED",
