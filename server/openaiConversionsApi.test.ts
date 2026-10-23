@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 afterEach(() => vi.unstubAllGlobals());
-import { buildConfirmedOrderEvent, buildVerifiedCloudflareOrderEvent, sendVerifiedOpenAIEventWithSecrets } from "./openaiConversionsApi";
+import { buildConfirmedOrderEvent, buildVerifiedCloudflareOrderEvent, sendVerifiedOpenAIEventWithSecrets, claimCapiOutboxLock, finalizeCapiOutboxLock, executeTransactionalCapiOutbox } from "./openaiConversionsApi";
 
 describe("OpenAI Ads confirmed purchase reporting", () => {
   const order = { id: "cs_test_verified_001", amountMinor: 1590, currency: "EUR" as const, consent: true };
@@ -89,5 +89,156 @@ describe("OpenAI Ads confirmed purchase reporting", () => {
     expect(JSON.stringify(event)).not.toContain("birth");
     const rejected = buildConfirmedOrderEvent({ ...order, oppref: "bad\nref" });
     expect(rejected?.oppref).toBeUndefined();
+  });
+});
+
+describe("Transactional CAPI outbox with concurrency lock", () => {
+  function makeMockD1(initialOrder: any) {
+    let currentOrder = initialOrder ? JSON.parse(JSON.stringify(initialOrder)) : null;
+    const queries: { sql: string; args: any[] }[] = [];
+
+    const db = {
+      prepare(sql: string) {
+        return {
+          bind(...args: any[]) {
+            queries.push({ sql, args });
+            return {
+              first: async () => currentOrder ? JSON.parse(JSON.stringify(currentOrder)) : null,
+              run: async () => {
+                if (!currentOrder) return { success: false, meta: { changes: 0 } };
+
+                // Handle claim update
+                if (sql.includes("openAIAdsCapiStatus', 'IN_FLIGHT'")) {
+                  let consent = JSON.parse(currentOrder.consent_record_json || "{}");
+                  if (consent.openAIAdsCapiSentAt) return { success: true, meta: { changes: 0 } };
+                  if (consent.openAIAdsCapiStatus === "IN_FLIGHT") {
+                    // Check lease
+                    return { success: true, meta: { changes: 0 } };
+                  }
+                  consent.openAIAdsCapiStatus = "IN_FLIGHT";
+                  consent.openAIAdsCapiClaimedAt = new Date().toISOString();
+                  currentOrder.consent_record_json = JSON.stringify(consent);
+                  return { success: true, meta: { changes: 1 } };
+                }
+
+                // Handle finalize SENT
+                if (sql.includes("openAIAdsCapiStatus', 'SENT'")) {
+                  let consent = JSON.parse(currentOrder.consent_record_json || "{}");
+                  consent.openAIAdsCapiStatus = "SENT";
+                  consent.openAIAdsCapiSentAt = new Date().toISOString();
+                  currentOrder.consent_record_json = JSON.stringify(consent);
+                  return { success: true, meta: { changes: 1 } };
+                }
+
+                // Handle finalize FAILED
+                if (sql.includes("openAIAdsCapiStatus', 'FAILED'")) {
+                  let consent = JSON.parse(currentOrder.consent_record_json || "{}");
+                  consent.openAIAdsCapiStatus = "FAILED";
+                  currentOrder.consent_record_json = JSON.stringify(consent);
+                  return { success: true, meta: { changes: 1 } };
+                }
+
+                return { success: true, meta: { changes: 1 } };
+              },
+            };
+          },
+        };
+      },
+      getCurrentOrder: () => currentOrder,
+      getQueries: () => queries,
+    };
+    return db;
+  }
+
+  const baseOrder = {
+    id: "ord_outbox_test",
+    payment_status: "PAID",
+    fulfillment_status: "FULFILLED",
+    amount_minor: 29000,
+    currency: "CZK",
+    consent_record_json: JSON.stringify({
+      digitalDeliveryConsent: true,
+      openAIAdsMarketingConsent: true,
+      openAIAdsOppref: "outbox_click_ref",
+    }),
+  };
+
+  it("claims lock, dispatches conversion, and finalizes to SENT with receipt", async () => {
+    const db = makeMockD1(baseOrder);
+    const mockFetch = vi.fn(async () => new Response(null, { status: 200 }));
+    vi.stubGlobal("fetch", mockFetch);
+
+    const result = await executeTransactionalCapiOutbox(db, {
+      OPENAI_ADS_PIXEL_ID: "pid_123",
+      OPENAI_CONVERSIONS_API_KEY: "key_123",
+    }, "ref_test_01");
+
+    expect(result).toBe("SENT");
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    const orderAfter = db.getCurrentOrder();
+    const consentAfter = JSON.parse(orderAfter.consent_record_json);
+    expect(consentAfter.openAIAdsCapiStatus).toBe("SENT");
+    expect(consentAfter.openAIAdsCapiSentAt).toBeDefined();
+  });
+
+  it("blocks concurrent callbacks: exactly one request is sent to OpenAI", async () => {
+    const db = makeMockD1(baseOrder);
+    const mockFetch = vi.fn(async () => {
+      // Simulate network latency so concurrent request arrives while in-flight
+      await new Promise(r => setTimeout(r, 20));
+      return new Response(null, { status: 200 });
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const env = { OPENAI_ADS_PIXEL_ID: "pid_123", OPENAI_CONVERSIONS_API_KEY: "key_123" };
+
+    // Fire 2 concurrent callbacks for the same payment reference
+    const [res1, res2] = await Promise.all([
+      executeTransactionalCapiOutbox(db, env, "ref_test_01"),
+      executeTransactionalCapiOutbox(db, env, "ref_test_01"),
+    ]);
+
+    // One wins and sends; the other is rejected as IN_FLIGHT
+    expect([res1, res2].sort()).toEqual(["IN_FLIGHT", "SENT"]);
+    expect(mockFetch).toHaveBeenCalledTimes(1); // EXACTLY ONCE!
+  });
+
+  it("skips orders that were already marked SENT (idempotence)", async () => {
+    const sentOrder = {
+      ...baseOrder,
+      consent_record_json: JSON.stringify({
+        openAIAdsMarketingConsent: true,
+        openAIAdsCapiStatus: "SENT",
+        openAIAdsCapiSentAt: "2026-10-22T12:00:00Z",
+      }),
+    };
+    const db = makeMockD1(sentOrder);
+    const mockFetch = vi.fn();
+    vi.stubGlobal("fetch", mockFetch);
+
+    const result = await executeTransactionalCapiOutbox(db, {
+      OPENAI_ADS_PIXEL_ID: "pid_123",
+      OPENAI_CONVERSIONS_API_KEY: "key_123",
+    }, "ref_test_01");
+
+    expect(result).toBe("ALREADY_SENT");
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it("marks FAILED when CAPI rejects or secrets missing, allowing retry", async () => {
+    const db = makeMockD1(baseOrder);
+    const mockFetch = vi.fn(async () => new Response(null, { status: 500 }));
+    vi.stubGlobal("fetch", mockFetch);
+
+    const result = await executeTransactionalCapiOutbox(db, {
+      OPENAI_ADS_PIXEL_ID: "pid_123",
+      OPENAI_CONVERSIONS_API_KEY: "key_123",
+    }, "ref_test_01");
+
+    expect(result).toBe("FAILED");
+    const consentAfter = JSON.parse(db.getCurrentOrder().consent_record_json);
+    expect(consentAfter.openAIAdsCapiStatus).toBe("FAILED");
+    expect(consentAfter.openAIAdsCapiSentAt).toBeUndefined(); // NOT marked as sent!
   });
 });
