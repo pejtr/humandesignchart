@@ -1,5 +1,11 @@
 name: Human Design | Cloudflare Pages (guarded)
 
+
+# PR revisions supersede one another; main build and production deploys are never cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 on:
   pull_request:
     branches: [main]
