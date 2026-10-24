@@ -42,7 +42,9 @@ export default function Pricing() {
     viewContent({ content_name: "Personal Human Design Blueprint", content_category: "report", content_ids: ["blueprint"], content_type: "product", value: offerQuery.data.amountMinor / 100, currency: offerQuery.data.currency });
   }, [offerQuery.data?.amountMinor, offerQuery.data?.currency, viewContent]);
 
-  const checkout = trpc.subscription.createCheckout.useMutation({ onSuccess: ({ url }) => { if (url) window.location.assign(url); }, onError: error => toast.error(
+  // Redirect only in the per-purchase success handler below, after session storage is durable.
+  // A hook-level redirect races with recording refId and the access token.
+  const checkout = trpc.subscription.createCheckout.useMutation({ onError: error => toast.error(
     error.message === "CHECKOUT_TEMPORARILY_UNAVAILABLE"
       ? isCs
         ? "Bezpečná platba je momentálně nedostupná. Zkuste to prosím později."
