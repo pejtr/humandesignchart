@@ -79,16 +79,35 @@ jobs:
         with:
           name: human-design-pages-dist
           path: dist/public
-      - name: Check credentials safely
+      - name: Normalize and validate Cloudflare deploy credentials
         env:
           CF_API: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          test -n "$CF_API" || { echo 'Missing repository secret CLOUDFLARE_API_TOKEN'; exit 1; }
-          test -n "$CF_ACCOUNT" || { echo 'Missing repository variable CLOUDFLARE_ACCOUNT_ID'; exit 1; }
+          python3 - <<'PY'
+          import os
+          import re
+          import sys
+
+          if not os.environ.get("CF_ACCOUNT"):
+              sys.exit("Missing CLOUDFLARE_ACCOUNT_ID repository variable")
+          token = os.environ.get("CF_API", "").strip()
+          # A pasted "Bearer TOKEN" or quoted value otherwise produces
+          # Cloudflare's opaque Authorization header error 6111.
+          if token.lower().startswith("bearer "):
+              token = token[7:].strip()
+          if len(token) >= 2 and token[0] == token[-1] and token[0] in ('"', "'"):
+              token = token[1:-1].strip()
+          if not re.fullmatch(r"[A-Za-z0-9._-]{30,256}", token):
+              sys.exit("Invalid CLOUDFLARE_API_TOKEN format. Save only the raw scoped API token, without Bearer, JSON or curl syntax.")
+          # Mask the derived token before passing it to the next action.
+          print(f"::add-mask::{token}")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as envfile:
+              envfile.write(f"CF_API_TOKEN_NORMALIZED={token}\n")
+          PY
       - uses: cloudflare/wrangler-action@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ env.CF_API_TOKEN_NORMALIZED }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist/public --project-name=humandesignchart-web --branch=hd-ci-preview
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
@@ -113,16 +132,35 @@ jobs:
         with:
           name: human-design-pages-dist
           path: dist/public
-      - name: Check credentials safely
+      - name: Normalize and validate Cloudflare deploy credentials
         env:
           CF_API: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          test -n "$CF_API" || { echo 'Missing repository secret CLOUDFLARE_API_TOKEN'; exit 1; }
-          test -n "$CF_ACCOUNT" || { echo 'Missing repository variable CLOUDFLARE_ACCOUNT_ID'; exit 1; }
+          python3 - <<'PY'
+          import os
+          import re
+          import sys
+
+          if not os.environ.get("CF_ACCOUNT"):
+              sys.exit("Missing CLOUDFLARE_ACCOUNT_ID repository variable")
+          token = os.environ.get("CF_API", "").strip()
+          # A pasted "Bearer TOKEN" or quoted value otherwise produces
+          # Cloudflare's opaque Authorization header error 6111.
+          if token.lower().startswith("bearer "):
+              token = token[7:].strip()
+          if len(token) >= 2 and token[0] == token[-1] and token[0] in ('"', "'"):
+              token = token[1:-1].strip()
+          if not re.fullmatch(r"[A-Za-z0-9._-]{30,256}", token):
+              sys.exit("Invalid CLOUDFLARE_API_TOKEN format. Save only the raw scoped API token, without Bearer, JSON or curl syntax.")
+          # Mask the derived token before passing it to the next action.
+          print(f"::add-mask::{token}")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as envfile:
+              envfile.write(f"CF_API_TOKEN_NORMALIZED={token}\n")
+          PY
       - uses: cloudflare/wrangler-action@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ env.CF_API_TOKEN_NORMALIZED }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist/public --project-name=humandesignchart-web --branch=main
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
