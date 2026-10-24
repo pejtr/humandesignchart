@@ -20,7 +20,7 @@ export function isOpenAIAdsConsentGranted(): boolean {
 }
 
 function pixelId(): string {
-  return String((import.meta as any).env?.VITE_OPENAI_ADS_PIXEL_ID || "").trim();
+  return String(import.meta.env.VITE_OPENAI_ADS_PIXEL_ID || "").trim();
 }
 
 /** Capture the OpenAI Ads click reference only AFTER marketing consent.

@@ -54,7 +54,18 @@ jobs:
       - name: Build Cloudflare Pages assets and Worker
         env:
           VITE_OPENAI_ADS_PIXEL_ID: ${{ vars.HD_OPENAI_ADS_PIXEL_ID }}
-        run: pnpm build:cloudflare
+        run: |
+          # Missing build-time Pixel configuration must fail, not silently ship.
+          if [ -z "${VITE_OPENAI_ADS_PIXEL_ID:-}" ]; then
+            echo "::error::Missing HD_OPENAI_ADS_PIXEL_ID repository variable; refusing an untracked build."
+            exit 1
+          fi
+          pnpm build:cloudflare
+          # Verify Vite embedded the real ID; the previous bundle silently contained import.meta.env = {}.
+          if ! grep -Fq -- "$VITE_OPENAI_ADS_PIXEL_ID" dist/public/assets/*.js; then
+            echo "::error::OpenAI Ads Pixel ID absent from the compiled browser assets."
+            exit 1
+          fi
       - name: Assert artifact is deployable
         run: test -s dist/public/index.html && test -s dist/public/_worker.js
       - uses: actions/upload-artifact@v4
