@@ -241,6 +241,33 @@ describe("Transactional CAPI outbox with concurrency lock", () => {
     expect(consentAfter.openAIAdsCapiStatus).toBe("FAILED");
     expect(consentAfter.openAIAdsCapiSentAt).toBeUndefined(); // NOT marked as sent!
   });
+  it("marks network timeouts FAILED and retries a verified order without changing its event id", async () => {
+    const db = makeMockD1(baseOrder);
+    const request = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("network unavailable"))
+      .mockResolvedValueOnce(new Response(null, { status: 200 }));
+    vi.stubGlobal("fetch", request);
+    const env = {
+      OPENAI_ADS_PIXEL_ID: "pid_123",
+      OPENAI_CONVERSIONS_API_KEY: "key_123",
+    };
+
+    const first = await executeTransactionalCapiOutbox(db, env, "ref_network_01");
+    expect(first).toBe("FAILED");
+    expect(JSON.parse(db.getCurrentOrder().consent_record_json).openAIAdsCapiStatus).toBe("FAILED");
+
+    const second = await executeTransactionalCapiOutbox(db, env, "ref_network_01");
+    expect(second).toBe("SENT");
+    expect(request).toHaveBeenCalledTimes(2);
+    const [firstOptions, secondOptions] = request.mock.calls.map(([, opts]) => opts as RequestInit);
+    const firstEvent = JSON.parse(String(firstOptions.body)).events[0];
+    const secondEvent = JSON.parse(String(secondOptions.body)).events[0];
+    expect(firstEvent.id).toBe(baseOrder.id);
+    expect(secondEvent.id).toBe(firstEvent.id);
+    expect(JSON.parse(db.getCurrentOrder().consent_record_json).openAIAdsCapiStatus).toBe("SENT");
+  });
+
   it("strictly rejects sandbox / QA test orders (is_test = 1) from claiming CAPI lock or sending conversions", async () => {
     const testOrder = {
       ...baseOrder,

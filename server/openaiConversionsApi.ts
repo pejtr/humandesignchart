@@ -263,7 +263,15 @@ export async function executeTransactionalCapiOutbox(
     return "INELIGIBLE";
   }
 
-  const accepted = await sendVerifiedOpenAIEventWithSecrets(conversion, env);
+  // A network outage or API timeout is not a reason to strand a paid order
+  // in IN_FLIGHT until the 5-minute lease expires. Persist FAILED immediately
+  // so a later verified callback can retry the same stable event ID.
+  let accepted = false;
+  try {
+    accepted = await sendVerifiedOpenAIEventWithSecrets(conversion, env);
+  } catch {
+    console.warn("[OpenAI CAPI Outbox] Transport failed; order remains eligible for retry");
+  }
   await finalizeCapiOutboxLock(d1, paymentRef, accepted);
 
   return accepted ? "SENT" : "FAILED";
