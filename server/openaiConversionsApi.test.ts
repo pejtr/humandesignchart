@@ -241,4 +241,29 @@ describe("Transactional CAPI outbox with concurrency lock", () => {
     expect(consentAfter.openAIAdsCapiStatus).toBe("FAILED");
     expect(consentAfter.openAIAdsCapiSentAt).toBeUndefined(); // NOT marked as sent!
   });
+  it("strictly rejects sandbox / QA test orders (is_test = 1) from claiming CAPI lock or sending conversions", async () => {
+    const testOrder = {
+      ...baseOrder,
+      is_test: 1,
+    };
+    const db = makeMockD1(testOrder);
+    const mockFetch = vi.fn();
+    vi.stubGlobal("fetch", mockFetch);
+
+    // Event builder returns null
+    expect(buildVerifiedCloudflareOrderEvent(testOrder as any)).toBeNull();
+
+    // Outbox lock returns INELIGIBLE
+    const claim = await claimCapiOutboxLock(db, "ref_test_01");
+    expect(claim.status).toBe("INELIGIBLE");
+
+    // Full dispatch returns INELIGIBLE and never calls fetch
+    const result = await executeTransactionalCapiOutbox(db, {
+      OPENAI_ADS_PIXEL_ID: "pid_123",
+      OPENAI_CONVERSIONS_API_KEY: "key_123",
+    }, "ref_test_01");
+
+    expect(result).toBe("INELIGIBLE");
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
 });

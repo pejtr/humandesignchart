@@ -58,6 +58,7 @@ export type VerifiedCloudflareBlueprint = {
   amount_minor: number | string;
   currency: string;
   consent_record_json: string | null;
+  is_test?: number | boolean;
 };
 
 /** Only a persisted fulfilled order may become an ad conversion. */
@@ -66,6 +67,7 @@ export function buildVerifiedCloudflareOrderEvent(
   timestampMs = Date.now(),
 ): OpenAIOrderEvent | null {
   if (order.payment_status !== "PAID" || order.fulfillment_status !== "FULFILLED") return null;
+  if (order.is_test === 1 || Boolean(order.is_test)) return null;
   let consent: Record<string, unknown>;
   try {
     consent = JSON.parse(order.consent_record_json || "{}");
@@ -126,7 +128,7 @@ export async function claimCapiOutboxLock(
 ): Promise<CapiOutboxClaimResult> {
   const order: any = await d1
     .prepare(
-      `SELECT id, payment_status, fulfillment_status, amount_minor, currency, consent_record_json
+      `SELECT id, payment_status, fulfillment_status, amount_minor, currency, consent_record_json, is_test
        FROM hd_orders WHERE payment_ref = ? LIMIT 1`
     )
     .bind(paymentRef)
@@ -134,6 +136,9 @@ export async function claimCapiOutboxLock(
 
   if (!order) return { status: "INELIGIBLE" };
   if (order.payment_status !== "PAID" || order.fulfillment_status !== "FULFILLED") {
+    return { status: "INELIGIBLE" };
+  }
+  if (order.is_test === 1 || Boolean(order.is_test)) {
     return { status: "INELIGIBLE" };
   }
 
