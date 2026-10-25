@@ -77,16 +77,18 @@ export function useReportWebVitals(enabled = true) {
       observers.forEach((observer) => observer.disconnect());
       observers.length = 0;
       started = false;
+      // Revoke collected-but-not-sent observations when consent is withdrawn.
+      for (const name of Object.keys(values)) delete values[name];
     }
 
     function flush() {
-      if (reported) return;
-      reported = true;
-      if (!analyticsAllowed()) return;
+      if (reported || !analyticsAllowed()) return;
       const metrics: Vital[] = [];
       if (Number.isFinite(values.LCP)) metrics.push({ name: "LCP", value: values.LCP, rating: classify(values.LCP, 2500, 4000) });
       if (Number.isFinite(values.CLS)) metrics.push({ name: "CLS", value: values.CLS, rating: classify(values.CLS, 0.1, 0.25) });
       if (Number.isFinite(values.INP_ESTIMATE)) metrics.push({ name: "INP_ESTIMATE", value: values.INP_ESTIMATE, rating: classify(values.INP_ESTIMATE, 200, 500) });
+      if (!metrics.length) return;
+      reported = true;
       for (const metric of metrics) {
         trackGA4Event("web_vital", {
           metric_name: metric.name,
