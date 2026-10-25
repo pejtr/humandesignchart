@@ -1434,6 +1434,34 @@ export default {
   async fetch(request: Request, env: Env, execution?: { waitUntil(promise: Promise<unknown>): void }): Promise<Response> {
     const url = new URL(request.url);
 
+    if (url.pathname === "/api/health") {
+      if (request.method !== "GET" && request.method !== "HEAD") {
+        return new Response("Method not allowed", { status: 405, headers: { Allow: "GET, HEAD" } });
+      }
+      // Binding presence is configuration evidence only. Do not query customer
+      // data or claim that Stripe, gateway callbacks or email delivery were tested.
+      const integrations = {
+        checkout: Boolean(env.PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN?.trim()),
+        fulfillment: Boolean(env.HUMAN_DESIGN_FULFILLMENT_API_KEY?.trim()),
+        orders: Boolean(env.HD_ORDERS || env.DB),
+        email: Boolean(env.BREVO_API_KEY?.trim() || env.RESEND_API_KEY?.trim()),
+      };
+      const body = {
+        ok: true,
+        runtime: "cloudflare-pages",
+        payments: {
+          provider: "onyxpay",
+          configured: Object.values(integrations).every(Boolean),
+          verified: false,
+          callbackPath: "/api/internal/onyxpay/fulfill",
+          integrations,
+        },
+      };
+      return new Response(request.method === "HEAD" ? null : JSON.stringify(body), {
+        headers: { "content-type": "application/json", "cache-control": "no-store" },
+      });
+    }
+
     if (url.pathname === "/api/internal/onyxpay/fulfill") {
       if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
       const expected = env.HUMAN_DESIGN_FULFILLMENT_API_KEY;

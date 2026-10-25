@@ -33,6 +33,25 @@ const caller = (env: Record<string, unknown>) =>
   appRouter.createCaller({ env, request: new Request("https://humandesignchart.app/api/trpc") } as any);
 
 describe("Cloudflare Blueprint checkout: no real payment may precede a valid chart", () => {
+  it.each([
+    { locale: "cs" as const, origin: "https://humandesignmapa.cz", offerKey: "hd-blueprint-cz", amountMinor: 29000, currency: "CZK" },
+    { locale: "en" as const, origin: "https://humandesignchart.app", offerKey: "hd-blueprint-en", amountMinor: 1590, currency: "EUR" },
+  ])("routes $locale through the authenticated gateway with its own canonical offer", async (offer) => {
+    const { db } = fakeD1({ exists: true });
+    const payment = vi.fn(async (_url: string, _options?: RequestInit) => Response.json({
+      publicId: "OPT-unit-locale", checkoutUrl: "https://pay.optimateo.com/c/test", ...offer,
+    }));
+    vi.stubGlobal("fetch", payment);
+    await caller({ HD_ORDERS: db, PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN: "unit_key" })
+      .subscription.createCheckout({ ...input, locale: offer.locale, origin: offer.origin });
+    expect(payment.mock.calls[0][0]).toBe("https://pay.optimateo.com/api/paygate/checkout-sessions");
+    const options = payment.mock.calls[0][1] as RequestInit;
+    expect(options.headers).toMatchObject({ Authorization: "Bearer unit_key" });
+    expect(JSON.parse(String(options.body))).toMatchObject({
+      tenant: "human-design", offerKey: offer.offerKey,
+      returnUrl: `${offer.origin}/${offer.locale}/payment/success?plan=blueprint`,
+    });
+  });
   it("saveChartSnapshot never returns a phantom id when D1 is missing", async () => {
     await expect(caller({}).subscription.saveChartSnapshot({
       email: "buyer@example.test", locale: "en", chartDataJson: '{"chart":1}',
