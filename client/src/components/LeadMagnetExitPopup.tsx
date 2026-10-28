@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,15 +10,30 @@ import { trpc } from "@/lib/trpc";
 
 export function LeadMagnetExitPopup() {
   const { locale } = useLanguage();
-  const isEn = locale === "en";
+  const [pathname] = useLocation();
+  const isEn = locale !== "cs";
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const isSuppressedPage =
+    pathname.includes("/calculate") ||
+    pathname.includes("/kalkulacka") ||
+    pathname.includes("/chart") ||
+    pathname.includes("/honorace") ||
+    pathname.includes("/pricing") ||
+    pathname.includes("/cenik") ||
+    pathname.includes("/payment") ||
+    pathname.includes("/vsl") ||
+    pathname.includes("/ai-guide");
 
   const subscribeMutation = trpc.newsletter.subscribe.useMutation();
 
   useEffect(() => {
+    if (isSuppressedPage) {
+      setOpen(false);
+      return;
+    }
     // Only trigger once per session
     if (sessionStorage.getItem("leadMagnetExitDismissed")) return;
 
@@ -35,7 +51,9 @@ export function LeadMagnetExitPopup() {
       clearTimeout(timer);
       document.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [open]);
+  }, [open, isSuppressedPage]);
+
+  if (isSuppressedPage) return null;
 
   const handleClose = () => {
     setOpen(false);

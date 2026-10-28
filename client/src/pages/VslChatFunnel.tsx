@@ -17,7 +17,7 @@ interface ChatMessage {
 
 export default function VslChatFunnel() {
   const { locale, localePath } = useLanguage();
-  const isEn = locale === "en";
+  const isEn = locale !== "cs";
 
   const [step, setStep] = useState(0);
   const [userName, setUserName] = useState("");
@@ -26,8 +26,8 @@ export default function VslChatFunnel() {
     {
       role: "assistant",
       content: isEn
-        ? "Welcome! I am AI Marie. Before I calculate your personal Human Design Blueprint, what is your first name?"
-        : "Vítejte! Jsem AI Marie. Než vám vypočítám vaši osobní Human Design mapu, jak se jmenujete?",
+        ? "Welcome! I am ORACULUM+, your personal Human Design guide. Before I prepare your personal Blueprint overview, what is your first name?"
+        : "Vítejte! Jsem ORACULUM+, váš osobní průvodce Human Designem. Než vám připravím přehled vaší osobní mapy, jak se jmenujete?",
     },
   ]);
   const [inputVal, setInputVal] = useState("");
@@ -52,7 +52,7 @@ export default function VslChatFunnel() {
           {
             role: "assistant",
             content: isEn
-              ? `Těší mě, ${text}! Kdy jste se narodil/a? (Napište datum narození nebo vyšte ranní/večerní čas)`
+              ? `Nice to meet you, ${text}! When were you born? (Please enter your date of birth)`
               : `Těší mě, ${text}! Kdy jste se narodil/a? (Zadejte prosím vaše datum narození)`,
           },
         ]);
@@ -64,12 +64,12 @@ export default function VslChatFunnel() {
           {
             role: "assistant",
             content: isEn
-              ? `Calculating chart for ${userName} (${text})... I see a powerful open Emotional Center! What is your biggest challenge right now?`
-              : `Počítám mapu pro uživatele ${userName} (${text})... Vidím ve vaší energetické mřížce silné Otevřené Emoční Centrum! Co vás v tuto chvíli nejvíce trápí?`,
+              ? `Analyzing chart profile for ${userName} (${text})... What is your most important area of focus right now?`
+              : `Analyzuji profil mapy pro ${userName} (${text})... Jaká oblast je pro vás v tuto chvíli nejdůležitější?`,
             options: [
               isEn ? "Career & Purpose" : "Kariéra a Životní Směr",
               isEn ? "Love & Relationships" : "Láska a Vztahová Harmonie",
-              isEn ? "Inner Peace & Stress" : "Vnitřní Mír a Přetížení",
+              isEn ? "Inner Peace & Decision Clarity" : "Vnitřní Klid a Rozhodování",
             ],
           },
         ]);
@@ -81,8 +81,8 @@ export default function VslChatFunnel() {
           {
             role: "assistant",
             content: isEn
-              ? `Thank you, ${userName}. Based on your unique chart configuration, your Emotional Authority holds the key to your success. Watch this personal video reading summary below!`
-              : `Děkuji, ${userName}. Na základě vaší uniktání energetické mapy drží vaše Emoční Autorita klíč k vaší životní lehkosti. Níže pro vás mám kompletní osobní videorozbor!`,
+              ? `Thank you, ${userName}. Your Strategy and Inner Authority hold the key to aligned decisions without burnout. Explore your personal Blueprint summary below!`
+              : `Děkuji, ${userName}. Vaše Strategie a Vnitřní Autorita drží klíč k rozhodování v lehkosti. Níže pro vás mám přehled vašeho osobního Blueprintu!`,
           },
         ]);
       }
@@ -98,18 +98,18 @@ export default function VslChatFunnel() {
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-600/30 to-amber-500/30 text-amber-300 text-xs font-bold border border-amber-400/40">
             <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-            {isEn ? "Interactive AI Reading & VSL Experience" : "Interaktivní AI Výklad & VSL Zkušenost z Reklamy"}
+            {isEn ? "ORACULUM+ · Interactive AI Reading & Guide" : "ORACULUM+ · Interaktivní AI Průvodce"}
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-serif font-bold text-white tracking-tight leading-tight">
             {isEn
-              ? "Discover Your Hidden Energetic Power with AI Marie"
-              : "Odhalte Své Skryté Energetické Nastavení s AI Marií"}
+              ? "Discover Your Energetic Blueprint with ORACULUM+"
+              : "Odhalte Své Energetické Nastavení s ORACULUM+"}
           </h1>
           <p className="text-sm sm:text-base text-purple-200/80 max-w-2xl mx-auto">
             {isEn
-              ? "Answer 3 quick questions to calculate your exact Human Design chart and unlock your custom 2026 reading."
-              : "Odpovězte na 3 rychlé otázky. AI Marie spočítá vaši mapu a odhalí vaše otevřená centra v reálném čase."}
+              ? "Answer 3 quick questions to explore your Human Design decision strategy and unlock your personal reading."
+              : "Odpovězte na 3 rychlé otázky. ORACULUM+ připraví úvodní vhled do vaší strategie a rozhodování."}
           </p>
         </div>
 
@@ -155,7 +155,7 @@ export default function VslChatFunnel() {
             {isTyping && (
               <div className="flex items-center gap-2 text-xs text-purple-300">
                 <Sparkles className="w-4 h-4 animate-spin text-amber-400" />
-                <span>{isEn ? "Marie is analyzing your chart..." : "AI Marie analyzuje vaši mapu..."}</span>
+                <span>{isEn ? "ORACULUM+ is analyzing your profile..." : "ORACULUM+ analyzuje váš profil..."}</span>
               </div>
             )}
           </div>
@@ -188,10 +188,10 @@ export default function VslChatFunnel() {
                 <Bot className="w-8 h-8" />
               </div>
               <h3 className="font-serif text-xl font-bold text-white">
-                {isEn ? `Osobní Videorozbor pro Uživatele ${userName}` : `Osobní Videorozbor pro Uživatele ${userName}`}
+                {isEn ? `Personal Blueprint Summary for ${userName}` : `Osobní Přehled Mapy pro ${userName}`}
               </h3>
               <p className="text-xs text-purple-200/80 mt-1">
-                {isEn ? "Click to start 5-minute video pitch with AI Marie" : "Klikněte pro spuštění 5minutové videoprezentace s AI Marií"}
+                {isEn ? "Personal Human Design overview prepared with ORACULUM+" : "Osobní přehled Human Designu připravený s ORACULUM+"}
               </p>
             </div>
 
@@ -199,34 +199,34 @@ export default function VslChatFunnel() {
             <Card className="border-2 border-amber-400 bg-gradient-to-br from-purple-950 via-slate-900 to-amber-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
               <div className="space-y-2">
                 <span className="text-xs font-bold uppercase tracking-widest text-amber-300">
-                  {isEn ? "Exclusive 50% Off VSL Offer" : "Exkluzivní 50% Sleva z Reklamního VSL Funnelu"}
+                  {isEn ? "One-Time Personal Report · No Subscription" : "Jednorázový Osobní Rozbor · Bez Předplatného"}
                 </span>
                 <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white">
-                  {isEn ? "Unlock Your Complete 25-Page HD Blueprint" : "Odemkněte Váš Kompletní 25-Stránkový HD Blueprint"}
+                  {isEn ? "Unlock Your Complete Personal Human Design Blueprint" : "Odemkněte Váš Kompletní Osobní HD Blueprint"}
                 </h3>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-left">
                 <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>{isEn ? "All 9 Centers Explained" : "Rozbor všech 9 centr"}</span>
+                  <span>{isEn ? "All 9 Centers & Channels" : "Rozbor všech 9 center a kanálů"}</span>
                 </div>
                 <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>{isEn ? "Career & Money Gates" : "Kariérní & Finanční brány"}</span>
+                  <span>{isEn ? "PDF Blueprint + 5 AI Readings" : "PDF Blueprint + 5 AI výkladů"}</span>
                 </div>
                 <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0" />
-                  <span>{isEn ? "Audio Reading Included" : "Audio výklad v ceně"}</span>
+                  <span>{isEn ? "Career, Love & Authority" : "Kariéra, vztahy a autorita"}</span>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-white/10">
                 <div className="text-center sm:text-left">
-                  <div className="text-xs text-muted-foreground">{isEn ? "VSL Promo Price:" : "Akční Reklamní Cena:"}</div>
+                  <div className="text-xs text-muted-foreground">{isEn ? "Personal Blueprint Price:" : "Cena osobního Blueprintu:"}</div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-amber-300">199 Kč</span>
-                    <span className="text-xs text-muted-foreground line-through">390 Kč</span>
+                    <span className="text-3xl font-bold text-amber-300">{isEn ? "€15.90" : "290 Kč"}</span>
+                    <span className="text-xs text-purple-200/70">{isEn ? "one-time" : "jednorázově"}</span>
                   </div>
                 </div>
 
@@ -235,9 +235,9 @@ export default function VslChatFunnel() {
                   className="w-full sm:w-auto bg-gradient-to-r from-amber-400 via-purple-500 to-indigo-600 hover:scale-105 text-slate-950 font-extrabold text-sm h-12 px-8 rounded-2xl shadow-xl gap-2"
                   asChild
                 >
-                  <Link href={localePath("/honorace") + "?coupon=VSL50"}>
+                  <Link href={localePath("/honorace")}>
                     <Sparkles className="w-4 h-4 fill-current" />
-                    {isEn ? "Claim 50% Off Blueprint Now" : "Získat 50% Slevu a Stáhnout Blueprint"}
+                    {isEn ? "Get My Personal Blueprint" : "Získat Osobní Blueprint"}
                   </Link>
                 </Button>
               </div>

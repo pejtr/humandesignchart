@@ -1,0 +1,199 @@
+/* Human Design Mapa — editorial conversion hero inspired by the approved visual concept.
+   Scoped to the Czech homepage; the separate US landing page retains its own design. */
+.hd-wow-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 675px;
+  overflow: hidden;
+  color: #231a33;
+  background:
+    radial-gradient(ellipse at 86% 17%, rgba(137, 116, 223, .29), transparent 39%),
+    radial-gradient(ellipse at 9% 72%, rgba(240, 186, 156, .27), transparent 43%),
+    linear-gradient(114deg, #fffbf9 1%, #faf7fd 46%, #eae1fa 100%);
+}
+.hd-wow-ambient {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(circle at 77% 40%, rgba(255, 228, 164, .46), transparent 24%),
+    radial-gradient(circle at 36% 97%, rgba(231, 179, 192, .22), transparent 30%),
+    radial-gradient(circle at 93% 85%, rgba(181, 153, 244, .18), transparent 25%);
+}
+.hd-wow-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.04fr) minmax(0, .96fr);
+  align-items: center;
+  width: min(1380px, calc(100% - 64px));
+  margin: 0 auto;
+  min-height: 675px;
+  gap: 18px;
+}
+.hd-wow-intro { position: relative; z-index: 5; padding: 75px 0 57px; }
+.hd-wow-eyebrow {
+  display: flex; align-items: center; gap: 9px;
+  margin: 0 0 22px;
+  font-size: 11px; font-weight: 750; letter-spacing: .25em;
+  line-height: 1.4; color: #6541a9;
+}
+.hd-wow-title {
+  max-width: 790px;
+  margin: 0; font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(3.1rem, 5.65vw, 5.75rem);
+  font-weight: 500; letter-spacing: -.056em; line-height: 1.05;
+  color: #151020;
+}
+.hd-wow-title span {
+  display: block;
+  padding-bottom: .1em;
+  background: linear-gradient(105deg, #825027, #ae793a 56%, #d69a53);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hd-wow-description {
+  margin: 20px 0 26px; max-width: 590px;
+  font-size: clamp(16px, 1.42vw, 19px); line-height: 1.65; color: #504c61;
+}
+.hd-wow-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.hd-wow-actions .hd-wow-primary {
+  min-height: 57px; padding: 0 24px; border: none; border-radius: 999px;
+  color: #fff; font-size: 15px; font-weight: 700; letter-spacing: -.015em;
+  background: linear-gradient(115deg, #5519b6, #8836e8 90%);
+  box-shadow: 0 13px 28px rgba(116, 44, 205, .23);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.hd-wow-actions .hd-wow-primary:hover { transform: translateY(-2px); box-shadow: 0 17px 35px rgba(116, 44, 205, .3); }
+.hd-wow-actions .hd-wow-secondary {
+  min-height: 57px; padding: 0 18px; border-radius: 999px;
+  border: 1px solid rgba(124, 82, 147, .21);
+  background: rgba(255, 255, 255, .76); color: #452583; font-size: 14px;
+}
+.hd-wow-actions .hd-wow-secondary:hover { background: #fff; border-color: #b9a3d5; }
+.hd-wow-play { display: inline-flex; width: 26px; height: 26px; border: 1px solid #8655c4; border-radius: 50%; align-items: center; justify-content: center; }
+.hd-wow-hint { margin: 16px 0 34px; display: flex; gap: 7px; align-items: center; font-size: 12px; color: #6c6174; }
+.hd-wow-hint svg { color: #1b998a; flex: 0 0 auto; }
+.hd-wow-benefits { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 15px 12px; max-width: 650px; }
+.hd-wow-benefit { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.hd-wow-benefit-icon {
+  width: 43px; height: 43px; flex: 0 0 43px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 14px; border: 1px solid #f0dfcd;
+  background: rgba(255,255,255,.76); color: #b67931;
+  box-shadow: 0 6px 17px rgba(149,102,112,.09);
+}
+.hd-wow-benefit strong { display:block; color:#29213b; font-size: 12.5px; line-height: 1.35; }
+.hd-wow-benefit small { display:block; color:#736b7c; font-size: 11.5px; line-height: 1.35; margin-top:2px; }
+.hd-wow-art { position: relative; min-height: 640px; align-self: stretch; overflow: visible; }
+.hd-wow-image-halo {
+  position:absolute; inset: 40px -19% 20px -10%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(253,219,157,.71), rgba(183,147,243,.25) 45%, transparent 72%);
+  filter: blur(15px);
+}
+.hd-wow-portrait {
+  position: absolute; right: -4%; bottom: 0; width: 105%; height: 100%;
+  object-fit: contain; object-position: center bottom;
+  filter: drop-shadow(0 10px 35px rgba(117,77,130,.19));
+  -webkit-mask-image: radial-gradient(ellipse 64% 76% at 55% 46%, #000 64%, transparent 100%);
+  mask-image: radial-gradient(ellipse 64% 76% at 55% 46%, #000 64%, transparent 100%);
+}
+.hd-wow-orbit {
+  position:absolute; inset: 11% 4% 5% 3%; border-radius: 50%;
+  border: 1px solid rgba(230, 184, 113, .52); z-index: 2; pointer-events:none;
+  box-shadow: inset 0 0 50px rgba(255,232,186,.1), 0 0 0 31px rgba(255,237,200,.1);
+}
+.hd-wow-orbit-one { animation: hd-wow-turn 55s linear infinite; }
+.hd-wow-orbit-two { inset: 19% 12% 14% 13%; border-style: dashed; border-color: rgba(133,98,202,.45); animation: hd-wow-turn 75s linear infinite reverse; }
+.hd-wow-orbit::before, .hd-wow-orbit::after { content:""; position:absolute; width: 11px; height:11px; border: 2px solid #e6ad52; border-radius:50%; background:#fff8dd; }
+.hd-wow-orbit::before { top:10%; left:17%; } .hd-wow-orbit::after { bottom:12%; right:14%; }
+.hd-wow-spark { position:absolute; z-index:3; color:#edb858; text-shadow:0 0 15px #fff; font-size:28px; }
+.hd-wow-spark-a { top:14%; left:18%; }.hd-wow-spark-b { top:44%; right:3%; }.hd-wow-spark-c { bottom:18%; left:12%; }
+.hd-wow-chart-preview {
+  position:absolute; z-index:4; right:-2%; top:15%; width:230px;
+  padding:18px 14px 13px; border:1px solid rgba(255,255,255,.78);
+  border-radius:20px;
+  color:#4b3456; background: rgba(255,255,255,.82);
+  box-shadow: 0 23px 60px rgba(70,39,92,.17), inset 0 1px 2px #fff;
+  backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  transform: rotate(2deg);
+}
+.hd-wow-preview-kicker { display:block; margin-bottom:4px; font-size:9px; font-weight:800; letter-spacing:.2em; color:#bd853c; }
+.hd-wow-chart-preview h2 {font-size:14px; line-height:1.35; font-weight:700; margin:0 0 8px; text-align:center; }
+.hd-wow-preview-content { display:flex; align-items:center; gap:8px; }
+.hd-wow-preview-content svg { width:80px; min-width:80px; height:121px; }
+.hd-wow-preview-fields { flex:1; min-width:0; }
+.hd-wow-preview-fields div { padding:4px 0; border-bottom:1px solid rgba(186,161,199,.28); }
+.hd-wow-preview-fields span { display:block; color:#8b7b93; font-size:9px; line-height:1.4; }
+.hd-wow-preview-fields b { display:block; font-size:10px; color:#563b6c; font-weight:650; }
+.hd-wow-chart-preview p { margin:10px 2px 0; font-size:9px; line-height:1.5; color:#8b7b93; text-align:center; }
+.hd-wow-proof { position:relative; z-index:3; margin:-3px auto 0; padding:20px 24px; background:rgba(255,255,255,.96); border-bottom:1px solid #f1e5e8; box-shadow:0 -8px 30px rgba(109,81,141,.05); }
+.hd-wow-proof-grid { width:min(1290px,100%); margin:0 auto; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
+.hd-wow-proof-item { display:flex; align-items:center; gap:13px; padding:0 14px; border-right:1px solid #e8dde9; }
+.hd-wow-proof-item:last-child { border-right:0; }
+.hd-wow-proof-item svg {color:#bd8135; min-width:28px;}
+.hd-wow-proof-item strong { display:block; color:#2f2454; font-size:15px; line-height:1.4; }
+.hd-wow-proof-item small { display:block; color:#726d7d; font-size:12px; }
+.hd-wow-oraculum { position:relative; overflow:hidden; background:linear-gradient(115deg,#f5eeff,#fffaf5 57%,#f8f3ff); padding:62px 0; }
+.hd-wow-oraculum::before { content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(circle at 20% 40%,rgba(186,134,241,.16),transparent 43%); }
+.hd-wow-oraculum-layout { position:relative; display:grid; align-items:center; grid-template-columns:minmax(0,.95fr) minmax(0,.95fr) minmax(185px,.48fr); gap:34px; width:min(1280px,calc(100% - 64px)); margin:auto; }
+.hd-wow-oraculum-visual { position:relative; height:300px; min-width:0; }
+.hd-wow-oraculum-visual img { display:block; width:100%; height:100%; object-fit:cover; object-position:center 34%; border-radius:27px; box-shadow:0 15px 45px rgba(88,53,113,.19); }
+.hd-wow-chat-bubble { position:absolute; max-width:62%; border:1px solid #efdef9; border-radius:17px; padding:10px 14px; font-size:12px; background:rgba(255,255,255,.94); box-shadow:0 7px 20px rgba(90,52,123,.12); color:#563a6d; }
+.hd-wow-chat-one { left:-7%; top:11%; }.hd-wow-chat-two {left:-4%; bottom:12%; display:flex; align-items:center; gap:7px; font-weight:750; color:#6b23be; }
+.hd-wow-oraculum-copy .hd-wow-eyebrow { margin-bottom:7px; font-size:10px; color:#bc853f; }
+.hd-wow-oraculum-copy h2 {margin:0 0 7px; font-family:Georgia,serif; font-size:clamp(2.9rem,4vw,4.3rem); line-height:1; font-weight:500; letter-spacing:-.04em; color:#57229c;}
+.hd-wow-oraculum-copy h2 span { color:#c88e36; }
+.hd-wow-oraculum-copy h3 {font-family:Georgia,serif; font-size:clamp(1.6rem,2vw,2.2rem); line-height:1.2; font-weight:500; color:#241536; max-width:490px;}
+.hd-wow-oraculum-copy p:not(.hd-wow-eyebrow) { max-width:520px; margin:12px 0 18px; color:#61596c; font-size:14px; line-height:1.65; }
+.hd-wow-oraculum-actions { display:flex; align-items:center; flex-wrap:wrap; gap:17px; }
+.hd-wow-oraculum-actions .hd-wow-oraculum-btn {display:inline-flex;gap:10px;min-height:45px;padding:0 20px;border-radius:999px;background:linear-gradient(110deg,#be862e,#d9a33f);color:white;box-shadow:0 10px 25px rgba(166,112,42,.19);font-weight:700;}
+.hd-wow-oraculum-actions .hd-wow-oraculum-btn:hover {background:#a97222;}
+.hd-wow-oraculum-link {font-size:12px; color:#57229c; font-weight:650; text-decoration:underline; text-underline-offset:3px;}
+.hd-wow-oraculum-points {display:flex;flex-direction:column;gap:18px;color:#6f6179;font-size:12px;}
+.hd-wow-oraculum-points span {display:flex;align-items:center;gap:12px;}
+.hd-wow-oraculum-points svg {width:37px;height:37px;padding:9px;flex:0 0 37px;color:#b68347;background:#fff9f4;border:1px solid #f0e1d0;border-radius:12px;}
+@keyframes hd-wow-turn { to { transform:rotate(360deg) } }
+@media (max-width:1160px) {
+  .hd-wow-layout {width:min(100% - 48px, 1170px);grid-template-columns:1.06fr .94fr;}
+  .hd-wow-art {min-height:570px;}
+  .hd-wow-title {font-size:clamp(3rem,5.6vw,4.7rem);}
+  .hd-wow-chart-preview {top:23%;right:0;}
+  .hd-wow-oraculum-layout {grid-template-columns:.87fr 1.13fr;gap:30px;}
+  .hd-wow-oraculum-points {grid-column:2;flex-direction:row;flex-wrap:wrap;gap:8px 22px;}
+}
+@media (max-width:800px) {
+  .hd-wow-hero {min-height:auto;}
+  .hd-wow-layout {grid-template-columns:1fr;gap:0;width:min(100% - 36px,620px);}
+  .hd-wow-intro {padding:59px 0 0;}
+  .hd-wow-title {font-size:clamp(2.9rem,8vw,4.6rem);}
+  .hd-wow-description {font-size:16px;}
+  .hd-wow-benefits {gap:12px;}
+  .hd-wow-art {min-height:470px;margin-top:8px;}
+  .hd-wow-portrait {right:1%;width:100%;}
+  .hd-wow-chart-preview {top:15%;right:0;transform:rotate(1deg) scale(.9);transform-origin:right top;}
+  .hd-wow-proof-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+  .hd-wow-proof-item:nth-child(2) {border-right:0;}
+  .hd-wow-oraculum-layout {grid-template-columns:1fr;gap:25px;width:min(100% - 40px,610px);}
+  .hd-wow-oraculum-visual {height:330px;}
+  .hd-wow-oraculum-points {grid-column:auto;}
+}
+@media (max-width:480px) {
+  .hd-wow-intro {padding-top:45px;}
+  .hd-wow-eyebrow {font-size:9px;letter-spacing:.13em;}
+  .hd-wow-title {font-size:clamp(2.65rem,11.4vw,3.55rem);line-height:1.08;}
+  .hd-wow-actions {align-items:stretch;flex-direction:column;}
+  .hd-wow-actions .hd-wow-primary,.hd-wow-actions .hd-wow-secondary {width:100%;justify-content:center;}
+  .hd-wow-benefit-icon {width:36px;height:36px;flex-basis:36px;}
+  .hd-wow-benefit strong {font-size:11px;}.hd-wow-benefit small {font-size:10px;}
+  .hd-wow-art {min-height:355px;}
+  .hd-wow-chart-preview {top:12%;right:-8px;transform:scale(.76);transform-origin:right top;}
+  .hd-wow-proof {padding:20px 14px;}.hd-wow-proof-grid {gap:18px 10px;}
+  .hd-wow-proof-item {padding:0 5px;gap:8px;}.hd-wow-proof-item svg {min-width:20px;width:20px;height:20px;}
+  .hd-wow-proof-item strong {font-size:12px;}.hd-wow-proof-item small {font-size:10px;}
+  .hd-wow-oraculum {padding:40px 0 48px;}
+  .hd-wow-oraculum-visual {height:230px;}
+  .hd-wow-chat-bubble {font-size:10px;}
+  .hd-wow-oraculum-points {flex-direction:column;gap:10px;}
+}
+@media (prefers-reduced-motion: reduce) {
+  .hd-wow-orbit {animation:none;}
+  .hd-wow-actions .hd-wow-primary {transition:none;}
+}

@@ -19,7 +19,8 @@ function translateCrossName(name: string): string {
   return result;
 }
 
-export async function generateChartPDF(chart: HumanDesignChartData, name: string, hdData: any, bodygraphRef?: React.RefObject<HTMLDivElement | null>): Promise<void> {
+export async function generateChartPDF(chart: HumanDesignChartData, name: string, hdData: any, bodygraphRef?: React.RefObject<HTMLDivElement | null>, locale?: "cs" | "en"): Promise<void> {
+  const isCzech = (locale ?? (typeof window !== "undefined" && window.location.pathname.startsWith("/en") ? "en" : "cs")) === "cs";
   const czType = (t.types as Record<string, string>)[chart.type] || chart.type;
   const czStrategy = (t.hd.strategies as Record<string, string>)[chart.strategy] || chart.strategy;
   const czSignature = (t.hd.signatures as Record<string, string>)[chart.signature] || chart.signature;
@@ -249,6 +250,50 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
   }).join("")}
           </div>
         </div>
+    <!-- Premium practical integration workbook: grounded in the calculated chart. -->
+    <div class="section" style="break-before:page;page-break-before:always;padding:18px;border:1px solid #ddd6fe;border-radius:12px;margin-top:20px">
+      <div class="section-title" style="font-size:17px">${isCzech ? "Váš osobní integrační plán · 7 dní" : "Your Personal Integration Plan · 7 Days"}</div>
+      <p style="font-size:11px;line-height:1.65;color:#475569">
+        ${isCzech
+          ? `Tento plán propojuje tři konkrétní prvky vaší mapy: energetický typ <strong>${czType}</strong>, strategii <strong>${czStrategy}</strong> a autoritu <strong>${chart.authority}</strong>. Berte jej jako prostor pro sebereflexi, nikoli jako vědeckou diagnózu či předpověď.`
+          : `This plan integrates three core elements of your chart: energy type <strong>${chart.type}</strong>, strategy <strong>${chart.strategy}</strong>, and authority <strong>${chart.authority}</strong>. Use it as a reflective guide rather than a rigid prescription.`
+        }
+      </p>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <tr>
+          <td style="padding:10px;vertical-align:top;width:22%;font-weight:700">${isCzech ? "Den 1 · Pozorování" : "Day 1 · Observation"}</td>
+          <td style="padding:10px">${isCzech ? "Všimněte si tří situací, kdy jste jednali automaticky. Kdy jste cítili energii a kdy tlak?" : "Notice three moments when you acted automatically. Where did you feel natural energy vs. pressure?"}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px;vertical-align:top;font-weight:700">${isCzech ? "Den 2 · Strategie" : "Day 2 · Strategy"}</td>
+          <td style="padding:10px">${isCzech ? `Vyberte jedno malé rozhodnutí a vědomě vyzkoušejte strategii „${czStrategy}“. Zapište si, co se změnilo.` : `Choose one small choice today and consciously apply your strategy: "${chart.strategy}". Record what shifts.`}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px;vertical-align:top;font-weight:700">${isCzech ? "Den 3 · Autorita" : "Day 3 · Authority"}</td>
+          <td style="padding:10px">${isCzech ? `Před dalším rozhodnutím si připomeňte svou autoritu „${chart.authority}“. Oddělte vlastní pocit od očekávání okolí.` : `Before your next decision, check in with your authority: "${chart.authority}". Distinguish your internal signal from external noise.`}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px;vertical-align:top;font-weight:700">${isCzech ? "Den 4 · Hranice" : "Day 4 · Boundaries"}</td>
+          <td style="padding:10px">${isCzech ? "Zaznamenejte jednu situaci, kdy jste řekli ano, ale chtěli jste říci ne. Co vám pomůže nastavit zdravou hranici?" : "Note one situation where you said yes but meant no. What boundary gives you peace?"}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px;vertical-align:top;font-weight:700">${isCzech ? "Den 5 · Vztahy" : "Day 5 · Relationships"}</td>
+          <td style="padding:10px">${isCzech ? "Vysvětlete blízkému člověku, jak vám vyhovuje dělat rozhodnutí. Požádejte o konkrétní podporu." : "Share how you make decisions with someone close to you. Ask for their specific patience or support."}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px;vertical-align:top;font-weight:700">${isCzech ? "Den 6 · Energie" : "Day 6 · Energy"}</td>
+          <td style="padding:10px">${isCzech ? "Sledujte činnosti, po kterých se cítíte více a méně spokojení. Vytvořte si dva krátké seznamy." : "Track activities that recharge you versus those that drain you. Make two short reference lists."}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px;vertical-align:top;font-weight:700">${isCzech ? "Den 7 · Integrace" : "Day 7 · Integration"}</td>
+          <td style="padding:10px">${isCzech ? "Vyberte jeden návyk na dalších 30 dní. Určete jednoduchý signál pokroku a termín kontroly." : "Choose one small habit to carry forward for 30 days. Define a check-in date."}</td>
+        </tr>
+      </table>
+      <div style="margin-top:14px;padding:12px;background:#f5f3ff;border-radius:8px;font-size:11px;line-height:1.6">
+        <strong>${isCzech ? "Vaše tři reflexní otázky:" : "Your Three Guiding Questions:"}</strong><br/>
+        1. ${isCzech ? "Kde ve svém životě nejvíce respektuji vlastní tempo?" : "Where in my life do I honor my natural rhythm most?"}<br/>
+        2. ${isCzech ? "Jak poznám, že rozhoduji ze své vůle, nikoli ze strachu?" : "How do I know when a choice comes from clarity rather than fear?"}<br/>
+        3. ${isCzech ? "Co mohu během příštího týdne udělat jinak?" : "What is one small thing I will do differently this coming week?"}
       </div>
     </div>
 

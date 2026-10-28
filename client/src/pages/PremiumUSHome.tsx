@@ -189,6 +189,7 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
                 <img
                   src="/images/brand/marie-landing-v1.webp"
                   alt="Human Design guide visual"
+                  fetchPriority="high" loading="eager" decoding="async"
                   className="absolute inset-0 h-full w-full object-cover opacity-72"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-[#071426]/90 via-[#071426]/45 to-transparent" />
@@ -290,23 +291,23 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
               {[
                 {
-                  image: "/images/how-gifts.png",
+                  image: "/images/how-gifts.avif",
                   eyebrow: "Understand your energy",
                   title: "See your natural operating pattern.",
                 },
                 {
-                  image: "/images/how-relationships.png",
+                  image: "/images/how-relationships.avif",
                   eyebrow: "Relationships",
                   title: "Explore where two designs meet.",
                 },
                 {
-                  image: "/images/how-purpose.png",
+                  image: "/images/how-purpose.avif",
                   eyebrow: "Direction",
                   title: "Turn abstract insights into reflection prompts.",
                 },
               ].map(card => (
                 <div key={card.title} className="group relative min-h-[180px] overflow-hidden rounded-[24px] border border-[#DDD6C8] bg-[#0D2442] shadow-sm">
-                  <img src={card.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-70 transition duration-700 group-hover:scale-105" />
+                  <img src={card.image} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover opacity-70 transition duration-700 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-r from-[#071426]/92 via-[#071426]/68 to-[#071426]/15" />
                   <div className="relative z-10 flex h-full min-h-[180px] max-w-sm flex-col justify-end p-6">
                     <p className="text-[10px] font-bold uppercase tracking-[0.23em] text-[#F4C762]">{card.eyebrow}</p>

@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 import { useLocation } from "wouter";
 import { cs } from "@shared/i18n/cs";
 import { en } from "@shared/i18n/en";
@@ -6,8 +6,11 @@ import { ru } from "@shared/i18n/ru";
 import { uk } from "@shared/i18n/uk";
 import { de } from "@shared/i18n/de";
 import { hu } from "@shared/i18n/hu";
+import { fr } from "@shared/i18n/fr";
+import { es } from "@shared/i18n/es";
+import { it } from "@shared/i18n/it";
 
-export type Locale = "cs" | "en" | "ru" | "uk" | "de" | "hu";
+export type Locale = "cs" | "en" | "ru" | "uk" | "de" | "hu" | "fr" | "es" | "it";
 
 const TRANSLATIONS: Record<Locale, typeof cs> = {
   cs,
@@ -16,6 +19,9 @@ const TRANSLATIONS: Record<Locale, typeof cs> = {
   uk: uk as unknown as typeof cs,
   de: de as unknown as typeof cs,
   hu: hu as unknown as typeof cs,
+  fr: fr as unknown as typeof cs,
+  es: es as unknown as typeof cs,
+  it: it as unknown as typeof cs,
 };
 
 interface LanguageContextValue {
@@ -27,11 +33,21 @@ interface LanguageContextValue {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-const ALL_LOCALES: Locale[] = ["cs", "en", "ru", "uk", "de", "hu"];
+export const ALL_LOCALES: Locale[] = ["cs", "en", "ru", "uk", "de", "hu", "fr", "es", "it"];
+
+export function isSupportedLocale(value: string | undefined | null): value is Locale {
+  return Boolean(value && (ALL_LOCALES as readonly string[]).includes(value));
+}
 
 function getLocaleFromPath(path: string): Locale {
   for (const l of ALL_LOCALES) {
     if (path.startsWith(`/${l}/`) || path === `/${l}`) return l;
+  }
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname.toLowerCase();
+    if (host === "humandesignchart.app" || host.endsWith(".humandesignchart.app")) {
+      return "en";
+    }
   }
   return "cs";
 }
@@ -47,6 +63,8 @@ function stripLocale(path: string): string {
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const locale = getLocaleFromPath(location);
+
+  useEffect(() => { document.documentElement.lang = locale; }, [locale]);
 
   const value = useMemo<LanguageContextValue>(() => ({
     locale,

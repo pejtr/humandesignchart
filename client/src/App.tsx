@@ -4,7 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { LanguageProvider, useLanguage } from "./contexts/LanguageContext";
+import { LanguageProvider, useLanguage, isSupportedLocale } from "./contexts/LanguageContext";
 import { CurrencyProvider } from "./contexts/CurrencyContext";
 import { AbTestingProvider } from "./contexts/AbTestingContext";
 import { JsonLdHead } from "./components/JsonLdHead";
@@ -100,6 +100,9 @@ function detectPreferredLocale(): Locale {
     if (code === "ru") return "ru";
     if (code === "uk") return "uk";
     if (code === "de" || code === "at" || code === "ch") return "de";
+    if (code === "fr") return "fr";
+    if (code === "es") return "es";
+    if (code === "it") return "it";
     if (code === "hu") return "hu";
     if (code === "en") return "en";
   }
@@ -136,10 +139,10 @@ function RootRedirect() {
 }
 
 /**
- * Legacy route redirect: /calculate → /cs/calculate (or /en/calculate)
+ * Legacy route redirect: /calculate → /cs/calculate (or /en/calculate on EN domain)
  */
 function LegacyRedirect({ path }: { path: string }) {
-  const locale = detectPreferredLocale();
+  const locale = defaultLocaleForHost();
   const [, setLocation] = useLocation();
   useEffect(() => {
     setLocation(`/${locale}${path}${window.location.search}`, { replace: true });
@@ -172,14 +175,74 @@ function LocaleRoutes() {
       <PageTransition>
         <Suspense fallback={<PageLoader />}>
           <Switch>
-            {/* Keep the unprefixed login route before /:locale, otherwise
-                Wouter treats "login" as a locale and renders the homepage. */}
+            {/* Root redirect */}
+            <Route path="/">
+              <RootRedirect />
+            </Route>
+
+            {/* Keep unprefixed routes BEFORE /:locale, otherwise Wouter treats
+                single-segment paths like /pricing, /ai-guide, /vsl-chat, /calculate
+                as a locale parameter and renders the homepage. */}
             <Route path="/login">
               {() => <SafeRoute><Login /></SafeRoute>}
             </Route>
+            <Route path="/404" component={NotFound} />
 
-            {/* Locale root = home */}
-            <Route path="/:locale" component={Home} />
+            {/* Shared charts (no locale prefix — public links) */}
+            <Route path="/embed/calculator">
+              {() => <SafeRoute><EmbedCalculator /></SafeRoute>}
+            </Route>
+            <Route path="/shared/:token">
+              {(params: any) => <SafeRoute><SharedChart token={params.token} /></SafeRoute>}
+            </Route>
+            {/* Referral without locale prefix */}
+            <Route path="/refer/:code">
+              {(params: any) => {
+                const locale = defaultLocaleForHost();
+                return <Redirect to={`/${locale}/refer/${params.code}`} />;
+              }}
+            </Route>
+
+            {/* Legacy routes without locale prefix → redirect */}
+            <Route path="/calculate"><LegacyRedirect path="/calculate" /></Route>
+            <Route path="/human-design-kalkulacka"><LegacyRedirect path="/human-design-kalkulacka" /></Route>
+            <Route path="/human-design-test"><LegacyRedirect path="/human-design-test" /></Route>
+            <Route path="/human-design-typy"><LegacyRedirect path="/human-design-typy" /></Route>
+            <Route path="/chart/:id">{(params: any) => <LegacyRedirect path={`/chart/${params.id}`} />}</Route>
+            <Route path="/dashboard"><LegacyRedirect path="/dashboard" /></Route>
+            <Route path="/compare"><LegacyRedirect path="/compare" /></Route>
+            <Route path="/transits"><LegacyRedirect path="/transits" /></Route>
+            <Route path="/iching"><LegacyRedirect path="/iching" /></Route>
+            <Route path="/celebrities"><LegacyRedirect path="/celebrities" /></Route>
+            <Route path="/encyclopedia"><LegacyRedirect path="/encyclopedia" /></Route>
+            <Route path="/ai-guide"><LegacyRedirect path="/ai-guide" /></Route>
+            <Route path="/return-chart"><LegacyRedirect path="/return-chart" /></Route>
+            <Route path="/transit-calendar"><LegacyRedirect path="/transit-calendar" /></Route>
+            <Route path="/variables"><LegacyRedirect path="/variables" /></Route>
+            <Route path="/types/:type">{(params: any) => <LegacyRedirect path={`/types/${params.type}`} />}</Route>
+            <Route path="/blog"><LegacyRedirect path="/blog" /></Route>
+            <Route path="/blog/:slug">{(params: any) => <LegacyRedirect path={`/blog/${params.slug}`} />}</Route>
+            <Route path="/incarnation-cross"><LegacyRedirect path="/incarnation-cross" /></Route>
+            <Route path="/daily-transit"><LegacyRedirect path="/daily-transit" /></Route>
+            <Route path="/honorace"><LegacyRedirect path="/honorace" /></Route>
+            <Route path="/pricing"><LegacyRedirect path="/honorace" /></Route>
+            <Route path="/cenik"><LegacyRedirect path="/honorace" /></Route>
+            <Route path="/reddit-human-design"><LegacyRedirect path="/reddit-human-design" /></Route>
+            <Route path="/payment/success"><LegacyRedirect path="/payment/success" /></Route>
+            <Route path="/payment/cancel"><LegacyRedirect path="/payment/cancel" /></Route>
+            <Route path="/composite"><LegacyRedirect path="/composite" /></Route>
+            <Route path="/crm-dashboard"><LegacyRedirect path="/crm-dashboard" /></Route>
+            <Route path="/vsl"><LegacyRedirect path="/vsl" /></Route>
+            <Route path="/chat-reading"><LegacyRedirect path="/chat-reading" /></Route>
+            <Route path="/vsl-chat"><LegacyRedirect path="/vsl-chat" /></Route>
+            <Route path="/portal"><LegacyRedirect path="/portal" /></Route>
+
+            {/* Locale root = home (validated against supported locales) */}
+            <Route path="/:locale">
+              {(params: { locale: string }) =>
+                isSupportedLocale(params.locale) ? <Home /> : <NotFound />
+              }
+            </Route>
 
             {/* Core pages */}
             <Route path="/:locale/partner/:code">
@@ -290,6 +353,9 @@ function LocaleRoutes() {
             <Route path="/:locale/chat-reading">
               {() => <SafeRoute><VslChatFunnel /></SafeRoute>}
             </Route>
+            <Route path="/:locale/vsl-chat">
+              {() => <SafeRoute><VslChatFunnel /></SafeRoute>}
+            </Route>
             <Route path="/:locale/ugc-factory">
               {() => <SafeRoute><UgcFactory /></SafeRoute>}
             </Route>
@@ -317,58 +383,7 @@ function LocaleRoutes() {
               {(params: any) => <ReferralLanding code={params.code} />}
             </Route>
 
-            {/* Shared charts (no locale prefix — public links) */}
-            <Route path="/embed/calculator">
-              {() => <SafeRoute><EmbedCalculator /></SafeRoute>}
-            </Route>
-            <Route path="/shared/:token">
-              {(params: any) => <SafeRoute><SharedChart token={params.token} /></SafeRoute>}
-            </Route>
-            {/* Referral without locale prefix */}
-            <Route path="/refer/:code">
-              {(params: any) => {
-                const locale = detectPreferredLocale();
-                return <Redirect to={`/${locale}/refer/${params.code}`} />;
-              }}
-            </Route>
-
-            {/* Root redirect */}
-            <Route path="/">
-              <RootRedirect />
-            </Route>
-
-            {/* Legacy routes without locale prefix → redirect */}
-            <Route path="/calculate"><LegacyRedirect path="/calculate" /></Route>
-            <Route path="/human-design-kalkulacka"><LegacyRedirect path="/human-design-kalkulacka" /></Route>
-            <Route path="/human-design-test"><LegacyRedirect path="/human-design-test" /></Route>
-            <Route path="/human-design-typy"><LegacyRedirect path="/human-design-typy" /></Route>
-            <Route path="/chart/:id">{(params: any) => <LegacyRedirect path={`/chart/${params.id}`} />}</Route>
-            <Route path="/dashboard"><LegacyRedirect path="/dashboard" /></Route>
-            <Route path="/compare"><LegacyRedirect path="/compare" /></Route>
-            <Route path="/transits"><LegacyRedirect path="/transits" /></Route>
-            <Route path="/iching"><LegacyRedirect path="/iching" /></Route>
-            <Route path="/celebrities"><LegacyRedirect path="/celebrities" /></Route>
-            <Route path="/encyclopedia"><LegacyRedirect path="/encyclopedia" /></Route>
-            <Route path="/ai-guide"><LegacyRedirect path="/ai-guide" /></Route>
-            <Route path="/return-chart"><LegacyRedirect path="/return-chart" /></Route>
-            <Route path="/transit-calendar"><LegacyRedirect path="/transit-calendar" /></Route>
-            <Route path="/variables"><LegacyRedirect path="/variables" /></Route>
-            <Route path="/types/:type">{(params: any) => <LegacyRedirect path={`/types/${params.type}`} />}</Route>
-            <Route path="/blog"><LegacyRedirect path="/blog" /></Route>
-            <Route path="/blog/:slug">{(params: any) => <LegacyRedirect path={`/blog/${params.slug}`} />}</Route>
-            <Route path="/incarnation-cross"><LegacyRedirect path="/incarnation-cross" /></Route>
-            <Route path="/daily-transit"><LegacyRedirect path="/daily-transit" /></Route>
-            <Route path="/honorace"><LegacyRedirect path="/honorace" /></Route>
-            <Route path="/pricing"><LegacyRedirect path="/honorace" /></Route>
-            <Route path="/cenik"><LegacyRedirect path="/honorace" /></Route>
-            <Route path="/reddit-human-design"><LegacyRedirect path="/reddit-human-design" /></Route>
-            <Route path="/payment/success"><LegacyRedirect path="/payment/success" /></Route>
-            <Route path="/payment/cancel"><LegacyRedirect path="/payment/cancel" /></Route>
-            <Route path="/composite"><LegacyRedirect path="/composite" /></Route>
-            <Route path="/crm-dashboard"><LegacyRedirect path="/crm-dashboard" /></Route>
-
             {/* 404 */}
-            <Route path="/404" component={NotFound} />
             <Route component={NotFound} />
           </Switch >
         </Suspense >

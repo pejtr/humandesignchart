@@ -1,18 +1,16 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { useState, useEffect, useRef, lazy, Suspense } from "react";
-import { trpc } from "@/lib/trpc";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ParticleField } from "@/components/ParticleField";
 import { TiltCard } from "@/components/TiltCard";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 const SocialProof = lazy(() =>
   import("@/components/SocialProof").then(m => ({ default: m.SocialProof }))
 );
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
 import {
   Compass,
@@ -27,73 +25,6 @@ import {
   Moon,
   Sparkles,
 } from "lucide-react";
-
-// ─── Animated Chart Counter (count-up on scroll into view) ────────────────────────────────────
-function ChartCounter({ isCs }: { isCs: boolean }) {
-  const { data } = trpc.publicStats.chartCount.useQuery(undefined, {
-    staleTime: 60_000,
-  });
-  const [displayCount, setDisplayCount] = useState(0);
-  const targetCount = data?.count ?? 12847;
-  const hasAnimated = useRef(false);
-  const counterRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!counterRef.current || hasAnimated.current || !data) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated.current) {
-          hasAnimated.current = true;
-          const duration = 2200;
-          const steps = 80;
-          const increment = targetCount / steps;
-          let current = 0;
-          const interval = setInterval(() => {
-            current += increment;
-            if (current >= targetCount) {
-              setDisplayCount(targetCount);
-              clearInterval(interval);
-            } else {
-              setDisplayCount(Math.floor(current));
-            }
-          }, duration / steps);
-        }
-      },
-      { threshold: 0.5 }
-    );
-    observer.observe(counterRef.current);
-    return () => observer.disconnect();
-  }, [data, targetCount]);
-
-  const formatted = displayCount.toLocaleString(isCs ? "cs-CZ" : "en-US");
-
-  return (
-    <div
-      ref={counterRef}
-      className="flex items-center gap-3 px-4 py-2.5 rounded-full border bg-white/80 dark:bg-card/80 shadow-sm"
-      style={{ borderColor: "#d4af37" }}
-    >
-      <div
-        className="w-9 h-9 rounded-full flex items-center justify-center"
-        style={{ background: "#fef3c7", border: "2px solid #d4af37" }}
-      >
-        <BarChart3 className="w-4 h-4" style={{ color: "#92400e" }} />
-      </div>
-      <div className="text-left">
-        <p
-          className="text-sm font-semibold leading-none tabular-nums"
-          style={{ color: "#1a1a1a" }}
-        >
-          {formatted}+
-        </p>
-        <p className="text-xs" style={{ color: "#777" }}>
-          {isCs ? "vygenerovaných map" : "charts generated"}
-        </p>
-      </div>
-    </div>
-  );
-}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -129,7 +60,7 @@ function getTypesData(isCs: boolean) {
       color: "bg-amber-50 border-amber-200",
       pctColor: "text-orange-500",
       imgUrl:
-        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/IxAVlaOWqHGkhytp.webp",
+        "/images/types/generator.webp",
     },
     {
       name: "Manifesting Generator",
@@ -143,7 +74,7 @@ function getTypesData(isCs: boolean) {
       color: "bg-red-50 border-red-200",
       pctColor: "text-red-500",
       imgUrl:
-        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/qWsAFzAtJmYBPSzE.webp",
+        "/images/types/manifesting-generator.webp",
     },
     {
       name: "Projector",
@@ -157,7 +88,7 @@ function getTypesData(isCs: boolean) {
       color: "bg-violet-50 border-violet-200",
       pctColor: "text-violet-500",
       imgUrl:
-        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/uyvogIBNHAiNkHXh.webp",
+        "/images/types/projector.webp",
     },
     {
       name: "Manifestor",
@@ -171,7 +102,7 @@ function getTypesData(isCs: boolean) {
       color: "bg-emerald-50 border-emerald-200",
       pctColor: "text-emerald-500",
       imgUrl:
-        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/rMbULSgMTGcVzRZZ.webp",
+        "/images/types/manifestor.webp",
     },
     {
       name: "Reflector",
@@ -185,7 +116,7 @@ function getTypesData(isCs: boolean) {
       color: "bg-slate-50 border-slate-200",
       pctColor: "text-slate-500",
       imgUrl:
-        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/UWRWlEUvFOKUinyN.webp",
+        "/images/types/reflector.webp",
     },
   ];
 }
@@ -196,6 +127,7 @@ function getTypesData(isCs: boolean) {
 import { FastTypeQuizModal } from "@/components/FastTypeQuizModal";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
 import PremiumUSHome from "./PremiumUSHome";
+import "./HomeWow.css";
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
@@ -204,23 +136,6 @@ export default function Home() {
   const isPremiumUsDomain = typeof window !== "undefined" && window.location.hostname.endsWith("humandesignchart.app");
 
   const [showQuiz, setShowQuiz] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setMousePos({ x, y });
-  };
-
-  // Parallax scroll effect for hero
-  const heroRef = useRef<HTMLElement>(null);
-  const { scrollYProgress: heroScrollProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  const heroY = useTransform(heroScrollProgress, [0, 1], ["0%", "30%"]);
-  const heroOpacity = useTransform(heroScrollProgress, [0, 0.8], [1, 0.3]);
-
   // Store referral code from URL (?ref=CODE) into localStorage
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -350,20 +265,6 @@ export default function Home() {
     { icon: FileText, ...t.home.features.pdfReports },
   ];
 
-  const benefits = isCs
-    ? [
-        "Pochopte své dary",
-        "Zlepšete své vztahy",
-        "Dělejte správná rozhodnutí",
-        "Najděte svůj účel",
-      ]
-    : [
-        "Understand your gifts",
-        "Improve your relationships",
-        "Make the right decisions",
-        "Find your purpose",
-      ];
-
   const steps = isCs
     ? [
         {
@@ -409,34 +310,34 @@ export default function Home() {
   const howItWorks = isCs
     ? [
         {
-          image: "/images/how-gifts.png",
+          image: "/images/how-gifts.avif",
           title: "1. Pochopte své dary",
           desc: "Zjistěte svůj typ, profil a autoritu. Poznejte, jak přirozeně fungujete a co vás skutečně naplňuje.",
         },
         {
-          image: "/images/how-relationships.png",
+          image: "/images/how-relationships.avif",
           title: "2. Zlepšete své vztahy",
           desc: "Porovnejte mapy s blízkými. Pochopte dynamiku vašich vztahů a jak spolu lépe fungovat.",
         },
         {
-          image: "/images/how-purpose.png",
+          image: "/images/how-purpose.avif",
           title: "3. Najděte svůj účel",
           desc: "Prozkoumejte svůj inkarnační kříž a brány. Objevte své životní poslání a směr.",
         },
       ]
     : [
         {
-          image: "/images/how-gifts.png",
+          image: "/images/how-gifts.avif",
           title: "1. Understand your gifts",
           desc: "Discover your type, profile, and authority. Learn how you naturally operate and what truly fulfills you.",
         },
         {
-          image: "/images/how-relationships.png",
+          image: "/images/how-relationships.avif",
           title: "2. Improve your relationships",
           desc: "Compare charts with loved ones. Understand the dynamics of your relationships and how to work better together.",
         },
         {
-          image: "/images/how-purpose.png",
+          image: "/images/how-purpose.avif",
           title: "3. Find your purpose",
           desc: "Explore your incarnation cross and gates. Discover your life mission and direction.",
         },
@@ -452,7 +353,7 @@ export default function Home() {
           cat: "Základy HD",
           catStyle: "bg-amber-100 text-amber-800 border-amber-200",
           time: 8,
-          cover: "/images/blog_what_is_hd.png",
+          cover: "/images/blog_what_is_hd.avif",
           featured: true,
         },
         {
@@ -463,7 +364,7 @@ export default function Home() {
           cat: "Typy",
           catStyle: "bg-violet-100 text-violet-800 border-violet-200",
           time: 10,
-          cover: "/images/blog_5_types.png",
+          cover: "/images/blog_5_types.avif",
           featured: false,
         },
         {
@@ -474,7 +375,7 @@ export default function Home() {
           cat: "Strategie",
           catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200",
           time: 7,
-          cover: "/images/blog_strategy.png",
+          cover: "/images/blog_strategy.avif",
           featured: false,
         },
         {
@@ -485,7 +386,7 @@ export default function Home() {
           cat: "Autorita",
           catStyle: "bg-rose-100 text-rose-800 border-rose-200",
           time: 9,
-          cover: "/images/blog_authority.png",
+          cover: "/images/blog_authority.avif",
           featured: false,
         },
         {
@@ -496,7 +397,7 @@ export default function Home() {
           cat: "Profily",
           catStyle: "bg-sky-100 text-sky-800 border-sky-200",
           time: 11,
-          cover: "/images/blog_profiles.png",
+          cover: "/images/blog_profiles.avif",
           featured: false,
         },
         {
@@ -507,7 +408,7 @@ export default function Home() {
           cat: "Vztahy",
           catStyle: "bg-pink-100 text-pink-800 border-pink-200",
           time: 8,
-          cover: "/images/blog_relationships.png",
+          cover: "/images/blog_relationships.avif",
           featured: false,
         },
       ]
@@ -520,7 +421,7 @@ export default function Home() {
           cat: "HD Basics",
           catStyle: "bg-amber-100 text-amber-800 border-amber-200",
           time: 8,
-          cover: "/images/blog_what_is_hd.png",
+          cover: "/images/blog_what_is_hd.avif",
           featured: true,
         },
         {
@@ -531,7 +432,7 @@ export default function Home() {
           cat: "Types",
           catStyle: "bg-violet-100 text-violet-800 border-violet-200",
           time: 10,
-          cover: "/images/blog_5_types.png",
+          cover: "/images/blog_5_types.avif",
           featured: false,
         },
         {
@@ -542,7 +443,7 @@ export default function Home() {
           cat: "Strategy",
           catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200",
           time: 7,
-          cover: "/images/blog_strategy.png",
+          cover: "/images/blog_strategy.avif",
           featured: false,
         },
         {
@@ -553,7 +454,7 @@ export default function Home() {
           cat: "Authority",
           catStyle: "bg-rose-100 text-rose-800 border-rose-200",
           time: 9,
-          cover: "/images/blog_authority.png",
+          cover: "/images/blog_authority.avif",
           featured: false,
         },
         {
@@ -564,7 +465,7 @@ export default function Home() {
           cat: "Profiles",
           catStyle: "bg-sky-100 text-sky-800 border-sky-200",
           time: 11,
-          cover: "/images/blog_profiles.png",
+          cover: "/images/blog_profiles.avif",
           featured: false,
         },
         {
@@ -575,7 +476,7 @@ export default function Home() {
           cat: "Relationships",
           catStyle: "bg-pink-100 text-pink-800 border-pink-200",
           time: 8,
-          cover: "/images/blog_relationships.png",
+          cover: "/images/blog_relationships.avif",
           featured: false,
         },
       ];
@@ -588,199 +489,135 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
-      {/* ── Hero Section (Avanito-style Live Fluid Animated Background) ────── */}
-      <section
-        ref={heroRef}
-        onMouseMove={handleMouseMove}
-        className="relative flex flex-col justify-center overflow-hidden bg-[#FAF8F5] dark:bg-[#070510] transition-colors duration-500 py-20 md:py-28"
-        style={{ minHeight: "65vh" }}
-      >
-        {/* Avanito-Style Fluid Animated Gradient Blobs */}
-        <div className="hero-fluid-blobs" aria-hidden="true">
-          <div
-            className="hero-fluid-blob hero-fluid-blob-1"
-            style={{
-              transform: `translate(${mousePos.x * 45}px, ${mousePos.y * 45}px)`,
-            }}
-          />
-          <div
-            className="hero-fluid-blob hero-fluid-blob-2"
-            style={{
-              transform: `translate(${mousePos.x * -55}px, ${mousePos.y * -55}px)`,
-            }}
-          />
-          <div
-            className="hero-fluid-blob hero-fluid-blob-3"
-            style={{
-              transform: `translate(${mousePos.x * 40}px, ${mousePos.y * -40}px)`,
-            }}
-          />
-          <div
-            className="hero-fluid-blob hero-fluid-blob-4"
-            style={{
-              transform: `translate(${mousePos.x * -35}px, ${mousePos.y * 35}px)`,
-            }}
-          />
-          <div className="hero-fluid-blob hero-fluid-blob-center" />
-        </div>
-
-        {/* Ambient Subtle Grid Mesh overlay */}
-        <div
-          className="absolute inset-0 bg-dots opacity-20 pointer-events-none z-[1]"
-          aria-hidden="true"
-        />
-
-        {/* Decorative Sacred Geometry Circles & Pulse */}
-        <div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none z-[2]"
-        >
-          <div className="sacred-rotate-cw w-[300px] h-[300px] md:w-[560px] md:h-[560px] rounded-full border border-purple-400/30 dark:border-purple-400/20" />
-          <div className="sacred-rotate-ccw absolute w-[230px] h-[230px] md:w-[440px] md:h-[440px] rounded-full border border-amber-300/35 dark:border-amber-300/20" />
-          <div className="sacred-glow-breathe absolute w-[160px] h-[160px] md:w-[320px] md:h-[320px] rounded-full border border-pink-400/30 dark:border-pink-400/20" />
-          <div className="absolute h-28 w-28 rounded-full bg-white/40 dark:bg-purple-500/20 blur-3xl animate-pulse" />
-        </div>
-
-        {/* Floating Particle Animation */}
-        <ParticleField />
-
-        <motion.div
-          className="container relative z-10 py-16 md:py-24"
-          style={{ y: heroY, opacity: heroOpacity }}
-        >
-          <div className="max-w-3xl mx-auto text-center">
-            <motion.h1
-              initial="hidden"
-              animate="visible"
-              custom={0}
-              variants={fadeUp}
-              className="font-serif text-5xl md:text-7xl font-bold leading-tight mb-6 tracking-tight"
-              style={{ color: "#1a1a1a" }}
-            >
-              {isCs ? (
-                <>
-                  Objevte svou jedinečnou
-                  <br />
-                  energetickou mapu
-                </>
-              ) : (
-                <>
-                  Discover Your Unique
-                  <br />
-                  Energy Blueprint
-                </>
-              )}
-            </motion.h1>
-
-            <motion.p
-              initial="hidden"
-              animate="visible"
-              custom={1}
-              variants={fadeUp}
-              className="text-base md:text-lg leading-relaxed mb-10 max-w-xl mx-auto"
-              style={{ color: "#555" }}
-            >
+      {/* Editorial hero: free chart is the primary action; visual chart is an illustrative sample. */}
+      <section className="hd-wow-hero" aria-labelledby="hd-wow-title">
+        <div className="hd-wow-ambient" aria-hidden="true" />
+        <div className="hd-wow-layout">
+          <div className="hd-wow-intro">
+            <p className="hd-wow-eyebrow">
+              <Sparkles aria-hidden="true" className="h-4 w-4" />
+              {isCs ? "SEBEPOZNÁNÍ • REFLEXE • VLASTNÍ CESTA" : "SELF-DISCOVERY • REFLECTION • YOUR PATH"}
+            </p>
+            <h1 id="hd-wow-title" className="hd-wow-title">
+              {isCs ? "Objevte svou jedinečnou" : "Discover your unique"}
+              <span>{isCs ? " energetickou mapu" : " energy blueprint"}</span>
+            </h1>
+            <p className="hd-wow-description">
               {isCs
-                ? "Human Design vám odhalí, jak fungujete, jak se rozhodujete a jak žít v souladu se svou přirozeností. Získejte svůj rozbor zdarma."
-                : "Human Design reveals how you operate, how you make decisions, and how to live in alignment with your true nature. Get your free chart now."}
-            </motion.p>
-
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              custom={2}
-              variants={fadeUp}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
-            >
-              <Button
-                size="lg"
-                className="omni-cta-pulse text-white text-base px-8 py-6 shadow-lg transition-all hover:scale-105 rounded-lg"
-                style={{ background: "#2a9d8f", border: "none" }}
-                asChild
-              >
+                ? "Prozkoumejte svůj Human Design typ, strategii a autoritu. Začněte bezplatnou osobní mapou a rozhodněte se sami, jak hluboko chcete jít."
+                : "Explore your Human Design type, strategy and authority. Start with a free personal chart, then choose how deeply you want to explore."}
+            </p>
+            <div className="hd-wow-actions">
+              <Button asChild size="lg" className="hd-wow-primary">
                 <Link href={localePath("/calculate")}>
-                  {isCs ? "Vytvořit moji mapu zdarma" : "Get my free chart"}
+                  <Sparkles aria-hidden="true" className="h-5 w-5" />
+                  {isCs ? "Vytvořit mapu zdarma" : "Create my free chart"}
+                  <ArrowRight aria-hidden="true" className="h-5 w-5" />
                 </Link>
               </Button>
-
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => setShowQuiz(true)}
-                className="text-base px-6 py-6 border-purple-300 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 rounded-lg gap-2"
-              >
-                <Sparkles className="w-4 h-4 text-amber-500" />
-                {isCs ? "Nevíte čas? 30s Rychlotest" : "Unknown time? 30s Quiz"}
+              <Button type="button" size="lg" variant="outline" className="hd-wow-secondary" onClick={() => setShowQuiz(true)}>
+                <span className="hd-wow-play"><ArrowRight aria-hidden="true" className="h-4 w-4" /></span>
+                {isCs ? "Nevíte čas narození?" : "Don't know your birth time?"}
               </Button>
-
-              <ChartCounter isCs={isCs} />
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              custom={3}
-              variants={fadeUp}
-              className="flex flex-wrap justify-center gap-x-8 gap-y-3"
-            >
-              {benefits.map(label => (
-                <span
-                  key={label}
-                  className="flex items-center gap-2 text-sm"
-                  style={{ color: "#444" }}
-                >
-                  <CheckCircle2
-                    className="w-4 h-4 flex-shrink-0"
-                    style={{ color: "#2a9d8f" }}
-                  />
-                  {label}
-                </span>
-              ))}
-            </motion.div>
+            </div>
+            <p className="hd-wow-hint">
+              <CheckCircle2 aria-hidden="true" className="h-4 w-4" />
+              {isCs ? "Základní mapa zdarma · Podrobný Blueprint je volitelný" : "Free basic chart · In-depth Blueprint available separately"}
+            </p>
+            <div className="hd-wow-benefits">
+              {[
+                { icon: Sparkles, label: isCs ? "Poznejte své dary" : "Explore your strengths", detail: isCs ? "a jedinečné nastavení" : "and unique design" },
+                { icon: Users, label: isCs ? "Lépe chápejte vztahy" : "Explore relationships", detail: isCs ? "a své interakce" : "and connection patterns" },
+                { icon: Compass, label: isCs ? "Objevte svou strategii" : "Discover your strategy", detail: isCs ? "a vnitřní autoritu" : "and inner authority" },
+                { icon: Star, label: isCs ? "Prostor pro sebereflexi" : "Make space to reflect", detail: isCs ? "svým vlastním tempem" : "at your own pace" },
+              ].map(item => {
+                const Icon = item.icon;
+                return (
+                  <div className="hd-wow-benefit" key={item.label}>
+                    <span className="hd-wow-benefit-icon"><Icon aria-hidden="true" className="h-5 w-5" /></span>
+                    <span><strong>{item.label}</strong><small>{item.detail}</small></span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </motion.div>
+          <div className="hd-wow-art" aria-label={isCs ? "Ilustrativní náhled Human Design mapy" : "Illustrative Human Design chart preview"}>
+            <div className="hd-wow-orbit hd-wow-orbit-one" aria-hidden="true" />
+            <div className="hd-wow-orbit hd-wow-orbit-two" aria-hidden="true" />
+            <div className="hd-wow-image-halo" aria-hidden="true" />
+            <img className="hd-wow-portrait" src="/images/brand/veleknezka-master-v1.avif" alt="" fetchPriority="high" loading="eager" decoding="async" width={941} height={1672} />
+            <span className="hd-wow-spark hd-wow-spark-a" aria-hidden="true">✦</span>
+            <span className="hd-wow-spark hd-wow-spark-b" aria-hidden="true">✧</span>
+            <span className="hd-wow-spark hd-wow-spark-c" aria-hidden="true">✦</span>
+            <div className="hd-wow-chart-preview">
+              <span className="hd-wow-preview-kicker">{isCs ? "UKÁZKA VÝSTUPU" : "CHART PREVIEW"}</span>
+              <h2>{isCs ? "Vaše Human Design mapa" : "Your Human Design chart"}</h2>
+              <div className="hd-wow-preview-content">
+                <svg viewBox="0 0 132 196" role="img" aria-label={isCs ? "Ilustrativní diagram center" : "Illustrative center diagram"}>
+                  <g fill="none" stroke="#c7a263" strokeWidth="1.3" opacity="0.85">
+                    <path d="M66 13 35 52 66 92 97 52 66 13ZM35 52 35 122 66 171 97 122 97 52ZM66 92V171M35 122H97M35 52 97 122M97 52 35 122"/>
+                    <path d="M66 13V187M24 82H108" strokeDasharray="3 4" opacity=".55"/>
+                  </g>
+                  <path d="M66 14 51 40 81 40Z" fill="#ebbc78" stroke="#b98948"/>
+                  <rect x="53" y="53" width="26" height="26" rx="3" transform="rotate(45 66 66)" fill="#edc4b6" stroke="#b78967"/>
+                  <rect x="51" y="88" width="30" height="30" rx="3" fill="#c1a4e5" stroke="#9675c8"/>
+                  <path d="M66 137 47 166H85Z" fill="#e3ac6a" stroke="#ae8251"/>
+                  <path d="M66 183 52 158H80Z" fill="#f6d9a2" stroke="#b89057"/>
+                  <g fill="#fff" stroke="#c7a263"><circle cx="66" cy="14" r="3"/><circle cx="35" cy="52" r="3"/><circle cx="97" cy="52" r="3"/><circle cx="35" cy="122" r="3"/><circle cx="97" cy="122" r="3"/><circle cx="66" cy="183" r="3"/></g>
+                </svg>
+                <div className="hd-wow-preview-fields">
+                  {[
+                    [isCs ? "Typ" : "Type", isCs ? "Váš typ" : "Your type"],
+                    [isCs ? "Strategie" : "Strategy", isCs ? "Vaše strategie" : "Your strategy"],
+                    [isCs ? "Autorita" : "Authority", isCs ? "Vaše autorita" : "Your authority"],
+                    [isCs ? "Profil" : "Profile", isCs ? "Váš profil" : "Your profile"],
+                  ].map(([name, value]) => <div key={name}><span>{name}</span><b>{value}</b></div>)}
+                </div>
+              </div>
+              <p>{isCs ? "Skutečnou mapu vypočítáme z vašich údajů narození." : "Your actual chart is calculated from your birth details."}</p>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section className="relative overflow-hidden border-y border-violet-100 bg-gradient-to-r from-[#f8f3ff] via-white to-[#fff9eb] py-10 dark:border-violet-900/50 dark:from-violet-950/30 dark:via-background dark:to-amber-950/20">
-        <div className="container relative z-10 flex max-w-5xl flex-col items-center gap-6 md:flex-row md:gap-9">
-          <div className="relative aspect-[16/10] w-full max-w-sm shrink-0 overflow-hidden rounded-[2rem] border border-amber-200/80 bg-[#160b2f] shadow-xl shadow-violet-900/15 ring-8 ring-violet-500/10 md:w-[38%] md:max-w-none">
-            <img
-              src="/images/brand/marie-landing-v1.webp"
-              alt={
-                isCs
-                  ? "ARACULUM, průvodkyně Human Designem"
-                  : "ARACULUM, Human Design guide"
-              }
-              className="h-full w-full object-cover object-center"
-            />
-            <span className="absolute bottom-1 right-2 flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-amber-600 text-amber-100 shadow-lg">
-              <Moon className="h-4 w-4 -rotate-12" />
-            </span>
+      <div className="hd-wow-proof" aria-label={isCs ? "Co získáte" : "What you get"}>
+        <div className="hd-wow-proof-grid">
+          {[
+            { icon: CheckCircle2, name: isCs ? "Mapa zdarma" : "Free chart", text: isCs ? "Základní výpočet bez platby" : "Basic calculation at no cost" },
+            { icon: Compass, name: isCs ? "Vlastní BodyGraph" : "Personal BodyGraph", text: isCs ? "Z vašich údajů narození" : "Based on your birth details" },
+            { icon: Brain, name: isCs ? "Podrobnější pohled" : "Deeper insights", text: isCs ? "Rozbory dostupné volitelně" : "Optional personalized readings" },
+            { icon: Sparkles, name: isCs ? "Praktický průvodce" : "Guided exploration", text: "ORACULUM+" },
+          ].map(item => {
+            const Icon = item.icon;
+            return <div className="hd-wow-proof-item" key={item.name}><Icon aria-hidden="true" className="h-7 w-7" /><span><strong>{item.name}</strong><small>{item.text}</small></span></div>;
+          })}
+        </div>
+      </div>
+
+      <section className="hd-wow-oraculum" aria-labelledby="hd-wow-oraculum-title">
+        <div className="hd-wow-oraculum-layout">
+          <div className="hd-wow-oraculum-visual">
+            <img src="/images/brand/marie-landing-v1.webp" alt={isCs ? "Digitální průvodkyně ORACULUM+" : "ORACULUM+ digital guide"} loading="lazy" decoding="async" />
+            <div className="hd-wow-chat-bubble hd-wow-chat-one">{isCs ? "Co bych dnes mohl/a prozkoumat?" : "What could I explore today?"}</div>
+            <div className="hd-wow-chat-bubble hd-wow-chat-two"><Sparkles aria-hidden="true" className="h-4 w-4" /> ORACULUM+</div>
           </div>
-          <div className="flex-1 text-center md:text-left">
-            <div className="mb-2 flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700 md:justify-start dark:text-amber-300">
-              <Sparkles className="h-4 w-4" />{" "}
-              {isCs ? "ARACULUM · osobní průvodkyně" : "ARACULUM · personal guide"}
+          <div className="hd-wow-oraculum-copy">
+            <p className="hd-wow-eyebrow"><Sparkles aria-hidden="true" className="h-4 w-4" /> {isCs ? "VÁŠ OSOBNÍ PRŮVODCE" : "YOUR PERSONAL GUIDE"}</p>
+            <h2 id="hd-wow-oraculum-title">ORACULUM<span>+</span></h2>
+            <h3>{isCs ? "Otázky, které stojí za hlubším prozkoumáním" : "A deeper look at the questions that matter"}</h3>
+            <p>{isCs
+              ? "Propojte svůj Human Design s otázkami každodenního života. ORACULUM+ vám nabídne podněty k reflexi vašich vztahů, rozhodování a aktuálních témat."
+              : "Connect your Human Design chart with everyday questions. ORACULUM+ offers prompts for reflection on relationships, decisions and what matters to you right now."}</p>
+            <div className="hd-wow-oraculum-actions">
+              <Button asChild className="hd-wow-oraculum-btn"><Link href={localePath("/ai-guide")}>{isCs ? "Otevřít ORACULUM+" : "Explore ORACULUM+"}<ArrowRight aria-hidden="true" className="h-4 w-4" /></Link></Button>
+              <Link href={localePath("/calculate")} className="hd-wow-oraculum-link">{isCs ? "Nejdřív vytvořit mapu" : "Create my chart first"} →</Link>
             </div>
-            <h2 className="font-serif text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-              {isCs
-                ? "ARACULUM pro osobní reflexi a každodenní rozhodování"
-                : "ARACULUM for personal reflection and everyday decisions"}
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
-              {isCs
-                ? "ARACULUM propojuje vaši mapu, Lunu a aktuální tranzity do praktických odpovědí pro rozhodování, práci i vztahy."
-                : "ARACULUM connects your chart, the Moon and current transits into practical answers for your decisions, career, and relationships."}
-            </p>
           </div>
-          <Button
-            asChild
-            className="shrink-0 bg-[#C59235] text-white hover:bg-[#B88326] shadow-md"
-          >
-            <Link href={localePath("/honorace") + "#blueprint"}>
-              {isCs ? "Zeptat se ARACULUM" : "Ask ARACULUM"}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+          <div className="hd-wow-oraculum-points" aria-hidden="true">
+            <span><Brain className="h-5 w-5" /> {isCs ? "Podněty k sebereflexi" : "Reflective prompts"}</span>
+            <span><Users className="h-5 w-5" /> {isCs ? "Vztahy a souvislosti" : "Relationships"}</span>
+            <span><Compass className="h-5 w-5" /> {isCs ? "Vlastní cesta" : "Your journey"}</span>
+          </div>
         </div>
       </section>
 

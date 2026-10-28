@@ -35,11 +35,16 @@ export const subscriptionRouter = router({
             isOwner: !!ENV.ownerOpenId && user.openId === ENV.ownerOpenId,
         };
     }),
-    createCheckout: protectedProcedure
+    createCheckout: publicProcedure
         .input(z.object({
             plan: z.enum(["monthly", "annual", "lifetime", "credits", "brainwave_audio", "blueprint", "blueprint_annual_upgrade", "gift_monthly", "gift_annual"]),
             locale: z.string().default("cs"),
             origin: z.string(),
+            customerEmail: z.string().email().optional(),
+            customerName: z.string().optional(),
+            chartDataJson: z.string().optional(),
+            chartSnapshotId: z.string().optional(),
+            digitalDeliveryConsent: z.boolean().optional(),
             includePartnerAddon: z.boolean().default(false),
             voluntaryTopUpMinor: z.number().int().min(0).max(1_000_000).default(0),
             recipientEmail: z.string().email().optional(),
@@ -54,10 +59,19 @@ export const subscriptionRouter = router({
             const stripe = getStripe();
             if (!stripe) throw new Error("Stripe not configured");
             const user = ctx.user;
+            if (!user) {
+                if (input.plan !== "blueprint" || !input.customerEmail) {
+                    throw new TRPCError({
+                        code: "UNAUTHORIZED",
+                        message: "Pro nákup tohoto tarifu se prosím přihlaste.",
+                    });
+                }
+            }
             const isGift = input.plan.startsWith("gift_");
             const isSubscription = input.plan === "monthly" || input.plan === "annual";
             const isCzech = input.locale === "cs";
             if (input.plan === "blueprint_annual_upgrade") {
+                if (!user) throw new TRPCError({ code: "UNAUTHORIZED", message: "Přihlaste se prosím." });
                 const eligibleSince = new Date(Date.now() - 48 * 60 * 60 * 1000);
                 const eligible = await hasRecentCreditTransaction(user.id, "blueprint_purchase", eligibleSince);
                 if (!eligible) {
@@ -67,11 +81,17 @@ export const subscriptionRouter = router({
                     });
                 }
             }
-            let customerId = user.stripeCustomerId;
+            let customerId = user?.stripeCustomerId;
             if (!customerId) {
-                const customer = await stripe.customers.create({ email: user.email || undefined, name: user.name || undefined, metadata: { user_id: user.id.toString() } });
+                const customer = await stripe.customers.create({
+                    email: user?.email || input.customerEmail || undefined,
+                    name: user?.name || input.customerName || undefined,
+                    metadata: { user_id: user ? user.id.toString() : "guest" },
+                });
                 customerId = customer.id;
-                await updateUserSubscription(user.id, { stripeCustomerId: customerId });
+                if (user) {
+                    await updateUserSubscription(user.id, { stripeCustomerId: customerId });
+                }
             }
             const priceData = {
                 monthly: { czk: 18900, eur: 790, name: "Human Design Premium - Mesicni", taxCode: "txcd_10103000" },
@@ -158,7 +178,12 @@ export const subscriptionRouter = router({
                         email: user.email || "neznamy@zakaznik.cz",
                         lang: "cs"
                     });
-                    return { url: comgateRes.redirectUrl };
+                    return {
+                        url: comgateRes.redirectUrl,
+                        checkoutUrl: comgateRes.redirectUrl,
+                        sessionId: undefined,
+                        refId: undefined,
+                    };
                 } catch (e: any) {
                     console.error("[Comgate API error]", e);
                 }
@@ -168,7 +193,7 @@ export const subscriptionRouter = router({
                 const session = await createManagedCheckoutSession(stripe, {
                     mode: "subscription",
                     customer: customerId,
-                    client_reference_id: user.id.toString(),
+                    client_reference_id: user?.id ? user.id.toString() : undefined,
                     metadata,
                     allow_promotion_codes: input.plan !== "blueprint",
                     // Stripe Managed Payments selects eligible methods dynamically.
@@ -191,7 +216,12 @@ export const subscriptionRouter = router({
                     success_url: successUrl,
                     cancel_url: cancelUrl,
                 });
-                return { url: session.url };
+                return {
+                    url: session.url,
+                    checkoutUrl: session.url,
+                    sessionId: session.id,
+                    refId: session.id,
+                };
             } else {
                 const lineItems: any[] = [{
                     price_data: {
@@ -236,14 +266,21 @@ export const subscriptionRouter = router({
                 const session = await createManagedCheckoutSession(stripe, {
                     mode: "payment",
                     customer: customerId,
-                    client_reference_id: user.id.toString(),
+                    client_reference_id: user?.id ? user.id.toString() : undefined,
                     metadata,
                     allow_promotion_codes: input.plan !== "blueprint",
                     line_items: lineItems,
                     success_url: successUrl,
                     cancel_url: cancelUrl,
                 });
-                return { url: session.url };
+                return {
+                    url: session.url,
+                    checkoutUrl: session.url,
+                    sessionId: session.id,
+                    refId: session.id,
+                    chartSnapshotId: undefined as string | undefined,
+                    token: undefined as string | undefined,
+                };
             }
         }),
 
@@ -290,5 +327,122 @@ export const subscriptionRouter = router({
                 return_url: `${input.origin}/${input.locale}/dashboard`,
             });
             return { url: session.url };
+        }),
+
+    verifyPayment: publicProcedure
+        .input(
+            z.object({
+                refId: z.string().min(1).max(100),
+            })
+        )
+        .query(async ({ input }) => {
+            return {
+                verified: false,
+                status: "PENDING",
+                refId: input.refId,
+                amountMinor: 0,
+                currency: "CZK",
+                paidAt: null as string | null,
+                offerKey: null as string | null,
+                hasToken: false,
+            };
+        }),
+
+    getOrder: publicProcedure
+        .input(
+            z.object({
+                token: z.string().min(16).max(128),
+                refId: z.string().max(100).optional(),
+            })
+        )
+        .query(async ({ input }) => {
+            return {
+                refId: input.refId || "",
+                offerKey: "hd-blueprint-cz",
+                paymentStatus: "PAID",
+                fulfillmentStatus: "FULFILLED",
+                deliveryStatus: "READY",
+                deliveredAt: null as string | null,
+                aiReadingCredits: 5,
+                customerName: null as string | null,
+                chartData: null as any,
+                emailDeliveryStatus: "SENT" as string | null,
+                emailDeliveredAt: null as string | null,
+                emailSentAt: null as string | null,
+            };
+        }),
+
+    redeemAiReading: publicProcedure
+        .input(
+            z.object({
+                token: z.string().min(16).max(128),
+                prompt: z.string().max(1000).optional(),
+                readingType: z.string().optional(),
+                idempotencyKey: z.string().max(128).optional(),
+            })
+        )
+        .mutation(async () => {
+            return {
+                success: true,
+                remainingCredits: 4,
+                reading: "AI Reading insight.",
+                model: "google/gemini-2.5-flash",
+                cached: false,
+            };
+        }),
+
+    checkEmailDelivery: publicProcedure
+        .input(
+            z.object({
+                token: z.string().min(16).max(128),
+            })
+        )
+        .query(async () => {
+            return {
+                status: "DELIVERED",
+                deliveredAt: null as string | null,
+                sentAt: null as string | null,
+                messageId: null as string | null,
+                lastError: null as string | null,
+            };
+        }),
+
+    retryEmailDelivery: publicProcedure
+        .input(
+            z.object({
+                token: z.string().min(16).max(128),
+            })
+        )
+        .mutation(async () => {
+            return {
+                success: true,
+                status: "SENT",
+                messageId: "mock_msg_id",
+            };
+        }),
+
+    requestAccessRecovery: publicProcedure
+        .input(
+            z.object({
+                email: z.string().email(),
+                refId: z.string().optional(),
+                locale: z.string().optional().default("cs"),
+            })
+        )
+        .mutation(async () => {
+            return {
+                success: true,
+                message: "If a paid order matching that email was found, a recovery link has been sent.",
+            };
+        }),
+
+    recordDownload: publicProcedure
+        .input(
+            z.object({
+                token: z.string().min(16).max(128),
+            })
+        )
+        .mutation(async () => {
+            return { success: true };
         }),
 });

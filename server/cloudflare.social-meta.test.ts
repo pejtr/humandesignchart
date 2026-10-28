@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { withServerRenderedSeoMeta } from "../workers/social-meta";
+import { publicSeoUrlFromRequest, withServerRenderedSeoMeta } from "../workers/social-meta";
 
 const html = "<!doctype html><html><head><!--SEO_META--></head><body><div id=\"root\"></div></body></html>";
 
@@ -10,6 +10,28 @@ function assetResponse(body: string = html, type = "text/html"): Response {
 }
 
 describe("Cloudflare WhatsApp preview metadata", () => {
+  it("recovers the EN hostname forwarded through a Pages-origin proxy", async () => {
+    const request = new Request("https://humandesignchart-web.pages.dev/", {
+      headers: { "x-forwarded-host": "humandesignchart.app" },
+    });
+    const url = publicSeoUrlFromRequest(request);
+    expect(url.hostname).toBe("humandesignchart.app");
+    const response = await withServerRenderedSeoMeta(url, assetResponse());
+    expect(await response.text()).toContain('property="og:locale" content="en_US"');
+    expect(response.headers.get("content-language")).toBe("en");
+  });
+
+  it("never trusts unknown upstream host forwarding", () => {
+    const request = new Request("https://humandesignchart-web.pages.dev/", {
+      headers: { "x-forwarded-host": "attacker.invalid" },
+    });
+    expect(publicSeoUrlFromRequest(request).hostname).toBe("humandesignchart-web.pages.dev");
+    const direct = new Request("https://humandesignmapa.cz/", {
+      headers: { "x-forwarded-host": "humandesignchart.app" },
+    });
+    expect(publicSeoUrlFromRequest(direct).hostname).toBe("humandesignmapa.cz");
+  });
+
   it("injects a complete Czech share card into initial HTML for /cs", async () => {
     const response = await withServerRenderedSeoMeta(
       new URL("https://humandesignmapa.cz/cs"),
@@ -32,8 +54,32 @@ describe("Cloudflare WhatsApp preview metadata", () => {
       assetResponse(),
     );
     expect(await response.text()).toContain(
-      'property="og:image" content="https://www.humandesignchart.app/images/og-homepage.png"',
+      'property="og:image" content="https://humandesignchart.app/images/og-homepage.png"',
     );
+  });
+
+  it("renders a Czech share card for the bare Czech domain", async () => {
+    const response = await withServerRenderedSeoMeta(
+      new URL("https://humandesignmapa.cz/"),
+      assetResponse(),
+    );
+    const text = await response.text();
+    expect(text).toContain('property="og:locale" content="cs_CZ"');
+    expect(text).toContain('property="og:image" content="https://humandesignmapa.cz/images/og-homepage.png"');
+    expect(text).toContain('rel="canonical" href="https://humandesignmapa.cz/cs/"');
+    expect(text).not.toContain("<!--SEO_META-->");
+  });
+
+  it("renders an English share card for the bare English domain", async () => {
+    const response = await withServerRenderedSeoMeta(
+      new URL("https://humandesignchart.app/"),
+      assetResponse(),
+    );
+    const text = await response.text();
+    expect(text).toContain('property="og:locale" content="en_US"');
+    expect(text).toContain('property="og:image" content="https://humandesignchart.app/images/og-homepage.png"');
+    expect(text).toContain('rel="canonical" href="https://humandesignchart.app/en/"');
+    expect(text).not.toContain("<!--SEO_META-->");
   });
 
   it("keeps unrelated binary and API responses unchanged", async () => {
@@ -51,5 +97,23 @@ describe("Cloudflare WhatsApp preview metadata", () => {
       assetResponse("<html><head></head><body></body></html>"),
     );
     expect(await response.text()).toContain('property="og:image"');
+  });
+
+  it("handles European locale routes in Cloudflare social-meta worker", async () => {
+    for (const [locale, expectedLocale] of [
+      ["de", "de_DE"],
+      ["fr", "fr_FR"],
+      ["es", "es_ES"],
+      ["it", "it_IT"],
+    ] as const) {
+      const response = await withServerRenderedSeoMeta(
+        new URL(`https://humandesignchart.app/${locale}/calculate`),
+        assetResponse(),
+      );
+      const text = await response.text();
+      expect(text).toContain(`property="og:locale" content="${expectedLocale}"`);
+      expect(text).not.toContain(`hreflang="${locale}"`);
+      expect(text).toContain('name="robots" content="noindex,follow"');
+    }
   });
 });
