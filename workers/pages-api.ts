@@ -19,8 +19,11 @@ import {
 } from "../server/data/hdContent";
 import { BLOG_ARTICLES_EN } from "../server/data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
-import { withServerRenderedSeoMeta } from "./social-meta";
+import { publicSeoUrlFromRequest, withServerRenderedSeoMeta } from "./social-meta";
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
+import { isVerifiedBlueprintPayment } from "../server/payments/blueprintPaymentVerification";
+import { getBlueprintFulfillmentBlocker } from "../server/payments/blueprintFulfillmentGate";
+import { buildVerifiedCloudflareOrderEvent, sendVerifiedOpenAIEventWithSecrets, executeTransactionalCapiOutbox } from "../server/openaiConversionsApi";
 import { getReadingPrompt, getSystemPrompt } from "../server/ai/prompts";
 type D1Database = any;
 
@@ -28,6 +31,8 @@ type Env = {
   HUMAN_DESIGN_FULFILLMENT_API_KEY?: string;
   PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN?: string;
   PAY_BASE_URL?: string;
+  OPENAI_ADS_PIXEL_ID?: string;
+  OPENAI_CONVERSIONS_API_KEY?: string;
   BREVO_API_KEY?: string;
   BREVO_SENDER_EMAIL?: string;
   RESEND_API_KEY?: string;
@@ -46,6 +51,8 @@ type Context = { env: Env; request: Request };
 
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
+  // Cloudflare Pages must never expose server stack traces to checkout clients.
+  isDev: false,
 });
 
 const publicProcedure = t.procedure;
@@ -468,25 +475,26 @@ export const appRouter = router({
         z.object({
           email: z.string().email(),
           locale: z.enum(["cs", "en"]).default("cs"),
-          chartDataJson: z.string().min(2),
+          chartDataJson: z.string().min(2).max(300_000),
           metaJson: z.string().optional(),
         })
       )
       .mutation(async ({ input, ctx }: { input: any; ctx: Context }) => {
         const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
+        if (!d1) throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHART_STORAGE_UNAVAILABLE" });
         const snapshotId = `snap_${crypto.randomUUID()}`;
-        if (d1) {
-          try {
-            await d1
-              .prepare(
-                `INSERT INTO hd_chart_snapshots (id, email, locale, chart_data_json, created_at)
-                 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
-              )
-              .bind(snapshotId, input.email, input.locale, input.chartDataJson)
-              .run();
-          } catch (err) {
-            console.error("[saveChartSnapshot] D1 error:", err);
-          }
+        try {
+          const result = await d1
+            .prepare(
+              `INSERT INTO hd_chart_snapshots (id, email, locale, chart_data_json, created_at)
+               VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`
+            )
+            .bind(snapshotId, input.email, input.locale, input.chartDataJson)
+            .run();
+          if (!result.success) throw new Error("SNAPSHOT_INSERT_FAILED");
+        } catch (err) {
+          console.error("[saveChartSnapshot] Chart persistence failed");
+          throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHART_SNAPSHOT_PERSISTENCE_FAILED" });
         }
         return { snapshotId };
       }),
@@ -494,14 +502,14 @@ export const appRouter = router({
     createCheckout: publicProcedure
       .input(
         z.object({
-          plan: z.string().default("blueprint"),
+          plan: z.literal("blueprint").default("blueprint"),
           locale: z.enum(["cs", "en"]).default("cs"),
           origin: z.string().url(),
           customerEmail: z.string().email().max(100),
           customerName: z.string().max(100).optional(),
           digitalDeliveryConsent: z.boolean(),
           chartSnapshotId: z.string().optional(),
-          chartDataJson: z.string().max(300_000).optional(),
+          chartDataJson: z.string().min(2).max(300_000).optional(),
           redditClickId: z.string().optional(),
           openAIAdsMarketingConsent: z.boolean().optional(),
           openAIAdsOppref: z.string().optional(),
@@ -541,9 +549,10 @@ export const appRouter = router({
 
         const s2sKey = ctx.env?.PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN;
         if (!s2sKey) {
+          console.error("[createCheckout] Missing production paygate checkout credential");
           throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "PAYGATE_CHECKOUT_API_KEY_NOT_CONFIGURED",
+            code: "SERVICE_UNAVAILABLE",
+            message: "CHECKOUT_TEMPORARILY_UNAVAILABLE",
           });
         }
 
@@ -586,6 +595,19 @@ export const appRouter = router({
           }
         }
 
+        // A caller-supplied snapshot id is not proof that the personalized
+        // report exists or belongs to this customer. Fail before requesting payment.
+        const savedChart = snapshotId
+          ? await d1
+              .prepare("SELECT id FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) AND locale = ? LIMIT 1")
+              .bind(snapshotId, input.customerEmail.trim(), input.locale)
+              .first()
+              .catch(() => null)
+          : null;
+        if (!savedChart) {
+          throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHART_SNAPSHOT_REQUIRED" });
+        }
+
         const isCzech = input.locale === "cs";
         const offerKey = isCzech ? "hd-blueprint-cz" : "hd-blueprint-en";
         const payBase = (ctx.env?.PAY_BASE_URL || "https://pay.optimateo.com").replace(/\/$/, "");
@@ -625,11 +647,21 @@ export const appRouter = router({
 
         const data: any = await res.json();
         const refId = data.publicId || data.orderId;
-        if (!refId) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "GATEWAY_REFERENCE_MISSING",
-          });
+        const offer = getBlueprintOffer(input.locale);
+        let checkoutUrlValid = false;
+        try {
+          const checkoutUrl = new URL(data.checkoutUrl);
+          checkoutUrlValid = checkoutUrl.protocol === "https:" && checkoutUrl.origin === new URL(payBase).origin;
+        } catch { /* malformed gateway URL */ }
+        if (
+          typeof refId !== "string" || !refId ||
+          data.offerKey && data.offerKey !== offerKey ||
+          Number(data.amountMinor) !== offer.amountMinor ||
+          data.currency !== offer.currency ||
+          !checkoutUrlValid
+        ) {
+          console.error("[createCheckout] Gateway session does not match canonical Blueprint offer");
+          throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHECKOUT_TEMPORARILY_UNAVAILABLE" });
         }
 
         const initialToken = `tok_${crypto.randomUUID().replace(/-/g, "")}`;
@@ -651,8 +683,8 @@ export const appRouter = router({
               input.customerEmail,
               input.customerName || null,
               offerKey,
-              data.amountMinor || (isCzech ? 29000 : 1590),
-              data.currency || (isCzech ? "CZK" : "EUR"),
+              offer.amountMinor,
+              offer.currency,
               input.locale,
               snapshotId || null,
               initialToken,
@@ -660,6 +692,14 @@ export const appRouter = router({
                 digitalDeliveryConsent: true,
                 consentedAt: new Date().toISOString(),
                 redditClickId: input.redditClickId || null,
+                // The paid gateway callback executes later, in another request.
+                // Preserve checkout-time marketing choice but never raw birth data.
+                openAIAdsMarketingConsent: input.openAIAdsMarketingConsent === true,
+                openAIAdsOppref: input.openAIAdsMarketingConsent === true
+                  && typeof input.openAIAdsOppref === "string"
+                  && input.openAIAdsOppref.length <= 255
+                  && !Array.from(input.openAIAdsOppref).some((char: string) => char.charCodeAt(0) < 32)
+                    ? input.openAIAdsOppref : null,
               })
             )
             .run();
@@ -727,11 +767,9 @@ export const appRouter = router({
           }
         }
 
-        const isPaid =
-          payData?.status === "PAID" ||
-          payData?.status === "FULFILLED" ||
-          localOrder?.payment_status === "PAID" ||
-          localOrder?.fulfillment_status === "FULFILLED";
+        // Do not confirm a purchase without an existing, canonical D1 order.
+        // A gateway PAID flag is only trusted when amount, currency and offer match.
+        const isPaid = isVerifiedBlueprintPayment(localOrder, payData);
 
         if (isPaid && localOrder && localOrder.payment_status !== "PAID" && d1) {
           try {
@@ -751,12 +789,12 @@ export const appRouter = router({
         // Return authoritative status without leaking PII, chart data, or download tokens
         return {
           verified: isPaid,
-          status: payData?.status || localOrder?.payment_status || "NOT_FOUND",
+          status: isPaid ? "PAID" : (localOrder?.payment_status || "NOT_FOUND"),
           refId: input.refId,
-          amountMinor: payData?.amountMinor || localOrder?.amount_minor || 0,
-          currency: payData?.currency || localOrder?.currency || "CZK",
-          paidAt: payData?.paidAt || null,
-          offerKey: payData?.offerKey || localOrder?.offer_key || null,
+          amountMinor: localOrder?.amount_minor ?? 0,
+          currency: localOrder?.currency || "CZK",
+          paidAt: isPaid ? (payData?.paidAt || null) : null,
+          offerKey: localOrder?.offer_key || null,
           hasToken: Boolean(localOrder?.download_token),
         };
       }),
@@ -1380,9 +1418,76 @@ Sitemap: ${domain}/sitemap.xml
 `;
 }
 
+/**
+ * Only ONYX PAY's independently verified, locally fulfilled order is eligible.
+ * Persist a receipt after CAPI acknowledges the event; replay uses the same
+ * order ID for de-duplication. Failure never revokes a paid customer's access.
+ */
+async function reportVerifiedBlueprintPurchase(d1: D1Database, env: Env, paymentRef: string): Promise<void> {
+  const result = await executeTransactionalCapiOutbox(d1, env, paymentRef);
+  if (result === "FAILED") {
+    console.warn("[OpenAI CAPI Outbox] Confirmed order remains unreported; verify server secrets and retry callback");
+  }
+}
+
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, execution?: { waitUntil(promise: Promise<unknown>): void }): Promise<Response> {
     const url = new URL(request.url);
+
+    // This deployment runs as Cloudflare Pages, not the legacy Express server.
+    // Do not send customers to non-existent OAuth routes or pretend that a
+    // successful Google redirect would create an authenticated Pages session.
+    // These routes are intentionally closed until native OAuth, durable user
+    // persistence and auth.me/session verification are deployed together.
+    if (/^\/api\/oauth\/(?:login(?:\/(?:google|facebook|apple))?|callback\/(?:google|facebook|apple))$/.test(url.pathname)) {
+      const locale = url.hostname.includes("humandesignchart.app") ? "en" : "cs";
+      const headers = {
+        "cache-control": "no-store",
+        "referrer-policy": "no-referrer",
+      };
+      const isBrowserNavigation =
+        request.headers.get("sec-fetch-mode") === "navigate" ||
+        request.headers.get("accept")?.includes("text/html");
+      if (isBrowserNavigation) {
+        const destination = new URL(`/${locale}/login?auth=unavailable`, url.origin);
+        return new Response(null, {
+          status: 303,
+          headers: { ...headers, location: destination.toString() },
+        });
+      }
+      return Response.json(
+        { error: "OAUTH_UNAVAILABLE_ON_PAGES", loginPage: `/${locale}/login` },
+        { status: 503, headers },
+      );
+    }
+
+    if (url.pathname === "/api/health") {
+      if (request.method !== "GET" && request.method !== "HEAD") {
+        return new Response("Method not allowed", { status: 405, headers: { Allow: "GET, HEAD" } });
+      }
+      // Binding presence is configuration evidence only. Do not query customer
+      // data or claim that Stripe, gateway callbacks or email delivery were tested.
+      const integrations = {
+        checkout: Boolean(env.PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN?.trim()),
+        fulfillment: Boolean(env.HUMAN_DESIGN_FULFILLMENT_API_KEY?.trim()),
+        orders: Boolean(env.HD_ORDERS || env.DB),
+        email: Boolean(env.BREVO_API_KEY?.trim() || env.RESEND_API_KEY?.trim()),
+      };
+      const body = {
+        ok: true,
+        runtime: "cloudflare-pages",
+        payments: {
+          provider: "onyxpay",
+          configured: Object.values(integrations).every(Boolean),
+          verified: false,
+          callbackPath: "/api/internal/onyxpay/fulfill",
+          integrations,
+        },
+      };
+      return new Response(request.method === "HEAD" ? null : JSON.stringify(body), {
+        headers: { "content-type": "application/json", "cache-control": "no-store" },
+      });
+    }
 
     if (url.pathname === "/api/internal/onyxpay/fulfill") {
       if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
@@ -1412,9 +1517,12 @@ export default {
         event?.eventType !== "PAYMENT_CAPTURED" ||
         event?.tenant !== "human-design" ||
         !["hd-blueprint-cz", "hd-blueprint-en"].includes(event?.offerKey) ||
-        !event?.refId ||
-        !event?.eventId ||
-        !event?.customerEmail
+        typeof event?.refId !== "string" ||
+        typeof event?.eventId !== "string" ||
+        typeof event?.customerEmail !== "string" ||
+        !Number.isInteger(Number(event?.amount)) ||
+        Number(event?.amount) <= 0 ||
+        !["CZK", "EUR"].includes(event?.currency)
       ) {
         return Response.json({ ok: false, error: "INVALID_PAYMENT_EVENT" }, { status: 400 });
       }
@@ -1468,21 +1576,45 @@ export default {
       const isEn = event.offerKey === "hd-blueprint-en";
       const domain = isEn ? "https://humandesignchart.app" : "https://humandesignmapa.cz";
       const locale = isEn ? "en" : "cs";
+      const reportConversion = async () => {
+        const job = reportVerifiedBlueprintPurchase(d1, env, event.refId).catch(() => {
+          console.warn("[OpenAI CAPI] Event could not be reported; paid fulfillment is unaffected");
+        });
+        if (execution?.waitUntil) execution.waitUntil(job);
+        else await job;
+      };
 
       try {
         const existing: any = await d1
           .prepare(
-            `SELECT id, payment_status, fulfillment_status, delivery_status, download_token FROM hd_orders WHERE payment_ref = ? LIMIT 1`
+            `SELECT id, payment_status, fulfillment_status, delivery_status, download_token,
+                    chart_snapshot_id, customer_email, offer_key, amount_minor, currency
+             FROM hd_orders WHERE payment_ref = ? LIMIT 1`
           )
           .bind(event.refId)
           .first();
 
-        let downloadToken = existing?.download_token;
-        if (!downloadToken) {
-          downloadToken = `tok_${crypto.randomUUID().replace(/-/g, "")}`;
+        // Reject a paid event when the original order or personalized chart is
+        // unavailable. Never create an empty paid order or issue an unusable PDF.
+        const snapshot = existing?.chart_snapshot_id
+          ? await d1
+              .prepare("SELECT id FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) LIMIT 1")
+              .bind(existing.chart_snapshot_id, existing.customer_email)
+              .first()
+          : null;
+        const blocked = getBlueprintFulfillmentBlocker(existing, event, Boolean(snapshot));
+        if (blocked) {
+          console.error("[onyxpay-fulfill] Cannot fulfill blueprint without valid order and chart:", blocked);
+          return Response.json(
+            { ok: false, error: blocked, retryable: blocked === "CHART_SNAPSHOT_REQUIRED" },
+            { status: blocked === "CHART_SNAPSHOT_REQUIRED" ? 503 : 422 }
+          );
         }
 
-        if (existing?.fulfillment_status === "FULFILLED") {
+        const downloadToken = existing.download_token || `tok_${crypto.randomUUID().replace(/-/g, "")}`;
+
+        if (existing.fulfillment_status === "FULFILLED") {
+          await reportConversion();
           return Response.json({
             ok: true,
             status: "ALREADY_FULFILLED",
@@ -1493,46 +1625,44 @@ export default {
           });
         }
 
-        const orderId = existing?.id || `ord_${crypto.randomUUID()}`;
         const tokenExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-        await d1
+        // UPDATE only: the chart-bearing order must be created before checkout.
+        // An INSERT here could claim a paid Blueprint was delivered without a chart.
+        const updateRes = await d1
           .prepare(
-            `INSERT INTO hd_orders (
-              id, payment_ref, event_id, customer_email, customer_name, offer_key,
-              amount_minor, currency, locale,
-              payment_status, fulfillment_status, delivery_status, delivered_at,
-              ai_reading_credits, download_token, download_token_expires_at, created_at, updated_at
-            ) VALUES (
-              ?, ?, ?, ?, ?, ?,
-              ?, ?, ?,
-              'PAID', 'FULFILLED', 'READY', NULL,
-              5, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-            )
-            ON CONFLICT(payment_ref) DO UPDATE SET
-              event_id = excluded.event_id,
-              payment_status = 'PAID',
-              fulfillment_status = 'FULFILLED',
-              delivery_status = CASE WHEN hd_orders.delivery_status = 'DOWNLOADED' THEN 'DOWNLOADED' ELSE 'READY' END,
-              ai_reading_credits = COALESCE(hd_orders.ai_reading_credits, 5),
-              download_token = COALESCE(hd_orders.download_token, excluded.download_token),
-              download_token_expires_at = COALESCE(hd_orders.download_token_expires_at, excluded.download_token_expires_at),
-              updated_at = CURRENT_TIMESTAMP`
+            `UPDATE hd_orders
+             SET event_id = ?, payment_status = 'PAID', fulfillment_status = 'FULFILLED',
+                 delivery_status = CASE WHEN delivery_status = 'DOWNLOADED' THEN 'DOWNLOADED' ELSE 'READY' END,
+                 ai_reading_credits = COALESCE(ai_reading_credits, 5),
+                 download_token = COALESCE(download_token, ?),
+                 download_token_expires_at = COALESCE(download_token_expires_at, ?),
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE payment_ref = ? AND fulfillment_status != 'FULFILLED'`
           )
-          .bind(
-            orderId,
-            event.refId,
-            event.eventId,
-            event.customerEmail,
-            event.customerName || null,
-            event.offerKey,
-            event.amount,
-            event.currency,
-            locale,
-            downloadToken,
-            tokenExpiresAt
-          )
+          .bind(event.eventId, downloadToken, tokenExpiresAt, event.refId)
           .run();
+
+        if (!updateRes.success) throw new Error("FULFILLMENT_UPDATE_FAILED");
+        if (updateRes.meta?.changes === 0) {
+          // Another authenticated callback committed first. Read the canonical
+          // persisted token and acknowledge idempotently without a second email.
+          const committed: any = await d1
+            .prepare("SELECT fulfillment_status, download_token FROM hd_orders WHERE payment_ref = ?")
+            .bind(event.refId)
+            .first();
+          if (committed?.fulfillment_status !== "FULFILLED" || !committed.download_token) {
+            return Response.json({ ok: false, error: "FULFILLMENT_CONFLICT" }, { status: 503 });
+          }
+          await reportConversion();
+          return Response.json({
+            ok: true,
+            status: "ALREADY_FULFILLED",
+            refId: event.refId,
+            publicToken: committed.download_token,
+            reportAccessUrl: `${domain}/${locale}/payment/success?plan=blueprint&refId=${encodeURIComponent(event.refId)}&token=${committed.download_token}`,
+          });
+        }
 
         const accessUrl = `${domain}/${locale}/payment/success?plan=blueprint&refId=${encodeURIComponent(event.refId)}&token=${downloadToken}`;
 
@@ -1590,6 +1720,7 @@ export default {
             .run();
         }
 
+        await reportConversion();
         return Response.json({
           ok: true,
           status: "FULFILLED",
@@ -1623,6 +1754,42 @@ export default {
       });
     }
 
+    // Public Human Design calculation endpoint for GPT/MCP clients.
+    // This must be handled by the Cloudflare Pages worker: the legacy Express
+    // route is not deployed on this hosting target.
+    if (url.pathname === "/api/gpt/calculate") {
+      if (request.method !== "POST") {
+        return Response.json({ error: "METHOD_NOT_ALLOWED" }, { status: 405, headers: { Allow: "POST" } });
+      }
+      let payload: unknown;
+      try { payload = await request.json(); }
+      catch { return Response.json({ error: "INVALID_JSON" }, { status: 400 }); }
+      const parsed = z.object({
+        birthDate: z.string(), birthTime: z.string(),
+        latitude: z.number().finite().min(-90).max(90),
+        longitude: z.number().finite().min(-180).max(180),
+      }).safeParse(payload);
+      if (!parsed.success) return Response.json({ error: "INVALID_INPUT" }, { status: 400 });
+      try {
+        const { birthDate, birthTime, latitude, longitude } = parsed.data;
+        const canonical = ChartCalculationInputSchema.parse({
+          name: "API request", birthDate, birthTime, birthPlace: "API request",
+          latitude, longitude, timezone: lookupIanaTimezone(latitude, longitude),
+        });
+        const chart = ChartResultSchema.parse(calculateChart(canonical));
+        return Response.json({ success: true, type: chart.type, strategy: chart.strategy,
+          authority: chart.authority, profile: chart.profile,
+          credits: "Data provided by humandesignchart.app",
+          sponsorLink: "https://humandesignchart.app" },
+          { headers: { "cache-control": "no-store" } });
+      } catch (error) {
+        if (error instanceof z.ZodError || error instanceof TimezoneResolutionError)
+          return Response.json({ error: "INVALID_BIRTH_DATA" }, { status: 400 });
+        console.error("[gpt-calculate]", error);
+        return Response.json({ error: "CALCULATION_FAILED" }, { status: 500 });
+      }
+    }
+
     if (url.pathname.startsWith("/api/trpc")) {
       return fetchRequestHandler({
         endpoint: "/api/trpc",
@@ -1645,6 +1812,6 @@ export default {
     }
 
     const asset = await env.ASSETS.fetch(request);
-    return withServerRenderedSeoMeta(url, asset);
+    return withServerRenderedSeoMeta(publicSeoUrlFromRequest(request), asset);
   },
 };

@@ -1,99 +1,121 @@
 import { useEffect } from "react";
+import { trackGA4Event } from "./useGA4";
 
-interface Metric {
-  name: string;
-  value: number;
-  rating: "good" | "needs-improvement" | "poor";
+const CONSENT_KEY = "hd-cookie-consent";
+const CONSENT_EVENT = "hd:marketing-consent-changed";
+
+function analyticsAllowed(): boolean {
+  try {
+    const consent = JSON.parse(localStorage.getItem(CONSENT_KEY) || "{}");
+    return consent.accepted === true && consent.analytics === true;
+  } catch {
+    return false;
+  }
 }
+type Rating = "good" | "needs-improvement" | "poor";
+type Vital = { name: string; value: number; rating: Rating };
+const classify = (value: number, good: number, poor: number): Rating =>
+  value <= good ? "good" : value <= poor ? "needs-improvement" : "poor";
 
-function rating(value: number, thresholds: [number, number]): Metric["rating"] {
-  if (value <= thresholds[0]) return "good";
-  if (value <= thresholds[1]) return "needs-improvement";
-  return "poor";
-}
-
+/**
+ * Consent-gated page performance monitoring.
+ * GA4 is the delivery transport; the old beacon pointed to a missing Cloudflare
+ * handler (returning SPA HTML), so it could never persist metrics.
+ *
+ * INP_ESTIMATE is the highest observed event duration, NOT Google's complete
+ * field INP estimator. Do not relabel it as validated Core Web Vitals INP.
+ * No URL query, UA, birth data or other PII leaves this hook.
+ */
 export function useReportWebVitals(enabled = true) {
   useEffect(() => {
-    if (!enabled || !("PerformanceObserver" in window)) return;
+    if (!enabled || typeof window === "undefined" || !("PerformanceObserver" in window)) return;
+    let started = false;
+    let reported = false;
+    const observers: PerformanceObserver[] = [];
+    const values: Record<string, number> = {};
 
-    const metrics: Metric[] = [];
-
-    // LCP
-    try {
-      const lcpObs = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const last = entries[entries.length - 1];
-        metrics.push({
-          name: "LCP",
-          value: last.startTime,
-          rating: rating(last.startTime, [2500, 4000]),
-        });
-      });
-      lcpObs.observe({ type: "largest-contentful-paint", buffered: true });
-    } catch {
-      // Observer is not supported by every browser.
-    }
-
-    // FID
-    try {
-      const fidObs = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          const fidEntry = entry as PerformanceEventTiming;
-          metrics.push({
-            name: "FID",
-            value: fidEntry.processingStart - fidEntry.startTime,
-            rating: rating(fidEntry.processingStart - fidEntry.startTime, [100, 300]),
-          });
-        }
-      });
-      fidObs.observe({ type: "first-input", buffered: true });
-    } catch {
-      // Observer is not supported by every browser.
-    }
-
-    // CLS
-    try {
-      let clsValue = 0;
-      const clsObs = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          if (!(entry as any).hadRecentInput) {
-            clsValue += (entry as any).value || 0;
-          }
-        }
-      });
-      clsObs.observe({ type: "layout-shift", buffered: true });
-
-      // Report CLS on pagehide
-      window.addEventListener("pagehide", () => {
-        metrics.push({
-          name: "CLS",
-          value: clsValue,
-          rating: rating(clsValue, [0.1, 0.25]),
-        });
-        sendMetrics(metrics);
-      });
-    } catch {
-      // Observer is not supported by every browser.
-    }
-
-    // Report on pagehide (for LCP/FID)
-    window.addEventListener("pagehide", () => {
-      if (metrics.length > 0) sendMetrics(metrics);
-    });
-
-    function sendMetrics(ms: Metric[]) {
-      if (ms.length === 0) return;
-      const payload = ms.map((m) => `${m.name}=${m.value.toFixed(2)}(${m.rating})`).join(", ");
-      console.log("[Web Vitals]", payload);
-      // Send to backend via beacon
+    function start() {
+      if (started || !analyticsAllowed()) return;
+      started = true;
       try {
-        const blob = new Blob([JSON.stringify({ metrics: ms, url: location.pathname, ua: navigator.userAgent.slice(0, 80) })], {
-          type: "application/json",
+        const observer = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            values.LCP = entry.startTime;
+          }
         });
-        navigator.sendBeacon?.("/api/analytics/web-vitals", blob);
-      } catch {
-        // Analytics must never interrupt the page lifecycle.
+        observer.observe({ type: "largest-contentful-paint", buffered: true });
+        observers.push(observer);
+      } catch { /* unsupported */ }
+
+      try {
+        let cls = 0;
+        const observer = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            if (!(entry as PerformanceEntry & { hadRecentInput?: boolean }).hadRecentInput) {
+              cls += (entry as PerformanceEntry & { value?: number }).value || 0;
+            }
+          }
+          values.CLS = cls;
+        });
+        observer.observe({ type: "layout-shift", buffered: true });
+        observers.push(observer);
+      } catch { /* unsupported */ }
+
+      try {
+        const observer = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            const duration = (entry as PerformanceEntry & { duration?: number }).duration || 0;
+            values.INP_ESTIMATE = Math.max(values.INP_ESTIMATE || 0, duration);
+          }
+        });
+        observer.observe({ type: "event", buffered: true, durationThreshold: 40 } as PerformanceObserverInit);
+        observers.push(observer);
+      } catch { /* unsupported */ }
+    }
+
+    function stop() {
+      observers.forEach((observer) => observer.disconnect());
+      observers.length = 0;
+      started = false;
+      // Revoke collected-but-not-sent observations when consent is withdrawn.
+      for (const name of Object.keys(values)) delete values[name];
+    }
+
+    function flush() {
+      if (reported || !analyticsAllowed()) return;
+      const metrics: Vital[] = [];
+      if (Number.isFinite(values.LCP)) metrics.push({ name: "LCP", value: values.LCP, rating: classify(values.LCP, 2500, 4000) });
+      if (Number.isFinite(values.CLS)) metrics.push({ name: "CLS", value: values.CLS, rating: classify(values.CLS, 0.1, 0.25) });
+      if (Number.isFinite(values.INP_ESTIMATE)) metrics.push({ name: "INP_ESTIMATE", value: values.INP_ESTIMATE, rating: classify(values.INP_ESTIMATE, 200, 500) });
+      if (!metrics.length) return;
+      reported = true;
+      for (const metric of metrics) {
+        trackGA4Event("web_vital", {
+          metric_name: metric.name,
+          metric_value: Math.round(metric.value * 100) / 100,
+          metric_rating: metric.rating,
+          page_path: location.pathname,
+          transport_type: "beacon",
+        });
       }
     }
+
+    const onConsent = () => {
+      if (analyticsAllowed()) start();
+      else stop();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    onConsent();
+    window.addEventListener(CONSENT_EVENT, onConsent);
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", flush);
+    return () => {
+      window.removeEventListener(CONSENT_EVENT, onConsent);
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", flush);
+      stop();
+    };
   }, [enabled]);
 }

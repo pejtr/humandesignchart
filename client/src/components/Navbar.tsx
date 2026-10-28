@@ -115,7 +115,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
     { ...primaryLinks[1], compactLabel: locale === "cs" ? "Tranzit" : "Transit" },
     { ...primaryLinks[2], compactLabel: locale === "cs" ? "Porovnání" : "Compare" },
     { ...primaryLinks[3], compactLabel: "Blog" },
-    { href: "/honorace", label: locale === "cs" ? "Honorace" : "Honorarium", compactLabel: locale === "cs" ? "Honorace" : "Honorarium", icon: CreditCard },
+    { href: "/honorace", label: locale === "cs" ? "Ceník" : "Pricing", compactLabel: locale === "cs" ? "Ceník" : "Pricing", icon: CreditCard },
   ];
 
   const toolsLinks = [
@@ -144,9 +144,9 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
         ? "bg-background/95 backdrop-blur-xl shadow-sm border-b border-border/20"
         : "bg-background/70 backdrop-blur-md border-b border-border/10"
         }`}>
-        <nav className="w-full flex items-center justify-between h-16 px-3 sm:px-4 xl:px-8 relative gap-2 sm:gap-4 max-w-screen-2xl mx-auto">
+        <nav className="w-full flex items-center justify-between h-16 px-3 sm:px-4 xl:px-8 relative gap-2 sm:gap-4 max-w-[2200px] mx-auto">
           {/* Left: Logo */}
-          <div className="flex shrink-0 items-center justify-start gap-3 min-w-0 max-w-[min(43vw,330px)] min-[1800px]:max-w-[320px]">
+          <div className="flex shrink-0 items-center justify-start gap-3 min-w-0">
             <Link href={localePath("/")} aria-label={locale === "cs" ? "Human Design — domů" : "Human Design — home"} className="flex items-center gap-2.5 no-underline shrink-0 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600 via-purple-600 to-indigo-700 flex items-center justify-center shadow-md shadow-red-500/20 group-hover:shadow-red-500/40 transition-shadow">
                 <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -163,24 +163,24 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
               </div>
               <div className="flex flex-col">
                 <span className="font-serif text-lg font-bold tracking-tight text-foreground hidden sm:block truncate">
-                  {locale === "cs" ? "HUMAN DESIGN MAPA" : "HUMAN DESIGN CHARTS"}
+                  {locale === "cs" ? "HUMAN DESIGN MAPA" : "HUMAN DESIGN CHART"}
                 </span>
                 
               </div>
             </Link>
-            {!offerMode && <div className="hidden min-[1850px]:block min-w-0">
+            {!offerMode && <div className="hidden min-[2200px]:block min-w-0">
               <DailyInsightBadge />
             </div>}
           </div>
 
           {/* Center: Desktop nav links */}
-          {!offerMode && <div className="hidden min-[1800px]:flex flex-1 items-center justify-center gap-1 min-w-0 whitespace-nowrap">
+          {!offerMode && <div className="hidden min-[1860px]:flex flex-1 items-center justify-center gap-1 min-[1860px]:gap-2 min-w-0 whitespace-nowrap">
             {primaryLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <Button
                   variant={isActive(link.href) ? "secondary" : "ghost"}
                   size="sm"
-                  className="text-sm px-2.5 font-medium"
+                  className="shrink-0 whitespace-nowrap text-sm px-2.5 font-medium"
                 >
                   <link.icon className="w-4 h-4 mr-1.5 opacity-80" />
                   {link.label}
@@ -191,7 +191,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
             {/* Tools dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-sm px-2 gap-1">
+                <Button variant="ghost" size="sm" className="shrink-0 whitespace-nowrap text-sm px-2 gap-1">
                   <Flame className="w-4 h-4" />
                   <span>{locale === "cs" ? "Nástroje" : "Tools"}</span>
                   <ChevronDown className="w-3 h-3 opacity-60" />
@@ -215,7 +215,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
             {/* Explore dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-sm px-2 gap-1 hidden min-[1800px]:inline-flex">
+                <Button variant="ghost" size="sm" className="text-sm px-2 gap-1 hidden min-[1860px]:inline-flex">
                   <Sparkles className="w-4 h-4" />
                   {locale === "cs" ? "Prozkoumat" : "Explore"}
                   <ChevronDown className="w-3 h-3 opacity-60" />
@@ -239,7 +239,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
           </div>}
 
           {/* Compact primary nav: preserve the key actions before opening the menu. */}
-          <div className="hidden md:flex min-[1800px]:hidden flex-1 items-center justify-center gap-1 min-w-0">
+          <div className="hidden md:flex min-[1860px]:hidden flex-1 items-center justify-center gap-1 min-w-0">
             {compactPrimaryLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <Button
@@ -260,7 +260,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
           {/* Right: Controls (Desktop + Mobile) */}
           <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop right section: premium + theme toggle + currency + language + user */}
-            <div className="hidden min-[1800px]:flex items-center gap-1.5 shrink-0">
+            <div className="hidden min-[1860px]:flex items-center gap-1.5 shrink-0">
               {!offerMode && <Link href={localePath("/honorace")}>
                 <Button
                   variant={isActive("/honorace") ? "secondary" : "ghost"}
@@ -377,7 +377,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
             </div>
 
             {/* Compact navigation: keep sign-in visible, with the full menu one tap away. */}
-            <div className="flex min-[1800px]:hidden items-center gap-1">
+            <div className="flex min-[1860px]:hidden items-center gap-1">
               {!isAuthenticated && (
                 <a href={getLoginUrl()} aria-label={t.common.signIn}>
                   <Button aria-label={t.common.signIn} size="sm" className="h-9 px-2 sm:px-3 bg-primary text-primary-foreground hover:bg-primary/90">
@@ -417,7 +417,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
       {/* Full-screen mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-[60] min-[1800px]:hidden"
+          className="fixed inset-0 z-[120] min-[1860px]:hidden"
           style={{ animation: "fadeIn 0.2s ease-out" }}
           aria-hidden="true"
         >
@@ -436,7 +436,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
         role="dialog"
         aria-modal="true"
         aria-label={locale === "cs" ? "Navigační menu" : "Navigation menu"}
-        className="fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm z-[70] bg-background flex flex-col min-[1800px]:hidden"
+        className="fixed top-0 right-0 bottom-0 w-[85vw] max-w-sm z-[130] bg-background flex flex-col min-[1860px]:hidden"
         style={{
           transform: mobileOpen ? "translateX(0)" : "translateX(100%)",
           transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -461,7 +461,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
                 <line x1="16.8" y1="7" x2="14" y2="10.5" />
               </svg>
             </div>
-            <span className="font-serif text-lg font-bold tracking-tight text-foreground">{locale === "cs" ? "Human Design Mapa" : "Human Design Charts"}</span>
+            <span className="font-serif text-lg font-bold tracking-tight text-foreground">Human Design</span>
           </Link>
           <div className="flex items-center gap-1">
             {/* Theme toggle — mobile */}
@@ -532,7 +532,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive("/honorace") ? "bg-primary/20" : "bg-muted"}`}>
                   <CreditCard className="w-4 h-4" />
                 </div>
-                <span>{locale === "cs" ? "Honorace" : "Honorarium"}</span>
+                <span>{locale === "cs" ? "Ceník" : "Pricing"}</span>
               </button>
             </Link>
           </div>

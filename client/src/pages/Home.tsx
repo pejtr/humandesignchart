@@ -60,7 +60,7 @@ function getTypesData(isCs: boolean) {
       color: "bg-amber-50 border-amber-200",
       pctColor: "text-orange-500",
       imgUrl:
-        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/IxAVlaOWqHGkhytp.webp",
+        "/images/types/generator.webp",
     },
     {
       name: "Manifesting Generator",
@@ -74,7 +74,7 @@ function getTypesData(isCs: boolean) {
       color: "bg-red-50 border-red-200",
       pctColor: "text-red-500",
       imgUrl:
-        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/qWsAFzAtJmYBPSzE.webp",
+        "/images/types/manifesting-generator.webp",
     },
     {
       name: "Projector",
@@ -88,7 +88,7 @@ function getTypesData(isCs: boolean) {
       color: "bg-violet-50 border-violet-200",
       pctColor: "text-violet-500",
       imgUrl:
-        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/uyvogIBNHAiNkHXh.webp",
+        "/images/types/projector.webp",
     },
     {
       name: "Manifestor",
@@ -102,7 +102,7 @@ function getTypesData(isCs: boolean) {
       color: "bg-emerald-50 border-emerald-200",
       pctColor: "text-emerald-500",
       imgUrl:
-        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/rMbULSgMTGcVzRZZ.webp",
+        "/images/types/manifestor.webp",
     },
     {
       name: "Reflector",
@@ -116,7 +116,7 @@ function getTypesData(isCs: boolean) {
       color: "bg-slate-50 border-slate-200",
       pctColor: "text-slate-500",
       imgUrl:
-        "https://files.manuscdn.com/user_upload_by_module/session_file/310419663032296198/UWRWlEUvFOKUinyN.webp",
+        "/images/types/reflector.webp",
     },
   ];
 }
@@ -310,34 +310,34 @@ export default function Home() {
   const howItWorks = isCs
     ? [
         {
-          image: "/images/how-gifts.png",
+          image: "/images/how-gifts.avif",
           title: "1. Pochopte své dary",
           desc: "Zjistěte svůj typ, profil a autoritu. Poznejte, jak přirozeně fungujete a co vás skutečně naplňuje.",
         },
         {
-          image: "/images/how-relationships.png",
+          image: "/images/how-relationships.avif",
           title: "2. Zlepšete své vztahy",
           desc: "Porovnejte mapy s blízkými. Pochopte dynamiku vašich vztahů a jak spolu lépe fungovat.",
         },
         {
-          image: "/images/how-purpose.png",
+          image: "/images/how-purpose.avif",
           title: "3. Najděte svůj účel",
           desc: "Prozkoumejte svůj inkarnační kříž a brány. Objevte své životní poslání a směr.",
         },
       ]
     : [
         {
-          image: "/images/how-gifts.png",
+          image: "/images/how-gifts.avif",
           title: "1. Understand your gifts",
           desc: "Discover your type, profile, and authority. Learn how you naturally operate and what truly fulfills you.",
         },
         {
-          image: "/images/how-relationships.png",
+          image: "/images/how-relationships.avif",
           title: "2. Improve your relationships",
           desc: "Compare charts with loved ones. Understand the dynamics of your relationships and how to work better together.",
         },
         {
-          image: "/images/how-purpose.png",
+          image: "/images/how-purpose.avif",
           title: "3. Find your purpose",
           desc: "Explore your incarnation cross and gates. Discover your life mission and direction.",
         },
@@ -353,7 +353,7 @@ export default function Home() {
           cat: "Základy HD",
           catStyle: "bg-amber-100 text-amber-800 border-amber-200",
           time: 8,
-          cover: "/images/blog_what_is_hd.png",
+          cover: "/images/blog_what_is_hd.avif",
           featured: true,
         },
         {
@@ -364,7 +364,7 @@ export default function Home() {
           cat: "Typy",
           catStyle: "bg-violet-100 text-violet-800 border-violet-200",
           time: 10,
-          cover: "/images/blog_5_types.png",
+          cover: "/images/blog_5_types.avif",
           featured: false,
         },
         {
@@ -375,7 +375,7 @@ export default function Home() {
           cat: "Strategie",
           catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200",
           time: 7,
-          cover: "/images/blog_strategy.png",
+          cover: "/images/blog_strategy.avif",
           featured: false,
         },
         {
@@ -386,7 +386,7 @@ export default function Home() {
           cat: "Autorita",
           catStyle: "bg-rose-100 text-rose-800 border-rose-200",
           time: 9,
-          cover: "/images/blog_authority.png",
+          cover: "/images/blog_authority.avif",
           featured: false,
         },
         {
@@ -397,7 +397,7 @@ export default function Home() {
           cat: "Profily",
           catStyle: "bg-sky-100 text-sky-800 border-sky-200",
           time: 11,
-          cover: "/images/blog_profiles.png",
+          cover: "/images/blog_profiles.avif",
           featured: false,
         },
         {
@@ -408,7 +408,7 @@ export default function Home() {
           cat: "Vztahy",
           catStyle: "bg-pink-100 text-pink-800 border-pink-200",
           time: 8,
-          cover: "/images/blog_relationships.png",
+          cover: "/images/blog_relationships.avif",
           featured: false,
         },
       ]
@@ -421,7 +421,7 @@ export default function Home() {
           cat: "HD Basics",
           catStyle: "bg-amber-100 text-amber-800 border-amber-200",
           time: 8,
-          cover: "/images/blog_what_is_hd.png",
+          cover: "/images/blog_what_is_hd.avif",
           featured: true,
         },
         {
@@ -432,7 +432,7 @@ export default function Home() {
           cat: "Types",
           catStyle: "bg-violet-100 text-violet-800 border-violet-200",
           time: 10,
-          cover: "/images/blog_5_types.png",
+          cover: "/images/blog_5_types.avif",
           featured: false,
         },
         {
@@ -443,7 +443,7 @@ export default function Home() {
           cat: "Strategy",
           catStyle: "bg-emerald-100 text-emerald-800 border-emerald-200",
           time: 7,
-          cover: "/images/blog_strategy.png",
+          cover: "/images/blog_strategy.avif",
           featured: false,
         },
         {
@@ -454,7 +454,7 @@ export default function Home() {
           cat: "Authority",
           catStyle: "bg-rose-100 text-rose-800 border-rose-200",
           time: 9,
-          cover: "/images/blog_authority.png",
+          cover: "/images/blog_authority.avif",
           featured: false,
         },
         {
@@ -465,7 +465,7 @@ export default function Home() {
           cat: "Profiles",
           catStyle: "bg-sky-100 text-sky-800 border-sky-200",
           time: 11,
-          cover: "/images/blog_profiles.png",
+          cover: "/images/blog_profiles.avif",
           featured: false,
         },
         {
@@ -476,7 +476,7 @@ export default function Home() {
           cat: "Relationships",
           catStyle: "bg-pink-100 text-pink-800 border-pink-200",
           time: 8,
-          cover: "/images/blog_relationships.png",
+          cover: "/images/blog_relationships.avif",
           featured: false,
         },
       ];
@@ -545,7 +545,7 @@ export default function Home() {
             <div className="hd-wow-orbit hd-wow-orbit-one" aria-hidden="true" />
             <div className="hd-wow-orbit hd-wow-orbit-two" aria-hidden="true" />
             <div className="hd-wow-image-halo" aria-hidden="true" />
-            <img className="hd-wow-portrait" src="/images/brand/veleknezka-master-v1.png" alt="" fetchPriority="high" decoding="async" />
+            <img className="hd-wow-portrait" src="/images/brand/veleknezka-master-v1.avif" alt="" fetchPriority="high" loading="eager" decoding="async" width={941} height={1672} />
             <span className="hd-wow-spark hd-wow-spark-a" aria-hidden="true">✦</span>
             <span className="hd-wow-spark hd-wow-spark-b" aria-hidden="true">✧</span>
             <span className="hd-wow-spark hd-wow-spark-c" aria-hidden="true">✦</span>
