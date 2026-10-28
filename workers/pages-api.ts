@@ -1434,6 +1434,33 @@ export default {
   async fetch(request: Request, env: Env, execution?: { waitUntil(promise: Promise<unknown>): void }): Promise<Response> {
     const url = new URL(request.url);
 
+    // This deployment runs as Cloudflare Pages, not the legacy Express server.
+    // Do not send customers to non-existent OAuth routes or pretend that a
+    // successful Google redirect would create an authenticated Pages session.
+    // These routes are intentionally closed until native OAuth, durable user
+    // persistence and auth.me/session verification are deployed together.
+    if (/^\/api\/oauth\/(?:login(?:\/(?:google|facebook|apple))?|callback\/(?:google|facebook|apple))$/.test(url.pathname)) {
+      const locale = url.hostname.includes("humandesignchart.app") ? "en" : "cs";
+      const headers = {
+        "cache-control": "no-store",
+        "referrer-policy": "no-referrer",
+      };
+      const isBrowserNavigation =
+        request.headers.get("sec-fetch-mode") === "navigate" ||
+        request.headers.get("accept")?.includes("text/html");
+      if (isBrowserNavigation) {
+        const destination = new URL(`/${locale}/login?auth=unavailable`, url.origin);
+        return new Response(null, {
+          status: 303,
+          headers: { ...headers, location: destination.toString() },
+        });
+      }
+      return Response.json(
+        { error: "OAUTH_UNAVAILABLE_ON_PAGES", loginPage: `/${locale}/login` },
+        { status: 503, headers },
+      );
+    }
+
     if (url.pathname === "/api/health") {
       if (request.method !== "GET" && request.method !== "HEAD") {
         return new Response("Method not allowed", { status: 405, headers: { Allow: "GET, HEAD" } });
