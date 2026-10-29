@@ -24,6 +24,15 @@ describe("Cloudflare-native Google OAuth release guard", () => {
     expect(res?.headers.get("cache-control")).toContain("no-store");
   });
 
+  it("redirects a browser to the local login page when Google is unavailable", async () => {
+    const res = await handleGoogleAuth(new Request(CS + "/api/oauth/login/google", {
+      headers: { accept: "text/html" },
+    }), {});
+    expect(res?.status).toBe(303);
+    expect(res?.headers.get("location")).toBe("/cs/login?auth=unavailable");
+    expect(res?.headers.get("set-cookie")).toContain("Max-Age=0");
+  });
+
   it("accepts only the four specified production hostnames", async () => {
     const response = await handleGoogleAuth(new Request("https://attacker.example/api/auth/config"), env);
     expect(response?.status).toBe(404);
