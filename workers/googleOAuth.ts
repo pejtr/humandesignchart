@@ -44,8 +44,18 @@ const fail = (url: URL) => {
   return new Response(null, {status: 303, headers: head});
 };
 export async function googleLogin(request: Request, env: AuthEnv, url: URL): Promise<Response> {
-  if (!(await googleAvailable(env)))
+  if (!(await googleAvailable(env))) {
+    // Direct browser navigation must never display a raw JSON error.
+    // The localized login page explains that Google sign-in is unavailable.
+    const acceptsHtml = request.headers.get("sec-fetch-mode") === "navigate" ||
+      request.headers.get("accept")?.includes("text/html") === true;
+    if (acceptsHtml) {
+      const headers = h({ location: "/" + loc(url.hostname) + "/login?auth=unavailable" });
+      headers.append("set-cookie", cookie(OAUTH, "", 0));
+      return new Response(null, { status: 303, headers });
+    }
     return Response.json({error:"GOOGLE_LOGIN_NOT_CONFIGURED"}, {status:503,headers:h()});
+  }
   const state = { s: token(), n: token(), v: token(), at: Date.now(), host:url.host,
     back:safeReturnPath(url.searchParams.get("returnTo"),loc(url.hostname)) };
   const target = new URL("https://accounts.google.com/o/oauth2/v2/auth");
