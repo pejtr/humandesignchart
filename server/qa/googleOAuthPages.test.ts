@@ -36,7 +36,7 @@ describe("Cloudflare-native Google OAuth release guard", () => {
 
   it("rejects external returnTo destinations and API paths", () => {
     for (const value of ["https://attacker.example","//attacker.example","/api/secret", "/\\attacker.example"])
-      expect(safeReturnPath(value,"cs")).toBe("/cs/dashboard");
+      expect(safeReturnPath(value,"cs")).toBe("/cs/account");
     expect(safeReturnPath("/en/dashboard?tab=charts","en")).toBe("/en/dashboard?tab=charts");
   });
 
