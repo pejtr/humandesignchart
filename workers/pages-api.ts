@@ -1446,11 +1446,9 @@ export default {
     const oauthResponse = await handleGoogleAuth(request, env);
     if (oauthResponse) return oauthResponse;
 
-    // This deployment runs as Cloudflare Pages, not the legacy Express server.
-    // Do not send customers to non-existent OAuth routes or pretend that a
-    // successful Google redirect would create an authenticated Pages session.
-    // These routes are intentionally closed until native OAuth, durable user
-    // persistence and auth.me/session verification are deployed together.
+    // Google is handled above by Cloudflare-native OAuth only after the
+    // D1 schema and Google credentials are configured. The unsupported
+    // Facebook/Apple legacy Express routes remain fail-closed.
     if (/^\/api\/oauth\/(?:login(?:\/(?:google|facebook|apple))?|callback\/(?:google|facebook|apple))$/.test(url.pathname)) {
       const locale = url.hostname.includes("humandesignchart.app") ? "en" : "cs";
       const headers = {
