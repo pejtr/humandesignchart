@@ -1,4 +1,5 @@
 import { initTRPC, TRPCError } from "@trpc/server";
+import { authStatus, clearSessionCookie, getAuthenticatedUser, googleOAuthRoute, type AuthEnv } from "./google-oauth";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import superjson from "superjson";
 import { z } from "zod";
@@ -27,7 +28,7 @@ import { buildVerifiedCloudflareOrderEvent, sendVerifiedOpenAIEventWithSecrets, 
 import { getReadingPrompt, getSystemPrompt } from "../server/ai/prompts";
 type D1Database = any;
 
-type Env = {
+type Env = AuthEnv & {
   HUMAN_DESIGN_FULFILLMENT_API_KEY?: string;
   PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN?: string;
   PAY_BASE_URL?: string;
@@ -443,7 +444,8 @@ async function generateHumanDesignAiReading(params: {
 
 export const appRouter = router({
   auth: router({
-    me: publicProcedure.query(() => null),
+    me: publicProcedure.query(({ ctx }) => getAuthenticatedUser(ctx.request, ctx.env)),
+    logout: publicProcedure.mutation(() => ({ success: true as const })),
   }),
   chart: chartRouter,
   publicStats: publicStatsRouter,
@@ -1434,6 +1436,16 @@ export default {
   async fetch(request: Request, env: Env, execution?: { waitUntil(promise: Promise<unknown>): void }): Promise<Response> {
     const url = new URL(request.url);
 
+    // Google OAuth and account lookup run directly inside the Pages Worker.
+    if (url.pathname === "/api/auth/status") {
+      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
+      return authStatus(request, env);
+    }
+    if (url.pathname === "/api/oauth/login" || url.pathname === "/api/oauth/login/google" ||
+        url.pathname === "/api/oauth/callback/google") {
+      return googleOAuthRoute(request, env);
+    }
+
     // This deployment runs as Cloudflare Pages, not the legacy Express server.
     // Do not send customers to non-existent OAuth routes or pretend that a
     // successful Google redirect would create an authenticated Pages session.
@@ -1791,7 +1803,11 @@ export default {
     }
 
     if (url.pathname.startsWith("/api/trpc")) {
-      return fetchRequestHandler({
+      const isLogout = url.pathname === "/api/trpc/auth.logout" && request.method === "POST";
+      const origin = request.headers.get("origin");
+      if (isLogout && origin && origin !== url.origin)
+        return Response.json({ error: "INVALID_ORIGIN" }, { status: 403 });
+      const response = await fetchRequestHandler({
         endpoint: "/api/trpc",
         req: request,
         router: appRouter,
@@ -1800,6 +1816,11 @@ export default {
           console.error("[pages-api]", path, error.code, error.message);
         },
       });
+      if (!isLogout || !response.ok) return response;
+      const headers = new Headers(response.headers);
+      headers.append("set-cookie", clearSessionCookie());
+      headers.set("cache-control", "no-store");
+      return new Response(response.body, { status: response.status, headers });
     }
 
     // API requests must never silently return the SPA HTML shell. Unknown
