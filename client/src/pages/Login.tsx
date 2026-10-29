@@ -1,18 +1,27 @@
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, Compass, Info, LockKeyhole } from "lucide-react";
+import { ArrowLeft, Compass, Info, LockKeyhole, LogIn } from "lucide-react";
 
 export default function Login() {
   const { locale, localePath } = useLanguage();
   const [, navigate] = useLocation();
   const isEn = locale === "en";
+  const [googleReady, setGoogleReady] = useState(false);
+  const [checking, setChecking] = useState(true);
 
-  // Authentication endpoints live in the legacy Express server. The current
-  // Cloudflare Pages application does not have OAuth sessions or user storage.
-  // Never expose a clickable Google / Facebook / Apple button leading to a
-  // missing API route, or pretend that a sign-in succeeded.
+  useEffect(() => {
+    const abort = new AbortController();
+    fetch("/api/auth/status", { credentials: "same-origin", cache: "no-store", signal: abort.signal })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((status) => { if (!abort.signal.aborted) setGoogleReady(status?.google === true); })
+      .catch(() => { if (!abort.signal.aborted) setGoogleReady(false); })
+      .finally(() => { if (!abort.signal.aborted) setChecking(false); });
+    return () => abort.abort();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md shadow-xl">
@@ -24,29 +33,40 @@ export default function Login() {
             {isEn ? "Your account, securely" : "Váš účet, bezpečně"}
           </CardTitle>
           <CardDescription className="text-muted-foreground text-sm">
-            {isEn ? "A quick update on account access" : "Aktuální informace o přihlášení"}
+            {isEn ? "Sign in to your Human Design account" : "Přihlaste se ke svému účtu Human Design"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div role="status" className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
-            <div className="flex items-start gap-3">
-              <Info className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-              <div>
-                <p className="text-sm font-semibold">
-                  {isEn ? "Google sign-in is temporarily unavailable" : "Přihlášení přes Google je dočasně nedostupné"}
-                </p>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                  {isEn
-                    ? "We are connecting secure account access to our new hosting infrastructure. Google, Facebook and Apple buttons are disabled until the complete sign-in flow is verified. We won't ask you to sign in through a broken page."
-                    : "Dokončujeme bezpečné přihlášení v nové infrastruktuře. Tlačítka Google, Facebook a Apple zůstanou vypnutá, dokud neověříme celé přihlášení. Nebudeme vás přesměrovávat na nefunkční stránku."}
-                </p>
+          {googleReady ? (
+            <Button className="w-full gap-2" onClick={() => window.location.assign("/api/oauth/login/google")}>
+              <LogIn className="h-4 w-4" aria-hidden="true" />
+              {isEn ? "Continue with Google" : "Pokračovat přes Google"}
+            </Button>
+          ) : (
+            <div role="status" className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+              <div className="flex items-start gap-3">
+                <Info className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+                <div>
+                  <p className="text-sm font-semibold">
+                    {checking
+                      ? (isEn ? "Checking secure sign-in…" : "Ověřuji zabezpečené přihlášení…")
+                      : (isEn ? "Google sign-in is temporarily unavailable" : "Přihlášení přes Google je dočasně nedostupné")}
+                  </p>
+                  {!checking && (
+                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                      {isEn
+                        ? "Account access will reopen once Google OAuth and secure account storage are configured. You can still calculate a free chart."
+                        : "Přihlášení obnovíme po dokončení konfigurace Google OAuth a bezpečného ukládání účtů. Mapu zdarma lze stále vypočítat."}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="rounded-xl bg-primary/[0.06] px-4 py-4">
             <p className="text-sm font-semibold">
-              {isEn ? "You can still explore your free chart" : "Svou mapu můžete prozkoumat i bez účtu"}
+              {isEn ? "You can also explore your free chart" : "Svou mapu můžete prozkoumat i bez účtu"}
             </p>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
               {isEn
