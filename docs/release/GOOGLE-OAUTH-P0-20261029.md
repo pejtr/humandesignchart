@@ -11,9 +11,10 @@ the existing Direct Upload project. PR #77 was only a fail-closed UX mitigation.
 - Users keyed by Google's immutable subject, not mutable email. Cryptographically
   random session cookies are Secure + HttpOnly + SameSite=Lax + host-only, with
   only a SHA-256 hash persisted in D1 and 30-day fixed expiry.
-- Additive D1 users and sessions migration. Session-aware auth.me, real logout.
+- Additive D1 users and sessions migration. Session-aware auth.me, real logout (session revoked and host-only cookie cleared).
 - CZ and EN login buttons appear only if the Cloudflare production Worker
   confirms both Google configuration AND migrated D1 tables.
+- A new /cs/account and /en/account landing shows verified signed-in identity and real logout. Old /dashboard depends on legacy APIs not yet implemented in Pages and is NOT the OAuth default.
 - Existing payment gates, free calculator, legacy customer records and
   premium credits are left unchanged.
 
@@ -36,15 +37,21 @@ the existing Direct Upload project. PR #77 was only a fail-closed UX mitigation.
 4. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET ONLY in Cloudflare Pages
    production secrets on the existing project, not in source, GitHub Actions,
    browser VITE_ variables, pull request, chat, or logs.
-5. Run pnpm check, Vitest, and pnpm build:cloudflare. Preview first; existing
-   GitHub workflow requires explicit production gating.
+5. GitHub Actions is NOT required. From a clean isolated checkout execute
+   bash scripts/release-hd-google-oauth.sh verify for frozen install,
+   pnpm check, Vitest and the Pages build; then run the script with preview to
+   direct-upload via Wrangler. This release path still requires a validated
+   Cloudflare authorization and all payment/security regression gates. A
+   preview pages.dev hostname cannot perform live Google OAuth until a separate
+   isolated preview OAuth client and allowed callback host have been configured.
+   The production mode is guarded by mandatory explicit environment approvals.
 6. Test with a dedicated Google test account on BOTH domains:
    - GET /api/auth/config says google:true only with Google secrets + D1 tables.
    - GET /api/oauth/login/google yields Google 302 with PKCE, nonce, state.
    - Real Google consent redirects to the exact matching host callback.
    - Callback persists new D1 user + hashed session; auth.me returns user
      after refresh/new tab. No admin/paid credits granted automatically.
-   - Logout revokes session and auth.me becomes null.
+   - Google callback reaches /cs/account or /en/account, with authenticated identity shown. Logout revokes the D1 session, clears the HttpOnly cookie and auth.me becomes null.
    - Invalid state, replay, expired/foreign-host cookie, missing keys fail closed.
    - Anonymous free chart generation and checkout fail-closed behavior unchanged.
    - Check existing customer portal and entitlement endpoints independently.
@@ -66,3 +73,13 @@ with verified ownership proof. Do not report customer portal complete yet.
 - Forged callback without same-host state cookie returns a safe login failure.
 - Roll back via previous good Cloudflare Pages deployment. Leave additive D1
   tables in place until separate reviewed cleanup; do not drop customer data.
+
+## CI-free commands (run only on the connected trusted developer machine)
+
+- Verify only: bash scripts/release-hd-google-oauth.sh verify
+- Deploy preview: bash scripts/release-hd-google-oauth.sh preview
+- Production: bash scripts/release-hd-google-oauth.sh production, **only** after
+  all six flags defined in the script have been independently confirmed, with
+  real auth E2E and rollback plan. Those flags are a checklist, not proofs.
+- Never paste Cloudflare/Google credentials into issue comments, this file,
+  GitHub Actions logs, a shell transcript shared publicly or ChatGPT.
