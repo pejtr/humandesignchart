@@ -36,7 +36,7 @@ interface SidebarItem {
 
 const SIDEBAR_ITEMS: SidebarItem[] = [
   // Core
-  { href: "/dashboard",        labelCs: "Dashboard",          labelEn: "Dashboard",       icon: LayoutDashboard, group: "core" },
+  { href: "/account",          labelCs: "Můj účet",          labelEn: "My account",      icon: LayoutDashboard, group: "core" },
   { href: "/calculate",        labelCs: "Generovat mapu",      labelEn: "Generate Chart", icon: Orbit,           group: "core" },
   { href: "/ai-guide",         labelCs: "HD Guru",             labelEn: "HD Guru",         icon: Eye,             group: "core",  badge: true },
   { href: "/blog",             labelCs: "Blog",                labelEn: "Blog",            icon: BookOpen,        group: "core" },
