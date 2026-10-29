@@ -1,5 +1,5 @@
 import { initTRPC, TRPCError } from "@trpc/server";
-import { authStatus, clearSessionCookie, getAuthenticatedUser, googleOAuthRoute } from "./google-oauth";
+import { authStatus, clearSessionCookie, getAuthenticatedUser, googleOAuthRoute, type AuthEnv } from "./google-oauth";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import superjson from "superjson";
 import { z } from "zod";
@@ -28,7 +28,7 @@ import { buildVerifiedCloudflareOrderEvent, sendVerifiedOpenAIEventWithSecrets, 
 import { getReadingPrompt, getSystemPrompt } from "../server/ai/prompts";
 type D1Database = any;
 
-type Env = {
+type Env = AuthEnv & {
   HUMAN_DESIGN_FULFILLMENT_API_KEY?: string;
   PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN?: string;
   PAY_BASE_URL?: string;
