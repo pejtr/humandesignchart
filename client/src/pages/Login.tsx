@@ -32,7 +32,7 @@ export default function Login() {
     if (provider !== "available") return;
     const params = new URLSearchParams(window.location.search);
     const intended = params.get("returnTo");
-    const fallback = localePath("/dashboard");
+    const fallback = localePath("/account");
     const local = intended && intended.startsWith("/") && !intended.startsWith("//") &&
       !intended.includes("\\") && !/^\/api(\/|$)/i.test(intended) ? intended : fallback;
     window.location.assign("/api/oauth/login/google?returnTo=" + encodeURIComponent(local));
