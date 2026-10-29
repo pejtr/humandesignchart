@@ -53,7 +53,7 @@ export function MobileBottomNav() {
     { id: "chart",    href: localePath("/calculate"),  icon: Map,      label: isCs ? "Mapa" : "Chart" },
     { id: "ai-guide", href: localePath("/ai-guide"),   icon: Sparkles, label: "AI Guide" },
     { id: "blog",     href: localePath("/blog"),       icon: BookOpen, label: "Blog" },
-    { id: "profile",  href: isAuthenticated ? localePath("/dashboard") : localePath("/calculate"), icon: User, label: isCs ? "Profil" : "Profile" },
+    { id: "profile",  href: isAuthenticated ? localePath("/account") : localePath("/calculate"), icon: User, label: isCs ? "Profil" : "Profile" },
   ];
 
   return (
