@@ -54,6 +54,7 @@ const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const PaymentCancel = lazy(() => import("./pages/PaymentCancel"));
 const NewsletterConfirm = lazy(() => import("./pages/NewsletterConfirm"));
 const Login = lazy(() => import("./pages/Login"));
+const Account = lazy(() => import("./pages/Account"));
 const ReferralLanding = lazy(() => import("./pages/ReferralLanding"));
 const SocialScheduler = lazy(() => import("./pages/SocialScheduler"));
 const CompositeChart = lazy(() => import("./pages/CompositeChart"));
@@ -210,6 +211,7 @@ function LocaleRoutes() {
             <Route path="/human-design-typy"><LegacyRedirect path="/human-design-typy" /></Route>
             <Route path="/chart/:id">{(params: any) => <LegacyRedirect path={`/chart/${params.id}`} />}</Route>
             <Route path="/dashboard"><LegacyRedirect path="/dashboard" /></Route>
+            <Route path="/account"><LegacyRedirect path="/account" /></Route>
             <Route path="/compare"><LegacyRedirect path="/compare" /></Route>
             <Route path="/transits"><LegacyRedirect path="/transits" /></Route>
             <Route path="/iching"><LegacyRedirect path="/iching" /></Route>
@@ -265,6 +267,9 @@ function LocaleRoutes() {
             </Route>
             <Route path="/:locale/dashboard">
               {() => <SafeRoute><Dashboard /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/account">
+              {() => <SafeRoute><Account /></SafeRoute>}
             </Route>
             <Route path="/:locale/compare">
               {() => <SafeRoute><ChartComparison /></SafeRoute>}
