@@ -28,7 +28,7 @@ export function useAuth(options?: UseAuthOptions) {
     try {
       const host = typeof window !== "undefined" ? window.location.hostname : "";
       const isCloudflareDomain =
-        /^(?:www\\.)?(?:humandesignchart\\.app|humandesignmapa\\.cz)$/.test(host);
+        /^(?:www\.)?(?:humandesignchart\.app|humandesignmapa\.cz)$/.test(host);
       if (isCloudflareDomain) {
         // Use the Pages-native logout endpoint: it revokes the hashed session
         // in D1 AND clears the HttpOnly __Host-hd_session cookie. A successful
