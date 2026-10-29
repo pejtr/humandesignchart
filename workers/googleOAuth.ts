@@ -28,7 +28,7 @@ export function safeReturnPath(raw: string | null | undefined, locale: string) {
   return raw && raw.length <= 512 && raw.startsWith("/") &&
     !raw.startsWith("//") && !raw.includes("\\") &&
     !/[\x00-\x1f]/.test(raw) && !/^\/api(\/|$)/i.test(raw)
-    ? raw : "/" + locale + "/dashboard";
+    ? raw : "/" + locale + "/account";
 }
 export async function googleAvailable(env: AuthEnv): Promise<boolean> {
   if (!DB(env) || !env.GOOGLE_CLIENT_ID?.trim() || !env.GOOGLE_CLIENT_SECRET?.trim()) return false;
