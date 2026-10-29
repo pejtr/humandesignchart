@@ -169,12 +169,13 @@ export async function googleOAuthRoute(request: Request, env: AuthEnv): Promise<
 
     const id = crypto.randomUUID();
     const name = typeof payload.name === "string" ? payload.name.slice(0, 120) : "";
-    await dbOf(env).prepare(
+    const persisted = await dbOf(env).prepare(
       `INSERT INTO hd_auth_users (id, google_sub, email, name, created_at, last_signed_in)
        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
        ON CONFLICT(google_sub) DO UPDATE SET
          email = excluded.email, name = excluded.name, last_signed_in = CURRENT_TIMESTAMP`
     ).bind(id, payload.sub, payload.email.slice(0, 254), name).run();
+    if (!persisted?.success) throw new Error("ACCOUNT_PERSISTENCE_FAILED");
 
     const user = await dbOf(env).prepare("SELECT id FROM hd_auth_users WHERE google_sub = ?")
       .bind(payload.sub).first() as { id?: string } | null;
