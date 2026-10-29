@@ -1,4 +1,5 @@
 import { initTRPC, TRPCError } from "@trpc/server";
+import { getSessionUser, revokeSession, handleGoogleAuth } from "./googleOAuth";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import superjson from "superjson";
 import { z } from "zod";
@@ -40,6 +41,8 @@ type Env = {
   OPENROUTER_API_KEY?: string;
   GEMINI_API_KEY?: string;
   LLM_MODEL?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
   HD_ORDERS?: D1Database;
   DB?: D1Database;
   ASSETS: {
@@ -443,7 +446,11 @@ async function generateHumanDesignAiReading(params: {
 
 export const appRouter = router({
   auth: router({
-    me: publicProcedure.query(() => null),
+    me: publicProcedure.query(({ ctx }) => getSessionUser(ctx.request, ctx.env)),
+    logout: publicProcedure.mutation(async ({ ctx }) => {
+      await revokeSession(ctx.request, ctx.env);
+      return { success: true } as const;
+    }),
   }),
   chart: chartRouter,
   publicStats: publicStatsRouter,
@@ -1433,6 +1440,11 @@ async function reportVerifiedBlueprintPurchase(d1: D1Database, env: Env, payment
 export default {
   async fetch(request: Request, env: Env, execution?: { waitUntil(promise: Promise<unknown>): void }): Promise<Response> {
     const url = new URL(request.url);
+
+    // Google login is implemented in the deployed Pages runtime, not Express.
+    // Provider remains fail-closed until D1 migration and Google secrets are ready.
+    const oauthResponse = await handleGoogleAuth(request, env);
+    if (oauthResponse) return oauthResponse;
 
     // This deployment runs as Cloudflare Pages, not the legacy Express server.
     // Do not send customers to non-existent OAuth routes or pretend that a
