@@ -84,11 +84,37 @@ export default function OmniUmamiPilot({ consentEvent, hasConsent, isPublicPath 
       lastPath.current = safePath;
     };
     if (existing) { send(); return; }
+    // Deny all automatic / unexpected telemetry. Only manually curated
+    // pageviews + static UI taxonomy may leave the browser.
+    const beforeSend = (_type: string, raw: unknown): unknown => {
+      if (!hasConsent() || privacyBlocked() || !isAllowedHost()) return false;
+      if (!raw || typeof raw !== "object") return false;
+      const payload = raw as Record<string, unknown>;
+      const url = payload.url;
+      if (typeof url !== "string" || !/^\/[a-zA-Z0-9_/-]*$/.test(url) ||
+          !isPublicPath(url) || payload.website !== config!.website) return false;
+      if (payload.name === undefined) {
+        return payload.title === SITE_TITLE ? payload : false;
+      }
+      if (payload.name !== "ui_interest") return false;
+      const data = payload.data;
+      if (!data || typeof data !== "object" || Array.isArray(data)) return false;
+      const values = data as Record<string, unknown>;
+      const allowedInterests = ["catalog_open", "devices_open", "audit_open", "ebook_offer",
+        "pricing_open", "report_offer", "chart_start", "quiz_open"];
+      if (!allowedInterests.includes(String(values.interest)) ||
+          !["nav", "hero", "pricing", "content", "footer"].includes(String(values.zone)) ||
+          Object.keys(values).some(k => k !== "interest" && k !== "zone")) return false;
+      return payload;
+    };
+    const exposed = window as Window & { __omniUmamiBeforeSend?: typeof beforeSend };
+    exposed.__omniUmamiBeforeSend = beforeSend;
     const script = document.createElement("script");
     script.id = SCRIPT_ID;
     script.defer = true;
     script.src = config!.source;
     script.dataset.websiteId = config!.website;
+    script.dataset.beforeSend = "__omniUmamiBeforeSend";
     // Auto pageviews OFF; tracker stays initialized for manual, sanitized events.
     script.dataset.autoPageview = "false";
     script.dataset.excludeSearch = "true";
