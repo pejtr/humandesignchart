@@ -1,18 +1,43 @@
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, Compass, Info, LockKeyhole } from "lucide-react";
+import { ArrowLeft, Compass, Info, LockKeyhole, LogIn, Loader2 } from "lucide-react";
 
+type ProviderStatus = "checking" | "available" | "unavailable";
+
+/**
+ * Show real Google sign-in only after the deployed Pages Worker confirms
+ * credentials and persistent D1 user/session tables. Never show a fake login.
+ */
 export default function Login() {
   const { locale, localePath } = useLanguage();
   const [, navigate] = useLocation();
   const isEn = locale === "en";
+  const [provider, setProvider] = useState<ProviderStatus>("checking");
+  const [failed, setFailed] = useState(false);
 
-  // Authentication endpoints live in the legacy Express server. The current
-  // Cloudflare Pages application does not have OAuth sessions or user storage.
-  // Never expose a clickable Google / Facebook / Apple button leading to a
-  // missing API route, or pretend that a sign-in succeeded.
+  useEffect(() => {
+    const controller = new AbortController();
+    setFailed(new URLSearchParams(window.location.search).get("auth") === "failed");
+    fetch("/api/auth/config", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => response.ok && (await response.json())?.google === true)
+      .then((enabled) => { if (!controller.signal.aborted) setProvider(enabled ? "available" : "unavailable"); })
+      .catch(() => { if (!controller.signal.aborted) setProvider("unavailable"); });
+    return () => controller.abort();
+  }, []);
+
+  const signIn = () => {
+    if (provider !== "available") return;
+    const params = new URLSearchParams(window.location.search);
+    const intended = params.get("returnTo");
+    const fallback = localePath("/account");
+    const local = intended && intended.startsWith("/") && !intended.startsWith("//") &&
+      !intended.includes("\\") && !/^\/api(\/|$)/i.test(intended) ? intended : fallback;
+    window.location.assign("/api/oauth/login/google?returnTo=" + encodeURIComponent(local));
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md shadow-xl">
@@ -21,45 +46,67 @@ export default function Login() {
             <LockKeyhole className="h-5 w-5" aria-hidden="true" />
           </div>
           <CardTitle className="font-serif text-2xl font-bold">
-            {isEn ? "Your account, securely" : "Váš účet, bezpečně"}
+            {isEn ? "Sign in securely" : "Bezpečné přihlášení"}
           </CardTitle>
           <CardDescription className="text-muted-foreground text-sm">
-            {isEn ? "A quick update on account access" : "Aktuální informace o přihlášení"}
+            {isEn ? "Access your Human Design account" : "Přístup k vašemu Human Design účtu"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div role="status" className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
-            <div className="flex items-start gap-3">
-              <Info className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-              <div>
-                <p className="text-sm font-semibold">
-                  {isEn ? "Google sign-in is temporarily unavailable" : "Přihlášení přes Google je dočasně nedostupné"}
-                </p>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                  {isEn
-                    ? "We are connecting secure account access to our new hosting infrastructure. Google, Facebook and Apple buttons are disabled until the complete sign-in flow is verified. We won't ask you to sign in through a broken page."
-                    : "Dokončujeme bezpečné přihlášení v nové infrastruktuře. Tlačítka Google, Facebook a Apple zůstanou vypnutá, dokud neověříme celé přihlášení. Nebudeme vás přesměrovávat na nefunkční stránku."}
-                </p>
+          {failed && (
+            <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm">
+              {isEn
+                ? "Google sign-in could not be completed. Please try again or use the free chart without signing in."
+                : "Přihlášení přes Google se nepodařilo dokončit. Zkuste to znovu nebo pokračujte k mapě zdarma."}
+            </div>
+          )}
+
+          {provider === "available" ? (
+            <Button className="w-full gap-2" onClick={signIn} data-testid="google-sign-in">
+              <LogIn className="h-4 w-4" aria-hidden="true" />
+              {isEn ? "Continue with Google" : "Pokračovat přes Google"}
+            </Button>
+          ) : provider === "checking" ? (
+            <div role="status" className="flex justify-center items-center gap-2 py-4 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              {isEn ? "Checking sign-in availability…" : "Ověřuji dostupnost přihlášení…"}
+            </div>
+          ) : (
+            <div role="status" className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+              <div className="flex items-start gap-3">
+                <Info className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+                <div>
+                  <p className="text-sm font-semibold">
+                    {isEn ? "Google sign-in is temporarily unavailable" : "Google přihlášení je dočasně nedostupné"}
+                  </p>
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                    {isEn
+                      ? "The secure Google connection is not yet configured on this domain. Your free Human Design chart remains available without signing in."
+                      : "Bezpečné propojení s Googlem zatím na této doméně není dokončené. Bezplatnou Human Design mapu můžete vytvořit bez přihlášení."}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="rounded-xl bg-primary/[0.06] px-4 py-4">
             <p className="text-sm font-semibold">
-              {isEn ? "You can still explore your free chart" : "Svou mapu můžete prozkoumat i bez účtu"}
+              {isEn ? "Explore your free chart" : "Vytvořit mapu zdarma"}
             </p>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
               {isEn
-                ? "Calculate a Human Design bodygraph with your birth details without signing in or paying."
-                : "Vypočítejte si Human Design mapu ze svých údajů o narození bez přihlášení a bez platby."}
+                ? "Calculate your Human Design chart without an account or payment."
+                : "Spočítejte si Human Design mapu bez účtu a bez platby."}
             </p>
-            <Button className="mt-4 w-full gap-2" onClick={() => navigate(localePath("/calculate"))}>
+            <Button className="mt-4 w-full gap-2" variant="outline"
+              onClick={() => navigate(localePath("/calculate"))}>
               <Compass className="h-4 w-4" aria-hidden="true" />
               {isEn ? "Calculate my free chart" : "Vypočítat mapu zdarma"}
             </Button>
           </div>
 
-          <Button variant="ghost" className="w-full gap-2 text-muted-foreground" onClick={() => navigate(localePath("/"))}>
+          <Button variant="ghost" className="w-full gap-2 text-muted-foreground"
+            onClick={() => navigate(localePath("/"))}>
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             {isEn ? "Back to home" : "Zpět na úvod"}
           </Button>

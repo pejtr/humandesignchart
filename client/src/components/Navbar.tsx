@@ -298,9 +298,9 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
                 <>
                   {/* Notification Bell */}
                   {user?.id && <NotificationBell userId={user.id} />}
-                  {/* Credits badge — links to Dashboard subscription tab */}
+                  {/* Credits badge — links to account summary */}
                   {creditsLabel !== null && (
-                    <Link href={localePath("/dashboard")}>
+                    <Link href={localePath("/account")}>
                       <button
                         title={locale === "cs" ? `${creditsLabel === "∞" ? "Neomezené" : creditsLabel} AI výkladů k dispozici` : `${creditsLabel === "∞" ? "Unlimited" : creditsLabel} AI readings available`}
                         className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold transition-all
@@ -333,10 +333,10 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
                           <span className="text-[11px] text-muted-foreground">{locale === "cs" ? "Free plán" : "Free plan"}</span>
                         )}
                       </div>
-                      <Link href={localePath("/dashboard")}>
+                      <Link href={localePath("/account")}>
                         <DropdownMenuItem>
                           <LayoutDashboard className="w-4 h-4 mr-2" />
-                          {t.common.dashboard}
+                          {(locale === "cs" ? "Můj účet" : "My account")}
                         </DropdownMenuItem>
                       </Link>
                       {user?.role === "admin" && (
@@ -387,7 +387,7 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
                 </a>
               )}
               {isAuthenticated && (
-                <Link href={localePath("/dashboard")} aria-label={t.common.dashboard}>
+                <Link href={localePath("/account")} aria-label={(locale === "cs" ? "Můj účet" : "My account")}>
                   <Button variant="ghost" size="icon" className="w-9 h-9 rounded-full">
                     <User className="w-4 h-4 text-primary" />
                   </Button>
@@ -638,13 +638,13 @@ export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
                   </button>
                 </Link>
               )}
-              <Link href={localePath("/dashboard")}>
+              <Link href={localePath("/account")}>
                 <button
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
                   <LayoutDashboard className="w-4 h-4 text-primary/70" />
-                  {t.common.dashboard}
+                  {(locale === "cs" ? "Můj účet" : "My account")}
                 </button>
               </Link>
               {user?.role === "admin" && (
