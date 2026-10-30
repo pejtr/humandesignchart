@@ -75,6 +75,31 @@ export default function OmniUmamiPilot({ consentEvent, hasConsent, isPublicPath 
     if (!isPublicPath(route)) return;
     const safePath = route.split("?")[0].split("#")[0];
     if (safePath !== window.location.pathname || !/^\/[a-zA-Z0-9_/-]*$/.test(safePath)) return;
+    const recordExposure = () => {
+      if (import.meta.env.VITE_OMNI_AB_PILOT_ENABLED !== "true" ||
+          !hasConsent() || privacyBlocked() || !isPublicPath(window.location.pathname)) return;
+      const umami = tracker();
+      if (!umami) return;
+      const permitted = ["omni-hero-2026q4", "opt-audit-2026q4",
+        "italy-ebook-2026q4", "katastr-pricing-2026q4", "hd-hero-2026q4"];
+      document.querySelectorAll<HTMLElement>("[data-omni-experiment][data-omni-variant]").forEach(el => {
+        const experiment = el.dataset.omniExperiment || "";
+        const variant = el.dataset.omniVariant || "";
+        if (!permitted.includes(experiment) || !["A", "B", "C"].includes(variant)) return;
+        const key = "omni-exp:" + experiment + ":" + variant;
+        try { if (window.sessionStorage.getItem(key) === "yes") return; } catch { /* optional */ }
+        try {
+          umami.track({
+            website: config!.website,
+            url: window.location.pathname,
+            title: SITE_TITLE,
+            name: "experiment_exposure",
+            data: { experiment, variant },
+          });
+          window.sessionStorage.setItem(key, "yes");
+        } catch { /* Do not interfere with primary UX. */ }
+      });
+    };
     const send = () => {
       if (!hasConsent() || privacyBlocked() || !isPublicPath(window.location.pathname) ||
           window.location.pathname !== safePath || lastPath.current === safePath) return;
@@ -83,7 +108,7 @@ export default function OmniUmamiPilot({ consentEvent, hasConsent, isPublicPath 
       umami.track({ website: config!.website, url: safePath, title: SITE_TITLE });
       lastPath.current = safePath;
     };
-    if (existing) { send(); return; }
+    if (existing) { send(); recordExposure(); return; }
     // Deny all automatic / unexpected telemetry. Only manually curated
     // pageviews + static UI taxonomy may leave the browser.
     const beforeSend = (_type: string, raw: unknown): unknown => {
@@ -96,15 +121,26 @@ export default function OmniUmamiPilot({ consentEvent, hasConsent, isPublicPath 
       if (payload.name === undefined) {
         return payload.title === SITE_TITLE ? payload : false;
       }
-      if (payload.name !== "ui_interest") return false;
+      const validExperiment = (name: unknown) => [
+        "omni-hero-2026q4", "opt-audit-2026q4", "italy-ebook-2026q4",
+        "katastr-pricing-2026q4", "hd-hero-2026q4",
+      ].includes(String(name));
+      if (payload.name !== "ui_interest" && payload.name !== "experiment_exposure") return false;
       const data = payload.data;
       if (!data || typeof data !== "object" || Array.isArray(data)) return false;
       const values = data as Record<string, unknown>;
+      if (payload.name === "experiment_exposure") {
+        return validExperiment(values.experiment) &&
+          ["A", "B", "C"].includes(String(values.variant)) &&
+          Object.keys(values).every(k => ["experiment", "variant"].includes(k)) ? payload : false;
+      }
       const allowedInterests = ["catalog_open", "devices_open", "audit_open", "ebook_offer",
         "pricing_open", "report_offer", "chart_start", "quiz_open"];
       if (!allowedInterests.includes(String(values.interest)) ||
           !["nav", "hero", "pricing", "content", "footer"].includes(String(values.zone)) ||
-          Object.keys(values).some(k => k !== "interest" && k !== "zone")) return false;
+          Object.keys(values).some(k => !["interest", "zone", "experiment", "variant"].includes(k))) return false;
+      if ((values.experiment !== undefined || values.variant !== undefined) &&
+          (!validExperiment(values.experiment) || !["A", "B", "C"].includes(String(values.variant)))) return false;
       return payload;
     };
     const exposed = window as Window & { __omniUmamiBeforeSend?: typeof beforeSend };
@@ -121,7 +157,7 @@ export default function OmniUmamiPilot({ consentEvent, hasConsent, isPublicPath 
     script.dataset.excludeHash = "true";
     script.dataset.doNotTrack = "true";
     script.dataset.domains = SITE_DOMAINS;
-    script.addEventListener("load", () => { wasLoaded.current = true; send(); }, { once: true });
+    script.addEventListener("load", () => { wasLoaded.current = true; send(); recordExposure(); }, { once: true });
     document.head.appendChild(script);
   }, [route, consentRevision, hasConsent, isPublicPath]);
   // Marketing research measures interest in an explicit, static taxonomy only.
@@ -145,13 +181,20 @@ export default function OmniUmamiPilot({ consentEvent, hasConsent, isPublicPath 
       const zone = allowedZones.has(zoneValue) ? zoneValue : "content";
       const umami = tracker();
       if (!umami) return;
+      const experiment = item.dataset.omniExperiment || "";
+      const variant = item.dataset.omniVariant || "";
+      const permitted = ["omni-hero-2026q4", "opt-audit-2026q4", "italy-ebook-2026q4",
+        "katastr-pricing-2026q4", "hd-hero-2026q4"];
+      const abData = permitted.includes(experiment) && ["A", "B", "C"].includes(variant) &&
+        import.meta.env.VITE_OMNI_AB_PILOT_ENABLED === "true"
+        ? { experiment, variant } : {};
       try {
         umami.track({
           website: config.website,
           url: window.location.pathname,
           title: SITE_TITLE,
           name: "ui_interest",
-          data: { interest, zone },
+          data: { interest, zone, ...abData },
         });
       } catch { /* Optional research must not block navigation. */ }
     };
