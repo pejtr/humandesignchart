@@ -509,7 +509,7 @@ export default function Home() {
             </p>
             <div className="hd-wow-actions">
               <Button asChild size="lg" className="hd-wow-primary">
-                <Link href={localePath("/calculate")}>
+                <Link href={localePath("/calculate")} data-omni-interest="chart_start" data-omni-zone="hero">
                   <Sparkles aria-hidden="true" className="h-5 w-5" />
                   {isCs ? "Vytvořit mapu zdarma" : "Create my free chart"}
                   <ArrowRight aria-hidden="true" className="h-5 w-5" />
