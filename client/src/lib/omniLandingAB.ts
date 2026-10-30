@@ -17,8 +17,13 @@ const VALID_EXPERIMENTS = new Set([
 ]);
 
 function enabled(): boolean {
-  return import.meta.env.VITE_OMNI_AB_PILOT_ENABLED === "true" &&
-    import.meta.env.VITE_UMAMI_ENABLED === "true";
+  const env = import.meta.env;
+  return env.VITE_OMNI_AB_PILOT_ENABLED === "true" &&
+    env.VITE_UMAMI_ENABLED === "true" &&
+    typeof env.VITE_UMAMI_WEBSITE_ID === "string" &&
+    /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(env.VITE_UMAMI_WEBSITE_ID) &&
+    typeof env.VITE_UMAMI_SCRIPT_URL === "string" &&
+    /^https:\/\/[^/?#]+(?:\/[^?#]*)?\/script\.js$/i.test(env.VITE_UMAMI_SCRIPT_URL);
 }
 
 function select(): OmniVariant {
@@ -32,29 +37,29 @@ function select(): OmniVariant {
 }
 
 export function useOmniLandingAB(experiment: string, hasConsent: () => boolean, consentEvent: string): OmniVariant {
-  // A is the existing content and the safe fallback if config is not active.
-  const [variant, setVariant] = useState<OmniVariant>("A");
-
+  // A is the safe fallback. Selection happens during the initial render,
+  // never in an effect after Umami could already register an exposure.
+  const [variant] = useState<OmniVariant>(() => {
+    if (!enabled() || !VALID_EXPERIMENTS.has(experiment) || typeof window === "undefined") return "A";
+    if (hasConsent()) {
+      try {
+        const prior = window.sessionStorage.getItem("omni-ab:" + experiment);
+        if (prior === "A" || prior === "B" || prior === "C") return prior;
+      } catch { /* storage is optional */ }
+    }
+    return select();
+  });
   useEffect(() => {
     if (!enabled() || !VALID_EXPERIMENTS.has(experiment)) return;
-    const key = "omni-ab:" + experiment;
-    let current: OmniVariant = select();
-    try {
-      const stored = window.sessionStorage.getItem(key);
-      if (stored === "A" || stored === "B" || stored === "C") current = stored;
-    } catch { /* session storage is optional */ }
-    setVariant(current);
-    const keepAssignment = () => {
+    const save = () => {
       if (!hasConsent()) return;
-      try { window.sessionStorage.setItem(key, current); } catch { /* optional */ }
+      try { window.sessionStorage.setItem("omni-ab:" + experiment, variant); }
+      catch { /* never block page behavior */ }
     };
-    keepAssignment();
-    window.addEventListener(consentEvent, keepAssignment);
-    return () => window.removeEventListener(consentEvent, keepAssignment);
-    // The consent callback reads current storage on each event; do not make
-    // function identity a dependency or rerenders would re-randomize variants.
-  }, [experiment, consentEvent]);
-
+    save();
+    window.addEventListener(consentEvent, save);
+    return () => window.removeEventListener(consentEvent, save);
+  }, [experiment, consentEvent, variant]);
   return variant;
 }
 
