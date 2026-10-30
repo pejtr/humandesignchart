@@ -8,7 +8,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 
-type UmamiApi = { track: (payload: { website: string; url: string; title: string } | string) => void };
+type UmamiApi = { track: (payload: { website: string; url: string; title: string; name?: string; data?: Record<string, string> }) => void };
 type Props = {
   consentEvent: string;
   hasConsent: () => boolean;
@@ -89,7 +89,8 @@ export default function OmniUmamiPilot({ consentEvent, hasConsent, isPublicPath 
     script.defer = true;
     script.src = config!.source;
     script.dataset.websiteId = config!.website;
-    script.dataset.autoTrack = "false";
+    // Auto pageviews OFF; tracker stays initialized for manual, sanitized events.
+    script.dataset.autoPageview = "false";
     script.dataset.excludeSearch = "true";
     script.dataset.excludeHash = "true";
     script.dataset.doNotTrack = "true";
@@ -97,5 +98,40 @@ export default function OmniUmamiPilot({ consentEvent, hasConsent, isPublicPath 
     script.addEventListener("load", () => { wasLoaded.current = true; send(); }, { once: true });
     document.head.appendChild(script);
   }, [route, consentRevision, hasConsent, isPublicPath]);
+  // Marketing research measures interest in an explicit, static taxonomy only.
+  // Never harvest form values, link URLs, text, coordinates, birth dates or property references.
+  useEffect(() => {
+    const config = validatedConfig();
+    if (!config || !hasConsent() || privacyBlocked() || !isAllowedHost() || !isPublicPath(route)) return;
+    const allowedInterest = new Set([
+      "catalog_open", "devices_open", "audit_open", "ebook_offer",
+      "pricing_open", "report_offer", "chart_start", "quiz_open",
+    ]);
+    const allowedZones = new Set(["nav", "hero", "pricing", "content", "footer"]);
+    const onClick = (event: MouseEvent) => {
+      if (!hasConsent() || privacyBlocked() || !isAllowedHost() || !isPublicPath(window.location.pathname)) return;
+      if (!(event.target instanceof Element)) return;
+      const item = event.target.closest<HTMLElement>("[data-omni-interest]");
+      if (!item || !item.matches('a,button,[role="button"]')) return;
+      const interest = item.dataset.omniInterest || "";
+      if (!allowedInterest.has(interest)) return;
+      const zoneValue = item.dataset.omniZone || "content";
+      const zone = allowedZones.has(zoneValue) ? zoneValue : "content";
+      const umami = tracker();
+      if (!umami) return;
+      try {
+        umami.track({
+          website: config.website,
+          url: window.location.pathname,
+          title: SITE_TITLE,
+          name: "ui_interest",
+          data: { interest, zone },
+        });
+      } catch { /* Optional research must not block navigation. */ }
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, [route, consentRevision, hasConsent, isPublicPath]);
+
   return null;
 }
