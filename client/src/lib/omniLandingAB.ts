@@ -51,7 +51,9 @@ export function useOmniLandingAB(experiment: string, hasConsent: () => boolean, 
     keepAssignment();
     window.addEventListener(consentEvent, keepAssignment);
     return () => window.removeEventListener(consentEvent, keepAssignment);
-  }, [experiment, consentEvent, hasConsent]);
+    // The consent callback reads current storage on each event; do not make
+    // function identity a dependency or rerenders would re-randomize variants.
+  }, [experiment, consentEvent]);
 
   return variant;
 }
