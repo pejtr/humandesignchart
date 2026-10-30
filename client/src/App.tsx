@@ -18,6 +18,7 @@ import WelcomeModal, { useWelcomeModal } from "./components/WelcomeModal";
 import PageTransition from "./components/PageTransition";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { CookieConsent } from "./components/CookieConsent";
+import UmamiSitePilot from "./components/UmamiSitePilot";
 import { useGA4PageViews } from "./hooks/useGA4";
 import { useOpenAIAdsPageViews } from "./hooks/useOpenAIAdsPixel";
 import { MobileBottomNav } from "./components/MobileBottomNav";
@@ -436,6 +437,7 @@ function App() {
               </Suspense>
               <ScrollToTop />
               <CookieConsent />
+              <UmamiSitePilot />
               <AuthSidebar />
               <MobileBottomNav />
               <Suspense fallback={null}>
