@@ -82,6 +82,23 @@ describe("Pages fulfillment boundary", () => {
     expect(response.status).toBe(401);
     expect(fetch).not.toHaveBeenCalled();
   });
+  it("fulfills successfully when gateway reports FULFILLMENT_PENDING status", async () => {
+    const sqlStatements: string[] = [];
+    const db = { prepare: (sql: string) => {
+      sqlStatements.push(sql);
+      return { bind: () => ({
+        first: async () => sql.includes("hd_chart_snapshots") ? { id: "snap-unit" } : order,
+        run: async () => ({ success: true, meta: { changes: 0 } }),
+      }) };
+    } };
+    const fetch = vi.fn(async () => Response.json({ status: "FULFILLMENT_PENDING", amountMinor: 1590, currency: "EUR" }));
+    vi.stubGlobal("fetch", fetch);
+    const response = await worker.fetch(callback(), { ASSETS: assets, HD_ORDERS: db,
+      HUMAN_DESIGN_FULFILLMENT_API_KEY: "unit-key" });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ status: "ALREADY_FULFILLED", publicToken: "existing-token" });
+  });
+
   it("does not accept Stripe events as gateway callbacks", async () => {
     const fetch = vi.fn();
     vi.stubGlobal("fetch", fetch);

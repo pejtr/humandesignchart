@@ -35,10 +35,15 @@ export function isVerifiedBlueprintPayment(
 
   if (order.payment_status === "PAID") return true;
 
+  const isCapturedStatus =
+    provider?.status === "PAID" ||
+    provider?.status === "FULFILLED" ||
+    provider?.status === "FULFILLMENT_PENDING";
+
   return Boolean(
-    (provider?.status === "PAID" || provider?.status === "FULFILLED") &&
-    provider.offerKey === order.offer_key &&
-    provider.amountMinor === order.amount_minor &&
-    provider.currency === order.currency
+    isCapturedStatus &&
+    provider?.offerKey === order.offer_key &&
+    provider?.amountMinor === order.amount_minor &&
+    provider?.currency === order.currency
   );
 }
