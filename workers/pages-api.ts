@@ -1558,7 +1558,7 @@ export default {
         return Response.json({ ok: false, error: "GATEWAY_VERIFICATION_FAILED" }, { status: 502 });
       }
 
-      const isActuallyPaid = payData?.status === "PAID" || payData?.status === "FULFILLED";
+      const isActuallyPaid = payData?.status === "PAID" || payData?.status === "FULFILLED" || payData?.status === "FULFILLMENT_PENDING";
       if (!isActuallyPaid) {
         console.error(`[onyxpay-fulfill] Gateway reports uncaptured status ${payData?.status} for ${event.refId}`);
         return Response.json(

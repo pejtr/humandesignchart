@@ -24,9 +24,14 @@ describe("Blueprint payment verification: fail closed", () => {
     expect(isVerifiedBlueprintPayment({ ...order, payment_status: "PAID" }, null)).toBe(true);
     expect(isVerifiedBlueprintPayment({ ...order, payment_status: "CREATED" }, null)).toBe(false);
   });
+  it("accepts gateway status FULFILLMENT_PENDING and FULFILLED", () => {
+    expect(isVerifiedBlueprintPayment(order, { ...paid, status: "FULFILLMENT_PENDING" })).toBe(true);
+    expect(isVerifiedBlueprintPayment(order, { ...paid, status: "FULFILLED" })).toBe(true);
+  });
   it("handles the canonical Czech payment and rejects a cross-offer match", () => {
     const cz = { payment_status: "CREATED", offer_key: "hd-blueprint-cz", amount_minor: 29000, currency: "CZK" };
     expect(isVerifiedBlueprintPayment(cz, { status: "PAID", offerKey: "hd-blueprint-cz", amountMinor: 29000, currency: "CZK" })).toBe(true);
+    expect(isVerifiedBlueprintPayment(cz, { status: "FULFILLMENT_PENDING", offerKey: "hd-blueprint-cz", amountMinor: 29000, currency: "CZK" })).toBe(true);
     expect(isVerifiedBlueprintPayment(cz, paid)).toBe(false);
   });
 });
