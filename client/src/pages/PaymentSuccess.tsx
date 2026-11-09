@@ -314,9 +314,13 @@ export default function PaymentSuccess() {
             <p className="text-lg text-muted-foreground mb-6 max-w-xl mx-auto">
               {isBlueprint
                 ? isEntitled
-                  ? isEn
-                    ? "Your personalized Blueprint with complete 7-day integration workbook has been prepared. Download your PDF below."
-                    : "Váš osobní Blueprint s kompletním 7denním integračním plánem je připraven. Stáhněte si své PDF níže."
+                  ? activeChart
+                    ? isEn
+                      ? "Your payment is confirmed and your complete birth chart is ready to print."
+                      : "Platba je potvrzená a kompletní mapa narození je připravená k tisku."
+                    : isEn
+                      ? "Your payment is confirmed. Your birth chart needs recovery before we can prepare a complete report; you will not be charged again."
+                      : "Platba je potvrzená. Před vydáním kompletního reportu je potřeba obnovit uloženou mapu; další platba není nutná."
                   : isEn
                     ? "A confirmed paid order is required to access your Personal Blueprint and generate the PDF report."
                     : "Pro stažení osobního Blueprintu a vygenerování PDF reportu je vyžadována potvrzená zaplacená objednávka."
