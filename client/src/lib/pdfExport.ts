@@ -24,6 +24,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
   if (!isCompleteBlueprintChart(chart)) throw new Error("COMPLETE_BIRTH_CHART_REQUIRED");
   if (!hdData?.types || !hdData?.profiles || !hdData?.authorities) throw new Error("HD_CONTENT_UNAVAILABLE");
   if (!bodygraphRef?.current) throw new Error("BODYGRAPH_NOT_RENDERED");
+  const safeName = name.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char] || char);
   const isCzech = (locale ?? (typeof window !== "undefined" && window.location.pathname.startsWith("/en") ? "en" : "cs")) === "cs";
   const czType = (t.types as Record<string, string>)[chart.type] || chart.type;
   const czStrategy = (t.hd.strategies as Record<string, string>)[chart.strategy] || chart.strategy;
@@ -113,7 +114,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Human Design — ${name}</title>
+  <title>Human Design — ${safeName}</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap');
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -330,7 +331,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
   </div>
 
   <div class="footer">
-    Human Design App &mdash; ${name} &mdash; Vygenerováno: ${new Date().toLocaleDateString("cs-CZ")}
+    Human Design App &mdash; ${safeName} &mdash; Vygenerováno: ${new Date().toLocaleDateString("cs-CZ")}
   </div>
 
   <script>
@@ -340,8 +341,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
 </html>`;
 
   const printWindow = window.open("", "_blank", "width=900,height=700");
-  if (printWindow) {
-    printWindow.document.write(html);
-    printWindow.document.close();
-  }
+  if (!printWindow) throw new Error("PDF_POPUP_BLOCKED");
+  printWindow.document.write(html);
+  printWindow.document.close();
 }
