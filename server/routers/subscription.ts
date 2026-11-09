@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isCompleteBlueprintChartJson } from "../../shared/chartSchemas";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import {
@@ -60,11 +61,17 @@ export const subscriptionRouter = router({
             if (!stripe) throw new Error("Stripe not configured");
             const user = ctx.user;
             if (!user) {
-                if (input.plan !== "blueprint" || !input.customerEmail) {
-                    throw new TRPCError({
-                        code: "UNAUTHORIZED",
-                        message: "Pro nákup tohoto tarifu se prosím přihlaste.",
-                    });
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Pro nákup se prosím přihlaste.",
+                });
+            }
+            if (input.plan === "blueprint") {
+                if (!user.email || !input.customerEmail || user.email.toLowerCase() !== input.customerEmail.trim().toLowerCase()) {
+                    throw new TRPCError({ code: "FORBIDDEN", message: "CHECKOUT_EMAIL_MUST_MATCH_ACCOUNT" });
+                }
+                if (!isCompleteBlueprintChartJson(input.chartDataJson)) {
+                    throw new TRPCError({ code: "BAD_REQUEST", message: "COMPLETE_BIRTH_CHART_REQUIRED" });
                 }
             }
             const isGift = input.plan.startsWith("gift_");
