@@ -173,7 +173,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
       <div class="header-sub">Osobní energetický blueprint</div>
     </div>
     <div class="header-right">
-      <div class="header-name">${name}</div>
+      <div class="header-name">${safeName}</div>
       <div class="header-date">${birthDateFormatted || new Date().toLocaleDateString("cs-CZ")}</div>
     </div>
   </div>
