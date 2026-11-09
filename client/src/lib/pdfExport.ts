@@ -24,7 +24,8 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
   if (!isCompleteBlueprintChart(chart)) throw new Error("COMPLETE_BIRTH_CHART_REQUIRED");
   if (!hdData?.types || !hdData?.profiles || !hdData?.authorities) throw new Error("HD_CONTENT_UNAVAILABLE");
   if (!bodygraphRef?.current) throw new Error("BODYGRAPH_NOT_RENDERED");
-  const safeName = name.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char] || char);
+  const htmlEntities: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+  const safeName = name.replace(/[&<>"']/g, char => htmlEntities[char] || char);
   const isCzech = (locale ?? (typeof window !== "undefined" && window.location.pathname.startsWith("/en") ? "en" : "cs")) === "cs";
   const czType = (t.types as Record<string, string>)[chart.type] || chart.type;
   const czStrategy = (t.hd.strategies as Record<string, string>)[chart.strategy] || chart.strategy;
