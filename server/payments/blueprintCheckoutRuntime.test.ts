@@ -1,9 +1,22 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { appRouter } from "../../workers/pages-api";
+import { calculateChart } from "../humandesign/calculator";
+import { isCompleteBlueprintChart, isCompleteBlueprintChartJson } from "../../shared/chartSchemas";
 
 afterEach(() => vi.unstubAllGlobals());
 
-function fakeD1(options: { exists?: boolean; writeSuccess?: boolean } = {}) {
+const validChartJson = JSON.stringify(calculateChart({
+  name: "Unit test",
+  birthDate: "1879-03-14",
+  birthTime: "11:30",
+  birthPlace: "Ulm, Germany",
+  latitude: 48.3985,
+  longitude: 9.9912,
+  timezone: "Europe/Berlin",
+}));
+const COOKIE = "__Host-hd_session=" + "a".repeat(43);
+
+function fakeD1(options: { exists?: boolean; writeSuccess?: boolean; incomplete?: boolean } = {}) {
   const statements: { sql: string; args: unknown[] }[] = [];
   const db = {
     prepare(sql: string) {
@@ -11,7 +24,14 @@ function fakeD1(options: { exists?: boolean; writeSuccess?: boolean } = {}) {
         bind(...args: unknown[]) {
           statements.push({ sql, args });
           return {
-            first: async () => options.exists ? { id: "snap_owned" } : null,
+            first: async () => {
+              if (sql.includes("FROM hd_oauth_sessions")) {
+                return { id: 7, email: "buyer@example.test", name: "Test Buyer", created_at: "2026-01-01 00:00:00" };
+              }
+              return options.exists
+                ? { id: "snap_owned", chart_data_json: options.incomplete ? '{"type":"Generator"}' : validChartJson }
+                : null;
+            },
             run: async () => ({ success: options.writeSuccess !== false }),
           };
         },
@@ -30,9 +50,41 @@ const input = {
   chartSnapshotId: "snap_owned",
 };
 const caller = (env: Record<string, unknown>) =>
-  appRouter.createCaller({ env, request: new Request("https://humandesignchart.app/api/trpc") } as any);
+  appRouter.createCaller({ env, request: new Request("https://humandesignchart.app/api/trpc", { headers: { cookie: COOKIE } }) } as any);
 
 describe("Cloudflare Blueprint checkout: no real payment may precede a valid chart", () => {
+  it("rejects placeholder chart data independently of payment", () => {
+    expect(isCompleteBlueprintChartJson(validChartJson)).toBe(true);
+    expect(isCompleteBlueprintChartJson('{"type":"Manifesting Generator","profile":"2/4"}')).toBe(false);
+    expect(isCompleteBlueprintChartJson("not json")).toBe(false);
+    const parsed = JSON.parse(validChartJson);
+    parsed.activatedGates = [];
+    expect(isCompleteBlueprintChart(parsed)).toBe(false);
+    parsed.activatedGates = JSON.parse(validChartJson).activatedGates;
+    parsed.strategy = "undefined";
+    expect(isCompleteBlueprintChart(parsed)).toBe(false);
+  });
+
+  it("guest or incomplete snapshot never calls payment gateway", async () => {
+    const payment = vi.fn();
+    vi.stubGlobal("fetch", payment);
+    const { db } = fakeD1({ exists: true });
+    const guest = appRouter.createCaller({ env: { HD_ORDERS: db, PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN: "unit_key" },
+      request: new Request("https://humandesignchart.app/api/trpc") } as any);
+    await expect(guest.subscription.createCheckout(input)).rejects.toThrow("LOGIN_REQUIRED_BEFORE_CHECKOUT");
+    const bad = fakeD1({ exists: true, incomplete: true });
+    await expect(caller({ HD_ORDERS: bad.db, PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN: "unit_key" })
+      .subscription.createCheckout(input)).rejects.toThrow("COMPLETE_BIRTH_CHART_REQUIRED");
+    expect(payment).not.toHaveBeenCalled();
+  });
+
+  it("checkout email must match authenticated account", async () => {
+    const { db } = fakeD1({ exists: true });
+    await expect(caller({ HD_ORDERS: db, PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN: "unit_key" })
+      .subscription.createCheckout({ ...input, customerEmail: "other@example.test" }))
+      .rejects.toThrow("CHECKOUT_EMAIL_MUST_MATCH_ACCOUNT");
+  });
+
   it.each([
     { locale: "cs" as const, origin: "https://humandesignmapa.cz", offerKey: "hd-blueprint-cz", amountMinor: 29000, currency: "CZK" },
     { locale: "en" as const, origin: "https://humandesignchart.app", offerKey: "hd-blueprint-en", amountMinor: 1590, currency: "EUR" },
