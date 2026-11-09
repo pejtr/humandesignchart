@@ -1,4 +1,3 @@
-import html2canvas from 'html2canvas';
 import type { HumanDesignChartData } from "@shared/types";
 import { isCompleteBlueprintChart } from "@shared/chartSchemas";
 import { cs } from "@shared/i18n/cs";
@@ -97,22 +96,12 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
     </tr>`;
   }).join("") : "";
 
-  let bodygraphImg = "";
-  if (bodygraphRef.current) {
-    try {
-      const canvas = await html2canvas(bodygraphRef.current, {
-        scale: 2,
-        backgroundColor: null,
-        logging: false,
-        useCORS: true
-      });
-      bodygraphImg = canvas.toDataURL("image/png");
-    } catch (e) {
-      console.error("Failed to capture bodygraph for PDF", e);
-      throw new Error("BODYGRAPH_CAPTURE_FAILED");
-    }
+  // Print native SVG directly: html2canvas 1.4 cannot reliably parse OKLCH
+  // colors used by Bodygraph, leading to blank or failed captures.
+  const bodygraphSvg = bodygraphRef.current.querySelector("svg")?.outerHTML;
+  if (!bodygraphSvg || !bodygraphSvg.includes("viewBox")) {
+    throw new Error("BODYGRAPH_NOT_RENDERED");
   }
-  if (!bodygraphImg) throw new Error("BODYGRAPH_CAPTURE_FAILED");
 
   const birthDateFormatted = chart.birthDate
     ? (chart.birthDate.includes("-")
@@ -154,7 +143,8 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
     .kv-label { font-size: 9px; color: #9ca3af; width: 100px; padding: 3px 6px; }
     .kv-value { font-size: 10px; font-weight: 600; color: #1e1e32; padding: 3px 6px; }
     
-    .bodygraph-img { max-width: 100%; height: auto; margin-top: 10px; border: 1px solid #f3f0ff; border-radius: 8px; padding: 10px; }
+    .bodygraph-img { max-width: 100%; margin-top: 10px; border: 1px solid #f3f0ff; border-radius: 8px; padding: 10px; }
+    .bodygraph-img svg { display: block; width: 100%; height: auto; }
     
     .desc-box { background: #fafafa; border: 1px solid #e9e5ff; border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; font-size: 9px; color: #4b5563; line-height: 1.5; }
     .desc-label { font-size: 8px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
@@ -193,7 +183,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
       <!-- Left side: Bodygraph -->
       <div class="bodygraph-side">
         <div class="section-title">Váš energetický Bodygraph</div>
-        <img src="${bodygraphImg}" class="bodygraph-img" alt="Bodygraph" />
+        <div class="bodygraph-img">${bodygraphSvg}</div>
         
         <div style="margin-top: 20px; text-align: left">
           <div class="section-title" style="margin-top:20px">Aktivované brány (${(chart.activatedGates || []).length})</div>
