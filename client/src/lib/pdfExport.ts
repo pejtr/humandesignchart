@@ -1,5 +1,6 @@
 import html2canvas from 'html2canvas';
 import type { HumanDesignChartData } from "@shared/types";
+import { isCompleteBlueprintChart } from "@shared/chartSchemas";
 import { cs } from "@shared/i18n/cs";
 
 const t = cs;
@@ -20,6 +21,10 @@ function translateCrossName(name: string): string {
 }
 
 export async function generateChartPDF(chart: HumanDesignChartData, name: string, hdData: any, bodygraphRef?: React.RefObject<HTMLDivElement | null>, locale?: "cs" | "en"): Promise<void> {
+  // Fail closed: do not generate a paid document with undefined values or a blank graph.
+  if (!isCompleteBlueprintChart(chart)) throw new Error("COMPLETE_BIRTH_CHART_REQUIRED");
+  if (!hdData?.types || !hdData?.profiles || !hdData?.authorities) throw new Error("HD_CONTENT_UNAVAILABLE");
+  if (!bodygraphRef?.current) throw new Error("BODYGRAPH_NOT_RENDERED");
   const isCzech = (locale ?? (typeof window !== "undefined" && window.location.pathname.startsWith("/en") ? "en" : "cs")) === "cs";
   const czType = (t.types as Record<string, string>)[chart.type] || chart.type;
   const czStrategy = (t.hd.strategies as Record<string, string>)[chart.strategy] || chart.strategy;
@@ -93,7 +98,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
   }).join("") : "";
 
   let bodygraphImg = "";
-  if (bodygraphRef?.current) {
+  if (bodygraphRef.current) {
     try {
       const canvas = await html2canvas(bodygraphRef.current, {
         scale: 2,
@@ -104,8 +109,10 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
       bodygraphImg = canvas.toDataURL("image/png");
     } catch (e) {
       console.error("Failed to capture bodygraph for PDF", e);
+      throw new Error("BODYGRAPH_CAPTURE_FAILED");
     }
   }
+  if (!bodygraphImg) throw new Error("BODYGRAPH_CAPTURE_FAILED");
 
   const birthDateFormatted = chart.birthDate
     ? (chart.birthDate.includes("-")
@@ -186,7 +193,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
       <!-- Left side: Bodygraph -->
       <div class="bodygraph-side">
         <div class="section-title">Váš energetický Bodygraph</div>
-        ${bodygraphImg ? `<img src="${bodygraphImg}" class="bodygraph-img" alt="Bodygraph" />` : `<div style="padding:40px; border:1px dashed #ccc; color:#999">Vizualizace mapy</div>`}
+        <img src="${bodygraphImg}" class="bodygraph-img" alt="Bodygraph" />
         
         <div style="margin-top: 20px; text-align: left">
           <div class="section-title" style="margin-top:20px">Aktivované brány (${(chart.activatedGates || []).length})</div>
@@ -294,27 +301,6 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
         1. ${isCzech ? "Kde ve svém životě nejvíce respektuji vlastní tempo?" : "Where in my life do I honor my natural rhythm most?"}<br/>
         2. ${isCzech ? "Jak poznám, že rozhoduji ze své vůle, nikoli ze strachu?" : "How do I know when a choice comes from clarity rather than fear?"}<br/>
         3. ${isCzech ? "Co mohu během příštího týdne udělat jinak?" : "What is one small thing I will do differently this coming week?"}
-      </div>
-    </div>
-
-    <!-- Premium practical integration workbook: grounded in the calculated chart. -->
-    <div class="section" style="break-before:page;page-break-before:always;padding:18px;border:1px solid #ddd6fe;border-radius:12px">
-      <div class="section-title" style="font-size:17px">Váš osobní integrační plán · 7 dní</div>
-      <p style="font-size:11px;line-height:1.65;color:#475569">Tento plán propojuje tři konkrétní prvky vaší mapy: energetický typ <strong>${czType}</strong>, strategii <strong>${czStrategy}</strong> a autoritu <strong>${chart.authority}</strong>. Berte jej jako prostor pro sebereflexi, nikoli jako vědeckou diagnózu či předpověď.</p>
-      <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <tr><td style="padding:10px;vertical-align:top;width:19%;font-weight:700">Den 1 · Pozorování</td><td style="padding:10px">Všimněte si tří situací, kdy jste jednali automaticky. Kdy jste cítili energii a kdy tlak?</td></tr>
-        <tr><td style="padding:10px;vertical-align:top;font-weight:700">Den 2 · Strategie</td><td style="padding:10px">Vyberte jedno malé rozhodnutí a vědomě vyzkoušejte strategii „${czStrategy}“. Zapište si, co se změnilo.</td></tr>
-        <tr><td style="padding:10px;vertical-align:top;font-weight:700">Den 3 · Autorita</td><td style="padding:10px">Před dalším rozhodnutím si připomeňte svou autoritu „${chart.authority}“. Oddělte vlastní pocit od očekávání okolí.</td></tr>
-        <tr><td style="padding:10px;vertical-align:top;font-weight:700">Den 4 · Hranice</td><td style="padding:10px">Zaznamenejte jednu situaci, kdy jste řekli ano, ale chtěli jste říci ne. Co vám pomůže nastavit zdravou hranici?</td></tr>
-        <tr><td style="padding:10px;vertical-align:top;font-weight:700">Den 5 · Vztahy</td><td style="padding:10px">Vysvětlete blízkému člověku, jak vám vyhovuje dělat rozhodnutí. Požádejte o konkrétní podporu.</td></tr>
-        <tr><td style="padding:10px;vertical-align:top;font-weight:700">Den 6 · Energie</td><td style="padding:10px">Sledujte činnosti, po kterých se cítíte více a méně spokojení. Vytvořte si dva krátké seznamy.</td></tr>
-        <tr><td style="padding:10px;vertical-align:top;font-weight:700">Den 7 · Integrace</td><td style="padding:10px">Vyberte jeden návyk na dalších 30 dní. Určete jednoduchý signál pokroku a termín kontroly.</td></tr>
-      </table>
-      <div style="margin-top:14px;padding:12px;background:#f5f3ff;border-radius:8px;font-size:11px;line-height:1.6">
-        <strong>Vaše tři otázky:</strong><br/>
-        1. Kde ve svém životě nejvíce respektuji vlastní tempo?<br/>
-        2. Jak poznám, že rozhoduji ze své vůle, nikoli ze strachu?<br/>
-        3. Co mohu během příštího týdne udělat jinak?
       </div>
     </div>
 
