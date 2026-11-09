@@ -8,6 +8,7 @@ import {
   ChartCalculationInputSchema,
   ChartCalculationRequestSchema,
   ChartResultSchema,
+  isCompleteBlueprintChartJson,
 } from "../shared/chartSchemas";
 import {
   lookupIanaTimezone,
@@ -523,6 +524,17 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input, ctx }: { input: any; ctx: Context }) => {
+        // Server-authoritative gates: a guest or mismatched account can never start payment.
+        const authenticatedUser = await getSessionUser(ctx.request, ctx.env);
+        if (!authenticatedUser?.email) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "LOGIN_REQUIRED_BEFORE_CHECKOUT" });
+        }
+        if (authenticatedUser.email.toLowerCase() !== input.customerEmail.trim().toLowerCase()) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "CHECKOUT_EMAIL_MUST_MATCH_ACCOUNT" });
+        }
+        if (input.chartDataJson && !isCompleteBlueprintChartJson(input.chartDataJson)) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "COMPLETE_BIRTH_CHART_REQUIRED" });
+        }
         if (!input.digitalDeliveryConsent) {
           throw new TRPCError({
             code: "BAD_REQUEST",
@@ -606,13 +618,16 @@ export const appRouter = router({
         // report exists or belongs to this customer. Fail before requesting payment.
         const savedChart = snapshotId
           ? await d1
-              .prepare("SELECT id FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) AND locale = ? LIMIT 1")
+               .prepare("SELECT id, chart_data_json FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) AND locale = ? LIMIT 1")
               .bind(snapshotId, input.customerEmail.trim(), input.locale)
               .first()
               .catch(() => null)
           : null;
         if (!savedChart) {
           throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHART_SNAPSHOT_REQUIRED" });
+        }
+        if (!isCompleteBlueprintChartJson(savedChart.chart_data_json)) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "COMPLETE_BIRTH_CHART_REQUIRED" });
         }
 
         const isCzech = input.locale === "cs";
