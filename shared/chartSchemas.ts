@@ -85,7 +85,13 @@ export const ChartResultSchema = z.object({
   incarnationCross: z.object({
     name: z.string(),
     type: z.string(),
-    gates: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+    // Zod's tuple inference in the deployed TypeScript version widens to an
+    // optional-length tuple. Preserve the exact 4-number domain contract.
+    gates: z.custom<[number, number, number, number]>(value =>
+      Array.isArray(value) && value.length === 4 && value.every(gate =>
+        typeof gate === "number" && Number.isInteger(gate) && gate >= 1 && gate <= 64
+      )
+    ),
   }),
   variables: z.object({
     digestion: VariableSchema,
