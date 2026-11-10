@@ -1,0 +1,89 @@
+/* Bodygraph motion only: never affects global charts, calculation or page transitions. */
+.bodygraph-motion-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+  --hd-motion-speed: 2.2;
+  --hd-motion-opacity: 0.42;
+}
+.bodygraph-motion-frame[data-motion-preset="flow"] {
+  --hd-motion-speed: 1;
+  --hd-motion-opacity: 0.78;
+}
+.bodygraph-motion-frame .bodygraph-svg { display: block; }
+.hd-motion-control {
+  display: flex;
+  align-self: flex-end;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 100%;
+  margin: 6px 0 0;
+  padding: 5px;
+  border: 1px solid rgba(201, 158, 97, 0.38);
+  border-radius: 999px;
+  background: rgba(14, 21, 43, 0.9);
+  color: #f8edce;
+  box-shadow: 0 7px 22px rgba(0, 0, 0, 0.16);
+}
+.hd-motion-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  font: 700 11px/1.3 system-ui, sans-serif;
+  letter-spacing: 0.045em;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.hd-motion-btn:hover { background: rgba(234, 195, 132, 0.14); }
+.hd-motion-btn:focus-visible { outline: 2px solid #f4cc82; outline-offset: 2px; }
+.hd-motion-btn[aria-pressed="true"] {
+  background: #f1c87a;
+  color: #201526;
+}
+.hd-motion-btn:disabled { cursor: not-allowed; opacity: 0.55; }
+.hd-motion-btn[aria-pressed="true"]:disabled { background: rgba(241, 200, 122, 0.18); color: #f1c87a; }
+
+/* Defined channels and centers are decorative layers; SVG hit targets remain unchanged. */
+.bodygraph-motion-frame .bodygraph-energy-pulse {
+  pointer-events: none;
+  opacity: var(--hd-motion-opacity);
+  animation: hd-bodygraph-energy calc(3.4s * var(--hd-motion-speed)) linear infinite;
+}
+.bodygraph-motion-frame .bodygraph-living-center {
+  animation: hd-bodygraph-breathe calc(5s * var(--hd-motion-speed)) ease-in-out infinite;
+}
+@keyframes hd-bodygraph-energy { to { stroke-dashoffset: -84; } }
+@keyframes hd-bodygraph-breathe {
+  0%, 100% { opacity: 0.96; }
+  50% { opacity: 0.78; }
+}
+/* Stop all SVG animations while keeping hover/click and static geometry usable. */
+.bodygraph-motion-frame[data-motion-state="paused"] .bodygraph-svg *,
+.bodygraph-motion-frame[data-motion-state="paused"] .bodygraph-svg *::before,
+.bodygraph-motion-frame[data-motion-state="paused"] .bodygraph-svg *::after {
+  animation-play-state: paused !important;
+}
+.bodygraph-motion-frame[data-motion-state="paused"] .bodygraph-energy-pulse {
+  opacity: 0 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bodygraph-motion-frame .bodygraph-svg *,
+  .bodygraph-motion-frame .bodygraph-svg *::before,
+  .bodygraph-motion-frame .bodygraph-svg *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .bodygraph-motion-frame .bodygraph-energy-pulse { opacity: 0 !important; }
+}

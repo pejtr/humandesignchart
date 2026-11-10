@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import BodygraphMotionFrame from "./BodygraphMotionFrame";
 import type { HumanDesignChartData } from "@shared/types";
 
 interface BodygraphProps {
@@ -8,6 +9,7 @@ interface BodygraphProps {
   showLabels?: boolean;
   transitGates?: number[];
   interactive?: boolean;
+  motionControls?: boolean;
   onGateClick?: (gate: number) => void;
   onCenterClick?: (center: string) => void;
   onChannelClick?: (gate1: number, gate2: number) => void;
@@ -133,6 +135,7 @@ export default function Bodygraph({
   showLabels = true,
   transitGates = [],
   interactive = true,
+  motionControls = interactive,
   onGateClick,
   onCenterClick,
   onChannelClick,
@@ -200,6 +203,7 @@ export default function Bodygraph({
   }
 
   return (
+    <BodygraphMotionFrame width={width} enabled={motionControls}>
     <svg
       viewBox="0 0 500 600"
       width={width}
@@ -274,6 +278,18 @@ export default function Bodygraph({
                   opacity={0.3}
                   filter="url(#glow)"
                 />
+                {/* Animated overlay never affects channel hit-testing or calculations. */}
+                <path
+                  d={path}
+                  className="bodygraph-energy-pulse"
+                  stroke="#f4d491"
+                  strokeWidth={2}
+                  strokeDasharray="3 18"
+                  strokeLinecap="round"
+                  fill="none"
+                  pointerEvents="none"
+                  aria-hidden="true"
+                />
                 {/* Main channel line */}
                 <path
                   d={path}
@@ -324,6 +340,7 @@ export default function Bodygraph({
                 stroke={strokeColor}
                 strokeWidth={sw}
                 filter={filterVal}
+                className={isDefined ? "bodygraph-living-center" : undefined}
                 style={{ transition: "all 0.2s" }}
               />
             ) : name === "Heart" ? (
@@ -333,6 +350,7 @@ export default function Bodygraph({
                 stroke={strokeColor}
                 strokeWidth={sw}
                 filter={filterVal}
+                className={isDefined ? "bodygraph-living-center" : undefined}
                 style={{ transition: "all 0.2s" }}
               />
             ) : name === "Head" ? (
@@ -342,6 +360,7 @@ export default function Bodygraph({
                 stroke={strokeColor}
                 strokeWidth={sw}
                 filter={filterVal}
+                className={isDefined ? "bodygraph-living-center" : undefined}
                 style={{ transition: "all 0.2s" }}
               />
             ) : (
@@ -355,6 +374,7 @@ export default function Bodygraph({
                 stroke={strokeColor}
                 strokeWidth={sw}
                 filter={filterVal}
+                className={isDefined ? "bodygraph-living-center" : undefined}
                 style={{ transition: "all 0.2s" }}
               />
             )}
@@ -470,5 +490,6 @@ export default function Bodygraph({
         );
       })()}
     </svg>
+    </BodygraphMotionFrame>
   );
 }
