@@ -278,18 +278,6 @@ export default function Bodygraph({
                   opacity={0.3}
                   filter="url(#glow)"
                 />
-                {/* Animated overlay never affects channel hit-testing or calculations. */}
-                <path
-                  d={path}
-                  className="bodygraph-energy-pulse"
-                  stroke="#f4d491"
-                  strokeWidth={2}
-                  strokeDasharray="3 18"
-                  strokeLinecap="round"
-                  fill="none"
-                  pointerEvents="none"
-                  aria-hidden="true"
-                />
                 {/* Main channel line */}
                 <path
                   d={path}
@@ -305,6 +293,18 @@ export default function Bodygraph({
                     onChannelClick?.(parts[0], parts[1]);
                   }}
                   style={{ transition: "all 0.2s", opacity: isHovered ? 1 : 0.9 }}
+                />
+                {/* Animated overlay never affects channel hit-testing or calculations. */}
+                <path
+                  d={path}
+                  className="bodygraph-energy-pulse"
+                  stroke="#f4d491"
+                  strokeWidth={2}
+                  strokeDasharray="3 18"
+                  strokeLinecap="round"
+                  fill="none"
+                  pointerEvents="none"
+                  aria-hidden="true"
                 />
               </>
             )}
