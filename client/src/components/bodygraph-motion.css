@@ -1,89 +1,147 @@
-/* Bodygraph motion only: never affects global charts, calculation or page transitions. */
+/* Motion styling scoped to the Bodygraph; no global animation overrides. */
 .bodygraph-motion-frame {
+  --hd-motion-speed: 1;
+  --hd-motion-opacity: .22;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  isolation: isolate;
+  width: 100%;
   min-width: 0;
-  --hd-motion-speed: 2.2;
-  --hd-motion-opacity: 0.42;
+  box-sizing: border-box;
+  padding: 0 0 70px;
 }
 .bodygraph-motion-frame[data-motion-preset="flow"] {
-  --hd-motion-speed: 1;
-  --hd-motion-opacity: 0.78;
+  --hd-motion-opacity: .55;
+  --hd-motion-speed: .5;
 }
-.bodygraph-motion-frame .bodygraph-svg { display: block; }
-.hd-motion-control {
-  display: flex;
-  align-self: flex-end;
-  align-items: center;
-  gap: 5px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+.bodygraph-motion-frame .bodygraph-svg {
+  display: block;
+  width: 100%;
+}
+.bodygraph-premium-preview {
   max-width: 100%;
-  margin: 6px 0 0;
+  padding: clamp(10px, 3vw, 26px) clamp(10px, 3vw, 26px) 78px;
+  border: 1px solid rgba(216,196,154,.22);
+  border-radius: 28px;
+  background: radial-gradient(circle at 50% 40%, #242849 0%, #171a36 45%, #0e1020 100%);
+  box-shadow: 0 22px 80px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.06);
+}
+.bodygraph-premium-preview .bodygraph-center-open > polygon,
+.bodygraph-premium-preview .bodygraph-center-open > rect {
+  fill: rgba(136,153,255,.10);
+  stroke: rgba(216,196,154,.45);
+  stroke-width: 1px;
+}
+.bodygraph-premium-preview .bodygraph-center-defined > polygon,
+.bodygraph-premium-preview .bodygraph-center-defined > rect {
+  fill: rgba(216,196,154,.46);
+  stroke: #d8c49a;
+  filter: drop-shadow(0 0 6px rgba(216,196,154,.35));
+}
+.bodygraph-premium-preview .bodygraph-center > text { fill: rgba(246,247,255,.90); }
+.bodygraph-premium-preview .bodygraph-svg g[role="button"]:focus-visible {
+  outline: none;
+  filter: drop-shadow(0 0 5px #8899ff);
+}
+.bodygraph-center-tooltip { filter: drop-shadow(0 6px 16px rgba(0,0,0,.45)); }
+.hd-motion-control {
+  position: absolute;
+  z-index: 5;
+  bottom: 16px;
+  right: 16px;
+  max-width: calc(100% - 24px);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   padding: 5px;
-  border: 1px solid rgba(201, 158, 97, 0.38);
+  border: 1px solid rgba(216,196,154,.52);
   border-radius: 999px;
-  background: rgba(14, 21, 43, 0.9);
-  color: #f8edce;
-  box-shadow: 0 7px 22px rgba(0, 0, 0, 0.16);
+  background: rgba(14,16,32,.78);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: #f5ebd7;
+  box-shadow: 0 10px 28px rgba(5,8,20,.28), inset 0 1px rgba(255,255,255,.08);
 }
 .hd-motion-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  min-width: 44px;
+  flex: 0 0 auto;
   min-height: 44px;
+  min-width: 44px;
   padding: 0 12px;
   border: 0;
   border-radius: 999px;
-  font: 700 11px/1.3 system-ui, sans-serif;
-  letter-spacing: 0.045em;
   background: transparent;
-  color: inherit;
+  color: #f5ebd7;
+  font: 700 11px/1.2 Inter, system-ui, sans-serif;
+  letter-spacing: .075em;
   cursor: pointer;
   touch-action: manipulation;
 }
-.hd-motion-btn:hover { background: rgba(234, 195, 132, 0.14); }
-.hd-motion-btn:focus-visible { outline: 2px solid #f4cc82; outline-offset: 2px; }
-.hd-motion-btn[aria-pressed="true"] {
-  background: #f1c87a;
-  color: #201526;
+.hd-motion-play {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(216,196,154,.22);
+  background: rgba(136,153,255,.13);
 }
-.hd-motion-btn:disabled { cursor: not-allowed; opacity: 0.55; }
-.hd-motion-btn[aria-pressed="true"]:disabled { background: rgba(241, 200, 122, 0.18); color: #f1c87a; }
-
-/* Defined channels and centers are decorative layers; SVG hit targets remain unchanged. */
+.hd-motion-segment {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid rgba(136,153,255,.23);
+  border-radius: 999px;
+  background: rgba(3,7,25,.36);
+}
+.hd-motion-preset { min-width: 58px; min-height: 38px; padding: 0 12px; }
+.hd-motion-btn[aria-pressed="true"] {
+  background: rgba(216,196,154,.94);
+  color: #0e1020;
+}
+.hd-motion-btn:hover:not(:disabled) { background: rgba(216,196,154,.25); color: white; }
+.hd-motion-btn[aria-pressed="true"]:hover:not(:disabled) { background: #f1dfb6; color: #0e1020; }
+.hd-motion-btn:focus-visible { outline: 2px solid #8899ff; outline-offset: 3px; }
+.hd-motion-btn:disabled { cursor: not-allowed; opacity: .6; }
+.bodygraph-motion-frame[data-motion-auto="true"] .hd-motion-control { opacity: .4; }
+.bodygraph-motion-frame[data-motion-auto="true"] .hd-motion-control:is(:hover,:focus-within) { opacity: 1; }
 .bodygraph-motion-frame .bodygraph-energy-pulse {
   pointer-events: none;
   opacity: var(--hd-motion-opacity);
-  animation: hd-bodygraph-energy calc(3.4s * var(--hd-motion-speed)) linear infinite;
+  animation: hd-bodygraph-energy calc(7.2s * var(--hd-motion-speed)) linear infinite;
 }
 .bodygraph-motion-frame .bodygraph-living-center {
-  animation: hd-bodygraph-breathe calc(5s * var(--hd-motion-speed)) ease-in-out infinite;
+  animation: hd-bodygraph-breathe calc(7s * var(--hd-motion-speed)) ease-in-out infinite;
 }
 @keyframes hd-bodygraph-energy { to { stroke-dashoffset: -84; } }
 @keyframes hd-bodygraph-breathe {
-  0%, 100% { opacity: 0.96; }
-  50% { opacity: 0.78; }
+  0%, 100% { opacity: 1; }
+  50% { opacity: .87; }
 }
-/* Stop all SVG animations while keeping hover/click and static geometry usable. */
 .bodygraph-motion-frame[data-motion-state="paused"] .bodygraph-svg *,
 .bodygraph-motion-frame[data-motion-state="paused"] .bodygraph-svg *::before,
 .bodygraph-motion-frame[data-motion-state="paused"] .bodygraph-svg *::after {
-  animation-play-state: paused !important;
+  animation: none !important;
 }
-.bodygraph-motion-frame[data-motion-state="paused"] .bodygraph-energy-pulse {
-  opacity: 0 !important;
+.bodygraph-motion-frame[data-motion-state="paused"] .bodygraph-living-center { opacity: 1 !important; }
+.bodygraph-motion-frame[data-motion-state="paused"] .bodygraph-energy-pulse { opacity: 0 !important; }
+@media (max-width: 640px) {
+  .bodygraph-premium-preview { border-radius: 20px; padding: 10px 8px 66px; }
+  .hd-motion-control {
+    position: sticky;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    margin: -56px 10px 0 auto;
+    right: auto;
+    align-self: flex-end;
+    justify-self: end;
+  }
+  .hd-motion-play { width: 44px; min-width: 44px; }
+  .hd-motion-preset { padding: 0 8px; min-width: 52px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .bodygraph-motion-frame .bodygraph-svg *,
   .bodygraph-motion-frame .bodygraph-svg *::before,
-  .bodygraph-motion-frame .bodygraph-svg *::after {
-    animation: none !important;
-    transition: none !important;
-  }
+  .bodygraph-motion-frame .bodygraph-svg *::after { animation: none !important; transition: none !important; }
   .bodygraph-motion-frame .bodygraph-energy-pulse { opacity: 0 !important; }
+  .bodygraph-motion-frame .bodygraph-living-center { opacity: 1 !important; }
+  .hd-motion-control { transition: none !important; }
 }

@@ -32,10 +32,12 @@ export default function BodygraphMotionFrame({
   children,
   width,
   enabled = true,
+  premium = false,
 }: {
   children: ReactNode;
   width: number;
   enabled?: boolean;
+  premium?: boolean;
 }) {
   // Developer opt-in, preview-only; never runs on the production domain.
   useEffect(() => {
@@ -118,7 +120,7 @@ export default function BodygraphMotionFrame({
   return (
     <div
       ref={rootRef}
-      className="bodygraph-motion-frame"
+      className={`bodygraph-motion-frame${premium ? " bodygraph-premium-preview" : ""}`}
       style={{ width, maxWidth: "100%" }}
       data-motion-state={enabled && running ? "running" : "paused"}
       data-motion-preset={preferences.preset}
@@ -131,10 +133,12 @@ export default function BodygraphMotionFrame({
           role="group"
           aria-label={isCz ? "Ovládání animací mapy" : "Bodygraph animation controls"}
           className="hd-motion-control"
+          data-testid="bodygraph-motion-control"
         >
           <button
             type="button"
             className="hd-motion-btn hd-motion-play"
+            data-testid="bodygraph-motion-toggle"
             disabled={systemPaused}
             aria-pressed={preferences.mode === "play"}
             aria-label={isCz
@@ -143,22 +147,25 @@ export default function BodygraphMotionFrame({
             title={stateLabel}
             onClick={() => setPreference("mode", preferences.mode === "play" ? "pause" : "play")}
           >
-            {running ? <Pause aria-hidden="true" size={15} /> : <Play aria-hidden="true" size={15} />}
-            <span>{isCz
-              ? running ? "Pauza" : "Spustit"
-              : running ? "Pause" : "Play"}</span>
+            {preferences.mode === "play"
+              ? <Pause aria-hidden="true" size={17} />
+              : <Play aria-hidden="true" size={17} />}
           </button>
+          <div className="hd-motion-segment" role="group" aria-label={isCz ? "Režim pohybu" : "Motion intensity"}>
           {(["zen", "flow"] as const).map(preset => (
             <button
               key={preset}
               type="button"
               className="hd-motion-btn hd-motion-preset"
+              data-testid={`bodygraph-motion-${preset}`}
+              title={preset === "zen" ? (isCz ? "Jemný a pomalý pohyb" : "Gentle, slow motion") : (isCz ? "Plynulé proudění" : "Fluid motion")}
               aria-pressed={preferences.preset === preset}
               onClick={() => setPreference("preset", preset)}
             >
               {preset === "zen" ? "ZEN" : "FLOW"}
             </button>
           ))}
+          </div>
           <span className="sr-only" role="status" aria-live="polite">
             {stateLabel}
           </span>
