@@ -8,7 +8,7 @@ import { dirname, resolve } from "node:path";
 import { Resvg } from "@resvg/resvg-js";
 
 const project = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const output = resolve(project, "client", "public", "images", "og-motion-preview.png");
+const output = resolve(project, "dist", "public", "images", "og-motion-preview.png");
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
 <defs>

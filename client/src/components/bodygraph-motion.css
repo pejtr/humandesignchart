@@ -128,6 +128,8 @@
   .bodygraph-premium-preview { border-radius: 20px; padding: 10px 8px 66px; }
   .hd-motion-control {
     position: sticky;
+    display: flex;
+    width: max-content;
     bottom: calc(10px + env(safe-area-inset-bottom, 0px));
     margin: -56px 10px 0 auto;
     right: auto;

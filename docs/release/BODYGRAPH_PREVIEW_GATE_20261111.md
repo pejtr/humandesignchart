@@ -10,7 +10,7 @@
 - Build-time generated PNG social card `/images/og-motion-preview.png`, OG/Twitter metadata server-side and client-side; the preview route is `noindex` until approval.
 
 ## Evidence still required from an actual Cloudflare Pages preview
-1. Preserve the Antigravity local WIP; use a clean isolated checkout of branch `feat/bodygraph-motion-controls-20261110`. Run frozen install, `pnpm check`, Vitest, and `pnpm build:cloudflare`. The build script generates the PNG under `client/public/images`; check `dist/public/images/og-motion-preview.png` is a nonempty **1200×630 PNG**.
+1. Preserve the Antigravity local WIP; use a clean isolated checkout of branch `feat/bodygraph-motion-controls-20261110`. Run frozen install, `pnpm check`, Vitest, and `pnpm build:cloudflare`. The build script generates the PNG directly under `dist/public/images` **after Vite**, leaving the clean source worktree unchanged; check `dist/public/images/og-motion-preview.png` is a nonempty **1200×630 PNG**.
 2. Inspect the preview deployment's secrets and bindings before any upload. Use the existing Pages project `humandesignchart-web` with preview branch `hd-motion-preview`. Never use `--branch main`.
 3. After preview deployment verify `/cs/motion-preview` and `/en/motion-preview` return actual HTML and correct server-side OG tags. Confirm PNG URL HTTP 200 with `image/png`, metadata title, `noindex`, 1200×630 and correct preview host for `og:url` and `og:image`.
 4. Browser QA at **360, 390, 768, 1440, 3840px**: no horizontal overflow, glass pill in lower right, 44×44px target, mobile stickiness within chart section, keyboard Tab/Enter, tap center description, focus/tooltip visible, `aria-pressed` updates, ZEN→FLOW visual difference and Play/Pause without chart geometry changes.
