@@ -21,3 +21,7 @@
 9. Only publish beta testimonials and traffic/count metrics after verifying consent and data source; do not create illustrative quotes that impersonate real testers.
 
 **Release status until evidence exists: NO-GO for production.** Preview can be deployed only after build and isolated binding safety checks.
+
+
+## Reproducible screenshot + 15-second silent browser recording
+After deploying to an isolated `*.pages.dev` URL and installing Playwright **in the operator QA environment** (not in production), set `HD_MOTION_PREVIEW_URL` to the exact preview origin and run `node scripts/qa/capture-motion-preview.mjs`. The tool fails closed for production hostnames and does not touch payments, credentials or customer records. It writes three genuine viewport screenshots, a 15-second **muted browser capture** in WebM format, and a JSON console-error report to a local untracked `qa-artifacts/motion-preview/` folder. No generated recordings are treated as verified or published until the script actually runs and QA reviews them.
