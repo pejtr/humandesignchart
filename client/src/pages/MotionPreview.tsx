@@ -155,6 +155,20 @@ export default function MotionPreview() {
                 <span>{cs ? "Přibližně 3,5 s na cyklus" : "Approximately 3.5s per cycle"}</span>
               </article>
             </div>
+            <figure className="hd-mp-loop" aria-label={cs ? "Ilustrativní patnáctisekundová animovaná ukázka ZEN a FLOW" : "Illustrative 15-second silent ZEN / FLOW animation"}>
+              <img
+                src="/images/motion-preview-loop.svg"
+                alt={cs ? "Tichá smyčka: klidné zlaté světlo ZEN přechází do světlejšího indigo FLOW." : "Silent loop: calm gold ZEN light transitions into brighter indigo FLOW."}
+                loading="lazy"
+                width={900}
+                height={440}
+              />
+              <figcaption>
+                {cs
+                  ? "15s tichá animovaná ilustrace přepnutí ZEN → FLOW. Skutečný Bodygraph ovládáš výše."
+                  : "15s silent animated illustration of ZEN → FLOW. Use the real controls above."}
+              </figcaption>
+            </figure>
             <div className="hd-mp-assurance" role="note">
               <span>{cs ? "Respektuje systémové omezení pohybu" : "Respects system reduced-motion"}</span>
               <span>{cs ? "Mapa zůstává čitelná i bez animací" : "Chart stays readable without animation"}</span>

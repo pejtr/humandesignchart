@@ -100,3 +100,16 @@
   .hd-mp-button { transition:none; }
   .hd-mp-button:hover { transform:none; }
 }
+
+/* Actual 15-second silent animated SVG illustration; not a claimed browser recording. */
+.hd-mp-loop {
+  width: min(900px,100%);
+  margin: 54px auto 0;
+  overflow: hidden;
+  border: 1px solid rgba(216,196,154,.20);
+  background: #101328;
+  border-radius: 25px;
+  box-shadow: 0 30px 85px rgba(0,0,0,.20);
+}
+.hd-mp-loop img { display:block; width:100%; height:auto; }
+.hd-mp-loop figcaption { padding:16px 20px 21px; color:rgba(242,240,247,.62); font:400 12px/1.6 Inter,system-ui,sans-serif; }
