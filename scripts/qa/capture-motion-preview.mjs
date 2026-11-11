@@ -11,7 +11,7 @@ import { resolve } from "node:path";
 const input = process.env.HD_MOTION_PREVIEW_URL;
 if (!input) throw new Error("Set HD_MOTION_PREVIEW_URL to an isolated Cloudflare preview origin");
 const base = new URL(input);
-if (base.protocol !== "https:" || !base.hostname.endsWith(".pages.dev") ||
+if (base.protocol !== "https:" || !/^(?:[a-z0-9-]+\.)?humandesignchart-web\.pages\.dev$/.test(base.hostname) ||
     base.pathname !== "/" || base.search || base.hash) {
   throw new Error("Refusing non-preview URL. Use https://<preview>.pages.dev/ only.");
 }
@@ -35,26 +35,64 @@ try {
     const page = await context.newPage();
     page.on("pageerror", error => evidence.consoleErrors.push(`${label}: ${error.message}`));
     page.on("console", msg => { if (msg.type() === "error") evidence.consoleErrors.push(`${label}: ${msg.text()}`); });
-    const response = await page.goto(target, { waitUntil: "networkidle", timeout: 45000 });
+    const response = await page.goto(target, { waitUntil: "domcontentloaded", timeout: 45000 });
     if (response?.status() !== 200) throw new Error(`${label}: preview returned HTTP ${response?.status()}`);
     const graph = page.locator(".bodygraph-premium-preview");
     await graph.waitFor({ state: "visible" });
     await graph.scrollIntoViewIfNeeded();
     const zen = page.locator('[data-testid="bodygraph-motion-zen"]');
     const flow = page.locator('[data-testid="bodygraph-motion-flow"]');
+    const control = page.locator(".hd-motion-control");
+    const toggle = page.locator('[data-testid="bodygraph-motion-toggle"]');
     await zen.click();
     if (await zen.getAttribute("aria-pressed") !== "true") throw new Error(`${label}: Zen switch did not activate`);
+    const beforeGeometry = await page.locator(".bodygraph-premium-preview .bodygraph-svg path").evaluateAll(
+      nodes => nodes.map(node => node.getAttribute("d")).join("|")
+    );
+    const zenShot = resolve(dir, `bodygraph-${label}-zen.png`);
+    await page.screenshot({ path: zenShot, fullPage: true });
+    evidence.screenshots.push({ label, state: "zen", file: zenShot });
+
     await flow.click();
     if (await flow.getAttribute("aria-pressed") !== "true") throw new Error(`${label}: Flow switch did not activate`);
+    const flowShot = resolve(dir, `bodygraph-${label}-flow.png`);
+    await page.screenshot({ path: flowShot, fullPage: true });
+    evidence.screenshots.push({ label, state: "flow", file: flowShot });
+
+    await toggle.click();
+    if (await graph.getAttribute("data-motion-state") !== "paused") throw new Error(`${label}: Play/Pause did not stop animation`);
+    const pausedShot = resolve(dir, `bodygraph-${label}-paused.png`);
+    await page.screenshot({ path: pausedShot, fullPage: true });
+    evidence.screenshots.push({ label, state: "paused", file: pausedShot });
+
+    const afterGeometry = await page.locator(".bodygraph-premium-preview .bodygraph-svg path").evaluateAll(
+      nodes => nodes.map(node => node.getAttribute("d")).join("|")
+    );
+    if (beforeGeometry !== afterGeometry) evidence.failures.push(`${label}: Bodygraph geometry changed with motion state`);
+
     const metrics = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
       viewportWidth: window.innerWidth,
       controlRect: document.querySelector(".hd-motion-control")?.getBoundingClientRect().toJSON(),
     }));
     if (metrics.scrollWidth > metrics.viewportWidth + 2) evidence.failures.push(`${label}: horizontal overflow`);
-    const shot = resolve(dir, `bodygraph-${label}.png`);
-    await page.screenshot({ path: shot, fullPage: true });
-    evidence.screenshots.push({ label, file: shot, ...metrics });
+    const controlRect = await control.boundingBox();
+    if (!controlRect || controlRect.width < 44 || controlRect.height < 44) evidence.failures.push(`${label}: control too small/invisible`);
+
+    await page.reload({ waitUntil: "domcontentloaded" });
+    const restored = page.locator(".bodygraph-premium-preview");
+    await restored.waitFor({ state: "visible" });
+    if (await restored.getAttribute("data-motion-state") !== "paused" ||
+        await page.locator('[data-testid="bodygraph-motion-flow"]').getAttribute("aria-pressed") !== "true") {
+      evidence.failures.push(`${label}: saved Pause/FLOW not restored after reload`);
+    }
+    if (label === "mobile-390") {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      if (await restored.getAttribute("data-motion-state") !== "paused") {
+        evidence.failures.push("mobile-390: reduced motion did not pause animation");
+      }
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+    }
     await context.close();
   }
 
@@ -66,7 +104,7 @@ try {
   });
   const page = await context.newPage();
   page.on("pageerror", error => evidence.consoleErrors.push(`video: ${error.message}`));
-  await page.goto(target, { waitUntil: "networkidle", timeout: 45000 });
+  await page.goto(target, { waitUntil: "domcontentloaded", timeout: 45000 });
   await page.locator(".bodygraph-premium-preview").scrollIntoViewIfNeeded();
   await page.locator('[data-testid="bodygraph-motion-zen"]').click();
   await page.waitForTimeout(7400);
