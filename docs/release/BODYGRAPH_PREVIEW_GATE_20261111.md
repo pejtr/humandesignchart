@@ -25,3 +25,19 @@
 
 ## Reproducible screenshot + 15-second silent browser recording
 After deploying to an isolated `*.pages.dev` URL and installing Playwright **in the operator QA environment** (not in production), set `HD_MOTION_PREVIEW_URL` to the exact preview origin and run `node scripts/qa/capture-motion-preview.mjs`. The tool fails closed for production hostnames and does not touch payments, credentials or customer records. It writes three genuine viewport screenshots, a 15-second **muted browser capture** in WebM format, and a JSON console-error report to a local untracked `qa-artifacts/motion-preview/` folder. No generated recordings are treated as verified or published until the script actually runs and QA reviews them.
+
+## One-command Windows / Antigravity preview release (no GitHub Actions deploy)
+
+Use a **clean isolated checkout** of PR #85; do not reuse Antigravity's dirty main working tree. The fully gated Windows script is `scripts/qa/deploy-motion-preview.ps1`:
+
+```powershell
+# Operator signs into Cloudflare with a SCOPED Pages token stored only in environment.
+# Do not paste token values into a chat or commit them.
+pwsh -File scripts/qa/deploy-motion-preview.ps1
+# If safety gate confirms NO shared production DB/KV/R2/DO resources and no revenue/email keys in preview:
+pwsh -File scripts/qa/deploy-motion-preview.ps1 -Deploy -Capture
+```
+
+The script checks GitHub remote and exact PR branch head, clean tree, frozen dependencies, TypeScript, Vitest, Pages build, valid 1200x630 PNG, and fetches Cloudflare project preview/production configuration read-only before any write. A preview sharing production data or revenue/fulfillment secrets is **NO-GO**. It only uploads `--branch=hd-motion-preview` and remote-probes both localized pages + image. `-Capture` requires an already installed Playwright browser in the QA operator's local environment.
+
+No Cloudflare credential or ONYX REMOTE command connector is exposed inside this ChatGPT session; authoring this script does **not** constitute a real deploy.
