@@ -105,7 +105,7 @@ if (-not $Deploy) {
   exit 0
 }
 
-# Re-read branch state immediately before uploading. No --branch=main is accepted here.
+# Re-read branch state immediately before uploading. Only the isolated preview alias is permitted.
 $dirtyAfter = ReadOutput git @('status','--porcelain','--untracked-files=all')
 Assert (-not $dirtyAfter) 'Refusing: source changed during build.'
 $shaAfter = ReadOutput git @('rev-parse','HEAD')
