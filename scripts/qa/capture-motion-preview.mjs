@@ -87,11 +87,33 @@ try {
       evidence.failures.push(`${label}: saved Pause/FLOW not restored after reload`);
     }
     if (label === "mobile-390") {
+      // A reduced-motion check performed while manually paused cannot verify
+      // whether the OS setting actually overrides an actively running graph.
+      await restored.scrollIntoViewIfNeeded();
+      const restoredToggle = page.locator('[data-testid="bodygraph-motion-toggle"]');
+      await restoredToggle.click(); // saved Pause -> Play
+      await page.waitForFunction(() =>
+        document.querySelector(".bodygraph-premium-preview")?.getAttribute("data-motion-state") === "running",
+        { timeout: 5000 },
+      );
       await page.emulateMedia({ reducedMotion: "reduce" });
-      if (await restored.getAttribute("data-motion-state") !== "paused") {
-        evidence.failures.push("mobile-390: reduced motion did not pause animation");
+      await page.waitForFunction(() =>
+        document.querySelector(".bodygraph-premium-preview")?.getAttribute("data-motion-state") === "paused",
+        { timeout: 5000 },
+      );
+      if (!(await restoredToggle.isDisabled())) {
+        evidence.failures.push("mobile-390: Play is not disabled while reduced-motion is active");
       }
       await page.emulateMedia({ reducedMotion: "no-preference" });
+      await page.waitForFunction(() =>
+        document.querySelector(".bodygraph-premium-preview")?.getAttribute("data-motion-state") === "running",
+        { timeout: 5000 },
+      );
+    }
+    const firstCenter = page.locator(".bodygraph-premium-preview .bodygraph-center").first();
+    await firstCenter.focus();
+    if (!(await page.locator(".bodygraph-center-tooltip").isVisible())) {
+      evidence.failures.push(`${label}: center micro-label does not appear on keyboard focus`);
     }
     await context.close();
   }
