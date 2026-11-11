@@ -94,11 +94,13 @@ try {
       await restoredToggle.click(); // saved Pause -> Play
       await page.waitForFunction(() =>
         document.querySelector(".bodygraph-premium-preview")?.getAttribute("data-motion-state") === "running",
+        undefined,
         { timeout: 5000 },
       );
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.waitForFunction(() =>
         document.querySelector(".bodygraph-premium-preview")?.getAttribute("data-motion-state") === "paused",
+        undefined,
         { timeout: 5000 },
       );
       if (!(await restoredToggle.isDisabled())) {
@@ -107,6 +109,7 @@ try {
       await page.emulateMedia({ reducedMotion: "no-preference" });
       await page.waitForFunction(() =>
         document.querySelector(".bodygraph-premium-preview")?.getAttribute("data-motion-state") === "running",
+        undefined,
         { timeout: 5000 },
       );
     }
