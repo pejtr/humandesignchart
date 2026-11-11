@@ -37,6 +37,21 @@ export default function BodygraphMotionFrame({
   width: number;
   enabled?: boolean;
 }) {
+  // Developer opt-in, preview-only; never runs on the production domain.
+  useEffect(() => {
+    if (!enabled || typeof window === "undefined") return;
+    const { hostname, search } = window.location;
+    const isPreview = hostname === "localhost" ||
+      hostname === "127.0.0.1" || hostname.endsWith(".pages.dev");
+    if (!isPreview || new URLSearchParams(search).get("motionqa") !== "1") return;
+    let disposed = false;
+    let stop = () => {};
+    void import("@/lib/bodygraphMotionQA").then(({ startBodygraphMotionSampler }) => {
+      if (!disposed && rootRef.current) stop = startBodygraphMotionSampler(rootRef.current);
+    }).catch(() => { /* Diagnostics must never affect chart rendering. */ });
+    return () => { disposed = true; stop(); };
+  }, [enabled]);
+
   const { locale } = useLanguage();
   const isCz = locale === "cs";
   const rootRef = useRef<HTMLDivElement>(null);
