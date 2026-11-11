@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { spawnSync } from "node:child_process";
 import { buildSeoHead } from "./_core/seoMeta";
 
 describe("premium motion preview release contract", () => {
@@ -15,6 +16,14 @@ describe("premium motion preview release contract", () => {
       expect(html).toContain('name="twitter:card"');
     });
   }
+
+  it("keeps both release scripts syntactically valid without running deployments", () => {
+    for (const script of ["scripts/generate-motion-preview-og.mjs", "scripts/qa/capture-motion-preview.mjs"]) {
+      const check = spawnSync(process.execPath, ["--check", resolve(script)], { encoding: "utf8", timeout: 10000 });
+      expect(check.error).toBeUndefined();
+      expect(check.status, `${script}: ${check.stderr}`).toBe(0);
+    }
+  });
 
   it("keeps demo media illustrative and never fabricates beta claims", () => {
     const page = readFileSync(resolve("client/src/pages/MotionPreview.tsx"), "utf8");
