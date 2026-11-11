@@ -39,7 +39,19 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
   // Bare domains ("/") are the most shared URLs. Infer their language from
   // the hostname; otherwise WhatsApp gets the unprocessed <!--SEO_META--> shell.
   const htmlLang = locale || (enHost ? "en" : "cs");
-  const meta = buildSeoHead(htmlLang, url.pathname);
+  let meta = buildSeoHead(htmlLang, url.pathname);
+  // A shareable *.pages.dev preview must refer to its OWN OG image, not an
+  // unlaunched image path on the live branded domains. This route stays noindex.
+  if (/^\/(?:cs|en)\/motion-preview\/?$/.test(url.pathname) &&
+      url.hostname.endsWith(".pages.dev") && meta) {
+    const canonicalBrand = htmlLang === "cs"
+      ? "https://humandesignmapa.cz" : "https://humandesignchart.app";
+    meta = meta
+      .replaceAll(`${canonicalBrand}/images/og-motion-preview.png`,
+        `${url.origin}/images/og-motion-preview.png`)
+      .replaceAll(`${canonicalBrand}/${htmlLang}/motion-preview`,
+        `${url.origin}${url.pathname}`);
+  }
   let html = await asset.text();
   if (enHost || (locale && locale !== "cs")) {
     html = html

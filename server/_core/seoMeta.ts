@@ -18,6 +18,7 @@ interface RouteMeta {
   ogImage?: string;
   ogType?: string;
   keywords?: string;
+  noIndex?: boolean;
 }
 
 function escapeHtml(s: string) {
@@ -57,7 +58,8 @@ export function buildSeoHead(locale: string, pathname: string): string {
     `<meta name="description" content="${escapeHtml(meta.description)}" />`,
     // DE/FR/ES/IT are still under translation and not yet full production-grade.
     // Do not let search engines index these routes, and do not emit invalid hreflang alternates.
-    ["de", "fr", "es", "it"].includes(locale) ? `<meta name="robots" content="noindex,follow" />` : "",
+    meta.noIndex ? `<meta name="robots" content="noindex,nofollow" />`
+      : ["de", "fr", "es", "it"].includes(locale) ? `<meta name="robots" content="noindex,follow" />` : "",
     `<meta property="og:title" content="${escapeHtml(meta.title)}" />`,
     `<meta property="og:description" content="${escapeHtml(meta.description)}" />`,
     `<meta property="og:type" content="${meta.ogType || "website"}" />`,
@@ -104,6 +106,17 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
       keywords: isEn
         ? "human design, human design chart, bodygraph calculator, free human design, human design reading, type, strategy, authority"
         : "human design, human design mapa, bodygraph kalkulátor, human design zdarma, human design česky, typ human design, autorita human design, inkarnační kříž, AI výklad human design",
+    },
+    "motion-preview": {
+      title: isEn
+        ? "Your Energy Blueprint. Alive. | Human Design ZEN / FLOW Preview"
+        : "Tvůj energetický blueprint. Živě. | Human Design ZEN / FLOW",
+      description: isEn
+        ? "Explore a free, illustrative Bodygraph. ZEN for calm, FLOW for discovery. Interactive and reduced-motion accessible."
+        : "Vyzkoušej interaktivní Bodygraph. ZEN pro klid, FLOW pro zkoumání. Bezplatná ukázka, respektující omezení pohybu.",
+      canonical: `${base}/${locale}/motion-preview`,
+      ogImage: `${base}/images/og-motion-preview.png`,
+      noIndex: true, // Preview must not be indexed before proven release readiness.
     },
     calculate: {
       title: isEn
