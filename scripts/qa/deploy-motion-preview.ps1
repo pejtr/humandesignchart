@@ -56,8 +56,8 @@ foreach ($path in @('dist/public/index.html','dist/public/_worker.js','dist/publ
 $png = [System.IO.File]::ReadAllBytes((Join-Path $root 'dist/public/images/og-motion-preview.png'))
 Assert ($png.Length -gt 10000) 'OG PNG unexpectedly small.'
 Assert (($png[0..7] -join ',') -eq '137,80,78,71,13,10,26,10') 'OG file is not PNG.'
-$width = [System.Buffers.Binary.BinaryPrimitives]::ReadInt32BigEndian([ReadOnlySpan[byte]]::new($png,16,4))
-$height = [System.Buffers.Binary.BinaryPrimitives]::ReadInt32BigEndian([ReadOnlySpan[byte]]::new($png,20,4))
+$width = 16777216 * [int]$png[16] + 65536 * [int]$png[17] + 256 * [int]$png[18] + [int]$png[19]
+$height = 16777216 * [int]$png[20] + 65536 * [int]$png[21] + 256 * [int]$png[22] + [int]$png[23]
 Assert ($width -eq 1200 -and $height -eq 630) "Unexpected OG size: $width x $height"
 Write-Host "[BUILD PASS] Typecheck, Vitest, Pages Worker, 1200x630 OG PNG."
 
@@ -91,7 +91,9 @@ foreach ($kind in @(
 }
 # Preview must not be able to charge customers, grant credits or send production email.
 $previewVars = @()
-if ($preview.env_vars) { $previewVars = @($preview.env_vars.PSObject.Properties.Name) }
+if ($preview.PSObject.Properties['env_vars'] -and $preview.env_vars) {
+  $previewVars = @($preview.env_vars.PSObject.Properties.Name)
+}
 $blockedVars = @($previewVars | Where-Object {
   $_ -match '(?i)STRIPE|COMGATE|PAYGATE|ONYX_PAY|FULFILLMENT|RESEND|BREVO|MAILGUN|OPENAI_CONVERSIONS_API_KEY|GOOGLE_CLIENT_SECRET'
 })

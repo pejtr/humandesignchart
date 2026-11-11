@@ -49,7 +49,7 @@ describe("premium motion preview release contract", () => {
     const script = readFileSync(resolve("scripts/qa/deploy-motion-preview.ps1"), "utf8");
     expect(script).toContain("hd-motion-preview");
     expect(script).toContain("--branch=$previewBranch");
-    expect(script).toContain("Refusing: shared");
+    expect(script).toContain("Unsafe preview: shared");
     expect(script).toContain("deployment_configs.preview");
     expect(script).toContain("noindex");
     expect(script).not.toContain("--branch=main");
