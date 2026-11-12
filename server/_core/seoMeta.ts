@@ -34,7 +34,8 @@ export function buildSeoHead(locale: string, pathname: string): string {
   const base = isCs ? CS : EN;
   const lang = locale || "en";
   const canonical = meta.canonical;
-  const ogImage = meta.ogImage || `${base}/images/og-homepage.png`;
+  // Keep WhatsApp/Meta payloads compact on every route without a custom OG card.
+  const ogImage = meta.ogImage || `${base}/images/og-home-${isCs ? "cs" : "en"}-share-v2.png`;
   const ogLocaleMap: Record<string, string> = {
     cs: "cs_CZ",
     en: "en_US",
