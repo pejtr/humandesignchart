@@ -25,9 +25,11 @@ const results = { origin: base.origin, when: new Date().toISOString(), viewports
 const browser = await chromium.launch({ headless: true });
 try {
   for (const v of [
+    { name: "small360", width: 360, height: 780 },
     { name: "mobile390", width: 390, height: 844 },
     { name: "tablet768", width: 768, height: 1024 },
     { name: "desktop1440", width: 1440, height: 900 },
+    { name: "wide3840", width: 3840, height: 2160 },
   ]) {
     const context = await browser.newContext({ viewport: { width: v.width, height: v.height } });
     const page = await context.newPage();
@@ -46,11 +48,26 @@ try {
     const overflow = await page.evaluate(() =>
       document.documentElement.scrollWidth - document.documentElement.clientWidth
     );
-    const cta = await page.getByRole("link", { name: /Get My Free Chart/i }).first().count();
+    const cta = page.getByRole("link", { name: /Get My Free Chart/i }).first();
     if (Math.abs(top) > 3) results.errors.push(v.name + ": header not pinned (" + top + "px)");
     if (overflow > 2) results.errors.push(v.name + ": horizontal overflow " + overflow + "px");
-    if (!cta) results.errors.push(v.name + ": free-chart CTA absent");
+    if (!(await cta.count())) results.errors.push(v.name + ": free-chart CTA absent");
+    else if (!(await cta.getAttribute("href"))?.endsWith("/calculate")) {
+      results.errors.push(v.name + ": CTA does not lead to calculator");
+    }
     if ((await hero.count()) === 0) results.errors.push(v.name + ": premium hero missing");
+
+    if (v.width < 1024) {
+      const menu = page.getByTestId("hd-en-mobile-navigation");
+      await menu.locator("summary").click();
+      const pricing = menu.getByRole("link", { name: "Pricing" });
+      if (!(await pricing.isVisible()) || !(await pricing.getAttribute("href"))?.endsWith("/honorace")) {
+        results.errors.push(v.name + ": mobile navigation not usable");
+      }
+      await page.screenshot({ path: resolve(out, "en-" + v.name + "-menu.png"), fullPage: true });
+      await menu.locator("summary").click();
+    }
+
     await page.screenshot({ path: resolve(out, "en-" + v.name + ".png"), fullPage: true });
     await page.emulateMedia({ reducedMotion: "reduce" });
     const motion = await page.locator(".hd-us-cosmos .hd-us-nebula").first().evaluate(
@@ -59,6 +76,34 @@ try {
     if (motion !== "none") results.errors.push(v.name + ": reduced-motion still animated (" + motion + ")");
     results.viewports.push({ ...v, headerTopAfterScroll: top, horizontalOverflow: overflow, reducedMotionName: motion });
     await context.close();
+  }
+
+  // Preview must expose crawler-ready server-side tags in the first HTML response;
+  // SPA-injected tags alone do not help the WhatsApp crawler.
+  for (const lang of ["en", "cs"]) {
+    const url = new URL("/" + lang, base).toString();
+    const response = await fetch(url, {
+      headers: { "User-Agent": "WhatsApp/2.24.0", Accept: "text/html" },
+      signal: AbortSignal.timeout(20000),
+    });
+    const html = await response.text();
+    const tags = html.match(/<meta\\s+[^>]*>/gi) || [];
+    const value = name => {
+      const tag = tags.find(t => t.includes('property="' + name + '"'));
+      return tag?.match(/\\bcontent=["']([^"']+)["']/i)?.[1] || "";
+    };
+    const image = value("og:image");
+    const title = value("og:title");
+    const expectedHost = lang === "en" ? "humandesignchart.app" : "humandesignmapa.cz";
+    const expectedPath = "/images/og-homepage-" + lang + ".png";
+    if (!response.ok || !response.headers.get("content-type")?.includes("text/html") ||
+        !title || !image ||
+        new URL(image).hostname !== expectedHost ||
+        new URL(image).pathname !== expectedPath ||
+        html.includes("<!--SEO_META-->")) {
+      results.errors.push(lang + ": crawler SSR OG tags invalid on isolated preview");
+    }
+    results.social.push({ lang, route: url, htmlStatus: response.status, title, image });
   }
 
   // Confirm the actual preview origin contains built image bytes even before public
