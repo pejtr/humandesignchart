@@ -54,12 +54,14 @@ foreach ($spec in @(@("d1_databases","id"),@("kv_namespaces","namespace_id"),@("
   $testIds = @()
   if ($live.PSObject.Properties[$spec[0]] -and $live.($spec[0])) {
     foreach ($b in $live.($spec[0]).PSObject.Properties) {
-      if ($b.Value.PSObject.Properties[$spec[1]]) { $liveIds += [string]$b.Value.($spec[1]) }
+      Check ($b.Value -and $b.Value.PSObject.Properties[$spec[1]]) "Production resource missing identity field: $($spec[0])."
+      $liveIds += [string]$b.Value.($spec[1])
     }
   }
   if ($test.PSObject.Properties[$spec[0]] -and $test.($spec[0])) {
     foreach ($b in $test.($spec[0]).PSObject.Properties) {
-      if ($b.Value.PSObject.Properties[$spec[1]]) { $testIds += [string]$b.Value.($spec[1]) }
+      Check ($b.Value -and $b.Value.PSObject.Properties[$spec[1]]) "Preview resource missing identity field: $($spec[0])."
+      $testIds += [string]$b.Value.($spec[1])
     }
   }
   foreach ($id in $testIds) { Check ($id -notin $liveIds) "Preview shares live $($spec[0]) resource." }
