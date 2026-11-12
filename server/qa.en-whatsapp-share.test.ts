@@ -29,4 +29,19 @@ describe("EN sticky + WhatsApp P0", () => {
     expect(qa).not.toContain("--branch=main");
   });
 
+  it("integrates premium cosmic hero without clobbering working mobile sticky header", () => {
+    const page = readFileSync("client/src/pages/PremiumUSHome.tsx", "utf8");
+    const css = readFileSync("client/src/pages/PremiumUSHome.css", "utf8");
+    expect(page).toContain('import "./PremiumUSHome.css"');
+    expect(page).toContain('data-testid="hd-en-cosmic-background"');
+    expect(page).toContain('Your Energy Blueprint.');
+    expect(page).toContain('Beautifully Revealed.');
+    expect(page).not.toContain("Science · Wisdom");
+    expect(page.indexOf("premium-en-sticky-header")).toBeLessThan(page.indexOf('data-testid="hd-en-premium-hero"'));
+    expect(page).toContain('aria-label="Mobile navigation"');
+    expect(css).toContain('@media (prefers-reduced-motion:reduce)');
+    expect(css).toContain("pointer-events:none");
+    expect(css).not.toContain("position:fixed");
+  });
+
 });
