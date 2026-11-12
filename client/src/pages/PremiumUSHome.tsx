@@ -1,3 +1,4 @@
+import "./PremiumUSHome.css";
 import { Link } from "wouter";
 import {
   ArrowRight,
@@ -152,18 +153,25 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
       <section className="relative overflow-hidden bg-[#071426] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_76%_34%,rgba(244,199,98,0.18),transparent_28%),radial-gradient(circle_at_34%_20%,rgba(139,92,246,0.14),transparent_34%),linear-gradient(135deg,#071426_0%,#0A1B31_58%,#111C35_100%)]" />
         <div className="absolute inset-0 opacity-[0.10] [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:44px_44px]" />
+        <div className="hd-us-cosmos" aria-hidden="true">
+          <span className="hd-us-nebula hd-us-nebula-a" />
+          <span className="hd-us-nebula hd-us-nebula-b" />
+          <span className="hd-us-stars hd-us-stars-far" />
+          <span className="hd-us-stars hd-us-stars-near" />
+          <span className="hd-us-gold-halo" />
+        </div>
         <div className="relative z-10 mx-auto grid w-full max-w-[1440px] gap-10 px-5 pb-14 pt-7 md:px-8 md:pb-20 lg:grid-cols-[0.94fr_1.06fr] lg:items-center lg:px-12 lg:pb-24 lg:pt-12">
           <div className="max-w-2xl">
             <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.34em] text-[#F4C762]/90">
-              Science · Wisdom · Self-discovery
+              PERSONAL BODYGRAPH · DESIGN · SELF-DISCOVERY
             </p>
             <h1 className="max-w-[760px] font-serif text-[46px] font-semibold leading-[0.98] tracking-[-0.045em] text-white sm:text-6xl lg:text-[76px]">
-              Your Unique Design for a More{" "}
-              <em className="font-serif font-medium text-[#F4C762]">Aligned Life</em>
+              Your Energy Blueprint.{" "}
+              <em className="font-serif font-medium text-[#F4C762]">Beautifully Revealed.</em>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-white/72 md:text-lg">
-              Get your personalized Human Design chart and explore how your energy, decisions,
-              relationships, and life patterns may fit together — in a clear, practical format.
+              Start with your free personal Bodygraph. Explore your type, strategy and centers,
+              then decide how deeply you want to reflect on your own design.
             </p>
 
             <div className="mt-7 grid gap-4 sm:grid-cols-3">
