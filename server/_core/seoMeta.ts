@@ -34,7 +34,8 @@ export function buildSeoHead(locale: string, pathname: string): string {
   const base = isCs ? CS : EN;
   const lang = locale || "en";
   const canonical = meta.canonical;
-  const ogImage = meta.ogImage || `${base}/images/og-homepage.png`;
+  // Lightweight locale-specific OG cards use new paths to bust stale scraper caches.
+  const ogImage = meta.ogImage || `${base}/images/og-homepage-${isCs ? "cs" : "en"}.png`;
   const ogLocaleMap: Record<string, string> = {
     cs: "cs_CZ",
     en: "en_US",
