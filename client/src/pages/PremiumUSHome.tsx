@@ -14,6 +14,7 @@ import {
   Sparkles,
   Star,
   Users,
+  Menu,
   Zap,
 } from "lucide-react";
 
@@ -123,12 +124,15 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
       {/* The navigation belongs to the page, not the overflow-clipped hero:
           sticky inside that section stops at the section boundary. */}
       <header data-testid="hd-en-premium-header" className="sticky top-0 z-[100] w-full border-b border-[#D8C49A]/20 bg-[#071426]/95 text-white shadow-[0_8px_30px_rgba(0,0,0,.18)] backdrop-blur-xl supports-[backdrop-filter]:bg-[#071426]/85">
-        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 px-5 py-4 md:px-8 lg:px-12">
-          <Link href={localePath("/")} className="flex items-center gap-3 no-underline">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#F4C762]/60 bg-[#F4C762]/10 text-[#F4C762]">
-              <Sparkles className="h-4 w-4" />
+        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-5 sm:py-4 md:px-8 lg:px-12">
+          <Link href={localePath("/")} className="flex min-w-0 shrink-0 items-center gap-2 no-underline sm:gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#F4C762]/60 bg-[#F4C762]/10 text-[#F4C762]">
+              <Sparkles className="h-4 w-4" aria-hidden="true" />
             </span>
-            <span className="text-[15px] font-semibold tracking-[-0.02em] text-white sm:text-lg">
+            <span className="text-sm font-semibold tracking-[-0.02em] text-white min-[420px]:hidden">
+              HD Chart
+            </span>
+            <span className="hidden font-semibold tracking-[-0.02em] text-white min-[420px]:inline min-[420px]:text-[15px] sm:text-lg">
               HumanDesignChart.app
             </span>
           </Link>
@@ -141,11 +145,30 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
             <Link href={localePath("/blog")} className="transition hover:text-white">Journal</Link>
           </nav>
 
+          {/* Pure native <details> navigation: keyboard accessible, no extra JS or state.
+              Keep the menu inside the sticky header but outside clipped hero. */}
+          <details className="group relative ml-auto shrink-0 lg:hidden" data-testid="hd-en-mobile-navigation">
+            <summary className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-xl border border-[#D8C49A]/30 bg-white/5 text-[#F6E6C6] marker:hidden hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8899FF] [&::-webkit-details-marker]:hidden">
+              <span className="sr-only">Open navigation menu</span>
+              <Menu className="h-5 w-5" aria-hidden="true" />
+            </summary>
+            <nav aria-label="Mobile navigation" className="absolute right-0 top-[calc(100%+10px)] z-[110] flex w-[min(280px,calc(100vw-24px))] flex-col gap-1 rounded-2xl border border-[#D8C49A]/30 bg-[#09172B] p-3 text-sm text-white shadow-2xl">
+              <Link href={localePath("/calculate")} className="rounded-xl px-4 py-3 hover:bg-white/10 focus-visible:outline-2">Get Your Chart</Link>
+              <Link href={localePath("/encyclopedia")} className="rounded-xl px-4 py-3 hover:bg-white/10 focus-visible:outline-2">Learn</Link>
+              <Link href={localePath("/ai-guide")} className="rounded-xl px-4 py-3 hover:bg-white/10 focus-visible:outline-2">Insights</Link>
+              <Link href={localePath("/honorace")} className="rounded-xl px-4 py-3 hover:bg-white/10 focus-visible:outline-2">Pricing</Link>
+              <Link href={localePath("/blog")} className="rounded-xl px-4 py-3 hover:bg-white/10 focus-visible:outline-2">Journal</Link>
+            </nav>
+          </details>
+
           <Link
             href={localePath("/calculate")}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#F4C762] px-4 py-2.5 text-sm font-bold text-[#071426] shadow-[0_10px_34px_rgba(244,199,98,.25)] transition hover:-translate-y-0.5 hover:bg-[#FFE09A]"
+            aria-label="Get My Free Chart"
+            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#F4C762] px-3 text-xs font-bold text-[#071426] shadow-[0_10px_34px_rgba(244,199,98,.25)] transition hover:bg-[#FFE09A] sm:px-4 sm:text-sm"
           >
-            Get My Free Chart <ArrowRight className="h-4 w-4" />
+            <span className="sm:hidden">Free Chart</span>
+            <span className="hidden sm:inline">Get My Free Chart</span>
+            <ArrowRight className="hidden h-4 w-4 sm:block" aria-hidden="true" />
           </Link>
         </div>
       </header>

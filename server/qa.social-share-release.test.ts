@@ -13,6 +13,10 @@ describe("P0 premium EN header and WhatsApp share contract", () => {
     expect(closing).toBeGreaterThan(opening);
     expect(closing).toBeLessThan(hero);
     expect(page).toContain("Get My Free Chart");
+    expect(page).toContain('data-testid="hd-en-mobile-navigation"');
+    expect(page).toContain('aria-label="Mobile navigation"');
+    expect(page).toContain('aria-label="Get My Free Chart"');
+    expect(page).toContain('min-[420px]:hidden');
     const css = readFileSync(resolve("client/src/pages/PremiumUSHome.css"), "utf8");
     expect(css).toContain("@media (prefers-reduced-motion:reduce)");
   });
