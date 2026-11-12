@@ -82,6 +82,27 @@ describe("Cloudflare WhatsApp preview metadata", () => {
     expect(text).not.toContain("<!--SEO_META-->");
   });
 
+
+  it("renders preview-origin OG assets and noindex for isolated Pages preview, not production", async () => {
+    const preview = new URL("https://pr87.humandesignchart-web.pages.dev/en");
+    const response = await withServerRenderedSeoMeta(preview, assetResponse());
+    const htmlText = await response.text();
+    expect(htmlText).toContain('property="og:image" content="https://pr87.humandesignchart-web.pages.dev/images/og-home-en-share-v2.png"');
+    expect(htmlText).toContain('property="og:image:secure_url" content="https://pr87.humandesignchart-web.pages.dev/images/og-home-en-share-v2.png"');
+    expect(htmlText).toContain('name="twitter:image" content="https://pr87.humandesignchart-web.pages.dev/images/og-home-en-share-v2.png"');
+    expect(htmlText).toContain('property="og:url" content="https://pr87.humandesignchart-web.pages.dev/en"');
+    expect(htmlText).toContain('name="robots" content="noindex,nofollow"');
+    expect(htmlText).toContain('rel="canonical" href="https://humandesignchart.app/en/"');
+    expect(response.headers.get("cache-control")).toBe("public, max-age=0, must-revalidate");
+    const prod = await withServerRenderedSeoMeta(
+      new URL("https://humandesignchart.app/en"),
+      assetResponse(),
+    );
+    const prodHtml = await prod.text();
+    expect(prodHtml).not.toContain("noindex,nofollow");
+    expect(prodHtml).toContain('property="og:image" content="https://humandesignchart.app/images/og-home-en-share-v2.png"');
+  });
+
   it("keeps unrelated binary and API responses unchanged", async () => {
     const css = assetResponse("body {color:red}", "text/css");
     const response = await withServerRenderedSeoMeta(
