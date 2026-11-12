@@ -50,4 +50,16 @@ describe("EN sticky + WhatsApp P0", () => {
     expect(css).not.toContain("position:fixed");
   });
 
+  it("guards direct release against ambiguous rollback and missing ads pixel", () => {
+    const ps = readFileSync("scripts/qa/release-p0-en-share.ps1", "utf8");
+    expect(ps).toContain("deployments?env=production");
+    expect(ps).toContain("Previous production deployment ID");
+    expect(ps).toContain("VITE_OPENAI_ADS_PIXEL_ID");
+    expect(ps).toContain("Built JS assets do not contain");
+    expect(ps).toContain('refs/remotes/origin/$feature');
+    expect(ps).toContain("hd-p0-en-share-preview");
+    expect(ps).toContain('Must (@($qa.screenshots).Count -ge 10)');
+    expect(ps).toContain('Run "node" @("scripts/qa/probe-whatsapp-share.mjs"');
+  });
+
 });
