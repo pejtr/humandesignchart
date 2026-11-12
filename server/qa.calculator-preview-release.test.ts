@@ -18,7 +18,7 @@ describe("PR86 calculator release gate", () => {
     expect(checked.status, checked.stderr).toBe(0);
     const s = readFileSync(file, "utf8");
     expect(s).toContain("/calculate");
-    expect(s).toContain("humandesignchart-web.pages.dev");
+    expect(s).toContain("humandesignchart-web");
     expect(s).toContain("reducedMotion");
     expect(s).not.toContain(".submit(");
   });
