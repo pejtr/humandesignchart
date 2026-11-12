@@ -77,10 +77,10 @@ createCard({
 });
 createCard({
   brand: "HumanDesignMapa.cz",
-  eyebrow: "TVA HUMAN DESIGN MAPA",
+  eyebrow: "TVÁ HUMAN DESIGN MAPA",
   title: "Objev svou mapu.",
   accent: "Poznej svůj design.",
-  subtitle: "Osobni mapa zdarma  ·  Prehledny vyklad",
-  cta: "Vytvorit mapu zdarma",
+  subtitle: "Osobní mapa zdarma  ·  Přehledný výklad",
+  cta: "Vytvořit mapu zdarma",
   file: "og-homepage-cs.png",
 });
