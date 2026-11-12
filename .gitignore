@@ -111,5 +111,7 @@ temp/
 .project-config.json
 
 # Test results
+# Local browser evidence (never publish screenshots containing app state)
+qa-artifacts/
 test_results.txt
 leados_test_results.txt
