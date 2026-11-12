@@ -21,7 +21,7 @@ catch { throw new Error("Playwright must be installed in the operator QA environ
 
 const out = resolve(process.cwd(), "qa-artifacts", "en-sticky-social");
 mkdirSync(out, { recursive: true });
-const results = { origin: base.origin, when: new Date().toISOString(), viewports: [], social: [], errors: [] };
+const results = { origin: base.origin, sha: process.env.HD_EN_SHARE_PREVIEW_SHA || null, when: new Date().toISOString(), viewports: [], social: [], errors: [] };
 const browser = await chromium.launch({ headless: true });
 try {
   for (const v of [

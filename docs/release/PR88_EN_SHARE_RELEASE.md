@@ -24,3 +24,7 @@ First command validates exact branch/SHA, clean tree, frozen install, typecheck,
 - Production and test-mode payment E2E must remain separate. No live checkout charges for design/OG QA.
 
 **Current status:** preview and production unverified until real Cloudflare IDs/browser evidence exist. 
+
+## Evidence readback
+
+The release script fetches the **real latest successful Cloudflare production deployment ID** before any write, then verifies an actual successful preview deployment whose branch and commit hash match PR #88. It writes `qa-artifacts/en-sticky-social/release-ids.json` with the previous-production rollback point and new preview ID. `evidence.json` records the preview source SHA, five viewport checks, actual crawler metadata and image responses. Both files are deliberately gitignored and must be reviewed before any production merge. **Missing IDs, a failed preview binding check or an E2E failure means NO-GO.**

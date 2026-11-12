@@ -83,6 +83,21 @@ try {
 Assert ($response.success -and $response.result.name -eq $projectName) 'Unexpected Cloudflare project.'
 $p = $response.result
 Assert ($p.production_branch -ne $previewBranch) 'Preview branch unexpectedly equals production branch.'
+# Record a genuine rollback point using the Cloudflare Pages deployment API.
+$historyUri = "https://api.cloudflare.com/client/v4/accounts/$account/pages/projects/$projectName/deployments"
+try {
+  $history = Invoke-RestMethod -Uri "$historyUri`?env=production&per_page=20" -Headers @{Authorization="Bearer $token"} -Method Get -TimeoutSec 30
+} catch {
+  throw 'Unable to read Cloudflare production deployment history. Rollback ID unknown. No deployment allowed.'
+}
+Assert ($history.success) 'Cloudflare production deployment history failed.'
+$rollback = @($history.result | Where-Object {
+  $_.environment -eq 'production' -and -not $_.is_skipped -and $_.id -and
+  $_.latest_stage.status -eq 'success'
+} | Sort-Object created_on -Descending | Select-Object -First 1)
+Assert ($rollback.Count -eq 1) 'No successful production deployment ID available for rollback.'
+Write-Host "[ROLLBACK READY] Previous Cloudflare production deployment ID: $($rollback[0].id)"
+Write-Host "[ROLLBACK SHA] $($rollback[0].deployment_trigger.metadata.commit_hash)"
 Assert ($p.deployment_configs -and $p.deployment_configs.production -and $p.deployment_configs.preview) 'Cloudflare did not return production+preview binding configs.'
 $production = $p.deployment_configs.production
 $preview = $p.deployment_configs.preview
@@ -133,10 +148,42 @@ foreach ($route in @('/en','/cs','/images/og-homepage-en.png','/images/og-homepa
   }
 }
 Write-Host "[REMOTE PREVIEW 200] $previewOrigin"
+# Read back the actual preview deployment ID + commit from Cloudflare; Wrangler exit 0
+# is not sufficient evidence of the environment or the deployed code.
+$deployed = $null
+for ($attempt = 0; $attempt -lt 5; $attempt++) {
+  try {
+    $list = Invoke-RestMethod -Uri "$historyUri`?env=preview&per_page=50" -Headers @{Authorization="Bearer $token"} -Method Get -TimeoutSec 30
+    if ($list.success) {
+      $deployed = @($list.result | Where-Object {
+        $_.environment -eq 'preview' -and -not $_.is_skipped -and
+        $_.deployment_trigger.metadata.branch -eq $previewBranch -and
+        $_.deployment_trigger.metadata.commit_hash -eq $sha -and
+        $_.latest_stage.status -eq 'success'
+      } | Sort-Object created_on -Descending | Select-Object -First 1)
+      if ($deployed.Count -eq 1) { break }
+    }
+  } catch { } # transient API read: retry without printing credentials
+  if ($attempt -lt 4) { Start-Sleep -Seconds 3 }
+}
+Assert ($null -ne $deployed -and $deployed.Count -eq 1) 'No matching successful Cloudflare preview deployment ID+SHA; NO-GO.'
+Write-Host "[PREVIEW VERIFIED] deployment=$($deployed[0].id) sha=$sha"
+$folder = Join-Path $root 'qa-artifacts/en-sticky-social'
+New-Item -ItemType Directory -Path $folder -Force | Out-Null
+$release = [ordered]@{
+  project = $projectName; environment = 'preview'; branch = $previewBranch
+  source_sha = $sha; preview_deployment_id = [string]$deployed[0].id
+  preview_url = $previewOrigin
+  prior_production_deployment_id = [string]$rollback[0].id
+  prior_production_sha = [string]$rollback[0].deployment_trigger.metadata.commit_hash
+  recorded_utc = [DateTime]::UtcNow.ToString('o')
+}
+$release | ConvertTo-Json -Depth 5 | Set-Content -Path (Join-Path $folder 'release-ids.json') -Encoding UTF8
 
 if ($Capture) {
   $env:HD_EN_SHARE_PREVIEW_URL = "$previewOrigin/"
+  $env:HD_EN_SHARE_PREVIEW_SHA = "$sha"
   Exec 'node' @('scripts/qa/capture-en-share-preview.mjs')
   Write-Host '[BROWSER EVIDENCE] qa-artifacts/en-sticky-social/'
 }
-Write-Host '[PREVIEW COMPLETE] Main and production were not modified.'
+Write-Host '[PREVIEW COMPLETE] Production was not modified. Merge+production release remains a separate gated decision.'
