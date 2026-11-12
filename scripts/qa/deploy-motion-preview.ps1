@@ -61,6 +61,25 @@ $height = 16777216 * [int]$png[20] + 65536 * [int]$png[21] + 256 * [int]$png[22]
 Assert ($width -eq 1200 -and $height -eq 630) "Unexpected OG size: $width x $height"
 Write-Host "[BUILD PASS] Typecheck, Vitest, Pages Worker, 1200x630 OG PNG."
 
+# Fail BEFORE any deployment when the operator requests real browser evidence but
+# the local QA runtime is not equipped. Playwright is not part of package.json.
+if ($Capture) {
+  $captureProbe = @'
+import("playwright")
+  .then(async ({ chromium }) => {
+    const browser = await chromium.launch({ headless: true });
+    await browser.close();
+  })
+  .catch(error => {
+    console.error("[QA BLOCKER] Playwright or Chromium is unavailable in this operator environment:", error.message);
+    process.exit(1);
+  });
+'@
+  & node --input-type=module -e $captureProbe
+  Assert ($LASTEXITCODE -eq 0) 'Browser capture is unavailable. Install Playwright/Chromium only in the isolated QA environment, or run -Deploy without -Capture and perform browser QA through Antigravity. No upload attempted.'
+  Write-Host '[QA READY] Playwright and Chromium can launch.'
+}
+
 # Read ONLY project configuration using a scoped Cloudflare token; never log it.
 $accountId = [Environment]::GetEnvironmentVariable('CLOUDFLARE_ACCOUNT_ID')
 $token = [Environment]::GetEnvironmentVariable('CLOUDFLARE_API_TOKEN')
