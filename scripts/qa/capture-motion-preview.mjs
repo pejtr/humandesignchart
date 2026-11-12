@@ -42,10 +42,13 @@ try {
     await graph.scrollIntoViewIfNeeded();
     const zen = page.locator('[data-testid="bodygraph-motion-zen"]');
     const flow = page.locator('[data-testid="bodygraph-motion-flow"]');
+    const atmosphere = page.locator('[data-testid="motion-cosmic-backdrop"]');
+    await atmosphere.waitFor({ state: "attached" });
     const control = page.locator(".hd-motion-control");
     const toggle = page.locator('[data-testid="bodygraph-motion-toggle"]');
     await zen.click();
     if (await zen.getAttribute("aria-pressed") !== "true") throw new Error(`${label}: Zen switch did not activate`);
+    if (await atmosphere.getAttribute("data-motion-preset") !== "zen") evidence.failures.push(`${label}: cosmic backdrop not synced with Zen`);
     const beforeGeometry = await page.locator(".bodygraph-premium-preview .bodygraph-svg path").evaluateAll(
       nodes => nodes.map(node => node.getAttribute("d")).join("|")
     );
@@ -55,12 +58,14 @@ try {
 
     await flow.click();
     if (await flow.getAttribute("aria-pressed") !== "true") throw new Error(`${label}: Flow switch did not activate`);
+    if (await atmosphere.getAttribute("data-motion-preset") !== "flow") evidence.failures.push(`${label}: cosmic backdrop not synced with Flow`);
     const flowShot = resolve(dir, `bodygraph-${label}-flow.png`);
     await page.screenshot({ path: flowShot, fullPage: true });
     evidence.screenshots.push({ label, state: "flow", file: flowShot });
 
     await toggle.click();
     if (await graph.getAttribute("data-motion-state") !== "paused") throw new Error(`${label}: Play/Pause did not stop animation`);
+    if (await atmosphere.getAttribute("data-motion-state") !== "paused") evidence.failures.push(`${label}: cosmic backdrop still moving after Pause`);
     const pausedShot = resolve(dir, `bodygraph-${label}-paused.png`);
     await page.screenshot({ path: pausedShot, fullPage: true });
     evidence.screenshots.push({ label, state: "paused", file: pausedShot });
