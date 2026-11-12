@@ -16,6 +16,12 @@ describe("EN sticky + WhatsApp P0", () => {
   it("social SVG-to-PNG build script passes JS syntax check", () => {
     const result=spawnSync(process.execPath,["--check","scripts/generate-social-cards.mjs"],{encoding:"utf8",timeout:10000});
     expect(result.status,result.stderr).toBe(0);
+    const generator = readFileSync("scripts/generate-social-cards.mjs", "utf8");
+    expect(generator).toContain('file: "og-home-en-share-v2.png"');
+    expect(generator).toContain('file: "og-home-cs-share-v2.png"');
+    expect(generator).toContain("Poznej svůj design.");
+    expect(generator).toContain("png.length > 300000");
+
   });
   it("publishes a syntax-valid isolated Pages screenshot and sticky E2E script", () => {
     const result = spawnSync(process.execPath, ["--check", "scripts/qa/capture-en-share-preview.mjs"], { encoding:"utf8", timeout:10_000 });
