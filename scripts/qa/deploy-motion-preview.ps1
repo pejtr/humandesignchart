@@ -35,7 +35,10 @@ Set-Location $root
 $origin = ReadOutput git @('remote','get-url','origin')
 Assert ($origin -match '(?i)(?:github\.com[:/])pejtr/humandesignchart(?:\.git)?$') 'Refusing: unexpected Git remote.'
 $currentBranch = ReadOutput git @('branch','--show-current')
-Assert ($currentBranch -eq $expectedBranch) "Refusing: wrong source branch '$currentBranch'."
+# A clean detached HEAD is permitted for a throwaway Git worktree, but ONLY
+# when its commit equals the exact fetched remote PR head checked below.
+# This avoids colliding with a branch checked out in Antigravity's main worktree.
+Assert (($currentBranch -eq $expectedBranch) -or ($currentBranch -eq '')) "Refusing: wrong source branch '$currentBranch'. Use the PR branch or a clean detached worktree at the exact remote PR SHA."
 $dirty = ReadOutput git @('status','--porcelain','--untracked-files=all')
 Assert (-not $dirty) "Refusing: worktree has uncommitted changes. Preserve local Antigravity WIP in a separate worktree."
 Exec git @('fetch','--quiet','origin', $expectedBranch)
