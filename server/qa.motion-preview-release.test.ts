@@ -55,4 +55,23 @@ describe("premium motion preview release contract", () => {
     expect(script).not.toContain("--branch=main");
   });
 
+  it("keeps the animated cosmic backdrop isolated, accessible and synchronized with Motion Control", () => {
+    const page = readFileSync(resolve("client/src/pages/MotionPreview.tsx"), "utf8");
+    const frame = readFileSync(resolve("client/src/components/BodygraphMotionFrame.tsx"), "utf8");
+    const atmosphere = readFileSync(resolve("client/src/components/MotionAtmosphere.tsx"), "utf8");
+    const css = readFileSync(resolve("client/src/pages/MotionPreview.css"), "utf8");
+    expect(page).toContain("<MotionAtmosphere />");
+    expect(atmosphere).toContain('aria-hidden="true"');
+    expect(atmosphere).toContain("resolveBodygraphMotion");
+    expect(atmosphere).toContain("IntersectionObserver");
+    expect(atmosphere).toContain("visibilitychange");
+    expect(atmosphere).toContain("prefers-reduced-motion: reduce");
+    expect(frame).toContain("hd:bodygraph-motion-change");
+    expect(atmosphere).toContain("hd:bodygraph-motion-change");
+    expect(css).toContain(".hd-mp-cosmos[data-motion-state=\"paused\"]");
+    expect(css).toContain("@media (prefers-reduced-motion: reduce)");
+    expect(css).not.toContain("position: fixed");
+    expect(atmosphere).not.toContain("requestAnimationFrame");
+  });
+
 });

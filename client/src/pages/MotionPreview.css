@@ -113,3 +113,183 @@
 }
 .hd-mp-loop img { display:block; width:100%; height:auto; }
 .hd-mp-loop figcaption { padding:16px 20px 21px; color:rgba(242,240,247,.62); font:400 12px/1.6 Inter,system-ui,sans-serif; }
+
+/* Premium living cosmos — scoped strictly to /motion-preview.
+   No video, canvas, external images or DOM animation loops. */
+.hd-mp-hero { isolation: isolate; }
+.hd-mp-hero > .hd-mp-ambient { z-index: -2; }
+.hd-mp-cosmos {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  contain: paint;
+}
+.hd-mp-cosmos > span { position: absolute; display: block; pointer-events: none; }
+.hd-mp-cosmos-nebula {
+  width: 92%;
+  height: 110%;
+  inset: -14% auto auto 18%;
+  border-radius: 50%;
+  opacity: .54;
+  transform: translate3d(0, 0, 0) rotate(-9deg);
+  background:
+    radial-gradient(ellipse 58% 32% at 48% 46%, rgba(126, 105, 220, .29), transparent 80%),
+    radial-gradient(ellipse 36% 30% at 78% 22%, rgba(73, 93, 190, .28), transparent 80%),
+    radial-gradient(ellipse 34% 22% at 18% 76%, rgba(217, 169, 126, .13), transparent 78%);
+  animation: hd-mp-aurora-drift 36s ease-in-out infinite alternate;
+}
+.hd-mp-cosmos-nebula-b {
+  inset: 10% auto auto -24%;
+  width: 80%;
+  height: 112%;
+  opacity: .32;
+  transform: translate3d(0, 0, 0) rotate(12deg);
+  background:
+    radial-gradient(ellipse 45% 37% at 40% 48%, rgba(111, 148, 247, .30), transparent 76%),
+    radial-gradient(ellipse 50% 25% at 58% 75%, rgba(224, 184, 123, .16), transparent 83%);
+  animation: hd-mp-aurora-counter 51s ease-in-out infinite alternate;
+}
+.hd-mp-cosmos-stars {
+  inset: -5%;
+  opacity: .62;
+  background-repeat: repeat;
+  transform: translate3d(0, 0, 0);
+  animation: hd-mp-star-drift 90s linear infinite alternate;
+}
+.hd-mp-cosmos-stars-far {
+  background-image:
+    radial-gradient(circle, rgba(245,239,220,.63) 0 1px, transparent 1.4px),
+    radial-gradient(circle, rgba(153,167,255,.65) 0 .7px, transparent 1.2px),
+    radial-gradient(circle, rgba(255,255,255,.35) 0 .8px, transparent 1.3px);
+  background-size: 217px 173px, 301px 197px, 379px 223px;
+  background-position: 12px 21px, 87px 104px, 211px 27px;
+}
+.hd-mp-cosmos-stars-near {
+  opacity: .55;
+  background-image:
+    radial-gradient(circle, rgba(255,235,197,.78) 0 1.2px, transparent 2px),
+    radial-gradient(circle, rgba(196,204,255,.77) 0 1px, transparent 1.7px);
+  background-size: 347px 331px, 457px 291px;
+  background-position: 160px 132px, 40px 219px;
+  animation-duration: 62s;
+  animation-direction: alternate-reverse;
+}
+.hd-mp-cosmos-halo {
+  width: min(86vw, 760px);
+  aspect-ratio: 1;
+  right: -13%;
+  top: 1%;
+  border-radius: 50%;
+  opacity: .28;
+  border: 1px solid rgba(216,196,154,.25);
+  box-shadow: 0 0 0 57px rgba(136,153,255,.018), 0 0 0 145px rgba(136,153,255,.012);
+  animation: hd-mp-halo-breathe 26s ease-in-out infinite;
+}
+.hd-mp-cosmos-comet {
+  width: 210px;
+  height: 1px;
+  top: 20%;
+  left: 9%;
+  opacity: 0;
+  transform: translate3d(-180px, 70px, 0) rotate(-24deg);
+  background: linear-gradient(90deg, transparent, rgba(136,153,255,.14), rgba(250,234,204,.72));
+  box-shadow: 0 0 9px rgba(159,179,255,.24);
+  animation: hd-mp-comet-pass 26s linear infinite;
+}
+.hd-mp-cosmos-glint {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f3e2c3;
+  box-shadow: 0 0 12px 4px rgba(216,196,154,.22);
+  opacity: .26;
+  animation: hd-mp-star-twinkle 6.8s ease-in-out infinite alternate;
+}
+.hd-mp-cosmos-glint-a { top: 16%; left: 14%; }
+.hd-mp-cosmos-glint-b { top: 58%; right: 18%; animation-delay: -2.4s; }
+.hd-mp-cosmos-glint-c { bottom: 22%; left: 48%; animation-delay: -4.3s; }
+@keyframes hd-mp-aurora-drift {
+  to { transform: translate3d(-7%, 6%, 0) rotate(9deg) scale(1.10); opacity: .72; }
+}
+@keyframes hd-mp-aurora-counter {
+  to { transform: translate3d(11%, -8%, 0) rotate(-8deg) scale(1.06); opacity: .48; }
+}
+@keyframes hd-mp-star-drift {
+  to { transform: translate3d(-3.5%, 2.6%, 0); }
+}
+@keyframes hd-mp-halo-breathe {
+  50% { opacity: .48; transform: scale(1.045); }
+}
+@keyframes hd-mp-comet-pass {
+  0%, 69%, 100% { opacity: 0; }
+  71% { opacity: .1; }
+  78% { opacity: .54; }
+  83% { opacity: 0; transform: translate3d(510px, -160px, 0) rotate(-24deg); }
+}
+@keyframes hd-mp-star-twinkle { to { opacity: .77; transform: scale(1.35); } }
+
+/* Atmospheric bloom around the real SVG chart: decorative, outside the hit targets. */
+.hd-mp-chart-shell { position: relative; isolation: isolate; }
+.hd-mp-chart-shell::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: min(105%, 550px);
+  aspect-ratio: 1;
+  top: 10%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate3d(-50%, 0, 0);
+  opacity: .58;
+  background: radial-gradient(circle, rgba(114,116,233,.20), rgba(216,196,154,.06) 40%, transparent 70%);
+  animation: hd-mp-chart-aura 12s ease-in-out infinite alternate;
+}
+@keyframes hd-mp-chart-aura {
+  to { opacity: .9; transform: translate3d(-50%, -2%, 0) scale(1.08); }
+}
+.hd-mp-hero-actions .hd-mp-button-primary { position: relative; isolation: isolate; overflow: hidden; }
+.hd-mp-hero-actions .hd-mp-button-primary::after {
+  content: "";
+  position: absolute;
+  inset: -30% auto -30% -75%;
+  width: 45%;
+  transform: skewX(-24deg) translate3d(0,0,0);
+  opacity: .4;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.72), transparent);
+  animation: hd-mp-gold-glide 9.5s ease-in-out infinite;
+}
+@keyframes hd-mp-gold-glide {
+  0%, 67% { transform: skewX(-24deg) translate3d(-250%,0,0); }
+  83%, 100% { transform: skewX(-24deg) translate3d(700%,0,0); }
+}
+.hd-mp-cosmos[data-motion-preset="flow"] .hd-mp-cosmos-nebula-a { animation-duration: 24s; }
+.hd-mp-cosmos[data-motion-preset="flow"] .hd-mp-cosmos-nebula-b { animation-duration: 32s; }
+.hd-mp-cosmos[data-motion-preset="flow"] .hd-mp-cosmos-stars { animation-duration: 40s; }
+.hd-mp-cosmos[data-motion-state="paused"] *,
+.hd-mp-cosmos[data-motion-state="paused"] *::before,
+.hd-mp-cosmos[data-motion-state="paused"] *::after {
+  animation-play-state: paused !important;
+}
+/* This preview's ambient chart glow and hero shimmer follow the same
+   accessible pause state via the sibling atmosphere's data attribute. */
+.hd-mp-hero:has(.hd-mp-cosmos[data-motion-state="paused"]) .hd-mp-button-primary::after {
+  animation-play-state: paused !important;
+}
+@media (max-width: 640px) {
+  .hd-mp-cosmos-nebula { width: 145%; left: -12%; opacity: .37; }
+  .hd-mp-cosmos-nebula-b { opacity: .24; }
+  .hd-mp-cosmos-halo { width: 105vw; right: -52%; top: 24%; opacity: .19; }
+  .hd-mp-cosmos-comet, .hd-mp-cosmos-glint-c { display: none; }
+  .hd-mp-chart-shell::before { width: 92%; opacity: .4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hd-mp-cosmos *, .hd-mp-cosmos *::before, .hd-mp-cosmos *::after,
+  .hd-mp-chart-shell::before,
+  .hd-mp-hero-actions .hd-mp-button-primary::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .hd-mp-cosmos-comet { opacity: 0; }
+}

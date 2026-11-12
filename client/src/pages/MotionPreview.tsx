@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { ArrowDownRight, ArrowRight, Compass, Eye, Moon, PlayCircle, ShieldCheck, Sparkles } from "lucide-react";
 import Bodygraph from "@/components/Bodygraph";
+import MotionAtmosphere from "@/components/MotionAtmosphere";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -70,6 +71,7 @@ export default function MotionPreview() {
       <main>
         <section className="hd-mp-hero" aria-labelledby="motion-preview-title">
           <div className="hd-mp-ambient" aria-hidden="true" />
+          <MotionAtmosphere />
           <div className="hd-mp-container hd-mp-hero-grid">
             <div>
               <p className="hd-mp-eyebrow"><Sparkles size={15} aria-hidden="true" /> HUMAN DESIGN • ZEN / FLOW</p>

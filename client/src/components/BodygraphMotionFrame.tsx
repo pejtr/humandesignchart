@@ -104,6 +104,8 @@ export default function BodygraphMotionFrame({
       manual: true,
     };
     setPreferences(updated);
+    // Same-tab settings change for the route's decorative cosmic backdrop.
+    window.dispatchEvent(new CustomEvent("hd:bodygraph-motion-change", { detail: updated }));
     try {
       window.localStorage.setItem(BODYGRAPH_MOTION_STORAGE_KEY, JSON.stringify(updated));
     } catch { /* Private browsing can disable storage; session control still works. */ }
