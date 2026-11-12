@@ -60,7 +60,7 @@ Must ($branch -eq $feature) "Use a clean PR #87 worktree, not main: current bran
 Must (-not (Output "git" @("status","--porcelain","--untracked-files=all"))) "Uncommitted changes; worktree must be clean."
 Run "git" @("fetch","--quiet","origin","main",$feature)
 $head=Output "git" @("rev-parse","HEAD")
-$remoteHead=Output "git" @("rev-parse","FETCH_HEAD")
+$remoteHead=Output "git" @("rev-parse","refs/remotes/origin/$feature")
 Must ($head -eq $remoteHead) "PR #87 HEAD changed locally or remotely. Recheck release SHA."
 $mainBefore=Output "git" @("rev-parse","origin/main")
 Must ($mainBefore -eq $expectedBase) "main advanced since this release was reviewed; re-review release diff and blockers."
@@ -104,17 +104,22 @@ foreach ($key in $envKeys) {
 Write-Host "[SAFETY PASS] Preview resource IDs separated from production."
 
 # Capture the current production rollback point before any release write.
-$history=Output "npx" @("wrangler","pages","deployment","list","--project-name",$project,"--environment","production","--json")
-try { $parsed=$history | ConvertFrom-Json } catch { throw "[RELEASE NO-GO] Production deployment history is not parseable JSON." }
-$items=@()
-if ($parsed -is [array]) { $items=@($parsed) }
-elseif ($parsed -and $parsed.PSObject.Properties["result"]) { $items=@($parsed.result) }
-elseif ($parsed -and $parsed.PSObject.Properties["deployments"]) { $items=@($parsed.deployments) }
-$items=@($items | Where-Object { $_ -and $_.id })
+# Cloudflare Pages deployments API returns lower-case `id`, independently of
+# Wrangler CLI JSON's PascalCase fields. Avoid parsing decorated CLI output.
+$history=Invoke-RestMethod -Uri "$uri/deployments?env=production&per_page=10" -Headers $headers -TimeoutSec 30
+Must ($history.success -and $history.result) "Cannot read Cloudflare production deployment history."
+$items=@($history.result | Where-Object { $_ -and $_.id })
 Must ($items.Count -gt 0) "Previous production deployment ID unavailable: cannot establish rollback point."
+# The Pages API orders newest first. Require an actual production deployment ID.
 $rollbackId=$items[0].id
 Must ($rollbackId -match "^[a-zA-Z0-9-]{20,}$") "Unexpected Cloudflare deployment ID shape."
 Write-Host "[ROLLBACK] Previous production deployment ID = $rollbackId"
+
+# CI already fails when the Ads Pixel is absent. Manual releases MUST match
+# this guard rather than shipping a bundle that silently loses attribution.
+$pixel=[Environment]::GetEnvironmentVariable("VITE_OPENAI_ADS_PIXEL_ID")
+Must (-not [string]::IsNullOrWhiteSpace($pixel)) "VITE_OPENAI_ADS_PIXEL_ID is missing. Do not deploy a build without conversion attribution."
+
 
 Run "pnpm" @("install","--frozen-lockfile")
 Run "pnpm" @("check")
@@ -124,6 +129,12 @@ ValidateFile "dist/public/index.html"
 ValidateFile "dist/public/_worker.js"
 AssertPng "dist/public/images/og-home-en-share-v2.png"
 AssertPng "dist/public/images/og-home-cs-share-v2.png"
+$jsAssets=@(Get-ChildItem "dist/public/assets" -Filter "*.js" -File)
+$hasPixel=$false
+foreach ($asset in $jsAssets) {
+  if (Select-String -Path $asset.FullName -Pattern $pixel -SimpleMatch -Quiet) { $hasPixel=$true; break }
+}
+Must ($hasPixel) "Built JS assets do not contain the configured OpenAI Ads Pixel identifier."
 Must (-not (Output "git" @("status","--porcelain","--untracked-files=all"))) "Build unexpectedly modified source tree."
 Write-Host "[BUILD PASS] TypeScript, tests, Pages assets, both 1200x630 compact share PNGs."
 
