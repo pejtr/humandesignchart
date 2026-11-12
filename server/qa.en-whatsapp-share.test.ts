@@ -7,6 +7,9 @@ describe("EN sticky + WhatsApp P0", () => {
     expect(buildSeoHead("en","/en")).toContain("og-home-en-share-v2.png");
     expect(buildSeoHead("cs","/cs")).toContain("og-home-cs-share-v2.png");
     expect(buildSeoHead("en","/")).toContain('og:url" content="https://humandesignchart.app/en/"');
+    expect(buildSeoHead("en", "/en/calculate")).toContain("og-home-en-share-v2.png");
+    expect(buildSeoHead("cs", "/cs/calculate")).toContain("og-home-cs-share-v2.png");
+
   });
   it("keeps header outside overflow hero and includes mobile menu", () => {
     const code=readFileSync("client/src/pages/PremiumUSHome.tsx","utf8");
