@@ -6,9 +6,9 @@ import { buildSeoHead } from "./_core/seoMeta";
 describe("P0 premium EN header and WhatsApp share contract", () => {
   it("keeps navigation sticky outside the overflow-clipped hero", () => {
     const page = readFileSync(resolve("client/src/pages/PremiumUSHome.tsx"), "utf8");
-    const opening = page.indexOf('<header className="sticky top-0');
+    const opening = page.indexOf('<header data-testid="hd-en-premium-header" className="sticky top-0');
     const closing = page.indexOf("</header>", opening);
-    const hero = page.indexOf('<section className="relative overflow-hidden bg-[#071426] text-white">');
+    const hero = page.indexOf('<section data-testid="hd-en-premium-hero" className="relative overflow-hidden bg-[#071426] text-white">');
     expect(opening).toBeGreaterThan(0);
     expect(closing).toBeGreaterThan(opening);
     expect(closing).toBeLessThan(hero);
