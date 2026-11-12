@@ -101,6 +101,7 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
         ? "Calculate your Human Design chart for free. Discover your type, strategy, authority, and profile. Get a personalized AI reading."
         : "Vypočítejte svou Human Design mapu zdarma. Zjistěte svůj typ, strategii, autoritu a profil. Získejte personalizovaný AI výklad v češtině.",
       canonical: `${base}/${locale}/`,
+      ogImage: `${base}/images/og-home-${isCs ? "cs" : "en"}-share-v2.png`,
       keywords: isEn
         ? "human design, human design chart, bodygraph calculator, free human design, human design reading, type, strategy, authority"
         : "human design, human design mapa, bodygraph kalkulátor, human design zdarma, human design česky, typ human design, autorita human design, inkarnační kříž, AI výklad human design",

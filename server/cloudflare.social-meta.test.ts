@@ -40,7 +40,7 @@ describe("Cloudflare WhatsApp preview metadata", () => {
     const text = await response.text();
     expect(text).toContain('property="og:title"');
     expect(text).toContain('property="og:locale" content="cs_CZ"');
-    expect(text).toContain('property="og:image" content="https://humandesignmapa.cz/images/og-homepage.png"');
+    expect(text).toContain('property="og:image" content="https://humandesignmapa.cz/images/og-home-cs-share-v2.png"');
     expect(text).toContain('property="og:image:type" content="image/png"');
     expect(text).toContain('name="twitter:card" content="summary_large_image"');
     expect(text).not.toContain("<!--SEO_META-->");
@@ -54,7 +54,7 @@ describe("Cloudflare WhatsApp preview metadata", () => {
       assetResponse(),
     );
     expect(await response.text()).toContain(
-      'property="og:image" content="https://humandesignchart.app/images/og-homepage.png"',
+      'property="og:image" content="https://humandesignchart.app/images/og-home-en-share-v2.png"',
     );
   });
 
@@ -65,7 +65,7 @@ describe("Cloudflare WhatsApp preview metadata", () => {
     );
     const text = await response.text();
     expect(text).toContain('property="og:locale" content="cs_CZ"');
-    expect(text).toContain('property="og:image" content="https://humandesignmapa.cz/images/og-homepage.png"');
+    expect(text).toContain('property="og:image" content="https://humandesignmapa.cz/images/og-home-cs-share-v2.png"');
     expect(text).toContain('rel="canonical" href="https://humandesignmapa.cz/cs/"');
     expect(text).not.toContain("<!--SEO_META-->");
   });
@@ -77,7 +77,7 @@ describe("Cloudflare WhatsApp preview metadata", () => {
     );
     const text = await response.text();
     expect(text).toContain('property="og:locale" content="en_US"');
-    expect(text).toContain('property="og:image" content="https://humandesignchart.app/images/og-homepage.png"');
+    expect(text).toContain('property="og:image" content="https://humandesignchart.app/images/og-home-en-share-v2.png"');
     expect(text).toContain('rel="canonical" href="https://humandesignchart.app/en/"');
     expect(text).not.toContain("<!--SEO_META-->");
   });
