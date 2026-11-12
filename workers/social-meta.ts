@@ -49,7 +49,7 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
   const meta = isDirectPagesPreview && baseMeta
     ? baseMeta
       .replace(
-        /(<meta (?:property="og:image(?:\\:secure_url)?"|name="twitter:image") content=")https:\/\/[^"]+(\/images\/[^"]+)"/g,
+        /(<meta (?:property="og:image(?::secure_url)?"|name="twitter:image") content=")https:\/\/[^"]+(\/images\/[^"]+)"/g,
         (_match, prefix: string, imagePath: string) => `${prefix}${url.origin}${imagePath}"`,
       )
       .replace(
