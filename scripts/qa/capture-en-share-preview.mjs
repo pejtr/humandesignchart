@@ -87,10 +87,10 @@ try {
       signal: AbortSignal.timeout(20000),
     });
     const html = await response.text();
-    const tags = html.match(/<meta\\s+[^>]*>/gi) || [];
+    const tags = html.match(/<meta\s+[^>]*>/gi) || [];
     const value = name => {
       const tag = tags.find(t => t.includes('property="' + name + '"'));
-      return tag?.match(/\\bcontent=["']([^"']+)["']/i)?.[1] || "";
+      return tag?.match(/\bcontent=["']([^"']+)["']/i)?.[1] || "";
     };
     const image = value("og:image");
     const title = value("og:title");
