@@ -36,9 +36,9 @@ try {
       waitUntil: "domcontentloaded", timeout: 45000,
     });
     if (response?.status() !== 200) throw new Error(v.name + ": EN homepage HTTP " + response?.status());
-    const header = page.locator("header.sticky").first();
+    const header = page.getByTestId("hd-en-premium-header");
     await header.waitFor({ state: "visible" });
-    const hero = page.locator("section.relative.overflow-hidden.bg-\\[\\#071426\\]").first();
+    const hero = page.getByTestId("hd-en-premium-hero");
     // Scroll well beyond the hero: header must stay pinned to the top of the screen.
     await page.evaluate(() => window.scrollTo(0, Math.max(1100, window.innerHeight * 1.7)));
     await page.waitForTimeout(350);

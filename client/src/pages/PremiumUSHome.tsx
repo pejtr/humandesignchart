@@ -122,7 +122,7 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
     <div className="min-h-screen bg-[#F7F3EA] text-[#071426]">
       {/* The navigation belongs to the page, not the overflow-clipped hero:
           sticky inside that section stops at the section boundary. */}
-      <header className="sticky top-0 z-[100] w-full border-b border-[#D8C49A]/20 bg-[#071426]/95 text-white shadow-[0_8px_30px_rgba(0,0,0,.18)] backdrop-blur-xl supports-[backdrop-filter]:bg-[#071426]/85">
+      <header data-testid="hd-en-premium-header" className="sticky top-0 z-[100] w-full border-b border-[#D8C49A]/20 bg-[#071426]/95 text-white shadow-[0_8px_30px_rgba(0,0,0,.18)] backdrop-blur-xl supports-[backdrop-filter]:bg-[#071426]/85">
         <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 px-5 py-4 md:px-8 lg:px-12">
           <Link href={localePath("/")} className="flex items-center gap-3 no-underline">
             <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#F4C762]/60 bg-[#F4C762]/10 text-[#F4C762]">
@@ -150,7 +150,7 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
         </div>
       </header>
 
-      <section className="relative overflow-hidden bg-[#071426] text-white">
+      <section data-testid="hd-en-premium-hero" className="relative overflow-hidden bg-[#071426] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_76%_34%,rgba(244,199,98,0.18),transparent_28%),radial-gradient(circle_at_34%_20%,rgba(139,92,246,0.14),transparent_34%),linear-gradient(135deg,#071426_0%,#0A1B31_58%,#111C35_100%)]" />
         <div className="absolute inset-0 opacity-[0.10] [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:44px_44px]" />
         <div className="hd-us-cosmos" aria-hidden="true">
