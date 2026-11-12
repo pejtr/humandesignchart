@@ -42,4 +42,22 @@ describe("P0 premium EN header and WhatsApp share contract", () => {
     expect(generator).toContain("og-homepage-cs.png");
     expect(generator).toContain("png.length > 300000");
   });
+  it("fails closed on unsafe Cloudflare preview bindings and missing rollback IDs", () => {
+    const script = readFileSync(resolve("scripts/qa/deploy-en-share-preview.ps1"), "utf8");
+    expect(script).toContain("hd-en-share-preview");
+    expect(script).toContain("production deployment ID");
+    expect(script).toContain("env=production");
+    expect(script).toContain("env=preview");
+    expect(script).toContain("deployment_trigger.metadata.commit_hash -eq $sha");
+    expect(script).toContain("qa-artifacts/en-sticky-social");
+    expect(script).toContain("NO-GO: Preview shares live");
+    expect(script).not.toContain("--branch=main");
+    const browser = readFileSync(resolve("scripts/qa/capture-en-share-preview.mjs"), "utf8");
+    expect(browser).toContain("small360");
+    expect(browser).toContain("wide3840");
+    expect(browser).toContain("WhatsApp/2.24.0");
+    expect(browser).toContain("hd-en-mobile-navigation");
+    expect(browser).toContain("image/png");
+  });
+
 });
