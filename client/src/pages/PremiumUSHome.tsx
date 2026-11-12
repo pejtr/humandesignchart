@@ -122,12 +122,13 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
     <div className="min-h-screen bg-[#F7F3EA] text-[#071426]">
       <header data-testid="premium-en-sticky-header" className="sticky top-0 z-[100] w-full border-b border-[#D8C49A]/20 bg-[#071426]/95 text-white shadow-[0_12px_40px_rgba(3,8,22,.24)] backdrop-blur-xl supports-[backdrop-filter]:bg-[#071426]/85">
         <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 px-5 py-4 md:px-8 lg:px-12">
-          <Link href={localePath("/")} className="flex items-center gap-3 no-underline">
+          <Link href={localePath("/")} aria-label="Human Design Chart — home" className="flex min-w-0 shrink-0 items-center gap-2.5 no-underline sm:gap-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#F4C762]/60 bg-[#F4C762]/10 text-[#F4C762]">
               <Sparkles className="h-4 w-4" />
             </span>
-            <span className="text-[15px] font-semibold tracking-[-0.02em] text-white sm:text-lg">
-              HumanDesignChart.app
+            <span className="whitespace-nowrap text-[15px] font-semibold tracking-[-0.02em] text-white sm:text-lg">
+              <span className="sm:hidden">HD Chart</span>
+              <span className="hidden sm:inline">HumanDesignChart.app</span>
             </span>
           </Link>
 
@@ -141,12 +142,12 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
 
           <Link
             href={localePath("/calculate")}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#F4C762] px-4 py-2.5 text-sm font-bold text-[#071426] shadow-[0_10px_34px_rgba(244,199,98,.25)] transition hover:-translate-y-0.5 hover:bg-[#FFE09A]"
+            className="hidden min-h-11 shrink-0 items-center gap-2 rounded-xl bg-[#F4C762] px-4 py-2.5 text-sm font-bold text-[#071426] shadow-[0_10px_34px_rgba(244,199,98,.25)] transition hover:-translate-y-0.5 hover:bg-[#FFE09A] sm:inline-flex"
           >
             Get My Free Chart <ArrowRight className="h-4 w-4" />
           </Link>
-          <details className="relative ml-auto lg:hidden">
-            <summary role="button" aria-label="Open main navigation" className="flex min-h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-xl border border-[#D8C49A]/30 text-[#F4C762] outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#8899FF] [&::-webkit-details-marker]:hidden">
+          <details className="relative ml-auto shrink-0 lg:hidden">
+            <summary aria-label="Open main navigation" className="flex min-h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-xl border border-[#D8C49A]/30 text-[#F4C762] outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#8899FF] [&::-webkit-details-marker]:hidden">
               <Menu aria-hidden="true" className="h-5 w-5" />
             </summary>
             <nav aria-label="Mobile navigation" className="absolute right-0 top-full z-[101] mt-3 flex w-56 flex-col gap-1 rounded-2xl border border-[#D8C49A]/30 bg-[#071426] p-3 shadow-2xl">
