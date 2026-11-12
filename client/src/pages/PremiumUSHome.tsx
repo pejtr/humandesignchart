@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Sparkles,
   Star,
+  Menu,
   Users,
   Zap,
 } from "lucide-react";
@@ -119,11 +120,8 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
 
   return (
     <div className="min-h-screen bg-[#F7F3EA] text-[#071426]">
-      <section className="relative overflow-hidden bg-[#071426] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_76%_34%,rgba(244,199,98,0.18),transparent_28%),radial-gradient(circle_at_34%_20%,rgba(139,92,246,0.14),transparent_34%),linear-gradient(135deg,#071426_0%,#0A1B31_58%,#111C35_100%)]" />
-        <div className="absolute inset-0 opacity-[0.10] [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:44px_44px]" />
-
-        <header className="relative z-20 mx-auto flex w-full max-w-[1440px] items-center justify-between px-5 py-5 md:px-8 lg:px-12">
+      <header data-testid="premium-en-sticky-header" className="sticky top-0 z-[100] w-full border-b border-[#D8C49A]/20 bg-[#071426]/95 text-white shadow-[0_12px_40px_rgba(3,8,22,.24)] backdrop-blur-xl supports-[backdrop-filter]:bg-[#071426]/85">
+        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 px-5 py-4 md:px-8 lg:px-12">
           <Link href={localePath("/")} className="flex items-center gap-3 no-underline">
             <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#F4C762]/60 bg-[#F4C762]/10 text-[#F4C762]">
               <Sparkles className="h-4 w-4" />
@@ -133,7 +131,7 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-7 text-sm text-white/72 lg:flex">
+          <nav aria-label="Desktop navigation" className="hidden items-center gap-7 text-sm text-white/72 lg:flex">
             <Link href={localePath("/calculate")} className="transition hover:text-white">Get Your Chart</Link>
             <Link href={localePath("/encyclopedia")} className="transition hover:text-white">Learn</Link>
             <Link href={localePath("/ai-guide")} className="transition hover:text-white">Insights</Link>
@@ -147,7 +145,25 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
           >
             Get My Free Chart <ArrowRight className="h-4 w-4" />
           </Link>
-        </header>
+          <details className="relative ml-auto lg:hidden">
+            <summary role="button" aria-label="Open main navigation" className="flex min-h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-xl border border-[#D8C49A]/30 text-[#F4C762] outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#8899FF] [&::-webkit-details-marker]:hidden">
+              <Menu aria-hidden="true" className="h-5 w-5" />
+            </summary>
+            <nav aria-label="Mobile navigation" className="absolute right-0 top-full z-[101] mt-3 flex w-56 flex-col gap-1 rounded-2xl border border-[#D8C49A]/30 bg-[#071426] p-3 shadow-2xl">
+              <Link href={localePath("/calculate")} className="rounded-lg px-4 py-3 text-sm text-white hover:bg-white/10">Get Your Chart</Link>
+              <Link href={localePath("/encyclopedia")} className="rounded-lg px-4 py-3 text-sm text-white hover:bg-white/10">Learn</Link>
+              <Link href={localePath("/ai-guide")} className="rounded-lg px-4 py-3 text-sm text-white hover:bg-white/10">Insights</Link>
+              <Link href={localePath("/honorace")} className="rounded-lg px-4 py-3 text-sm text-white hover:bg-white/10">Pricing</Link>
+              <Link href={localePath("/blog")} className="rounded-lg px-4 py-3 text-sm text-white hover:bg-white/10">Journal</Link>
+            </nav>
+          </details>
+        </div>
+      </header>
+      <section className="relative overflow-hidden bg-[#071426] text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_76%_34%,rgba(244,199,98,0.18),transparent_28%),radial-gradient(circle_at_34%_20%,rgba(139,92,246,0.14),transparent_34%),linear-gradient(135deg,#071426_0%,#0A1B31_58%,#111C35_100%)]" />
+        <div className="absolute inset-0 opacity-[0.10] [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:44px_44px]" />
+
+
 
         <div className="relative z-10 mx-auto grid w-full max-w-[1440px] gap-10 px-5 pb-14 pt-7 md:px-8 md:pb-20 lg:grid-cols-[0.94fr_1.06fr] lg:items-center lg:px-12 lg:pb-24 lg:pt-12">
           <div className="max-w-2xl">
