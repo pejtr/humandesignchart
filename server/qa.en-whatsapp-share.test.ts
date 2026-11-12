@@ -17,4 +17,16 @@ describe("EN sticky + WhatsApp P0", () => {
     const result=spawnSync(process.execPath,["--check","scripts/generate-social-cards.mjs"],{encoding:"utf8",timeout:10000});
     expect(result.status,result.stderr).toBe(0);
   });
+  it("publishes a syntax-valid isolated Pages screenshot and sticky E2E script", () => {
+    const result = spawnSync(process.execPath, ["--check", "scripts/qa/capture-en-share-preview.mjs"], { encoding:"utf8", timeout:10_000 });
+    expect(result.status, result.stderr).toBe(0);
+    const qa = readFileSync("scripts/qa/capture-en-share-preview.mjs","utf8");
+    expect(qa).toContain("humandesignchart-web.pages.dev");
+    expect(qa).toContain('data-testid="premium-en-sticky-header"');
+    expect(qa).toContain('document.documentElement.scrollWidth');
+    expect(qa).toContain("page.screenshot");
+    expect(qa).toContain("noindex,nofollow");
+    expect(qa).not.toContain("--branch=main");
+  });
+
 });

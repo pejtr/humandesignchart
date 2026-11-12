@@ -14,3 +14,13 @@ The premium EN header was inside an `overflow-hidden` hero section, so sticky co
 6. Known rollback Cloudflare production deployment ID, exact tested SHA, rollback plan; only then merge and production release.
 
 **Status until deployment and browser screenshots: CODE-ONLY / NOT PRODUCTION VERIFIED.**
+
+## Reproducible browser QA with evidence files
+With isolated preview deployed and Playwright installed in operator's QA runtime:
+
+```powershell
+$env:HD_EN_PREVIEW_URL = "https://<isolated>.humandesignchart-web.pages.dev/"
+node scripts/qa/capture-en-share-preview.mjs
+```
+
+The script refuses non-Cloudflare project hosts and produces **10 real screenshots** (top/scrolled × 360/390/768/1440/3840) and `qa-artifacts/p0-en-sticky-whatsapp/evidence.json`. It asserts viewport overflow, sticky position after scrolling, desktop/menu/CTA navigation, EN raw SSR og:image, preview noindex and a real **200 OK / image/png / <600 KB / 1200×630** preview card. It only reads preview and does not trigger checkout. A green code CI is not a substitute for this evidence.
