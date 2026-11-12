@@ -113,3 +113,6 @@ temp/
 # Test results
 test_results.txt
 leados_test_results.txt
+
+# Local isolated browser QA screenshots/video (never commit customer content)
+qa-artifacts/
