@@ -272,9 +272,12 @@
 .hd-mp-cosmos[data-motion-state="paused"] *::after {
   animation-play-state: paused !important;
 }
-/* This preview's ambient chart glow and hero shimmer follow the same
-   accessible pause state via the sibling atmosphere's data attribute. */
-.hd-mp-hero:has(.hd-mp-cosmos[data-motion-state="paused"]) .hd-mp-button-primary::after {
+/* Hero embellishments follow the shared bodygraph control, with no JS polling. */
+.hd-mp-hero:has(.hd-mp-cosmos[data-motion-state="paused"]) .hd-mp-button-primary::after,
+.hd-mp-hero:has(.hd-mp-cosmos[data-motion-state="paused"]) .hd-mp-orbit-outer {
+  animation-play-state: paused !important;
+}
+.hd-mp-chart-shell:has(.bodygraph-motion-frame[data-motion-state="paused"])::before {
   animation-play-state: paused !important;
 }
 @media (max-width: 640px) {
