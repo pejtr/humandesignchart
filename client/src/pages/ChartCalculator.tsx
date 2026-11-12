@@ -21,6 +21,7 @@ import { TimeDisambiguationField, type TimeDisambiguation } from "@/components/T
 import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { trackGA4Event } from "@/hooks/useGA4";
 import { saveChartDraft } from "@/lib/chartDraft";
+import "./ChartCalculatorAmbient.css";
 
 const CALCULATOR_HERO_VISUALS = {
   self: { eyebrowCs: "Moje mapa", eyebrowEn: "My chart", headlineCs: "Začněte u sebe.", headlineEn: "Start with yourself.", background: "radial-gradient(circle at 18% 18%, rgba(168,85,247,.20), transparent 38%), radial-gradient(circle at 82% 25%, rgba(99,102,241,.16), transparent 32%), linear-gradient(140deg, rgba(250,248,255,.96), rgba(244,247,255,.82))", accent: "#8b5cf6" },
@@ -228,44 +229,36 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-hidden">
-      <div className="absolute inset-x-0 top-16 h-[34rem] pointer-events-none z-0 transition-opacity duration-500" style={{ background: heroVisual.background }} aria-hidden="true" />
-      {/* Mystical Background Decorations */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] dark:opacity-[0.05] animate-slow-spin">
-          <svg viewBox="0 0 24 24" className="w-[800px] h-[800px] text-primary" fill="none" stroke="currentColor" strokeWidth="0.5">
-            <circle cx="12" cy="4" r="2" />
-            <circle cx="12" cy="12" r="2.5" />
-            <circle cx="12" cy="20" r="2" />
-            <circle cx="6" cy="8" r="1.5" />
-            <circle cx="18" cy="8" r="1.5" />
-            <line x1="12" y1="6" x2="12" y2="9.5" />
-            <line x1="12" y1="14.5" x2="12" y2="18" />
-            <line x1="7.2" y1="7" x2="10" y2="10.5" />
-            <line x1="16.8" y1="7" x2="14" y2="10.5" />
-          </svg>
-        </div>
-        <div className="absolute top-[20%] left-[10%] w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-[20%] right-[10%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
+    <div className="hd-calculator-page min-h-screen flex flex-col bg-background text-foreground relative overflow-hidden">
+      {/* Decorative only. Continuous ivory-to-lavender atmosphere replaces the
+          abrupt 34rem background strip without changing form behavior. */}
+      <div className="hd-calculator-backdrop" aria-hidden="true">
+        <div className="hd-calculator-category-wash" style={{ background: heroVisual.background }} />
+        <span className="hd-calculator-aurora hd-calculator-aurora-violet" />
+        <span className="hd-calculator-aurora hd-calculator-aurora-champagne" />
+        <span className="hd-calculator-stars" />
+        <span className="hd-calculator-orbit hd-calculator-orbit-outer" />
+        <span className="hd-calculator-orbit hd-calculator-orbit-inner" />
+        <span className="hd-calculator-horizon" />
       </div>
 
       <Navbar />
 
-      <main className="flex-1 pt-24 pb-16">
-        <div className="container max-w-2xl relative">
+      <main className="hd-calculator-main flex-1 pt-24 pb-16">
+        <div className="hd-calculator-shell container max-w-2xl relative">
           {/* Top Hero Section */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border bg-white/70 dark:bg-card/70 text-sm mb-4 transition-colors duration-500 shadow-xs" style={{ borderColor: `${heroVisual.accent}55`, color: heroVisual.accent }}>
+          <div className="hd-calculator-intro text-center mb-8">
+            <div className="hd-calculator-eyebrow inline-flex items-center gap-2 px-4 py-1.5 rounded-full border bg-white/70 dark:bg-card/70 text-sm mb-4 transition-colors duration-500 shadow-xs" style={{ borderColor: `${heroVisual.accent}55`, color: heroVisual.accent }}>
               <Compass className="w-4 h-4" />
               {isEn ? heroVisual.eyebrowEn : heroVisual.eyebrowCs}
             </div>
-            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold mb-3 tracking-tight">
+            <h1 className="hd-calculator-title font-serif text-3xl md:text-4xl lg:text-5xl font-bold mb-3 tracking-tight">
               {seoType === "kalkulacka" && isEn === false ? "Human Design Kalkulačka Zdarma" :
                 seoType === "test" && isEn === false ? "Human Design Test Osobnosti Zdarma" :
                   seoType === "typy" && isEn === false ? "Human Design Typy — Vypočítejte svůj typ" :
                     t.calculator.title}
             </h1>
-            <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto leading-relaxed">
+            <p className="hd-calculator-description text-muted-foreground text-sm md:text-base max-w-xl mx-auto leading-relaxed">
               {seoType === "kalkulacka" && isEn === false ? "Využijte nejkomplexnější přesnou Human Design kalkulačku v češtině. Zjistěte ihned, jak byla vaše energetická mapa poskládána v momentě narození." :
                 seoType === "test" && isEn === false ? "Na rozdíl od jiných psychologických testů vychází Human design z přesného postavení planet a vaší DNA v čase zrození. Získejte svůj rozbor zdarma." :
                   seoType === "typy" && isEn === false ? "Generátor, Projektor, Manifestor nebo Reflektor? Použijte náš výpočet a objevte svůj přesný typ a strategii pro život v lehkosti." :
@@ -273,20 +266,20 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
             </p>
 
             {/* Instant Value / Benefit Badges */}
-            <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
+            <div className="hd-calculator-benefits mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
+              <div className="hd-calculator-benefit flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 shrink-0 text-xs font-bold">⚡</span>
                 <span className="text-[11px] font-medium leading-tight text-foreground">{isEn ? "100% Free & Instant" : "100% Zdarma & Ihned"}</span>
               </div>
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
+              <div className="hd-calculator-benefit flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/15 text-purple-600 dark:text-purple-400 shrink-0 text-xs font-bold">🎯</span>
                 <span className="text-[11px] font-medium leading-tight text-foreground">{isEn ? "Type & Inner Authority" : "Typ, strategie & autorita"}</span>
               </div>
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
+              <div className="hd-calculator-benefit flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 shrink-0 text-xs font-bold">🔮</span>
                 <span className="text-[11px] font-medium leading-tight text-foreground">{isEn ? "9 Centers & Channels" : "9 center, kanály a brány"}</span>
               </div>
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
+              <div className="hd-calculator-benefit flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 shrink-0 text-xs font-bold">🇨🇿</span>
                 <span className="text-[11px] font-medium leading-tight text-foreground">{isEn ? "Deep English Analysis" : "Kompletní výklad v češtině"}</span>
               </div>
@@ -298,7 +291,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
           </div>
 
           {/* Main Calculation Card */}
-          <Card className="bg-card/95 backdrop-blur-sm border-border/70 shadow-lg rounded-2xl md:rounded-3xl overflow-hidden">
+          <Card className="hd-calculator-card bg-card/95 backdrop-blur-sm border-border/70 shadow-lg rounded-2xl md:rounded-3xl overflow-hidden">
             <CardHeader className="pb-4">
               <CardTitle className="font-serif text-xl md:text-2xl text-foreground flex items-center justify-between">
                 <span>{t.calculator.birthDataTitle}</span>
@@ -502,7 +495,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                 <Button
                   type="submit"
                   size="lg"
-                  className="w-full h-13 text-base font-semibold bg-gradient-to-r from-purple-600 via-primary to-indigo-600 text-primary-foreground hover:brightness-105 shadow-lg shadow-purple-500/20 transition-all rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="hd-calculator-cta w-full h-13 text-base font-semibold bg-gradient-to-r from-purple-600 via-primary to-indigo-600 text-primary-foreground hover:brightness-105 shadow-lg shadow-purple-500/20 transition-all rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={calculateMutation.isPending || isSearchingPlace}
                 >
                   {calculateMutation.isPending ? (
