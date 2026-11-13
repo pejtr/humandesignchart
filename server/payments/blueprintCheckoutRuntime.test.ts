@@ -21,7 +21,7 @@ const validChartJson = JSON.stringify(calculateChart({
 }));
 const COOKIE = "__Host-hd_session=" + "a".repeat(43);
 
-function fakeD1(options: { exists?: boolean; writeSuccess?: boolean; incomplete?: boolean } = {}) {
+function fakeD1(options: { exists?: boolean; writeSuccess?: boolean; incomplete?: boolean; alreadyPaid?: boolean } = {}) {
   const statements: { sql: string; args: unknown[] }[] = [];
   const db = {
     prepare(sql: string) {
@@ -32,6 +32,9 @@ function fakeD1(options: { exists?: boolean; writeSuccess?: boolean; incomplete?
             first: async () => {
               if (sql.includes("FROM hd_oauth_sessions")) {
                 return { id: 7, email: "buyer@example.test", name: "Test Buyer", created_at: "2026-01-01 00:00:00" };
+              }
+              if (sql.includes("FROM hd_orders o") && sql.includes("INNER JOIN hd_chart_snapshots s")) {
+                return options.alreadyPaid ? { id: "previous-paid-blueprint" } : null;
               }
               return options.exists
                 ? { id: "snap_owned", chart_data_json: options.incomplete ? '{"type":"Generator"}' : validChartJson }
@@ -88,6 +91,19 @@ describe("Cloudflare Blueprint checkout: no real payment may precede a valid cha
     await expect(caller({ HD_ORDERS: db, PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN: "unit_key" })
       .subscription.createCheckout({ ...input, customerEmail: "other@example.test" }))
       .rejects.toThrow("CHECKOUT_EMAIL_MUST_MATCH_ACCOUNT");
+  });
+
+  it("blocks paying again for the same birth chart and directs to recovery", async () => {
+    const { db, statements } = fakeD1({ exists: true, alreadyPaid: true });
+    const payment = vi.fn();
+    vi.stubGlobal("fetch", payment);
+    await expect(caller({ HD_ORDERS: db, PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN: "unit_key" })
+      .subscription.createCheckout(input)).rejects.toThrow("BLUEPRINT_ALREADY_PAID_RECOVER_ACCESS");
+    expect(payment).not.toHaveBeenCalled();
+    expect(statements.filter(entry => entry.sql.includes("INSERT INTO hd_orders"))).toHaveLength(0);
+    const duplicateCheck = statements.find(entry => entry.sql.includes("INNER JOIN hd_chart_snapshots s"));
+    expect(duplicateCheck?.args[0]).toBe("buyer@example.test");
+    expect(duplicateCheck?.args[1]).toBe(JSON.parse(validChartJson).birthUtc);
   });
 
   it.each([
