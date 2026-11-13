@@ -166,6 +166,10 @@ async function sendTransactionalEmail(params: {
   const greeting = params.customerName
     ? (isEn ? `Dear ${params.customerName},` : `Dobrý den ${params.customerName},`)
     : (isEn ? "Dear Customer," : "Dobrý den,");
+  // Customer names come from checkout input and must not inject HTML into mail.
+  const safeGreeting = greeting.replace(/[&<>"']/g, char =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" } as Record<string, string>)[char]
+  );
 
   const message = params.isRecovery
     ? (isEn
@@ -190,7 +194,7 @@ async function sendTransactionalEmail(params: {
         <p style="margin:8px 0 0;font-size:14px;opacity:0.9;">${isEn ? "Human Design Blueprint" : "Osobní Human Design Blueprint"}</p>
       </div>
       <div style="padding:32px 24px;line-height:1.6;">
-        <p style="margin:0 0 16px;font-size:16px;font-weight:600;">${greeting}</p>
+        <p style="margin:0 0 16px;font-size:16px;font-weight:600;">${safeGreeting}</p>
         <p style="margin:0 0 24px;color:#334155;font-size:15px;">${message}</p>
         <div style="text-align:center;margin:32px 0;">
           <a href="${params.accessUrl}" style="background:#059669;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:700;font-size:16px;display:inline-block;box-shadow:0 4px 6px rgba(5,150,105,0.2);">${ctaText}</a>
