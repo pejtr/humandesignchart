@@ -630,6 +630,30 @@ export const appRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: "COMPLETE_BIRTH_CHART_REQUIRED" });
         }
 
+        // P0 paid-access protection: buying the same birth chart again is not
+        // recovery. Look up a PAID order for this authenticated email and the
+        // same authoritative birth instant *before* contacting ONYX PAY.
+        // Other charts for the same account remain purchasable.
+        const chartBirthUtc = JSON.parse(savedChart.chart_data_json).birthUtc as string;
+        let existingPaidBlueprint: unknown;
+        try {
+          existingPaidBlueprint = await d1.prepare(
+            `SELECT o.id FROM hd_orders o
+             INNER JOIN hd_chart_snapshots s ON s.id = o.chart_snapshot_id
+             WHERE LOWER(o.customer_email) = LOWER(?)
+               AND o.payment_status = 'PAID'
+               AND o.offer_key IN ('hd-blueprint-cz', 'hd-blueprint-en')
+               AND json_extract(s.chart_data_json, '$.birthUtc') = ?
+             LIMIT 1`
+          ).bind(input.customerEmail.trim(), chartBirthUtc).first();
+        } catch {
+          // Database ambiguity must never silently turn into a second charge.
+          throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "PAID_ACCESS_CHECK_UNAVAILABLE" });
+        }
+        if (existingPaidBlueprint) {
+          throw new TRPCError({ code: "CONFLICT", message: "BLUEPRINT_ALREADY_PAID_RECOVER_ACCESS" });
+        }
+
         const isCzech = input.locale === "cs";
         const offerKey = isCzech ? "hd-blueprint-cz" : "hd-blueprint-en";
         const payBase = (ctx.env?.PAY_BASE_URL || "https://pay.optimateo.com").replace(/\/$/, "");
