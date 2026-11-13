@@ -1610,13 +1610,18 @@ export default {
 
         // Reject a paid event when the original order or personalized chart is
         // unavailable. Never create an empty paid order or issue an unusable PDF.
+        // A snapshot row can exist while its chart is incomplete or corrupt
+        // (especially on orders created before the checkout completeness gate).
+        // Never mark money-captured orders FULFILLED until the original snapshot
+        // contains a usable Bodygraph, not just a database identifier.
         const snapshot = existing?.chart_snapshot_id
           ? await d1
-              .prepare("SELECT id FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) LIMIT 1")
+              .prepare("SELECT chart_data_json FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) LIMIT 1")
               .bind(existing.chart_snapshot_id, existing.customer_email)
               .first()
           : null;
-        const blocked = getBlueprintFulfillmentBlocker(existing, event, Boolean(snapshot));
+        const hasCompleteChart = isCompleteBlueprintChartJson(snapshot?.chart_data_json);
+        const blocked = getBlueprintFulfillmentBlocker(existing, event, hasCompleteChart);
         if (blocked) {
           console.error("[onyxpay-fulfill] Cannot fulfill blueprint without valid order and chart:", blocked);
           return Response.json(
