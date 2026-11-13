@@ -21,7 +21,7 @@ const validChartJson = JSON.stringify(calculateChart({
 }));
 const COOKIE = "__Host-hd_session=" + "a".repeat(43);
 
-function fakeD1(options: { exists?: boolean; writeSuccess?: boolean; incomplete?: boolean; alreadyPaid?: boolean } = {}) {
+function fakeD1(options: { exists?: boolean; writeSuccess?: boolean; incomplete?: boolean; alreadyPaid?: boolean; paidLookupFails?: boolean } = {}) {
   const statements: { sql: string; args: unknown[] }[] = [];
   const db = {
     prepare(sql: string) {
@@ -34,6 +34,7 @@ function fakeD1(options: { exists?: boolean; writeSuccess?: boolean; incomplete?
                 return { id: 7, email: "buyer@example.test", name: "Test Buyer", created_at: "2026-01-01 00:00:00" };
               }
               if (sql.includes("FROM hd_orders o") && sql.includes("INNER JOIN hd_chart_snapshots s")) {
+                if (options.paidLookupFails) throw new Error("D1_READ_FAILED");
                 return options.alreadyPaid ? { id: "previous-paid-blueprint" } : null;
               }
               return options.exists
@@ -104,6 +105,15 @@ describe("Cloudflare Blueprint checkout: no real payment may precede a valid cha
     const duplicateCheck = statements.find(entry => entry.sql.includes("INNER JOIN hd_chart_snapshots s"));
     expect(duplicateCheck?.args[0]).toBe("buyer@example.test");
     expect(duplicateCheck?.args[1]).toBe(JSON.parse(validChartJson).birthUtc);
+  });
+
+  it("fails closed if existing paid order lookup is unavailable", async () => {
+    const { db } = fakeD1({ exists: true, paidLookupFails: true });
+    const payment = vi.fn();
+    vi.stubGlobal("fetch", payment);
+    await expect(caller({ HD_ORDERS: db, PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN: "unit_key" })
+      .subscription.createCheckout(input)).rejects.toThrow("PAID_ACCESS_CHECK_UNAVAILABLE");
+    expect(payment).not.toHaveBeenCalled();
   });
 
   it.each([
