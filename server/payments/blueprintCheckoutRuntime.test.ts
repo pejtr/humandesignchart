@@ -237,6 +237,13 @@ describe("Paid Blueprint printable content: locale and real SVG", () => {
     const html = await renderPaidPdfForLocale("en");
     expect(html).toContain('<html lang="en">');
     expect(html).toContain("Your Energy Bodygraph");
+    expect(html).toContain("Type:");
+    expect(html).toContain("Profile:");
+    expect(html).toContain("Conscious line");
+    expect(html).toContain("Unconscious line");
+    expect(html).toContain("Authority:");
+    expect(html).toContain("How to explore:");
+    expect(html).toContain("Your profile combines conscious and unconscious themes");
     expect(html).toContain("Chart Overview");
     expect(html).toContain("Activated Gates");
     expect(html).toContain("Planetary Activations");
