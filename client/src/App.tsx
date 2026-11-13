@@ -31,6 +31,7 @@ import { useReportWebVitals } from "./hooks/useReportWebVitals";
 import { useRedditPageViews } from "./hooks/useRedditPixel";
 
 const ChartCalculator = lazy(() => import("./pages/ChartCalculator"));
+const MotionPreview = lazy(() => import("./pages/MotionPreview"));
 const ChartResult = lazy(() => import("./pages/ChartResult"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const ChartComparison = lazy(() => import("./pages/ChartComparison"));
@@ -206,6 +207,7 @@ function LocaleRoutes() {
 
             {/* Legacy routes without locale prefix → redirect */}
             <Route path="/calculate"><LegacyRedirect path="/calculate" /></Route>
+            <Route path="/motion-preview"><LegacyRedirect path="/motion-preview" /></Route>
             <Route path="/human-design-kalkulacka"><LegacyRedirect path="/human-design-kalkulacka" /></Route>
             <Route path="/human-design-test"><LegacyRedirect path="/human-design-test" /></Route>
             <Route path="/human-design-typy"><LegacyRedirect path="/human-design-typy" /></Route>
@@ -252,6 +254,9 @@ function LocaleRoutes() {
             </Route>
             <Route path="/:locale/calculate">
               {() => <SafeRoute><ChartCalculator /></SafeRoute>}
+            </Route>
+            <Route path="/:locale/motion-preview">
+              {() => <SafeRoute><MotionPreview /></SafeRoute>}
             </Route>
             <Route path="/:locale/human-design-kalkulacka">
               {() => <SafeRoute><ChartCalculator seoType="kalkulacka" /></SafeRoute>}

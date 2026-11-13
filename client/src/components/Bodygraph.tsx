@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import BodygraphMotionFrame from "./BodygraphMotionFrame";
 import type { HumanDesignChartData } from "@shared/types";
 
 interface BodygraphProps {
@@ -8,6 +10,8 @@ interface BodygraphProps {
   showLabels?: boolean;
   transitGates?: number[];
   interactive?: boolean;
+  motionControls?: boolean;
+  premium?: boolean;
   onGateClick?: (gate: number) => void;
   onCenterClick?: (center: string) => void;
   onChannelClick?: (gate1: number, gate2: number) => void;
@@ -37,6 +41,24 @@ const CENTER_DISPLAY: Record<string, string> = {
   SolarPlexus: "Sol. Plexus",
   Spleen: "Slezina",
   Root: "Kořen",
+};
+
+const CENTER_DISPLAY_EN: Record<string, string> = {
+  Head: "Head", Ajna: "Ajna", Throat: "Throat", G: "Identity",
+  Heart: "Will", Sacral: "Sacral", SolarPlexus: "Emotions",
+  Spleen: "Spleen", Root: "Root",
+};
+
+// Reflective micro-labels, not medical or diagnostic advice.
+const CENTER_DESCRIPTIONS_CS: Record<string, string> = {
+  Head: "Inspirace a otázky", Ajna: "Způsoby uvažování", Throat: "Vyjádření a komunikace",
+  G: "Směr a identita", Heart: "Vůle a závazky", Sacral: "Životní energie",
+  SolarPlexus: "Emoce a vnímání", Spleen: "Instinkt a intuice", Root: "Tlak a hybná síla",
+};
+const CENTER_DESCRIPTIONS_EN: Record<string, string> = {
+  Head: "Inspiration and questions", Ajna: "Ways of thinking", Throat: "Voice and expression",
+  G: "Identity and direction", Heart: "Will and commitments", Sacral: "Life energy",
+  SolarPlexus: "Emotions and awareness", Spleen: "Instinct and intuition", Root: "Drive and pressure",
 };
 
 // Defined center colors per center (unique hues)
@@ -133,11 +155,15 @@ export default function Bodygraph({
   showLabels = true,
   transitGates = [],
   interactive = true,
+  motionControls = interactive,
+  premium = false,
   onGateClick,
   onCenterClick,
   onChannelClick,
 }: BodygraphProps) {
   const [hoveredElement, setHoveredElement] = useState<string | null>(null);
+  const { locale } = useLanguage();
+  const isCs = locale === "cs";
 
   const activatedGateSet = useMemo(() => new Set(chart.activatedGates || []), [chart.activatedGates]);
   const transitGateSet = useMemo(() => new Set(transitGates), [transitGates]);
@@ -200,6 +226,7 @@ export default function Bodygraph({
   }
 
   return (
+    <BodygraphMotionFrame width={width} enabled={motionControls} premium={premium}>
     <svg
       viewBox="0 0 500 600"
       width={width}
@@ -290,6 +317,18 @@ export default function Bodygraph({
                   }}
                   style={{ transition: "all 0.2s", opacity: isHovered ? 1 : 0.9 }}
                 />
+                {/* Animated overlay never affects channel hit-testing or calculations. */}
+                <path
+                  d={path}
+                  className="bodygraph-energy-pulse"
+                  stroke="#f4d491"
+                  strokeWidth={2}
+                  strokeDasharray="3 18"
+                  strokeLinecap="round"
+                  fill="none"
+                  pointerEvents="none"
+                  aria-hidden="true"
+                />
               </>
             )}
           </g>
@@ -311,10 +350,22 @@ export default function Bodygraph({
         return (
           <g
             key={name}
-            className={interactive ? "cursor-pointer" : ""}
+            className={`bodygraph-center ${isDefined ? "bodygraph-center-defined" : "bodygraph-center-open"}${interactive ? " cursor-pointer" : ""}`}
+            role={interactive ? "button" : undefined}
+            tabIndex={interactive ? 0 : undefined}
+            aria-label={`${(isCs ? CENTER_DISPLAY : CENTER_DISPLAY_EN)[name]}: ${(isCs ? CENTER_DESCRIPTIONS_CS : CENTER_DESCRIPTIONS_EN)[name]}`}
             onMouseEnter={() => setHoveredElement(`center-${name}`)}
             onMouseLeave={() => setHoveredElement(null)}
-            onClick={() => onCenterClick?.(name)}
+            onFocus={() => setHoveredElement(`center-${name}`)}
+            onBlur={() => setHoveredElement(null)}
+            onClick={() => { setHoveredElement(isHovered ? null : `center-${name}`); onCenterClick?.(name); }}
+            onKeyDown={event => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                setHoveredElement(`center-${name}`);
+                onCenterClick?.(name);
+              }
+            }}
           >
             {/* Center shape */}
             {name === "G" ? (
@@ -324,6 +375,7 @@ export default function Bodygraph({
                 stroke={strokeColor}
                 strokeWidth={sw}
                 filter={filterVal}
+                className={isDefined ? "bodygraph-living-center" : undefined}
                 style={{ transition: "all 0.2s" }}
               />
             ) : name === "Heart" ? (
@@ -333,6 +385,7 @@ export default function Bodygraph({
                 stroke={strokeColor}
                 strokeWidth={sw}
                 filter={filterVal}
+                className={isDefined ? "bodygraph-living-center" : undefined}
                 style={{ transition: "all 0.2s" }}
               />
             ) : name === "Head" ? (
@@ -342,6 +395,7 @@ export default function Bodygraph({
                 stroke={strokeColor}
                 strokeWidth={sw}
                 filter={filterVal}
+                className={isDefined ? "bodygraph-living-center" : undefined}
                 style={{ transition: "all 0.2s" }}
               />
             ) : (
@@ -355,6 +409,7 @@ export default function Bodygraph({
                 stroke={strokeColor}
                 strokeWidth={sw}
                 filter={filterVal}
+                className={isDefined ? "bodygraph-living-center" : undefined}
                 style={{ transition: "all 0.2s" }}
               />
             )}
@@ -365,13 +420,13 @@ export default function Bodygraph({
                 x={pos.x}
                 y={pos.y + 4}
                 textAnchor="middle"
-                fill={isDefined ? "white" : "oklch(0.45 0.03 280)"}
+                fill={isDefined ? "rgba(255,255,255,0.9)" : "oklch(0.45 0.03 280)"}
                 fontSize="9"
                 fontFamily="Inter, sans-serif"
                 fontWeight={isDefined ? "600" : "400"}
                 style={{ pointerEvents: "none" }}
               >
-                {CENTER_DISPLAY[name]}
+                {(isCs ? CENTER_DISPLAY : CENTER_DISPLAY_EN)[name]}
               </text>
             )}
           </g>
@@ -423,7 +478,7 @@ export default function Bodygraph({
               x={pos.x}
               y={pos.y + 3.5}
               textAnchor="middle"
-              fill="white"
+              fill="rgba(255,255,255,0.9)"
               fontSize="7.5"
               fontFamily="Inter, sans-serif"
               fontWeight="700"
@@ -469,6 +524,28 @@ export default function Bodygraph({
           </g>
         );
       })()}
+
+      {/* Premium center micro-label: hover, keyboard focus or touch. */}
+      {premium && hoveredElement?.startsWith("center-") && (() => {
+        const name = hoveredElement.slice("center-".length);
+        const pos = CENTER_POSITIONS[name];
+        if (!pos) return null;
+        const label = (isCs ? CENTER_DISPLAY : CENTER_DISPLAY_EN)[name];
+        const description = (isCs ? CENTER_DESCRIPTIONS_CS : CENTER_DESCRIPTIONS_EN)[name];
+        const x = Math.max(8, Math.min(304, pos.x - 94));
+        const y = Math.max(10, pos.y - 70);
+        return (
+          <g role="tooltip" pointerEvents="none" className="bodygraph-center-tooltip">
+            <rect x={x} y={y} width={188} height={49} rx={10}
+              fill="#161a36" stroke="#D8C49A" strokeOpacity={0.85} strokeWidth={1} />
+            <text x={x + 12} y={y + 19} fontFamily="Inter, sans-serif"
+              fill="#D8C49A" fontSize={11} fontWeight={700}>{label}</text>
+            <text x={x + 12} y={y + 37} fontFamily="Inter, sans-serif"
+              fill="rgba(250,248,255,0.88)" fontSize={10}>{description}</text>
+          </g>
+        );
+      })()}
     </svg>
+    </BodygraphMotionFrame>
   );
 }
