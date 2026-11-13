@@ -236,6 +236,32 @@ describe("Cloudflare Blueprint checkout: no real payment may precede a valid cha
   });
 });
 
+it("renews an expired paid access credential without another checkout", async () => {
+  const actions: Array<{ sql: string; args: unknown[] }> = [];
+  const db = { prepare(sql: string) { return { bind(...args: unknown[]) {
+    actions.push({ sql, args });
+    return {
+      first: async () => ({
+        id: "paid-fixture", payment_ref: "fixture-reference",
+        customer_email: "buyer@example.test", offer_key: "hd-blueprint-en",
+        download_token: "old-credential", download_token_expires_at: "2025-01-01T00:00:00Z",
+        payment_status: "PAID", locale: "en",
+      }),
+      run: async () => ({ success: true, meta: { changes: 1 } }),
+    };
+  } }; } };
+  vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 202 })));
+  const result = await caller({ HD_ORDERS: db }).subscription.requestAccessRecovery({
+    email: "buyer@example.test", locale: "en",
+  });
+  expect(result.success).toBe(true);
+  const renewal = actions.find(row => row.sql.includes("SET download_token = ?"));
+  expect(renewal).toBeDefined();
+  expect(String(renewal?.args[0])).toMatch(/^tok_[a-f0-9]{32}$/);
+  expect(renewal?.args[3]).toBe("old-credential");
+  expect(actions.some(row => row.sql.includes("INSERT INTO hd_orders"))).toBe(false);
+});
+
 const allHdDescriptions = {
   gates: GATE_DESCRIPTIONS, channels: CHANNEL_DESCRIPTIONS, types: TYPE_DESCRIPTIONS,
   profiles: PROFILE_DESCRIPTIONS, authorities: AUTHORITY_DESCRIPTIONS, centers: CENTER_DESCRIPTIONS,
