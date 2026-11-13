@@ -1,8 +1,7 @@
 import type { HumanDesignChartData } from "@shared/types";
 import { isCompleteBlueprintChart } from "@shared/chartSchemas";
 import { cs } from "@shared/i18n/cs";
-
-const t = cs;
+import { en } from "@shared/i18n/en";
 
 // Czech cross type translations
 const CROSS_TYPE_CS: Record<string, string> = {
@@ -27,13 +26,14 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
   const htmlEntities: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
   const safeName = name.replace(/[&<>"']/g, char => htmlEntities[char] || char);
   const isCzech = (locale ?? (typeof window !== "undefined" && window.location.pathname.startsWith("/en") ? "en" : "cs")) === "cs";
+  const t = isCzech ? cs : en;
   const czType = (t.types as Record<string, string>)[chart.type] || chart.type;
   const czStrategy = (t.hd.strategies as Record<string, string>)[chart.strategy] || chart.strategy;
   const czSignature = (t.hd.signatures as Record<string, string>)[chart.signature] || chart.signature;
   const czNotSelf = (t.hd.notSelfs as Record<string, string>)[chart.notSelf] || chart.notSelf;
   const czDefinition = (t.hd.definitionTypes as Record<string, string>)[chart.definition] || chart.definition;
-  const czCrossName = translateCrossName(chart.incarnationCross?.name || "—");
-  const czCrossType = CROSS_TYPE_CS[chart.incarnationCross?.type || ""] || chart.incarnationCross?.type || "";
+  const czCrossName = isCzech ? translateCrossName(chart.incarnationCross?.name || "—") : (chart.incarnationCross?.name || "—");
+  const czCrossType = isCzech ? (CROSS_TYPE_CS[chart.incarnationCross?.type || ""] || chart.incarnationCross?.type || "") : (chart.incarnationCross?.type || "");
 
   const typeDesc = hdData?.types[chart.type];
   const profileDesc = hdData?.profiles[chart.profile];
@@ -41,13 +41,13 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
 
   const centersHtml = (chart.centers || []).map(center => {
     const czName = (t.hd.centerNames as Record<string, string>)[center.name] || center.name;
-    const status = center.defined ? "Definováno" : "Otevřeno";
+    const status = center.defined ? (isCzech ? "Definováno" : "Defined") : (isCzech ? "Otevřeno" : "Open");
     const desc = hdData?.centers[center.name];
     const statusColor = center.defined ? "#7c3aed" : "#6b7280";
     return `<tr>
       <td style="padding:5px 8px;font-weight:600;color:#374151;width:120px">${czName}</td>
       <td style="padding:5px 8px;color:${statusColor};font-weight:600">${status}</td>
-      <td style="padding:5px 8px;color:#6b7280">${desc?.theme || ""}</td>
+      <td style="padding:5px 8px;color:#6b7280">${isCzech ? (desc?.theme || "") : ""}</td>
     </tr>`;
   }).join("");
 
@@ -59,9 +59,9 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
     const czCenB = (t.hd.centerNames as Record<string, string>)[ch.centerB] || ch.centerB;
     return `<tr>
       <td style="padding:5px 8px;font-weight:600;color:#374151;width:60px">${ch.gate1}–${ch.gate2}</td>
-      <td style="padding:5px 8px;font-weight:600;color:#374151">${desc?.name || ""}</td>
+      <td style="padding:5px 8px;font-weight:600;color:#374151">${(isCzech ? desc?.name : desc?.nameEn) || ""}</td>
       <td style="padding:5px 8px;color:#6b7280">${czCenA} → ${czCenB}</td>
-      <td style="padding:5px 8px;color:#9ca3af;font-style:italic">${desc?.theme || ""}</td>
+      <td style="padding:5px 8px;color:#9ca3af;font-style:italic">${(isCzech ? desc?.theme : desc?.themeEn) || ""}</td>
     </tr>`;
   }).join("");
 
@@ -74,27 +74,36 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
       const gateDesc = hdData?.gates[a.gate];
       return `<tr>
             <td style="padding:3px 8px;color:#6b7280;width:90px;font-size:10px">${czPlanet}</td>
-            <td style="padding:3px 8px;font-weight:600;color:#374151;font-size:10px">Brána ${a.gate}.${a.line}</td>
-            <td style="padding:3px 8px;color:#6b7280;font-size:10px">${gateDesc?.name || ""}</td>
+            <td style="padding:3px 8px;font-weight:600;color:#374151;font-size:10px">${isCzech ? "Brána" : "Gate"} ${a.gate}.${a.line}</td>
+            <td style="padding:3px 8px;color:#6b7280;font-size:10px">${(isCzech ? gateDesc?.name : gateDesc?.nameEn) || ""}</td>
           </tr>`;
     }).join("")}
       </table>
     </div>`;
 
-  const gatesHtml = (chart.activatedGates || []).sort((a, b) => a - b).map(gate => {
+  const gatesHtml = [...(chart.activatedGates || [])].sort((a, b) => a - b).map(gate => {
     const desc = hdData?.gates[gate];
-    return `<span style="display:inline-block;background:#f3f0ff;color:#7c3aed;border-radius:4px;padding:2px 7px;margin:2px;font-size:10px;font-weight:600">${gate}${desc ? ` · ${desc.name}` : ""}</span>`;
+    return `<span style="display:inline-block;background:#f3f0ff;color:#7c3aed;border-radius:4px;padding:2px 7px;margin:2px;font-size:10px;font-weight:600">${gate}${desc ? ` · ${isCzech ? desc.name : (desc.nameEn || "")}` : ""}</span>`;
   }).join("");
 
+  // English narratives use the existing bilingual gate content; the detailed
+  // type/profile/authority source descriptions are Czech-only and must not leak into EN PDFs.
+  const gateAnalysisHtml = isCzech ? "" : [...(chart.activatedGates || [])].sort((a, b) => a - b)
+    .map(gate => {
+      const desc = hdData?.gates?.[gate];
+      return desc?.descriptionEn
+        ? `<div class="desc-box"><strong>Gate ${gate}: ${desc.nameEn || gate}</strong><br/>${desc.descriptionEn}</div>`
+        : "";
+    }).join("");
+
   const variablesHtml = chart.variables ? Object.entries(chart.variables).map(([key, v]) => {
-    const labels: Record<string, string> = {
-      digestion: "Trávení", environment: "Prostředí",
-      perspective: "Perspektiva", awareness: "Vědomí",
-    };
+    const labels: Record<string, string> = isCzech
+      ? { digestion: "Trávení", environment: "Prostředí", perspective: "Perspektiva", awareness: "Vědomí" }
+      : { digestion: "Digestion", environment: "Environment", perspective: "Perspective", awareness: "Awareness" };
     return `<tr>
       <td style="padding:5px 8px;font-weight:600;color:#374151;width:120px">${labels[key] || key}</td>
       <td style="padding:5px 8px;color:#7c3aed;font-weight:600">${v.type}</td>
-      <td style="padding:5px 8px;color:#6b7280">${v.arrow} · Barva ${v.color} · Tón ${v.tone}</td>
+      <td style="padding:5px 8px;color:#6b7280">${v.arrow} · ${isCzech ? "Barva" : "Color"} ${v.color} · ${isCzech ? "Tón" : "Tone"} ${v.tone}</td>
     </tr>`;
   }).join("") : "";
 
@@ -107,12 +116,12 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
 
   const birthDateFormatted = chart.birthDate
     ? (chart.birthDate.includes("-")
-        ? new Date(chart.birthDate).toLocaleDateString("cs-CZ")
+        ? new Date(chart.birthDate).toLocaleDateString(isCzech ? "cs-CZ" : "en-GB")
         : chart.birthDate)
     : "";
 
   const html = `<!DOCTYPE html>
-<html lang="cs">
+<html lang="${isCzech ? "cs" : "en"}">
 <head>
   <meta charset="UTF-8">
   <title>Human Design — ${safeName}</title>
@@ -171,7 +180,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
   <div class="header">
     <div>
       <div class="header-title">HUMAN DESIGN</div>
-      <div class="header-sub">Osobní energetický blueprint</div>
+      <div class="header-sub">${isCzech ? "Osobní energetický blueprint" : "Personal Energy Blueprint"}</div>
     </div>
     <div class="header-right">
       <div class="header-name">${safeName}</div>
@@ -184,11 +193,11 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
     <div class="main-grid">
       <!-- Left side: Bodygraph -->
       <div class="bodygraph-side">
-        <div class="section-title">Váš energetický Bodygraph</div>
+        <div class="section-title">${isCzech ? "Váš energetický Bodygraph" : "Your Energy Bodygraph"}</div>
         <div class="bodygraph-img">${bodygraphSvg}</div>
         
         <div style="margin-top: 20px; text-align: left">
-          <div class="section-title" style="margin-top:20px">Aktivované brány (${(chart.activatedGates || []).length})</div>
+          <div class="section-title" style="margin-top:20px">${isCzech ? "Aktivované brány" : "Activated Gates"} (${(chart.activatedGates || []).length})</div>
           <div style="padding:4px">${gatesHtml}</div>
         </div>
       </div>
@@ -197,17 +206,17 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
       <div class="info-side">
         <!-- Overview -->
         <div class="section">
-          <div class="section-title">Přehled mapy</div>
+          <div class="section-title">${isCzech ? "Přehled mapy" : "Chart Overview"}</div>
           <table>
-            <tr><td class="kv-label">Typ:</td><td class="kv-value">${czType}</td><td class="kv-label">Strategie:</td><td class="kv-value">${czStrategy}</td></tr>
-            <tr><td class="kv-label">Profil:</td><td class="kv-value">${chart.profile} ${chart.profileName}</td><td class="kv-label">Autorita:</td><td class="kv-value">${chart.authority}</td></tr>
-            <tr><td class="kv-label">Definice:</td><td class="kv-value">${czDefinition}</td><td class="kv-label">Signatura:</td><td class="kv-value">${czSignature}</td></tr>
-            <tr><td class="kv-label">Inkarnační kříž:</td><td class="kv-value" colspan="3">${czCrossName}</td></tr>
+            <tr><td class="kv-label">${isCzech ? "Typ" : "Type"}:</td><td class="kv-value">${czType}</td><td class="kv-label">${isCzech ? "Strategie" : "Strategy"}:</td><td class="kv-value">${czStrategy}</td></tr>
+            <tr><td class="kv-label">${isCzech ? "Profil" : "Profile"}:</td><td class="kv-value">${chart.profile} ${chart.profileName}</td><td class="kv-label">${isCzech ? "Autorita" : "Authority"}:</td><td class="kv-value">${chart.authority}</td></tr>
+            <tr><td class="kv-label">${isCzech ? "Definice" : "Definition"}:</td><td class="kv-value">${czDefinition}</td><td class="kv-label">${isCzech ? "Signatura" : "Signature"}:</td><td class="kv-value">${czSignature}</td></tr>
+            <tr><td class="kv-label">${isCzech ? "Inkarnační kříž" : "Incarnation Cross"}:</td><td class="kv-value" colspan="3">${czCrossName}</td></tr>
           </table>
         </div>
 
 
-        ${typeDesc ? `
+        ${isCzech && typeDesc ? `
         <!-- Type -->
         <div class="section">
           <div class="section-title">Typ: ${czType}</div>
@@ -215,7 +224,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
           <div style="font-size:9px;color:#7c3aed;padding:0 4px">Strategie: ${czStrategy} · Signatura: ${czSignature} · Ne-Já: ${czNotSelf}</div>
         </div>` : ""}
 
-        ${profileDesc ? `
+        ${isCzech && profileDesc ? `
         <!-- Profile -->
         <div class="section">
           <div class="section-title">Profil: ${chart.profile} ${chart.profileName}</div>
@@ -224,7 +233,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
           <div class="unconscious-box"><strong>Nevědomé:</strong> ${profileDesc.unconscious}</div>
         </div>` : ""}
 
-        ${authDesc ? `
+        ${isCzech && authDesc ? `
         <!-- Authority -->
         <div class="section">
           <div class="section-title">Autorita: ${chart.authority}</div>
@@ -236,12 +245,12 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
 
         <!-- Incarnation Cross -->
         <div class="section">
-          <div class="section-title">Inkarnační kříž</div>
+          <div class="section-title">${isCzech ? "Inkarnační kříž" : "Incarnation Cross"}</div>
           <div style="font-size:12px;font-weight:700;color:#1e1e32;margin-bottom:2px">${czCrossName} ${czCrossType ? `· ${czCrossType}` : ""}</div>
           <div class="cross-gates">
             ${(chart.incarnationCross?.gates || []).map((g, i) => {
     const gd = hdData?.gates[g];
-    const labels = ["Osobnost ☉", "Osobnost ⊕", "Design ☉", "Design ⊕"];
+    const labels = isCzech ? ["Osobnost ☉", "Osobnost ⊕", "Design ☉", "Design ⊕"] : ["Personality ☉", "Personality ⊕", "Design ☉", "Design ⊕"];
     return `<div class="cross-gate">
                 <div class="cross-gate-label">${labels[i] || ""}</div>
                 <div class="cross-gate-num">${g}</div>
@@ -300,30 +309,36 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
     <div style="margin-top:20px">
       <!-- Centers -->
       <div class="section">
-        <div class="section-title">Centra</div>
+        <div class="section-title">${isCzech ? "Centra" : "Centers"}</div>
         <table>${centersHtml}</table>
       </div>
 
       ${(chart.channels || []).length > 0 ? `
       <!-- Channels -->
       <div class="section">
-        <div class="section-title">Kanály (${chart.channels.length})</div>
+        <div class="section-title">${isCzech ? "Kanály" : "Channels"} (${chart.channels.length})</div>
         <table>${channelsHtml}</table>
       </div>` : ""}
 
       <!-- Activations -->
       <div class="section">
-        <div class="section-title">Planetární aktivace</div>
+        <div class="section-title">${isCzech ? "Planetární aktivace" : "Planetary Activations"}</div>
         <div style="display:flex; gap:20px">
-          <div style="flex:1">${activationsHtml(chart.personalityActivations, "Osobnost (Vědomé)", "#166534")}</div>
-          <div style="flex:1">${activationsHtml(chart.designActivations, "Design (Nevědomé)", "#991b1b")}</div>
+          <div style="flex:1">${activationsHtml(chart.personalityActivations, isCzech ? "Osobnost (Vědomé)" : "Personality (Conscious)", "#166534")}</div>
+          <div style="flex:1">${activationsHtml(chart.designActivations, isCzech ? "Design (Nevědomé)" : "Design (Unconscious)", "#991b1b")}</div>
         </div>
       </div>
+
+      ${gateAnalysisHtml ? `
+      <div class="section">
+        <div class="section-title">Your Activated Gates — Interpretations</div>
+        ${gateAnalysisHtml}
+      </div>` : ""}
 
       ${chart.variables ? `
       <!-- Variables -->
       <div class="section">
-        <div class="section-title">Proměnné (PHS)</div>
+        <div class="section-title">${isCzech ? "Proměnné" : "Variables"} (PHS)</div>
         <table>${variablesHtml}</table>
       </div>` : ""}
     </div>
@@ -332,7 +347,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
   </div>
 
   <div class="footer">
-    Human Design App &mdash; ${safeName} &mdash; Vygenerováno: ${new Date().toLocaleDateString("cs-CZ")}
+    Human Design App &mdash; ${safeName} &mdash; ${isCzech ? "Vygenerováno" : "Generated"}: ${new Date().toLocaleDateString(isCzech ? "cs-CZ" : "en-GB")}
   </div>
 
   <script>
