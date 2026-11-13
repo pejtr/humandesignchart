@@ -39,7 +39,25 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
   // Bare domains ("/") are the most shared URLs. Infer their language from
   // the hostname; otherwise WhatsApp gets the unprocessed <!--SEO_META--> shell.
   const htmlLang = locale || (enHost ? "en" : "cs");
-  const meta = buildSeoHead(htmlLang, url.pathname);
+  const baseMeta = buildSeoHead(htmlLang, url.pathname);
+  // When validating a direct Pages preview, WhatsApp/Meta must see the
+  // *preview* image and page, not the old image still running in production.
+  // Forwarded requests already normalized to a public brand domain above.
+  const host = url.hostname.toLowerCase();
+  const isDirectPagesPreview = host === "humandesignchart-web.pages.dev"
+    || host.endsWith(".humandesignchart-web.pages.dev");
+  const meta = isDirectPagesPreview && baseMeta
+    ? baseMeta
+      .replace(
+        /(<meta (?:property="og:image(?::secure_url)?"|name="twitter:image") content=")https:\/\/[^"]+(\/images\/[^"]+)"/g,
+        (_match, prefix: string, imagePath: string) => `${prefix}${url.origin}${imagePath}"`,
+      )
+      .replace(
+        /(<meta property="og:url" content=")[^"]+"/g,
+        (_match, prefix: string) => `${prefix}${url.origin}${url.pathname}"`,
+      )
+      + `\n    <meta name="robots" content="noindex,nofollow" />`
+    : baseMeta;
   let html = await asset.text();
   if (enHost || (locale && locale !== "cs")) {
     html = html
@@ -63,6 +81,9 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
   headers.delete("etag");
   headers.set("content-type", "text/html; charset=utf-8");
   headers.set("content-language", htmlLang);
+  // HTML must revalidate after an OG card is updated. Static images retain
+  // their own asset caching, and no private API/checkout responses pass here.
+  headers.set("cache-control", "public, max-age=0, must-revalidate");
 
   return new Response(rendered, {
     status: asset.status,

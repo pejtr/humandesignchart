@@ -34,7 +34,8 @@ export function buildSeoHead(locale: string, pathname: string): string {
   const base = isCs ? CS : EN;
   const lang = locale || "en";
   const canonical = meta.canonical;
-  const ogImage = meta.ogImage || `${base}/images/og-homepage.png`;
+  // Keep WhatsApp/Meta payloads compact on every route without a custom OG card.
+  const ogImage = meta.ogImage || `${base}/images/og-home-${isCs ? "cs" : "en"}-share-v2.png`;
   const ogLocaleMap: Record<string, string> = {
     cs: "cs_CZ",
     en: "en_US",
@@ -101,6 +102,7 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
         ? "Calculate your Human Design chart for free. Discover your type, strategy, authority, and profile. Get a personalized AI reading."
         : "Vypočítejte svou Human Design mapu zdarma. Zjistěte svůj typ, strategii, autoritu a profil. Získejte personalizovaný AI výklad v češtině.",
       canonical: `${base}/${locale}/`,
+      ogImage: `${base}/images/og-home-${isCs ? "cs" : "en"}-share-v2.png`,
       keywords: isEn
         ? "human design, human design chart, bodygraph calculator, free human design, human design reading, type, strategy, authority"
         : "human design, human design mapa, bodygraph kalkulátor, human design zdarma, human design česky, typ human design, autorita human design, inkarnační kříž, AI výklad human design",

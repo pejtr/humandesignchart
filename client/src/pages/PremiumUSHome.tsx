@@ -1,3 +1,4 @@
+import "./PremiumUSHome.css";
 import { Link } from "wouter";
 import {
   ArrowRight,
@@ -12,6 +13,7 @@ import {
   ShieldCheck,
   Sparkles,
   Star,
+  Menu,
   Users,
   Zap,
 } from "lucide-react";
@@ -119,21 +121,19 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
 
   return (
     <div className="min-h-screen bg-[#F7F3EA] text-[#071426]">
-      <section className="relative overflow-hidden bg-[#071426] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_76%_34%,rgba(244,199,98,0.18),transparent_28%),radial-gradient(circle_at_34%_20%,rgba(139,92,246,0.14),transparent_34%),linear-gradient(135deg,#071426_0%,#0A1B31_58%,#111C35_100%)]" />
-        <div className="absolute inset-0 opacity-[0.10] [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:44px_44px]" />
-
-        <header className="relative z-20 mx-auto flex w-full max-w-[1440px] items-center justify-between px-5 py-5 md:px-8 lg:px-12">
-          <Link href={localePath("/")} className="flex items-center gap-3 no-underline">
+      <header data-testid="premium-en-sticky-header" className="sticky top-0 z-[100] w-full border-b border-[#D8C49A]/20 bg-[#071426]/95 text-white shadow-[0_12px_40px_rgba(3,8,22,.24)] backdrop-blur-xl supports-[backdrop-filter]:bg-[#071426]/85">
+        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3 px-5 py-4 md:px-8 lg:px-12">
+          <Link href={localePath("/")} aria-label="Human Design Chart — home" className="flex min-w-0 shrink-0 items-center gap-2.5 no-underline sm:gap-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#F4C762]/60 bg-[#F4C762]/10 text-[#F4C762]">
               <Sparkles className="h-4 w-4" />
             </span>
-            <span className="text-[15px] font-semibold tracking-[-0.02em] text-white sm:text-lg">
-              HumanDesignChart.app
+            <span className="whitespace-nowrap text-[15px] font-semibold tracking-[-0.02em] text-white sm:text-lg">
+              <span className="sm:hidden">HD Chart</span>
+              <span className="hidden sm:inline">HumanDesignChart.app</span>
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-7 text-sm text-white/72 lg:flex">
+          <nav aria-label="Desktop navigation" className="hidden items-center gap-7 text-sm text-white/72 lg:flex">
             <Link href={localePath("/calculate")} className="transition hover:text-white">Get Your Chart</Link>
             <Link href={localePath("/encyclopedia")} className="transition hover:text-white">Learn</Link>
             <Link href={localePath("/ai-guide")} className="transition hover:text-white">Insights</Link>
@@ -143,24 +143,46 @@ export default function PremiumUSHome({ localePath }: { localePath: (path: strin
 
           <Link
             href={localePath("/calculate")}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#F4C762] px-4 py-2.5 text-sm font-bold text-[#071426] shadow-[0_10px_34px_rgba(244,199,98,.25)] transition hover:-translate-y-0.5 hover:bg-[#FFE09A]"
+            className="hidden min-h-11 shrink-0 items-center gap-2 rounded-xl bg-[#F4C762] px-4 py-2.5 text-sm font-bold text-[#071426] shadow-[0_10px_34px_rgba(244,199,98,.25)] transition hover:-translate-y-0.5 hover:bg-[#FFE09A] sm:inline-flex"
           >
             Get My Free Chart <ArrowRight className="h-4 w-4" />
           </Link>
-        </header>
-
+          <details className="relative ml-auto shrink-0 lg:hidden">
+            <summary aria-label="Open main navigation" className="flex min-h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-xl border border-[#D8C49A]/30 text-[#F4C762] outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#8899FF] [&::-webkit-details-marker]:hidden">
+              <Menu aria-hidden="true" className="h-5 w-5" />
+            </summary>
+            <nav aria-label="Mobile navigation" className="absolute right-0 top-full z-[101] mt-3 flex w-56 flex-col gap-1 rounded-2xl border border-[#D8C49A]/30 bg-[#071426] p-3 shadow-2xl">
+              <Link href={localePath("/calculate")} className="rounded-lg px-4 py-3 text-sm text-white hover:bg-white/10">Get Your Chart</Link>
+              <Link href={localePath("/encyclopedia")} className="rounded-lg px-4 py-3 text-sm text-white hover:bg-white/10">Learn</Link>
+              <Link href={localePath("/ai-guide")} className="rounded-lg px-4 py-3 text-sm text-white hover:bg-white/10">Insights</Link>
+              <Link href={localePath("/honorace")} className="rounded-lg px-4 py-3 text-sm text-white hover:bg-white/10">Pricing</Link>
+              <Link href={localePath("/blog")} className="rounded-lg px-4 py-3 text-sm text-white hover:bg-white/10">Journal</Link>
+            </nav>
+          </details>
+        </div>
+      </header>
+      <section data-testid="hd-en-premium-hero" className="relative overflow-hidden bg-[#071426] text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_76%_34%,rgba(244,199,98,0.18),transparent_28%),radial-gradient(circle_at_34%_20%,rgba(139,92,246,0.14),transparent_34%),linear-gradient(135deg,#071426_0%,#0A1B31_58%,#111C35_100%)]" />
+        <div className="absolute inset-0 opacity-[0.10] [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:44px_44px]" />
+        <div className="hd-us-cosmos" aria-hidden="true" data-testid="hd-en-cosmic-background">
+          <span className="hd-us-nebula hd-us-nebula-a" />
+          <span className="hd-us-nebula hd-us-nebula-b" />
+          <span className="hd-us-stars hd-us-stars-far" />
+          <span className="hd-us-stars hd-us-stars-near" />
+          <span className="hd-us-gold-halo" />
+        </div>
         <div className="relative z-10 mx-auto grid w-full max-w-[1440px] gap-10 px-5 pb-14 pt-7 md:px-8 md:pb-20 lg:grid-cols-[0.94fr_1.06fr] lg:items-center lg:px-12 lg:pb-24 lg:pt-12">
           <div className="max-w-2xl">
             <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.34em] text-[#F4C762]/90">
-              Science · Wisdom · Self-discovery
+              PERSONAL BODYGRAPH · DESIGN · SELF-DISCOVERY
             </p>
             <h1 className="max-w-[760px] font-serif text-[46px] font-semibold leading-[0.98] tracking-[-0.045em] text-white sm:text-6xl lg:text-[76px]">
-              Your Unique Design for a More{" "}
-              <em className="font-serif font-medium text-[#F4C762]">Aligned Life</em>
+              Your Energy Blueprint.{" "}
+              <em className="font-serif font-medium text-[#F4C762]">Beautifully Revealed.</em>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-white/72 md:text-lg">
-              Get your personalized Human Design chart and explore how your energy, decisions,
-              relationships, and life patterns may fit together — in a clear, practical format.
+              Start with your free personal Bodygraph. Explore your type, strategy and centers,
+              then decide how deeply you want to reflect on your own design.
             </p>
 
             <div className="mt-7 grid gap-4 sm:grid-cols-3">

@@ -40,7 +40,7 @@ describe("Cloudflare WhatsApp preview metadata", () => {
     const text = await response.text();
     expect(text).toContain('property="og:title"');
     expect(text).toContain('property="og:locale" content="cs_CZ"');
-    expect(text).toContain('property="og:image" content="https://humandesignmapa.cz/images/og-homepage.png"');
+    expect(text).toContain('property="og:image" content="https://humandesignmapa.cz/images/og-home-cs-share-v2.png"');
     expect(text).toContain('property="og:image:type" content="image/png"');
     expect(text).toContain('name="twitter:card" content="summary_large_image"');
     expect(text).not.toContain("<!--SEO_META-->");
@@ -54,7 +54,7 @@ describe("Cloudflare WhatsApp preview metadata", () => {
       assetResponse(),
     );
     expect(await response.text()).toContain(
-      'property="og:image" content="https://humandesignchart.app/images/og-homepage.png"',
+      'property="og:image" content="https://humandesignchart.app/images/og-home-en-share-v2.png"',
     );
   });
 
@@ -65,7 +65,7 @@ describe("Cloudflare WhatsApp preview metadata", () => {
     );
     const text = await response.text();
     expect(text).toContain('property="og:locale" content="cs_CZ"');
-    expect(text).toContain('property="og:image" content="https://humandesignmapa.cz/images/og-homepage.png"');
+    expect(text).toContain('property="og:image" content="https://humandesignmapa.cz/images/og-home-cs-share-v2.png"');
     expect(text).toContain('rel="canonical" href="https://humandesignmapa.cz/cs/"');
     expect(text).not.toContain("<!--SEO_META-->");
   });
@@ -77,9 +77,30 @@ describe("Cloudflare WhatsApp preview metadata", () => {
     );
     const text = await response.text();
     expect(text).toContain('property="og:locale" content="en_US"');
-    expect(text).toContain('property="og:image" content="https://humandesignchart.app/images/og-homepage.png"');
+    expect(text).toContain('property="og:image" content="https://humandesignchart.app/images/og-home-en-share-v2.png"');
     expect(text).toContain('rel="canonical" href="https://humandesignchart.app/en/"');
     expect(text).not.toContain("<!--SEO_META-->");
+  });
+
+
+  it("renders preview-origin OG assets and noindex for isolated Pages preview, not production", async () => {
+    const preview = new URL("https://pr87.humandesignchart-web.pages.dev/en");
+    const response = await withServerRenderedSeoMeta(preview, assetResponse());
+    const htmlText = await response.text();
+    expect(htmlText).toContain('property="og:image" content="https://pr87.humandesignchart-web.pages.dev/images/og-home-en-share-v2.png"');
+    expect(htmlText).toContain('property="og:image:secure_url" content="https://pr87.humandesignchart-web.pages.dev/images/og-home-en-share-v2.png"');
+    expect(htmlText).toContain('name="twitter:image" content="https://pr87.humandesignchart-web.pages.dev/images/og-home-en-share-v2.png"');
+    expect(htmlText).toContain('property="og:url" content="https://pr87.humandesignchart-web.pages.dev/en"');
+    expect(htmlText).toContain('name="robots" content="noindex,nofollow"');
+    expect(htmlText).toContain('rel="canonical" href="https://humandesignchart.app/en/"');
+    expect(response.headers.get("cache-control")).toBe("public, max-age=0, must-revalidate");
+    const prod = await withServerRenderedSeoMeta(
+      new URL("https://humandesignchart.app/en"),
+      assetResponse(),
+    );
+    const prodHtml = await prod.text();
+    expect(prodHtml).not.toContain("noindex,nofollow");
+    expect(prodHtml).toContain('property="og:image" content="https://humandesignchart.app/images/og-home-en-share-v2.png"');
   });
 
   it("keeps unrelated binary and API responses unchanged", async () => {
