@@ -60,3 +60,31 @@ Never invent preview ID or reuse production D1 / real payment credentials in pre
 - [ ] Post-deploy production HTTP/redirect/analytics health read-back verified without charging users.
 
 **The QA PR adds observation only, makes no payment or design changes, and is not production release approval.**
+
+## Corrected executable release handoff (13 Nov)
+
+The owner-provided PowerShell runbook was **not** executed. It describes several incompatible paths and payment assumptions; do **not** run it verbatim:
+
+| In supplied runbook | Verified repository contract / safe action |
+|---|---|
+| `stripe events resend`, Stripe card `4242...`, `/api/webhooks/stripe` | Current Cloudflare Pages Blueprint path calls **ONYX PAY** `/api/paygate/checkout-sessions` on `pay.optimateo.com`; captured order uses `/api/internal/onyxpay/fulfill`. Never send Stripe test webhooks to this flow. A dedicated isolated ONYX PAY test tenant and capture evidence are required. |
+| `/cs/checkout`, `/en/checkout` | Existing paid offer uses `/cs/honorace`, `/en/honorace`, and `subscription.createCheckout` after authenticated, complete birth chart. The route `/checkout` was not independently verified. |
+| `page.waitForEvent('download')` and `%PDF-` for Blueprint | Current client generates HTML with an inline Bodygraph SVG and calls **browser print / Save as PDF**. Inspect actual print output; a `download` event is not the current client contract. |
+| `wrangler.toml` / `[env.preview]` | This is an existing **Cloudflare Pages Direct Upload** deployment; check project preview/production bindings via the Cloudflare Pages project API before any deploy. Never add guessed config or replace the project. |
+| `git worktree add ... -b qa/pr84 origin/pull/84/head` | Fetch PR ref first, then create a clean isolated worktree. Do not assume Git has a pre-existing `origin/pull/84/head` tracking branch. |
+| `npx wrangler pages deploy ... --branch=qa-pr84-preview` is safe by itself | A different branch **does not certify isolation of D1, secrets, payments or mail**. Verify actual preview bindings first. |
+| PR #84 exact commit `17eb6beb...` | An extra **read-only-by-default PowerShell preview release helper** was added to PR #84 after this SHA. Always fetch and verify latest PR head and CI before deploying. |
+
+### Actual release helper
+
+The **PR #84** branch now contains `scripts/qa/release-blueprint-preview.ps1`. Run it from a clean isolated checkout of that exact PR branch:
+
+```powershell
+pwsh -File scripts/qa/release-blueprint-preview.ps1
+# Only after preflight PASS and separate inspection:
+pwsh -File scripts/qa/release-blueprint-preview.ps1 -Deploy
+```
+
+This helper verifies branch HEAD against the remote, runs frozen install/typecheck/Vitest/Cloudflare build, reads current Cloudflare project config, blocks detected shared storage/payment/auth/email credentials, defaults to **no deploy**, and when explicitly requested deploys **preview only**. The callback, payment capture and OAuth test must use purpose-built nonproduction providers; without them these gates stay **BLOCKED / production NO-GO**.
+
+Do **not** paste credentials, Google client secrets, paid-user birth data, or API keys into chat, pull requests or reports. Never send real payments merely to produce E2E evidence.
