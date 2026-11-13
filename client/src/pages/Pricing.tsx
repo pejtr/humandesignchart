@@ -18,6 +18,7 @@ import { trackGA4Event } from "@/hooks/useGA4";
 import { getRedditClickIdForCapi } from "@/hooks/useRedditPixel";
 import { getOpenAIAdsClickRef, isOpenAIAdsConsentGranted, measureOpenAIAdsEvent } from "@/hooks/useOpenAIAdsPixel";
 import { readChartDraft } from "@/lib/chartDraft";
+import { isCompleteBlueprintChartJson } from "@shared/chartSchemas";
 
 function formatPrice(amountMinor: number, currency: string, locale: string) {
   const digits = amountMinor % 100 === 0 ? 0 : 2;
@@ -26,7 +27,7 @@ function formatPrice(amountMinor: number, currency: string, locale: string) {
 
 export default function Pricing() {
   const { locale } = useLanguage();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [, navigate] = useLocation();
   const { viewContent, initiateCheckout } = useMetaPixel();
   const isCs = locale === "cs";
@@ -44,13 +45,25 @@ export default function Pricing() {
 
   // Redirect only in the per-purchase success handler below, after session storage is durable.
   // A hook-level redirect races with recording refId and the access token.
-  const checkout = trpc.subscription.createCheckout.useMutation({ onError: error => toast.error(
-    error.message === "CHECKOUT_TEMPORARILY_UNAVAILABLE"
-      ? isCs
-        ? "Bezpečná platba je momentálně nedostupná. Zkuste to prosím později."
-        : "Secure checkout is temporarily unavailable. Please try again later."
-      : error.message
-  ) });
+  const checkout = trpc.subscription.createCheckout.useMutation({
+    onError: error => {
+      if (error.message === "BLUEPRINT_ALREADY_PAID_RECOVER_ACCESS") {
+        setShowCheckoutModal(false);
+        toast.info(isCs
+          ? "Tato mapa už byla zaplacena. Obnovte původní přístup bez další platby."
+          : "You already paid for this chart. Recover your existing access without paying again.");
+        navigate(`/${locale}/payment/success?plan=blueprint`);
+        return;
+      }
+      toast.error(
+        error.message === "CHECKOUT_TEMPORARILY_UNAVAILABLE" || error.message === "PAID_ACCESS_CHECK_UNAVAILABLE"
+          ? isCs
+            ? "Bezpečná platba je momentálně nedostupná. Zkuste to prosím později."
+            : "Secure checkout is temporarily unavailable. Please try again later."
+          : error.message
+      );
+    },
+  });
   const redeemVoucher = trpc.giftVoucher.redeem.useMutation({ onSuccess: () => { toast.success(isCs ? "Dárkový kód byl uplatněn." : "Gift voucher redeemed."); setVoucherCode(""); }, onError: error => toast.error(
     error.message === "CHECKOUT_TEMPORARILY_UNAVAILABLE"
       ? isCs
@@ -68,11 +81,16 @@ export default function Pricing() {
   const [customerName, setCustomerName] = useState("");
   const [digitalConsent, setDigitalConsent] = useState(false);
 
+  // Checkout email is the verified identity, not an arbitrary guest address.
+  useEffect(() => {
+    if (user?.email) setCustomerEmail(user.email);
+  }, [user?.email]);
+
   const beginCheckout = () => {
     if (!offer) return;
     if (hasBlueprintAccess) return navigate(`/${locale}/dashboard`);
     const chartDraft = readChartDraft();
-    if (!chartDraft?.chart) {
+    if (!isCompleteBlueprintChartJson(chartDraft?.chart)) {
       toast.info(
         isCs
           ? "Nejprve prosím zadejte údaje narození pro výpočet vaší osobní mapy."
@@ -81,11 +99,26 @@ export default function Pricing() {
       navigate(`/${locale}/calculate?next=honorace`);
       return;
     }
+    if (!isAuthenticated) {
+      toast.info(isCs ? "Před zaplacením Blueprintu se prosím přihlaste." : "Sign in before purchasing your Blueprint.");
+      navigate(`/${locale}/login?returnTo=${encodeURIComponent(`/${locale}/honorace`)}`);
+      return;
+    }
     setShowCheckoutModal(true);
   };
 
   const handleConfirmCheckout = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAuthenticated || !user?.email) {
+      toast.error(isCs ? "Před platbou je nutné přihlášení." : "Sign-in is required before payment.");
+      setShowCheckoutModal(false);
+      navigate(`/${locale}/login?returnTo=${encodeURIComponent(`/${locale}/honorace`)}`);
+      return;
+    }
+    if (customerEmail.trim().toLowerCase() !== user.email.toLowerCase()) {
+      toast.error(isCs ? "E-mail musí odpovídat přihlášenému účtu." : "Email must match your signed-in account.");
+      return;
+    }
     if (!customerEmail.includes("@")) {
       toast.error(isCs ? "Zadejte platnou e-mailovou adresu" : "Please enter a valid email address");
       return;
@@ -95,7 +128,7 @@ export default function Pricing() {
       return;
     }
     const chartDraft = readChartDraft();
-    if (!chartDraft?.chart) {
+    if (!isCompleteBlueprintChartJson(chartDraft?.chart)) {
       toast.info(
         isCs
           ? "Nejprve prosím zadejte údaje narození pro výpočet vaší osobní mapy."
@@ -167,7 +200,7 @@ export default function Pricing() {
         </div>
         <div className="overflow-hidden rounded-[2rem] border border-violet-100 bg-white p-4 shadow-xl shadow-violet-100/60"><img src="/images/brand/veleknezka-master-v1.png" width={941} height={1672} alt={isCs ? "Marie, průvodkyně Human Designem" : "Marie, Human Design guide"} className="aspect-[941/1672] w-full rounded-[1.35rem] object-cover object-top" /></div>
       </section>
-      <section className="mx-auto max-w-4xl px-5 pb-16 md:px-8"><div className="rounded-[2rem] border border-amber-200 bg-white p-6 shadow-xl md:p-10"><div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-start"><div><p className="text-sm font-bold uppercase tracking-[0.16em] text-amber-700">{isCs ? "HUMAN DESIGN MAPA · DEEP" : "HUMAN DESIGN CHART · DEEP"}</p><h2 className="mt-3 font-serif text-3xl">{isCs ? "Osobní hlubší rozbor vaší mapy." : "Personal deep reading of your chart."}</h2></div><div className="text-left sm:text-right"><p className="text-3xl font-bold">{price}</p><p className="mt-1 text-sm text-slate-500">{isCs ? "jednorázový nákup" : "one-time purchase"}</p></div></div><p className="mt-5 max-w-2xl text-sm leading-6 text-slate-600">{isCs ? "Získáváte kompletní osobní rozbor pro rozhodování, vztahy a práci v PDF, na webu i v audiu + permanentní uložení profilu." : "You get a complete personal reading for decision making, relationships and work in PDF, web & audio + permanent profile access."}</p><ul className="mt-8 grid gap-4 md:grid-cols-2">{features.map(feature => <li key={feature} className="flex gap-3 text-slate-700"><Check className="mt-0.5 size-5 shrink-0 text-emerald-600" />{feature}</li>)}</ul><Button size="lg" className="mt-6 w-full rounded-xl bg-[#C59235] py-6 text-base hover:bg-[#B88326] text-white shadow-md font-bold cursor-pointer" onClick={beginCheckout} disabled={!offer || checkout.isPending}>{hasBlueprintAccess ? (isCs ? "Otevřít moji mapu" : "Open my chart") : offer ? (isCs ? `Získat osobní Blueprint · ${price}` : `Get my Blueprint · ${price}`) : (isCs ? "Načítám cenu…" : "Loading price…")}</Button>{offerQuery.isError && <p role="alert" className="mt-3 text-center text-sm text-red-700">{isCs ? "Cenu se nepodařilo načíst. Obnovte prosím stránku." : "Pricing is currently unavailable. Please refresh the page."}</p>}<p className="mt-4 text-center text-sm text-slate-500">{offer?.delivery ?? (isCs ? "Přístup ihned po potvrzení platby." : "Access immediately after payment confirmation.")}</p></div></section>
+      <section className="mx-auto max-w-4xl px-5 pb-16 md:px-8"><div className="rounded-[2rem] border border-amber-200 bg-white p-6 shadow-xl md:p-10"><div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-start"><div><p className="text-sm font-bold uppercase tracking-[0.16em] text-amber-700">{isCs ? "HUMAN DESIGN MAPA · DEEP" : "HUMAN DESIGN CHART · DEEP"}</p><h2 className="mt-3 font-serif text-3xl">{isCs ? "Osobní hlubší rozbor vaší mapy." : "Personal deep reading of your chart."}</h2></div><div className="text-left sm:text-right"><p className="text-3xl font-bold">{price}</p><p className="mt-1 text-sm text-slate-500">{isCs ? "jednorázový nákup" : "one-time purchase"}</p></div></div><p className="mt-5 max-w-2xl text-sm leading-6 text-slate-600">{isCs ? "Součástí jednorázového nákupu je osobní PDF Blueprint s praktickým výkladem a 5 navazujících AI výkladů. Přístup získáte po potvrzení platby." : "Your one-time purchase includes a personal PDF Blueprint with a practical interpretation and 5 follow-up AI readings. Access becomes available after payment confirmation."}</p><ul className="mt-8 grid gap-4 md:grid-cols-2">{features.map(feature => <li key={feature} className="flex gap-3 text-slate-700"><Check className="mt-0.5 size-5 shrink-0 text-emerald-600" />{feature}</li>)}</ul><Button size="lg" className="mt-6 w-full rounded-xl bg-[#C59235] py-6 text-base hover:bg-[#B88326] text-white shadow-md font-bold cursor-pointer" onClick={beginCheckout} disabled={!offer || checkout.isPending || authLoading}>{hasBlueprintAccess ? (isCs ? "Otevřít moji mapu" : "Open my chart") : offer ? (isCs ? `Získat osobní Blueprint · ${price}` : `Get my Blueprint · ${price}`) : (isCs ? "Načítám cenu…" : "Loading price…")}</Button>{offerQuery.isError && <p role="alert" className="mt-3 text-center text-sm text-red-700">{isCs ? "Cenu se nepodařilo načíst. Obnovte prosím stránku." : "Pricing is currently unavailable. Please refresh the page."}</p>}<p className="mt-4 text-center text-sm text-slate-500">{offer?.delivery ?? (isCs ? "Přístup ihned po potvrzení platby." : "Access immediately after payment confirmation.")}</p><p className="mt-3 text-center text-sm"><a className="font-medium text-violet-800 underline underline-offset-4 hover:text-violet-950" href={`/${locale}/payment/success?plan=blueprint`}>{isCs ? "Už jste zaplatili? Obnovit přístup bez další platby" : "Already paid? Recover access without another payment"}</a></p></div></section>
       <section className="border-y border-amber-100 bg-amber-50/40 py-14"><div className="mx-auto max-w-5xl px-5 md:px-8"><h2 className="font-serif text-3xl">{isCs ? "Členství ORACULUM+ " : "ORACULUM+ Membership"}</h2><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{isCs ? "Průběžná hodnota, denní tranzity, reflexní deník a výhledy. Roční variantu s vyhodnocením připravujeme." : "Ongoing insights, daily transits, reflection journal and perspectives."}</p><div className="mt-8 grid gap-5 md:grid-cols-3">{[{ name: "ORACULUM+", minimum: "189 Kč / měsíc", recommended: "1 190 Kč / rok (-47 %)" }].map(tier => <div key={tier.name} className="rounded-2xl border border-amber-200 bg-white p-5 shadow-sm"><p className="font-serif text-2xl font-bold">{tier.name}</p><p className="mt-3 text-sm font-semibold text-slate-700">{tier.minimum}</p><p className="text-xs text-amber-700 font-medium">{tier.recommended}</p></div>)}</div></div></section>
       <section className="border-y border-violet-100 bg-white py-14"><div className="mx-auto max-w-5xl px-5 md:px-8"><h2 className="font-serif text-3xl">{isCs ? "Jak to funguje" : "How it works"}</h2><div className="mt-8 grid gap-5 md:grid-cols-3">{[isCs ? "Vypočítáte si mapu zdarma." : "Calculate your free chart.", isCs ? "Vyberete Blueprint pro svou mapu." : "Choose a Blueprint for your chart.", isCs ? "Po potvrzení platby pokračujete ve svém účtu." : "Continue in your account after payment confirmation."].map((step, index) => <div key={step} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100"><p className="text-sm font-bold text-violet-700">0{index + 1}</p><p className="mt-3 font-medium text-slate-700">{step}</p></div>)}</div></div></section>
       <section className="mx-auto max-w-5xl px-5 py-14 md:px-8"><div className="rounded-2xl border border-slate-200 bg-white p-6"><p className="inline-flex items-center gap-2 font-semibold"><Heart className="size-4 text-rose-500" />{isCs ? "MAAT — vědomý přístup k Human Designu" : "MAAT — a conscious approach to Human Design"}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{isCs ? "Blueprint nenahrazuje vlastní zkušenost ani odbornou péči. Je to pozvání dívat se na sebe s větší pozorností a ověřovat si, co vám skutečně funguje." : "The Blueprint does not replace lived experience or professional care. It is an invitation to observe what truly works for you."}</p></div></section>
@@ -188,23 +221,26 @@ export default function Pricing() {
             </div>
             <form onSubmit={handleConfirmCheckout} className="mt-4 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label htmlFor="blueprint-email" className="block text-xs font-semibold text-slate-700 mb-1">
                   {isCs ? "Váš e-mail pro doručení *" : "Your Email for Delivery *"}
                 </label>
                 <Input
+                  id="blueprint-email"
                   type="email"
                   required
                   placeholder={isCs ? "vas@email.cz" : "your@email.com"}
                   value={customerEmail}
+                  readOnly={isAuthenticated}
                   onChange={(e) => setCustomerEmail(e.target.value)}
                   className="rounded-xl border-slate-200 text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label htmlFor="blueprint-customer-name" className="block text-xs font-semibold text-slate-700 mb-1">
                   {isCs ? "Jméno (volitelné)" : "Name (optional)"}
                 </label>
                 <Input
+                  id="blueprint-customer-name"
                   type="text"
                   placeholder={isCs ? "Vaše jméno" : "Your name"}
                   value={customerName}

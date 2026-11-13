@@ -85,7 +85,13 @@ export const ChartResultSchema = z.object({
   incarnationCross: z.object({
     name: z.string(),
     type: z.string(),
-    gates: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+    // Zod's tuple inference in the deployed TypeScript version widens to an
+    // optional-length tuple. Preserve the exact 4-number domain contract.
+    gates: z.custom<[number, number, number, number]>(value =>
+      Array.isArray(value) && value.length === 4 && value.every(gate =>
+        typeof gate === "number" && Number.isInteger(gate) && gate >= 1 && gate <= 64
+      )
+    ),
   }),
   variables: z.object({
     digestion: VariableSchema,
@@ -118,3 +124,38 @@ export type ChartCalculationInput = z.infer<typeof ChartCalculationInputSchema>;
 export type ChartCalculationRequest = z.infer<typeof ChartCalculationRequestSchema>;
 export type ChartResult = z.infer<typeof ChartResultSchema>;
 export type LocalTimeDisambiguation = z.infer<typeof LocalTimeDisambiguationSchema>;
+
+// Never accept a partial/localStorage placeholder as a paid personal Blueprint.
+// A Reflector can legitimately have zero defined channels, so channels are NOT required.
+const blueprintRequiredLabels = (chart: ChartResult) => [
+  chart.birthPlace, chart.timezone, chart.type, chart.profile,
+  chart.profileName, chart.strategy, chart.authority, chart.signature,
+  chart.notSelf, chart.definition, chart.incarnationCross.name,
+];
+
+export function isCompleteBlueprintChart(value: unknown): value is ChartResult {
+  const parsed = ChartResultSchema.safeParse(value);
+  if (!parsed.success) return false;
+  const chart = parsed.data;
+  const birthDay = new Date(chart.birthDate + "T00:00:00.000Z");
+  if (!Number.isFinite(birthDay.getTime()) || birthDay.toISOString().slice(0, 10) !== chart.birthDate) return false;
+  const [hours, minutes, seconds = "00"] = chart.birthTime.split(":");
+  if (+hours > 23 || +minutes > 59 || +seconds > 59) return false;
+  if (blueprintRequiredLabels(chart).some(label =>
+    !label.trim() || /^(?:undefined|null|unknown|nan)$/i.test(label.trim())
+  )) return false;
+  if (chart.centers.length !== 9 || new Set(chart.centers.map(center => center.name)).size !== 9) return false;
+  if (chart.personalityActivations.length < 10 || chart.designActivations.length < 10) return false;
+  if (chart.activatedGates.length < 4) return false;
+  if (chart.incarnationCross.gates.some(gate => !Number.isInteger(gate) || gate < 1 || gate > 64)) return false;
+  return true;
+}
+
+export function isCompleteBlueprintChartJson(raw: string | null | undefined): boolean {
+  if (!raw) return false;
+  try {
+    return isCompleteBlueprintChart(JSON.parse(raw));
+  } catch {
+    return false;
+  }
+}
