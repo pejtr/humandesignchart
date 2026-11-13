@@ -18,6 +18,60 @@ function translateCrossName(name: string): string {
   return result;
 }
 
+
+/** English readings curated from the existing CZ catalog; interpretive, not diagnostic. */
+const EN_TYPE_SUMMARIES: Record<string, string> = {
+  Manifestor: "In the Human Design framework, Manifestors initiate new directions. Informing those affected before acting is presented as a way to reduce resistance while keeping independence.",
+  Generator: "In the Human Design framework, Generators are associated with sustained sacral energy. Their practice is to notice what naturally elicits a response instead of forcing every new initiative.",
+  "Manifesting Generator": "Manifesting Generators combine a responsive sacral process with quick action. The reflective practice is to respond, then communicate, while allowing course corrections.",
+  Projector: "Projectors are described as observers and guides. Recognition, invitation and considerate energy management are central themes of this Human Design type.",
+  Reflector: "Reflectors are associated with openness to their environment and changing perspectives. The traditional Human Design practice encourages observing a full lunar cycle before major decisions.",
+};
+
+const EN_AUTHORITY_SUMMARIES: Record<string, { description: string; practice: string }> = {
+  "Emotional (Solar Plexus)": {
+    description: "Emotional authority is associated with a changing emotional wave rather than instant certainty.",
+    practice: "For an important choice, observe how your perspective changes over time before deciding.",
+  },
+  Sacral: {
+    description: "Sacral authority emphasizes immediate physical responses to opportunities and questions.",
+    practice: "Notice your initial response to a simple yes-or-no choice and reflect on what it tells you.",
+  },
+  Splenic: {
+    description: "Splenic authority is presented as a quiet, spontaneous intuitive signal in the moment.",
+    practice: "Reflect on subtle first impressions without treating them as medical or safety advice.",
+  },
+  "Ego Manifested": {
+    description: "Ego manifested authority centers on personally felt commitment and will.",
+    practice: "Ask what you genuinely want to commit to, rather than what others expect from you.",
+  },
+  "Ego Projected": {
+    description: "Ego projected authority connects decisions with the capacity for heartfelt commitment.",
+    practice: "Talk through options with someone you trust and listen to your own expressed priorities.",
+  },
+  "Self-Projected": {
+    description: "Self-projected authority uses your own voice to clarify identity and direction.",
+    practice: "Speak your options aloud to a trusted listener and notice which direction feels authentic.",
+  },
+  "Mental (Outer Authority)": {
+    description: "Mental or environmental authority emphasizes dialogue and the settings in which you reflect.",
+    practice: "Discuss a choice in different supportive environments; notice how your perspective evolves.",
+  },
+  "Lunar (No Inner Authority)": {
+    description: "Lunar authority is traditionally associated with a full lunar cycle of observation.",
+    practice: "For a major decision, journal and discuss your options over time rather than rushing.",
+  },
+};
+
+const EN_PROFILE_LINES: Record<string, { name: string; theme: string }> = {
+  "1": { name: "Investigator", theme: "Building a reliable foundation through research and understanding." },
+  "2": { name: "Hermit", theme: "Developing natural gifts through periods of retreat and reflection." },
+  "3": { name: "Experimenter", theme: "Learning what works through direct experience and trial and error." },
+  "4": { name: "Connector", theme: "Discovering opportunities and influence through trusted relationships." },
+  "5": { name: "Problem Solver", theme: "Responding to practical expectations and finding broadly useful solutions." },
+  "6": { name: "Role Model", theme: "Reflecting on experience and developing wisdom across life stages." },
+};
+
 export async function generateChartPDF(chart: HumanDesignChartData, name: string, hdData: any, bodygraphRef?: React.RefObject<HTMLDivElement | null>, locale?: "cs" | "en"): Promise<void> {
   // Fail closed: do not generate a paid document with undefined values or a blank graph.
   if (!isCompleteBlueprintChart(chart)) throw new Error("COMPLETE_BIRTH_CHART_REQUIRED");
@@ -38,6 +92,10 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
   const typeDesc = hdData?.types[chart.type];
   const profileDesc = hdData?.profiles[chart.profile];
   const authDesc = hdData?.authorities[chart.authority];
+  const [consciousLine, unconsciousLine] = chart.profile.split("/");
+  const consciousEn = EN_PROFILE_LINES[consciousLine];
+  const unconsciousEn = EN_PROFILE_LINES[unconsciousLine];
+  const authorityEn = EN_AUTHORITY_SUMMARIES[chart.authority];
 
   const centersHtml = (chart.centers || []).map(center => {
     const czName = (t.hd.centerNames as Record<string, string>)[center.name] || center.name;
@@ -215,6 +273,26 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
           </table>
         </div>
 
+
+
+        ${!isCzech ? `
+        <!-- English interpretations: never silently omit paid type/profile/authority coverage. -->
+        <div class="section">
+          <div class="section-title">Type: ${czType}</div>
+          <div class="desc-box">${EN_TYPE_SUMMARIES[chart.type] || "Your energy type is " + chart.type + ". Reflect on your strategy in the Human Design framework."}</div>
+          <div style="font-size:9px;color:#7c3aed;padding:0 4px">Strategy: ${czStrategy} · Signature: ${czSignature} · Not-Self: ${czNotSelf}</div>
+        </div>
+        <div class="section">
+          <div class="section-title">Profile: ${chart.profile}</div>
+          <div class="desc-box">Your profile combines conscious and unconscious themes in the Human Design framework.</div>
+          <div class="conscious-box"><strong>Conscious line ${consciousLine}${consciousEn ? " · " + consciousEn.name : ""}:</strong> ${consciousEn?.theme || "Reflect on the first line of your profile."}</div>
+          <div class="unconscious-box"><strong>Unconscious line ${unconsciousLine}${unconsciousEn ? " · " + unconsciousEn.name : ""}:</strong> ${unconsciousEn?.theme || "Reflect on the second line of your profile."}</div>
+        </div>
+        <div class="section">
+          <div class="section-title">Authority: ${chart.authority}</div>
+          <div class="desc-box">${authorityEn?.description || "Explore this decision-making authority as a reflective Human Design concept."}</div>
+          <div class="desc-box"><strong>How to explore:</strong> ${authorityEn?.practice || "Notice your choices and reflect on your own experience."}</div>
+        </div>` : ""}
 
         ${isCzech && typeDesc ? `
         <!-- Type -->
