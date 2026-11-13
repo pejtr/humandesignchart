@@ -643,7 +643,9 @@ export const appRouter = router({
              WHERE LOWER(o.customer_email) = LOWER(?)
                AND o.payment_status = 'PAID'
                AND o.offer_key IN ('hd-blueprint-cz', 'hd-blueprint-en')
-               AND json_extract(s.chart_data_json, '$.birthUtc') = ?
+               AND CASE WHEN json_valid(s.chart_data_json)
+                 THEN json_extract(s.chart_data_json, '$.birthUtc')
+                 ELSE NULL END = ?
              LIMIT 1`
           ).bind(input.customerEmail.trim(), chartBirthUtc).first();
         } catch {
