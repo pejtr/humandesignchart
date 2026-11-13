@@ -1330,29 +1330,18 @@ export const appRouter = router({
         if (!order) {
           throw new TRPCError({ code: "NOT_FOUND", message: "INVALID_ACCESS_TOKEN" });
         }
-
         if (order.download_token_expires_at && Date.now() > new Date(order.download_token_expires_at).getTime()) {
           throw new TRPCError({ code: "FORBIDDEN", message: "ACCESS_TOKEN_EXPIRED" });
         }
-
         if (order.payment_status !== "PAID") {
           throw new TRPCError({ code: "FORBIDDEN", message: "ORDER_NOT_PAID" });
         }
 
-        await d1
-          .prepare(
-            `UPDATE hd_orders
-             SET delivery_status = 'DOWNLOADED',
-                 download_count = COALESCE(download_count, 0) + 1,
-                 last_downloaded_at = CURRENT_TIMESTAMP,
-                 delivered_at = COALESCE(delivered_at, CURRENT_TIMESTAMP),
-                 updated_at = CURRENT_TIMESTAMP
-             WHERE id = ?`
-          )
-          .bind(order.id)
-          .run();
-
-        return { success: true };
+        // A browser print dialog (even after successful HTML generation) cannot
+        // confirm a PDF was saved. Client signals must NEVER mark the order
+        // DOWNLOADED, set delivered_at, or close the paid-fulfillment SLA.
+        // Preserve this route for older clients, but make it read-only.
+        return { success: true, recorded: false, reason: "UNVERIFIED_CLIENT_DOWNLOAD" };
       }),
   }),
 });
