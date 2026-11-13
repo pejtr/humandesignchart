@@ -8,6 +8,7 @@ import {
   ChartCalculationInputSchema,
   ChartCalculationRequestSchema,
   ChartResultSchema,
+  isCompleteBlueprintChartJson,
 } from "../shared/chartSchemas";
 import {
   lookupIanaTimezone,
@@ -165,6 +166,10 @@ async function sendTransactionalEmail(params: {
   const greeting = params.customerName
     ? (isEn ? `Dear ${params.customerName},` : `Dobrý den ${params.customerName},`)
     : (isEn ? "Dear Customer," : "Dobrý den,");
+  // Customer names come from checkout input and must not inject HTML into mail.
+  const safeGreeting = greeting.replace(/[&<>"']/g, char =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" } as Record<string, string>)[char]
+  );
 
   const message = params.isRecovery
     ? (isEn
@@ -189,7 +194,7 @@ async function sendTransactionalEmail(params: {
         <p style="margin:8px 0 0;font-size:14px;opacity:0.9;">${isEn ? "Human Design Blueprint" : "Osobní Human Design Blueprint"}</p>
       </div>
       <div style="padding:32px 24px;line-height:1.6;">
-        <p style="margin:0 0 16px;font-size:16px;font-weight:600;">${greeting}</p>
+        <p style="margin:0 0 16px;font-size:16px;font-weight:600;">${safeGreeting}</p>
         <p style="margin:0 0 24px;color:#334155;font-size:15px;">${message}</p>
         <div style="text-align:center;margin:32px 0;">
           <a href="${params.accessUrl}" style="background:#059669;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:700;font-size:16px;display:inline-block;box-shadow:0 4px 6px rgba(5,150,105,0.2);">${ctaText}</a>
@@ -523,6 +528,17 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input, ctx }: { input: any; ctx: Context }) => {
+        // Server-authoritative gates: a guest or mismatched account can never start payment.
+        const authenticatedUser = await getSessionUser(ctx.request, ctx.env);
+        if (!authenticatedUser?.email) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "LOGIN_REQUIRED_BEFORE_CHECKOUT" });
+        }
+        if (authenticatedUser.email.toLowerCase() !== input.customerEmail.trim().toLowerCase()) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "CHECKOUT_EMAIL_MUST_MATCH_ACCOUNT" });
+        }
+        if (input.chartDataJson && !isCompleteBlueprintChartJson(input.chartDataJson)) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "COMPLETE_BIRTH_CHART_REQUIRED" });
+        }
         if (!input.digitalDeliveryConsent) {
           throw new TRPCError({
             code: "BAD_REQUEST",
@@ -606,13 +622,42 @@ export const appRouter = router({
         // report exists or belongs to this customer. Fail before requesting payment.
         const savedChart = snapshotId
           ? await d1
-              .prepare("SELECT id FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) AND locale = ? LIMIT 1")
+               .prepare("SELECT id, chart_data_json FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) AND locale = ? LIMIT 1")
               .bind(snapshotId, input.customerEmail.trim(), input.locale)
               .first()
               .catch(() => null)
           : null;
         if (!savedChart) {
           throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "CHART_SNAPSHOT_REQUIRED" });
+        }
+        if (!isCompleteBlueprintChartJson(savedChart.chart_data_json)) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "COMPLETE_BIRTH_CHART_REQUIRED" });
+        }
+
+        // P0 paid-access protection: buying the same birth chart again is not
+        // recovery. Look up a PAID order for this authenticated email and the
+        // same authoritative birth instant *before* contacting ONYX PAY.
+        // Other charts for the same account remain purchasable.
+        const chartBirthUtc = JSON.parse(savedChart.chart_data_json).birthUtc as string;
+        let existingPaidBlueprint: unknown;
+        try {
+          existingPaidBlueprint = await d1.prepare(
+            `SELECT o.id FROM hd_orders o
+             INNER JOIN hd_chart_snapshots s ON s.id = o.chart_snapshot_id
+             WHERE LOWER(o.customer_email) = LOWER(?)
+               AND o.payment_status = 'PAID'
+               AND o.offer_key IN ('hd-blueprint-cz', 'hd-blueprint-en')
+               AND CASE WHEN json_valid(s.chart_data_json)
+                 THEN json_extract(s.chart_data_json, '$.birthUtc')
+                 ELSE NULL END = ?
+             LIMIT 1`
+          ).bind(input.customerEmail.trim(), chartBirthUtc).first();
+        } catch {
+          // Database ambiguity must never silently turn into a second charge.
+          throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "PAID_ACCESS_CHECK_UNAVAILABLE" });
+        }
+        if (existingPaidBlueprint) {
+          throw new TRPCError({ code: "CONFLICT", message: "BLUEPRINT_ALREADY_PAID_RECOVER_ACCESS" });
         }
 
         const isCzech = input.locale === "cs";
@@ -1217,7 +1262,7 @@ export const appRouter = router({
         if (!d1) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DATABASE_UNAVAILABLE" });
 
         const searchEmail = input.email.trim();
-        let query = `SELECT id, payment_ref, customer_email, customer_name, offer_key, download_token, payment_status, locale
+        let query = `SELECT id, payment_ref, customer_email, customer_name, offer_key, download_token, download_token_expires_at, payment_status, locale
                      FROM hd_orders
                      WHERE LOWER(customer_email) = LOWER(?) AND payment_status = 'PAID'`;
         const params: any[] = [searchEmail];
@@ -1230,11 +1275,45 @@ export const appRouter = router({
 
         const order: any = await d1.prepare(query).bind(...params).first();
 
-        if (order && order.download_token) {
+        if (order) {
+          // Previously expired access tokens cannot unlock getOrder. Recover
+          // the paid entitlement with a fresh, short-lived token without
+          // creating a new checkout or touching the customer's payment state.
+          let recoveryToken: string = order.download_token || "";
+          const expiresAtMs = order.download_token_expires_at
+            ? Date.parse(order.download_token_expires_at)
+            : null;
+          const expired = expiresAtMs !== null && (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now());
+          if (!recoveryToken || expired) {
+            const nextToken = `tok_${crypto.randomUUID().replace(/-/g, "")}`;
+            const nextExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+            // Compare-and-swap: concurrent recovery requests must never email
+            // an already-invalidated token. Only this PAID order may change.
+            let renewed: any;
+            try {
+              renewed = await d1.prepare(
+                `UPDATE hd_orders
+                 SET download_token = ?, download_token_expires_at = ?, updated_at = CURRENT_TIMESTAMP
+                 WHERE id = ? AND payment_status = 'PAID'
+                   AND COALESCE(download_token, '') = ?`
+              ).bind(nextToken, nextExpiry, order.id, recoveryToken).run();
+            } catch {
+              console.warn("[requestAccessRecovery] Paid token renewal unavailable");
+              renewed = null;
+            }
+            if (!renewed?.success || (renewed.meta && renewed.meta.changes !== 1)) {
+              // Privacy-preserving generic response; no broken email link.
+              return {
+                success: true,
+                message: "If a paid order matching that email was found, a recovery link has been sent.",
+              };
+            }
+            recoveryToken = nextToken;
+          }
           const isEn = order.locale === "en" || input.locale === "en" || order.offer_key === "hd-blueprint-en";
           const domain = isEn ? "https://humandesignchart.app" : "https://humandesignmapa.cz";
           const loc = isEn ? "en" : "cs";
-          const accessUrl = `${domain}/${loc}/payment/success?plan=blueprint&refId=${encodeURIComponent(order.payment_ref)}&token=${order.download_token}`;
+          const accessUrl = `${domain}/${loc}/payment/success?plan=blueprint&refId=${encodeURIComponent(order.payment_ref)}&token=${encodeURIComponent(recoveryToken)}`;
 
           try {
             const emailRes = await sendTransactionalEmail({
@@ -1242,7 +1321,7 @@ export const appRouter = router({
               toEmail: order.customer_email,
               customerName: order.customer_name,
               accessUrl,
-              token: order.download_token,
+              token: recoveryToken,
               refId: order.payment_ref,
               locale: loc,
               isRecovery: true,
@@ -1315,29 +1394,18 @@ export const appRouter = router({
         if (!order) {
           throw new TRPCError({ code: "NOT_FOUND", message: "INVALID_ACCESS_TOKEN" });
         }
-
         if (order.download_token_expires_at && Date.now() > new Date(order.download_token_expires_at).getTime()) {
           throw new TRPCError({ code: "FORBIDDEN", message: "ACCESS_TOKEN_EXPIRED" });
         }
-
         if (order.payment_status !== "PAID") {
           throw new TRPCError({ code: "FORBIDDEN", message: "ORDER_NOT_PAID" });
         }
 
-        await d1
-          .prepare(
-            `UPDATE hd_orders
-             SET delivery_status = 'DOWNLOADED',
-                 download_count = COALESCE(download_count, 0) + 1,
-                 last_downloaded_at = CURRENT_TIMESTAMP,
-                 delivered_at = COALESCE(delivered_at, CURRENT_TIMESTAMP),
-                 updated_at = CURRENT_TIMESTAMP
-             WHERE id = ?`
-          )
-          .bind(order.id)
-          .run();
-
-        return { success: true };
+        // A browser print dialog (even after successful HTML generation) cannot
+        // confirm a PDF was saved. Client signals must NEVER mark the order
+        // DOWNLOADED, set delivered_at, or close the paid-fulfillment SLA.
+        // Preserve this route for older clients, but make it read-only.
+        return { success: true, recorded: false, reason: "UNVERIFIED_CLIENT_DOWNLOAD" };
       }),
   }),
 });
@@ -1606,13 +1674,18 @@ export default {
 
         // Reject a paid event when the original order or personalized chart is
         // unavailable. Never create an empty paid order or issue an unusable PDF.
+        // A snapshot row can exist while its chart is incomplete or corrupt
+        // (especially on orders created before the checkout completeness gate).
+        // Never mark money-captured orders FULFILLED until the original snapshot
+        // contains a usable Bodygraph, not just a database identifier.
         const snapshot = existing?.chart_snapshot_id
           ? await d1
-              .prepare("SELECT id FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) LIMIT 1")
+              .prepare("SELECT chart_data_json FROM hd_chart_snapshots WHERE id = ? AND LOWER(email) = LOWER(?) LIMIT 1")
               .bind(existing.chart_snapshot_id, existing.customer_email)
               .first()
           : null;
-        const blocked = getBlueprintFulfillmentBlocker(existing, event, Boolean(snapshot));
+        const hasCompleteChart = isCompleteBlueprintChartJson(snapshot?.chart_data_json);
+        const blocked = getBlueprintFulfillmentBlocker(existing, event, hasCompleteChart);
         if (blocked) {
           console.error("[onyxpay-fulfill] Cannot fulfill blueprint without valid order and chart:", blocked);
           return Response.json(

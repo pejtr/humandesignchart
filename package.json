@@ -13,7 +13,7 @@
     "test": "vitest run",
     "healthcheck": "vitest run server/qa-healthcheck.test.ts --reporter=verbose",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
-    "build:cloudflare": "vite build && node scripts/generate-motion-preview-og.mjs && esbuild workers/pages-api.ts --bundle --format=esm --platform=browser --target=es2022 --minify --outfile=dist/public/_worker.js",
+    "build:cloudflare": "vite build && node scripts/generate-social-cards.mjs && node scripts/generate-motion-preview-og.mjs && esbuild workers/pages-api.ts --bundle --format=esm --platform=browser --target=es2022 --minify --outfile=dist/public/_worker.js",
     "deploy:cloudflare": "pnpm build:cloudflare && npx -y wrangler@4.147.0 pages deploy dist/public --project-name humandesignchart-web --branch main"
   },
   "dependencies": {

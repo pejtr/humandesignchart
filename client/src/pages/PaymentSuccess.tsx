@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -28,7 +28,9 @@ import {
   FileText,
 } from "lucide-react";
 import { Link } from "wouter";
-import { readChartDraft } from "@/lib/chartDraft";
+import { isCompleteBlueprintChart } from "@shared/chartSchemas";
+import Bodygraph from "@/components/Bodygraph";
+import { toast } from "sonner";
 import { generateChartPDF } from "@/lib/pdfExport";
 
 export default function PaymentSuccess() {
@@ -72,6 +74,7 @@ export default function PaymentSuccess() {
 
   const contentQuery = trpc.content.getHdContent.useQuery();
   const [generatingPdf, setGeneratingPdf] = useState(false);
+  const bodygraphRef = useRef<HTMLDivElement>(null);
 
   const verifyPaymentQuery = trpc.subscription.verifyPayment.useQuery(
     { refId },
@@ -108,14 +111,9 @@ export default function PaymentSuccess() {
     },
   });
 
-  const recordDownloadMutation = trpc.subscription.recordDownload.useMutation();
-
-  const chartDraft = typeof window !== "undefined" ? readChartDraft() : null;
-  const parsedChart = chartDraft?.chart ? JSON.parse(chartDraft.chart) : null;
-  const parsedMeta = chartDraft?.meta ? JSON.parse(chartDraft.meta) : null;
-
-  // STRICT ENTITLEMENT GATE: activeChart is ONLY populated when the order is authoritatively PAID
-  const activeChart = isEntitled ? (orderQuery.data?.chartData || parsedChart) : null;
+  // Only use the paid order's persisted chart; never substitute a stale local browser draft.
+  const paidChart = orderQuery.data?.chartData;
+  const activeChart = isEntitled && isCompleteBlueprintChart(paidChart) ? paidChart : null;
 
   const handleDownloadBlueprint = async () => {
     if (!isEntitled || !activeChart || !activeToken) {
@@ -125,15 +123,16 @@ export default function PaymentSuccess() {
     setGeneratingPdf(true);
     try {
       const customerName =
-        parsedMeta?.name ||
         orderQuery.data?.customerName ||
         (isEn ? "Personal Blueprint" : "Osobní Blueprint");
-      await generateChartPDF(activeChart, customerName, contentQuery.data, undefined, isEn ? "en" : "cs");
-      if (activeToken && activeToken.length >= 16) {
-        recordDownloadMutation.mutate({ token: activeToken });
-      }
+      await generateChartPDF(activeChart, customerName, contentQuery.data, bodygraphRef, isEn ? "en" : "cs");
+      // Opening a print dialog cannot prove the PDF was saved or delivered.
+      // Keep the durable fulfillment state unchanged until independently verified.
     } catch (err) {
       console.error("PDF generation error:", err);
+      toast.error(isEn
+        ? "Could not create the complete Blueprint. Your paid access is preserved; please retry or contact support."
+        : "Kompletní Blueprint se nepodařilo vygenerovat. Zaplacený přístup zůstává zachován; zkuste to znovu nebo kontaktujte podporu.");
     } finally {
       setGeneratingPdf(false);
     }
@@ -312,9 +311,13 @@ export default function PaymentSuccess() {
             <p className="text-lg text-muted-foreground mb-6 max-w-xl mx-auto">
               {isBlueprint
                 ? isEntitled
-                  ? isEn
-                    ? "Your personalized Blueprint with complete 7-day integration workbook has been prepared. Download your PDF below."
-                    : "Váš osobní Blueprint s kompletním 7denním integračním plánem je připraven. Stáhněte si své PDF níže."
+                  ? activeChart
+                    ? isEn
+                      ? "Your payment is confirmed and your complete birth chart is ready to print."
+                      : "Platba je potvrzená a kompletní mapa narození je připravená k tisku."
+                    : isEn
+                      ? "Your payment is confirmed. Your birth chart needs recovery before we can prepare a complete report; you will not be charged again."
+                      : "Platba je potvrzená. Před vydáním kompletního reportu je potřeba obnovit uloženou mapu; další platba není nutná."
                   : isEn
                     ? "A confirmed paid order is required to access your Personal Blueprint and generate the PDF report."
                     : "Pro stažení osobního Blueprintu a vygenerování PDF reportu je vyžadována potvrzená zaplacená objednávka."
@@ -345,8 +348,17 @@ export default function PaymentSuccess() {
                           : "Zadejte svůj bezpečnostní přístupový kód z potvrzovacího e-mailu nebo si nechte poslat odkaz."}
                     </p>
                   </div>
-                  {isEntitled && activeChart ? (
+                  {isEntitled && !activeChart ? (
+                    <div role="alert" className="rounded-xl border border-amber-400/40 bg-amber-100/10 p-4 text-sm text-amber-700">
+                      {isEn
+                        ? "Your payment is confirmed, but your saved birth chart is incomplete. No empty report will be issued. Please contact support to recover your personal Blueprint without paying again."
+                        : "Platba je potvrzená, ale uložená mapa narození je neúplná. Prázdný report nevydáme. Kontaktujte prosím podporu pro obnovu Blueprintu bez další platby."}
+                    </div>
+                  ) : isEntitled && activeChart ? (
                     <div className="space-y-6 pt-2">
+                      <div ref={bodygraphRef} className="mx-auto w-fit max-w-full rounded-xl bg-white p-3 shadow-sm">
+                        <Bodygraph chart={activeChart} width={320} height={400} interactive={false} />
+                      </div>
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                         <Button
                           size="lg"
@@ -362,7 +374,7 @@ export default function PaymentSuccess() {
                           ) : (
                             <>
                               <Download className="mr-2 h-5 w-5" />
-                              {isEn ? "Download Personal Blueprint (PDF)" : "Stáhnout osobní Blueprint (PDF)"}
+                              {isEn ? "Print / Save Blueprint as PDF" : "Tisk / Uložit Blueprint jako PDF"}
                             </>
                           )}
                         </Button>

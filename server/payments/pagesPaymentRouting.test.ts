@@ -1,9 +1,19 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "../../workers/pages-api";
+import { calculateChart } from "../humandesign/calculator";
 
 afterEach(() => vi.unstubAllGlobals());
 const assets = { fetch: vi.fn(() => Promise.resolve(new Response("asset"))) };
 const request = (path: string) => new Request(`https://humandesignchart.app${path}`);
+const validSnapshot = JSON.stringify(calculateChart({
+  name: "Payment callback fixture",
+  birthDate: "1986-04-22",
+  birthTime: "05:55",
+  birthPlace: "Pardubice, Czech Republic",
+  latitude: 50.0343,
+  longitude: 15.7812,
+  timezone: "Europe/Prague",
+}));
 
 describe("Pages payment routing diagnostics", () => {
   it("separates liveness from missing payment configuration without exposing credentials", async () => {
@@ -42,7 +52,7 @@ describe("Pages fulfillment boundary", () => {
     const db = { prepare: (sql: string) => {
       sqlStatements.push(sql);
       return { bind: () => ({
-        first: async () => sql.includes("hd_chart_snapshots") ? { id: "snap-unit" } : order,
+        first: async () => sql.includes("hd_chart_snapshots") ? { chart_data_json: validSnapshot } : order,
         run: async () => ({ success: true, meta: { changes: 0 } }),
       }) };
     } };
@@ -58,13 +68,14 @@ describe("Pages fulfillment boundary", () => {
     expect(sqlStatements.some(sql => sql.includes("SET event_id"))).toBe(false);
   });
   it.each([
-    { row: null, status: 503, error: "CHART_SNAPSHOT_REQUIRED" },
-    { row: { ...order, amount_minor: 1 }, status: 422, error: "ORDER_DATA_MISMATCH" },
-    { row: { ...order, offer_key: "hd-blueprint-cz" }, status: 422, error: "ORDER_DATA_MISMATCH" },
-  ])("rejects invalid persisted orders: $error", async ({ row, status, error }) => {
+    { row: null, snapshotJson: validSnapshot, status: 503, error: "CHART_SNAPSHOT_REQUIRED" },
+    { row: { ...order, amount_minor: 1 }, snapshotJson: validSnapshot, status: 422, error: "ORDER_DATA_MISMATCH" },
+    { row: { ...order, offer_key: "hd-blueprint-cz" }, snapshotJson: validSnapshot, status: 422, error: "ORDER_DATA_MISMATCH" },
+    { row: order, snapshotJson: '{"type":"Generator"}', status: 503, error: "CHART_SNAPSHOT_REQUIRED" },
+  ])("rejects invalid persisted orders: $error", async ({ row, snapshotJson, status, error }) => {
     const run = vi.fn();
     const db = { prepare: (sql: string) => ({ bind: () => ({
-      first: async () => sql.includes("hd_chart_snapshots") ? { id: "snap-unit" } : row, run,
+      first: async () => sql.includes("hd_chart_snapshots") ? { chart_data_json: snapshotJson } : row, run,
     }) }) };
     vi.stubGlobal("fetch", vi.fn(async () => Response.json({ status: "PAID", amountMinor: 1590, currency: "EUR" })));
     const response = await worker.fetch(callback(), { ASSETS: assets, HD_ORDERS: db,
@@ -87,7 +98,7 @@ describe("Pages fulfillment boundary", () => {
     const db = { prepare: (sql: string) => {
       sqlStatements.push(sql);
       return { bind: () => ({
-        first: async () => sql.includes("hd_chart_snapshots") ? { id: "snap-unit" } : order,
+        first: async () => sql.includes("hd_chart_snapshots") ? { chart_data_json: validSnapshot } : order,
         run: async () => ({ success: true, meta: { changes: 0 } }),
       }) };
     } };
