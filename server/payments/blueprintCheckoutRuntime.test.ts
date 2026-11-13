@@ -173,4 +173,34 @@ describe("Cloudflare Blueprint checkout: no real payment may precede a valid cha
     expect(consent.openAIAdsMarketingConsent).toBe(false);
     expect(consent.openAIAdsOppref).toBeNull();
   });
+  it("a paid buyer opening the print dialog cannot mark their order delivered", async () => {
+    const queries: string[] = [];
+    const db = {
+      prepare(sql: string) {
+        queries.push(sql);
+        return {
+          bind(..._args: unknown[]) {
+            return {
+              first: async () => ({
+                id: "paid-order",
+                payment_status: "PAID",
+                download_token_expires_at: null,
+              }),
+              run: async () => { throw new Error("UNEXPECTED_D1_WRITE"); },
+            };
+          },
+        };
+      },
+    };
+    const result = await caller({ HD_ORDERS: db }).subscription.recordDownload({
+      token: "opaque-paid-download-token-123456",
+    });
+    expect(result).toEqual({
+      success: true,
+      recorded: false,
+      reason: "UNVERIFIED_CLIENT_DOWNLOAD",
+    });
+    expect(queries).toHaveLength(1);
+    expect(queries[0]).toContain("SELECT id, payment_status");
+  });
 });
