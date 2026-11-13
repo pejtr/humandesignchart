@@ -72,22 +72,28 @@ const EN_PROFILE_LINES: Record<string, { name: string; theme: string }> = {
   "6": { name: "Role Model", theme: "Reflecting on experience and developing wisdom across life stages." },
 };
 
+function escapePrintText(value: unknown): string {
+  const entities: Record<string, string> = {
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  };
+  return String(value ?? "").replace(/[&<>"']/g, char => entities[char] || char);
+}
+
 export async function generateChartPDF(chart: HumanDesignChartData, name: string, hdData: any, bodygraphRef?: React.RefObject<HTMLDivElement | null>, locale?: "cs" | "en"): Promise<void> {
   // Fail closed: do not generate a paid document with undefined values or a blank graph.
   if (!isCompleteBlueprintChart(chart)) throw new Error("COMPLETE_BIRTH_CHART_REQUIRED");
   if (!hdData?.types || !hdData?.profiles || !hdData?.authorities) throw new Error("HD_CONTENT_UNAVAILABLE");
   if (!bodygraphRef?.current) throw new Error("BODYGRAPH_NOT_RENDERED");
-  const htmlEntities: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-  const safeName = name.replace(/[&<>"']/g, char => htmlEntities[char] || char);
+  const safeName = escapePrintText(name);
   const isCzech = (locale ?? (typeof window !== "undefined" && window.location.pathname.startsWith("/en") ? "en" : "cs")) === "cs";
   const t = isCzech ? cs : en;
-  const czType = (t.types as Record<string, string>)[chart.type] || chart.type;
-  const czStrategy = (t.hd.strategies as Record<string, string>)[chart.strategy] || chart.strategy;
-  const czSignature = (t.hd.signatures as Record<string, string>)[chart.signature] || chart.signature;
-  const czNotSelf = (t.hd.notSelfs as Record<string, string>)[chart.notSelf] || chart.notSelf;
-  const czDefinition = (t.hd.definitionTypes as Record<string, string>)[chart.definition] || chart.definition;
-  const czCrossName = isCzech ? translateCrossName(chart.incarnationCross?.name || "—") : (chart.incarnationCross?.name || "—");
-  const czCrossType = isCzech ? (CROSS_TYPE_CS[chart.incarnationCross?.type || ""] || chart.incarnationCross?.type || "") : (chart.incarnationCross?.type || "");
+  const czType = escapePrintText((t.types as Record<string, string>)[chart.type] || chart.type);
+  const czStrategy = escapePrintText((t.hd.strategies as Record<string, string>)[chart.strategy] || chart.strategy);
+  const czSignature = escapePrintText((t.hd.signatures as Record<string, string>)[chart.signature] || chart.signature);
+  const czNotSelf = escapePrintText((t.hd.notSelfs as Record<string, string>)[chart.notSelf] || chart.notSelf);
+  const czDefinition = escapePrintText((t.hd.definitionTypes as Record<string, string>)[chart.definition] || chart.definition);
+  const czCrossName = escapePrintText(isCzech ? translateCrossName(chart.incarnationCross?.name || "—") : (chart.incarnationCross?.name || "—"));
+  const czCrossType = escapePrintText(isCzech ? (CROSS_TYPE_CS[chart.incarnationCross?.type || ""] || chart.incarnationCross?.type || "") : (chart.incarnationCross?.type || ""));
 
   const typeDesc = hdData?.types[chart.type];
   const profileDesc = hdData?.profiles[chart.profile];
@@ -98,14 +104,14 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
   const authorityEn = EN_AUTHORITY_SUMMARIES[chart.authority];
 
   const centersHtml = (chart.centers || []).map(center => {
-    const czName = (t.hd.centerNames as Record<string, string>)[center.name] || center.name;
+    const czName = escapePrintText((t.hd.centerNames as Record<string, string>)[center.name] || center.name);
     const status = center.defined ? (isCzech ? "Definováno" : "Defined") : (isCzech ? "Otevřeno" : "Open");
     const desc = hdData?.centers[center.name];
     const statusColor = center.defined ? "#7c3aed" : "#6b7280";
     return `<tr>
       <td style="padding:5px 8px;font-weight:600;color:#374151;width:120px">${czName}</td>
       <td style="padding:5px 8px;color:${statusColor};font-weight:600">${status}</td>
-      <td style="padding:5px 8px;color:#6b7280">${isCzech ? (desc?.theme || "") : ""}</td>
+      <td style="padding:5px 8px;color:#6b7280">${isCzech ? escapePrintText(desc?.theme || "") : ""}</td>
     </tr>`;
   }).join("");
 
@@ -113,13 +119,13 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
     if (!hdData) return "";
     const key = hdData.channels[`${ch.gate1}-${ch.gate2}`] ? `${ch.gate1}-${ch.gate2}` : `${ch.gate2}-${ch.gate1}`;
     const desc = hdData.channels[key];
-    const czCenA = (t.hd.centerNames as Record<string, string>)[ch.centerA] || ch.centerA;
-    const czCenB = (t.hd.centerNames as Record<string, string>)[ch.centerB] || ch.centerB;
+    const czCenA = escapePrintText((t.hd.centerNames as Record<string, string>)[ch.centerA] || ch.centerA);
+    const czCenB = escapePrintText((t.hd.centerNames as Record<string, string>)[ch.centerB] || ch.centerB);
     return `<tr>
       <td style="padding:5px 8px;font-weight:600;color:#374151;width:60px">${ch.gate1}–${ch.gate2}</td>
-      <td style="padding:5px 8px;font-weight:600;color:#374151">${(isCzech ? desc?.name : desc?.nameEn) || ""}</td>
+      <td style="padding:5px 8px;font-weight:600;color:#374151">${escapePrintText((isCzech ? desc?.name : desc?.nameEn) || "")}</td>
       <td style="padding:5px 8px;color:#6b7280">${czCenA} → ${czCenB}</td>
-      <td style="padding:5px 8px;color:#9ca3af;font-style:italic">${(isCzech ? desc?.theme : desc?.themeEn) || ""}</td>
+      <td style="padding:5px 8px;color:#9ca3af;font-style:italic">${escapePrintText((isCzech ? desc?.theme : desc?.themeEn) || "")}</td>
     </tr>`;
   }).join("");
 
@@ -128,12 +134,12 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
       <h4 style="font-size:11px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0">${label}</h4>
       <table style="width:100%;border-collapse:collapse">
         ${(activations || []).map(a => {
-      const czPlanet = (t.hd.planets as Record<string, string>)[a.planet] || a.planet;
+      const czPlanet = escapePrintText((t.hd.planets as Record<string, string>)[a.planet] || a.planet);
       const gateDesc = hdData?.gates[a.gate];
       return `<tr>
             <td style="padding:3px 8px;color:#6b7280;width:90px;font-size:10px">${czPlanet}</td>
             <td style="padding:3px 8px;font-weight:600;color:#374151;font-size:10px">${isCzech ? "Brána" : "Gate"} ${a.gate}.${a.line}</td>
-            <td style="padding:3px 8px;color:#6b7280;font-size:10px">${(isCzech ? gateDesc?.name : gateDesc?.nameEn) || ""}</td>
+            <td style="padding:3px 8px;color:#6b7280;font-size:10px">${escapePrintText((isCzech ? gateDesc?.name : gateDesc?.nameEn) || "")}</td>
           </tr>`;
     }).join("")}
       </table>
@@ -141,7 +147,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
 
   const gatesHtml = [...(chart.activatedGates || [])].sort((a, b) => a - b).map(gate => {
     const desc = hdData?.gates[gate];
-    return `<span style="display:inline-block;background:#f3f0ff;color:#7c3aed;border-radius:4px;padding:2px 7px;margin:2px;font-size:10px;font-weight:600">${gate}${desc ? ` · ${isCzech ? desc.name : (desc.nameEn || "")}` : ""}</span>`;
+    return `<span style="display:inline-block;background:#f3f0ff;color:#7c3aed;border-radius:4px;padding:2px 7px;margin:2px;font-size:10px;font-weight:600">${gate}${desc ? ` · ${escapePrintText(isCzech ? desc.name : (desc.nameEn || ""))}` : ""}</span>`;
   }).join("");
 
   // English narratives use the existing bilingual gate content; the detailed
@@ -150,7 +156,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
     .map(gate => {
       const desc = hdData?.gates?.[gate];
       return desc?.descriptionEn
-        ? `<div class="desc-box"><strong>Gate ${gate}: ${desc.nameEn || gate}</strong><br/>${desc.descriptionEn}</div>`
+        ? `<div class="desc-box"><strong>Gate ${gate}: ${escapePrintText(desc.nameEn || gate)}</strong><br/>${escapePrintText(desc.descriptionEn)}</div>`
         : "";
     }).join("");
 
@@ -160,8 +166,8 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
       : { digestion: "Digestion", environment: "Environment", perspective: "Perspective", awareness: "Awareness" };
     return `<tr>
       <td style="padding:5px 8px;font-weight:600;color:#374151;width:120px">${labels[key] || key}</td>
-      <td style="padding:5px 8px;color:#7c3aed;font-weight:600">${v.type}</td>
-      <td style="padding:5px 8px;color:#6b7280">${v.arrow} · ${isCzech ? "Barva" : "Color"} ${v.color} · ${isCzech ? "Tón" : "Tone"} ${v.tone}</td>
+      <td style="padding:5px 8px;color:#7c3aed;font-weight:600">${escapePrintText(v.type)}</td>
+      <td style="padding:5px 8px;color:#6b7280">${escapePrintText(v.arrow)} · ${isCzech ? "Barva" : "Color"} ${v.color} · ${isCzech ? "Tón" : "Tone"} ${v.tone}</td>
     </tr>`;
   }).join("") : "";
 
@@ -267,7 +273,7 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
           <div class="section-title">${isCzech ? "Přehled mapy" : "Chart Overview"}</div>
           <table>
             <tr><td class="kv-label">${isCzech ? "Typ" : "Type"}:</td><td class="kv-value">${czType}</td><td class="kv-label">${isCzech ? "Strategie" : "Strategy"}:</td><td class="kv-value">${czStrategy}</td></tr>
-            <tr><td class="kv-label">${isCzech ? "Profil" : "Profile"}:</td><td class="kv-value">${chart.profile} ${chart.profileName}</td><td class="kv-label">${isCzech ? "Autorita" : "Authority"}:</td><td class="kv-value">${chart.authority}</td></tr>
+            <tr><td class="kv-label">${isCzech ? "Profil" : "Profile"}:</td><td class="kv-value">${escapePrintText(chart.profile)} ${escapePrintText(chart.profileName)}</td><td class="kv-label">${isCzech ? "Autorita" : "Authority"}:</td><td class="kv-value">${escapePrintText(chart.authority)}</td></tr>
             <tr><td class="kv-label">${isCzech ? "Definice" : "Definition"}:</td><td class="kv-value">${czDefinition}</td><td class="kv-label">${isCzech ? "Signatura" : "Signature"}:</td><td class="kv-value">${czSignature}</td></tr>
             <tr><td class="kv-label">${isCzech ? "Inkarnační kříž" : "Incarnation Cross"}:</td><td class="kv-value" colspan="3">${czCrossName}</td></tr>
           </table>
@@ -279,17 +285,17 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
         <!-- English interpretations: never silently omit paid type/profile/authority coverage. -->
         <div class="section">
           <div class="section-title">Type: ${czType}</div>
-          <div class="desc-box">${EN_TYPE_SUMMARIES[chart.type] || "Your energy type is " + chart.type + ". Reflect on your strategy in the Human Design framework."}</div>
+          <div class="desc-box">${escapePrintText(EN_TYPE_SUMMARIES[chart.type] || "Your energy type is " + chart.type + ". Reflect on your strategy in the Human Design framework.")}</div>
           <div style="font-size:9px;color:#7c3aed;padding:0 4px">Strategy: ${czStrategy} · Signature: ${czSignature} · Not-Self: ${czNotSelf}</div>
         </div>
         <div class="section">
-          <div class="section-title">Profile: ${chart.profile}</div>
+          <div class="section-title">Profile: ${escapePrintText(chart.profile)}</div>
           <div class="desc-box">Your profile combines conscious and unconscious themes in the Human Design framework.</div>
           <div class="conscious-box"><strong>Conscious line ${consciousLine}${consciousEn ? " · " + consciousEn.name : ""}:</strong> ${consciousEn?.theme || "Reflect on the first line of your profile."}</div>
           <div class="unconscious-box"><strong>Unconscious line ${unconsciousLine}${unconsciousEn ? " · " + unconsciousEn.name : ""}:</strong> ${unconsciousEn?.theme || "Reflect on the second line of your profile."}</div>
         </div>
         <div class="section">
-          <div class="section-title">Authority: ${chart.authority}</div>
+          <div class="section-title">Authority: ${escapePrintText(chart.authority)}</div>
           <div class="desc-box">${authorityEn?.description || "Explore this decision-making authority as a reflective Human Design concept."}</div>
           <div class="desc-box"><strong>How to explore:</strong> ${authorityEn?.practice || "Notice your choices and reflect on your own experience."}</div>
         </div>` : ""}
@@ -298,26 +304,26 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
         <!-- Type -->
         <div class="section">
           <div class="section-title">Typ: ${czType}</div>
-          <div class="desc-box">${typeDesc.description}</div>
+          <div class="desc-box">${escapePrintText(typeDesc.description)}</div>
           <div style="font-size:9px;color:#7c3aed;padding:0 4px">Strategie: ${czStrategy} · Signatura: ${czSignature} · Ne-Já: ${czNotSelf}</div>
         </div>` : ""}
 
         ${isCzech && profileDesc ? `
         <!-- Profile -->
         <div class="section">
-          <div class="section-title">Profil: ${chart.profile} ${chart.profileName}</div>
-          <div class="desc-box">${profileDesc.description}</div>
-          <div class="conscious-box"><strong>Vědomé:</strong> ${profileDesc.conscious}</div>
-          <div class="unconscious-box"><strong>Nevědomé:</strong> ${profileDesc.unconscious}</div>
+          <div class="section-title">Profil: ${escapePrintText(chart.profile)} ${escapePrintText(chart.profileName)}</div>
+          <div class="desc-box">${escapePrintText(profileDesc.description)}</div>
+          <div class="conscious-box"><strong>Vědomé:</strong> ${escapePrintText(profileDesc.conscious)}</div>
+          <div class="unconscious-box"><strong>Nevědomé:</strong> ${escapePrintText(profileDesc.unconscious)}</div>
         </div>` : ""}
 
         ${isCzech && authDesc ? `
         <!-- Authority -->
         <div class="section">
-          <div class="section-title">Autorita: ${chart.authority}</div>
-          <div class="desc-box">${authDesc.description}</div>
+          <div class="section-title">Autorita: ${escapePrintText(chart.authority)}</div>
+          <div class="desc-box">${escapePrintText(authDesc.description)}</div>
           <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:4px;padding:5px 8px;margin-top:4px;font-size:9px;color:#6b21a8">
-            <strong>Jak používat:</strong> ${authDesc.howToUse}
+            <strong>Jak používat:</strong> ${escapePrintText(authDesc.howToUse)}
           </div>
         </div>` : ""}
 
@@ -341,8 +347,8 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
       <div class="section-title" style="font-size:17px">${isCzech ? "Váš osobní integrační plán · 7 dní" : "Your Personal Integration Plan · 7 Days"}</div>
       <p style="font-size:11px;line-height:1.65;color:#475569">
         ${isCzech
-          ? `Tento plán propojuje tři konkrétní prvky vaší mapy: energetický typ <strong>${czType}</strong>, strategii <strong>${czStrategy}</strong> a autoritu <strong>${chart.authority}</strong>. Berte jej jako prostor pro sebereflexi, nikoli jako vědeckou diagnózu či předpověď.`
-          : `This plan integrates three core elements of your chart: energy type <strong>${chart.type}</strong>, strategy <strong>${chart.strategy}</strong>, and authority <strong>${chart.authority}</strong>. Use it as a reflective guide rather than a rigid prescription.`
+          ? `Tento plán propojuje tři konkrétní prvky vaší mapy: energetický typ <strong>${czType}</strong>, strategii <strong>${czStrategy}</strong> a autoritu <strong>${escapePrintText(chart.authority)}</strong>. Berte jej jako prostor pro sebereflexi, nikoli jako vědeckou diagnózu či předpověď.`
+          : `This plan integrates three core elements of your chart: energy type <strong>${escapePrintText(chart.type)}</strong>, strategy <strong>${escapePrintText(chart.strategy)}</strong>, and authority <strong>${escapePrintText(chart.authority)}</strong>. Use it as a reflective guide rather than a rigid prescription.`
         }
       </p>
       <table style="width:100%;border-collapse:collapse;font-size:11px">
@@ -352,11 +358,11 @@ export async function generateChartPDF(chart: HumanDesignChartData, name: string
         </tr>
         <tr>
           <td style="padding:10px;vertical-align:top;font-weight:700">${isCzech ? "Den 2 · Strategie" : "Day 2 · Strategy"}</td>
-          <td style="padding:10px">${isCzech ? `Vyberte jedno malé rozhodnutí a vědomě vyzkoušejte strategii „${czStrategy}“. Zapište si, co se změnilo.` : `Choose one small choice today and consciously apply your strategy: "${chart.strategy}". Record what shifts.`}</td>
+          <td style="padding:10px">${isCzech ? `Vyberte jedno malé rozhodnutí a vědomě vyzkoušejte strategii „${czStrategy}“. Zapište si, co se změnilo.` : `Choose one small choice today and consciously apply your strategy: "${escapePrintText(chart.strategy)}". Record what shifts.`}</td>
         </tr>
         <tr>
           <td style="padding:10px;vertical-align:top;font-weight:700">${isCzech ? "Den 3 · Autorita" : "Day 3 · Authority"}</td>
-          <td style="padding:10px">${isCzech ? `Před dalším rozhodnutím si připomeňte svou autoritu „${chart.authority}“. Oddělte vlastní pocit od očekávání okolí.` : `Before your next decision, check in with your authority: "${chart.authority}". Distinguish your internal signal from external noise.`}</td>
+          <td style="padding:10px">${isCzech ? `Před dalším rozhodnutím si připomeňte svou autoritu „${escapePrintText(chart.authority)}“. Oddělte vlastní pocit od očekávání okolí.` : `Before your next decision, check in with your authority: "${escapePrintText(chart.authority)}". Distinguish your internal signal from external noise.`}</td>
         </tr>
         <tr>
           <td style="padding:10px;vertical-align:top;font-weight:700">${isCzech ? "Den 4 · Hranice" : "Day 4 · Boundaries"}</td>
