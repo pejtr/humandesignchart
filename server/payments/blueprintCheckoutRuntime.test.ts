@@ -2,6 +2,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { appRouter } from "../../workers/pages-api";
 import { calculateChart } from "../humandesign/calculator";
 import { isCompleteBlueprintChart, isCompleteBlueprintChartJson } from "../../shared/chartSchemas";
+import { generateChartPDF } from "../../client/src/lib/pdfExport";
+import {
+  GATE_DESCRIPTIONS, CHANNEL_DESCRIPTIONS, TYPE_DESCRIPTIONS,
+  AUTHORITY_DESCRIPTIONS, PROFILE_DESCRIPTIONS, CENTER_DESCRIPTIONS,
+} from "../data/hdContent";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -202,5 +207,68 @@ describe("Cloudflare Blueprint checkout: no real payment may precede a valid cha
     });
     expect(queries).toHaveLength(1);
     expect(queries[0]).toContain("SELECT id, payment_status");
+  });
+});
+
+const allHdDescriptions = {
+  gates: GATE_DESCRIPTIONS, channels: CHANNEL_DESCRIPTIONS, types: TYPE_DESCRIPTIONS,
+  profiles: PROFILE_DESCRIPTIONS, authorities: AUTHORITY_DESCRIPTIONS, centers: CENTER_DESCRIPTIONS,
+};
+
+async function renderPaidPdfForLocale(locale: "cs" | "en") {
+  const write = vi.fn();
+  const printDocument = { write, close: vi.fn() };
+  vi.stubGlobal("window", {
+    location: { pathname: `/${locale}/payment/success` },
+    open: vi.fn(() => ({ document: printDocument })),
+  });
+  const ref = {
+    current: { querySelector: (selector: string) => selector === "svg"
+      ? { outerHTML: '<svg viewBox="0 0 500 600"><circle r="20"/></svg>' }
+      : null },
+  };
+  await generateChartPDF(JSON.parse(validChartJson), "Unit test", allHdDescriptions, ref as any, locale);
+  expect(write).toHaveBeenCalledOnce();
+  return String(write.mock.calls[0][0]);
+}
+
+describe("Paid Blueprint printable content: locale and real SVG", () => {
+  it("renders the English report without leaking Czech description paragraphs", async () => {
+    const html = await renderPaidPdfForLocale("en");
+    expect(html).toContain('<html lang="en">');
+    expect(html).toContain("Your Energy Bodygraph");
+    expect(html).toContain("Chart Overview");
+    expect(html).toContain("Activated Gates");
+    expect(html).toContain("Planetary Activations");
+    expect(html).toContain("Your Activated Gates — Interpretations");
+    expect(html).toContain("Day 7 · Integration");
+    expect(html).toContain("<svg viewBox=");
+    expect(html).not.toContain("Váš energetický Bodygraph");
+    expect(html).not.toContain("Planetární aktivace");
+    expect(html).not.toContain("Vědomé:");
+    expect(html).not.toContain("Nevědomé:");
+    expect(html).not.toContain("Brána Sebevyjádření");
+    expect(html).not.toContain("Vygenerováno:");
+    expect(html).not.toContain("undefined");
+  });
+
+  it("preserves the Czech report and its real SVG", async () => {
+    const html = await renderPaidPdfForLocale("cs");
+    expect(html).toContain('<html lang="cs">');
+    expect(html).toContain("Váš energetický Bodygraph");
+    expect(html).toContain("Aktivované brány");
+    expect(html).toContain("Váš osobní integrační plán · 7 dní");
+    expect(html).toContain("<svg viewBox=");
+    expect(html).not.toContain("undefined");
+  });
+
+  it("fails closed if the Bodygraph is missing, without opening a print window", async () => {
+    const open = vi.fn();
+    vi.stubGlobal("window", { location: { pathname: "/en" }, open });
+    await expect(generateChartPDF(
+      JSON.parse(validChartJson), "Unit test", allHdDescriptions,
+      { current: { querySelector: () => null } } as any, "en",
+    )).rejects.toThrow("BODYGRAPH_NOT_RENDERED");
+    expect(open).not.toHaveBeenCalled();
   });
 });
