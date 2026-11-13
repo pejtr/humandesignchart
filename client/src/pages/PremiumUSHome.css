@@ -1,0 +1,51 @@
+/* EN-only global landing background, clipped to the hero only. CSS opacity and
+   transform animations; no WebGL, video, external files or running JS loop. */
+.hd-us-cosmos { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; contain:paint; }
+.hd-us-cosmos > span { position:absolute; display:block; pointer-events:none; }
+.hd-us-nebula {
+ inset:-10% -22%;
+ background:radial-gradient(ellipse at 65% 32%,rgba(132,145,255,.17),transparent 40%),
+  radial-gradient(ellipse at 35% 78%,rgba(216,196,154,.12),transparent 44%);
+ animation:hd-us-drift 35s ease-in-out infinite alternate;
+}
+.hd-us-nebula-b {
+ inset:0 -35%; opacity:.53;
+ background:radial-gradient(ellipse at 77% 58%,rgba(180,113,232,.20),transparent 48%);
+ animation:hd-us-drift-alt 50s ease-in-out infinite alternate;
+}
+.hd-us-stars { inset:-5%; background-repeat:repeat; animation:hd-us-stars 95s linear infinite alternate; }
+.hd-us-stars-far {
+ opacity:.54;
+ background-image:radial-gradient(circle,rgba(255,244,220,.53) 0 1px,transparent 1.4px),
+  radial-gradient(circle,rgba(169,183,255,.62) 0 .8px,transparent 1.3px);
+ background-size:239px 181px,359px 273px;
+ background-position:21px 31px,111px 97px;
+}
+.hd-us-stars-near {
+ opacity:.31;
+ background-image:radial-gradient(circle,rgba(255,235,194,.85) 0 1.2px,transparent 1.8px);
+ background-size:467px 367px;
+ background-position:140px 217px;
+ animation-duration:63s;
+ animation-direction:alternate-reverse;
+}
+.hd-us-gold-halo {
+ width:650px;height:650px;right:-120px;top:-110px;
+ border-radius:50%;border:1px solid rgba(216,196,154,.19);
+ box-shadow:0 0 0 58px rgba(136,153,255,.025),0 0 0 151px rgba(136,153,255,.014);
+ opacity:.5;animation:hd-us-breathe 17s ease-in-out infinite alternate;
+}
+@keyframes hd-us-drift {to{transform:translate3d(-4%,5%,0) scale(1.07);}}
+@keyframes hd-us-drift-alt{to{transform:translate3d(7%,-4%,0) scale(1.08);}}
+@keyframes hd-us-stars{to{transform:translate3d(-3%,2%,0);}}
+@keyframes hd-us-breathe{to{opacity:.68;transform:scale(1.055);}}
+@media (max-width:640px){
+ .hd-us-gold-halo{width:90vw;height:90vw;right:-45vw;top:3%;opacity:.2;}
+ .hd-us-nebula-b{opacity:.24;}
+ .hd-us-stars-near{opacity:.18;}
+}
+@media (prefers-reduced-motion:reduce){
+ .hd-us-cosmos *, .hd-us-cosmos *::before, .hd-us-cosmos *::after {
+  animation:none !important;transition:none !important;
+ }
+}
