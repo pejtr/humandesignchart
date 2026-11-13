@@ -111,8 +111,6 @@ export default function PaymentSuccess() {
     },
   });
 
-  const recordDownloadMutation = trpc.subscription.recordDownload.useMutation();
-
   // Only use the paid order's persisted chart; never substitute a stale local browser draft.
   const paidChart = orderQuery.data?.chartData;
   const activeChart = isEntitled && isCompleteBlueprintChart(paidChart) ? paidChart : null;
@@ -128,9 +126,8 @@ export default function PaymentSuccess() {
         orderQuery.data?.customerName ||
         (isEn ? "Personal Blueprint" : "Osobní Blueprint");
       await generateChartPDF(activeChart, customerName, contentQuery.data, bodygraphRef, isEn ? "en" : "cs");
-      if (activeToken && activeToken.length >= 16) {
-        recordDownloadMutation.mutate({ token: activeToken });
-      }
+      // Opening a print dialog cannot prove the PDF was saved or delivered.
+      // Keep the durable fulfillment state unchanged until independently verified.
     } catch (err) {
       console.error("PDF generation error:", err);
       toast.error(isEn
@@ -377,7 +374,7 @@ export default function PaymentSuccess() {
                           ) : (
                             <>
                               <Download className="mr-2 h-5 w-5" />
-                              {isEn ? "Download Personal Blueprint (PDF)" : "Stáhnout osobní Blueprint (PDF)"}
+                              {isEn ? "Print / Save Blueprint as PDF" : "Tisk / Uložit Blueprint jako PDF"}
                             </>
                           )}
                         </Button>
