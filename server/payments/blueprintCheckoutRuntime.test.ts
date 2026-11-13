@@ -243,14 +243,15 @@ it("renews an expired paid access credential without another checkout", async ()
     return {
       first: async () => ({
         id: "paid-fixture", payment_ref: "fixture-reference",
-        customer_email: "buyer@example.test", offer_key: "hd-blueprint-en",
+        customer_email: "buyer@example.test", customer_name: "<img src=x onerror=alert(1)>", offer_key: "hd-blueprint-en",
         download_token: "old-credential", download_token_expires_at: "2025-01-01T00:00:00Z",
         payment_status: "PAID", locale: "en",
       }),
       run: async () => ({ success: true, meta: { changes: 1 } }),
     };
   } }; } };
-  vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 202 })));
+  const outgoing = vi.fn(async (_url: string, _options?: RequestInit) => new Response(null, { status: 202 }));
+  vi.stubGlobal("fetch", outgoing);
   const result = await caller({ HD_ORDERS: db }).subscription.requestAccessRecovery({
     email: "buyer@example.test", locale: "en",
   });
@@ -259,6 +260,10 @@ it("renews an expired paid access credential without another checkout", async ()
   expect(renewal).toBeDefined();
   expect(String(renewal?.args[0])).toMatch(/^tok_[a-f0-9]{32}$/);
   expect(renewal?.args[3]).toBe("old-credential");
+  expect(outgoing).toHaveBeenCalledTimes(1);
+  const mailBody = JSON.parse(String(outgoing.mock.calls[0][1]?.body)).content[0].value as string;
+  expect(mailBody).not.toContain("<img src=x onerror=alert(1)>");
+  expect(mailBody).toContain("&lt;img src=x onerror=alert(1)&gt;");
   expect(actions.some(row => row.sql.includes("INSERT INTO hd_orders"))).toBe(false);
 });
 
