@@ -295,6 +295,32 @@ describe("Paid Blueprint printable content: locale and real SVG", () => {
     expect(html).not.toContain("undefined");
   });
 
+  it.each(["cs", "en"] as const)("escapes untrusted chart fields before rendering the %s PDF", async locale => {
+    const payload = "<img src=x onerror=alert(1)>";
+    const chart = JSON.parse(validChartJson);
+    chart.profileName = payload;
+    chart.strategy = payload;
+    chart.authority = payload;
+    chart.incarnationCross.name = payload;
+    chart.centers[0].name = payload;
+    chart.variables.digestion.type = payload;
+    expect(isCompleteBlueprintChart(chart)).toBe(true);
+
+    const write = vi.fn();
+    vi.stubGlobal("window", {
+      location: { pathname: `/${locale}/payment/success` },
+      open: vi.fn(() => ({ document: { write, close: vi.fn() } })),
+    });
+    const graphRef = { current: { querySelector: (selector: string) =>
+      selector === "svg" ? { outerHTML: '<svg viewBox="0 0 500 600"><circle r="20"/></svg>' } : null,
+    } };
+    await generateChartPDF(chart, payload, allHdDescriptions, graphRef as any, locale);
+    const html = String(write.mock.calls[0][0]);
+    expect(html).not.toContain(payload);
+    expect(html).toContain("&lt;img src=x onerror=alert(1)&gt;");
+    expect(html).toContain('<svg viewBox="0 0 500 600">');
+  });
+
   it("fails closed if the Bodygraph is missing, without opening a print window", async () => {
     const open = vi.fn();
     vi.stubGlobal("window", { location: { pathname: "/en" }, open });
