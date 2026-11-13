@@ -1258,7 +1258,7 @@ export const appRouter = router({
         if (!d1) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DATABASE_UNAVAILABLE" });
 
         const searchEmail = input.email.trim();
-        let query = `SELECT id, payment_ref, customer_email, customer_name, offer_key, download_token, payment_status, locale
+        let query = `SELECT id, payment_ref, customer_email, customer_name, offer_key, download_token, download_token_expires_at, payment_status, locale
                      FROM hd_orders
                      WHERE LOWER(customer_email) = LOWER(?) AND payment_status = 'PAID'`;
         const params: any[] = [searchEmail];
@@ -1271,11 +1271,45 @@ export const appRouter = router({
 
         const order: any = await d1.prepare(query).bind(...params).first();
 
-        if (order && order.download_token) {
+        if (order) {
+          // Previously expired access tokens cannot unlock getOrder. Recover
+          // the paid entitlement with a fresh, short-lived token without
+          // creating a new checkout or touching the customer's payment state.
+          let recoveryToken: string = order.download_token || "";
+          const expiresAtMs = order.download_token_expires_at
+            ? Date.parse(order.download_token_expires_at)
+            : null;
+          const expired = expiresAtMs !== null && (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now());
+          if (!recoveryToken || expired) {
+            const nextToken = `tok_${crypto.randomUUID().replace(/-/g, "")}`;
+            const nextExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+            // Compare-and-swap: concurrent recovery requests must never email
+            // an already-invalidated token. Only this PAID order may change.
+            let renewed: any;
+            try {
+              renewed = await d1.prepare(
+                `UPDATE hd_orders
+                 SET download_token = ?, download_token_expires_at = ?, updated_at = CURRENT_TIMESTAMP
+                 WHERE id = ? AND payment_status = 'PAID'
+                   AND COALESCE(download_token, '') = ?`
+              ).bind(nextToken, nextExpiry, order.id, recoveryToken).run();
+            } catch {
+              console.warn("[requestAccessRecovery] Paid token renewal unavailable");
+              renewed = null;
+            }
+            if (!renewed?.success || (renewed.meta && renewed.meta.changes !== 1)) {
+              // Privacy-preserving generic response; no broken email link.
+              return {
+                success: true,
+                message: "If a paid order matching that email was found, a recovery link has been sent.",
+              };
+            }
+            recoveryToken = nextToken;
+          }
           const isEn = order.locale === "en" || input.locale === "en" || order.offer_key === "hd-blueprint-en";
           const domain = isEn ? "https://humandesignchart.app" : "https://humandesignmapa.cz";
           const loc = isEn ? "en" : "cs";
-          const accessUrl = `${domain}/${loc}/payment/success?plan=blueprint&refId=${encodeURIComponent(order.payment_ref)}&token=${order.download_token}`;
+          const accessUrl = `${domain}/${loc}/payment/success?plan=blueprint&refId=${encodeURIComponent(order.payment_ref)}&token=${encodeURIComponent(recoveryToken)}`;
 
           try {
             const emailRes = await sendTransactionalEmail({
@@ -1283,7 +1317,7 @@ export const appRouter = router({
               toEmail: order.customer_email,
               customerName: order.customer_name,
               accessUrl,
-              token: order.download_token,
+              token: recoveryToken,
               refId: order.payment_ref,
               locale: loc,
               isRecovery: true,
