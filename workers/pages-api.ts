@@ -848,19 +848,14 @@ export const appRouter = router({
               .bind(input.refId)
               .run();
             if (!saved?.success) throw new Error("PAID_STATUS_PERSISTENCE_FAILED");
-            // The order may have disappeared, or another callback may have
-            // updated it between our read and write. On a no-op, verify the
-            // committed state rather than treating success=true as evidence
-            // that a PAID order now exists.
-            if (saved.meta?.changes === 0) {
-              const committed = await d1
-                .prepare("SELECT payment_status FROM hd_orders WHERE payment_ref = ? LIMIT 1")
-                .bind(input.refId)
-                .first();
-              locallyConfirmed = committed?.payment_status === "PAID";
-            } else {
-              locallyConfirmed = true;
-            }
+            // An UPDATE success flag (or affected-row count) is not proof of
+            // a committed entitlement. Always read back the canonical D1 row.
+            // This also handles a concurrent verified callback marking PAID.
+            const committed = await d1
+              .prepare("SELECT payment_status FROM hd_orders WHERE payment_ref = ? LIMIT 1")
+              .bind(input.refId)
+              .first();
+            locallyConfirmed = committed?.payment_status === "PAID";
           } catch (err) {
             console.warn("[verifyPayment] failed to persist payment_status:", err);
           }
