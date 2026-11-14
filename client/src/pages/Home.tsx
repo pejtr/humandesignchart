@@ -3,6 +3,7 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useOmniLandingAB, abCopy } from "@/lib/omniLandingAB";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { TiltCard } from "@/components/TiltCard";
@@ -133,6 +134,10 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
   const { t, locale, localePath } = useLanguage();
   const isCs = locale === "cs";
+  const creative = useOmniLandingAB("hd-hero-2026q4", () => {
+    try { const consent = JSON.parse(localStorage.getItem("hd-cookie-consent") || "null"); return consent?.accepted === true && consent.analytics === true; }
+    catch { return false; }
+  }, "hd:marketing-consent-changed");
   const isPremiumUsDomain = typeof window !== "undefined" && window.location.hostname.endsWith("humandesignchart.app");
 
   const [showQuiz, setShowQuiz] = useState(false);
@@ -498,9 +503,13 @@ export default function Home() {
               <Sparkles aria-hidden="true" className="h-4 w-4" />
               {isCs ? "SEBEPOZNÁNÍ • REFLEXE • VLASTNÍ CESTA" : "SELF-DISCOVERY • REFLECTION • YOUR PATH"}
             </p>
-            <h1 id="hd-wow-title" className="hd-wow-title">
-              {isCs ? "Objevte svou jedinečnou" : "Discover your unique"}
-              <span>{isCs ? " energetickou mapu" : " energy blueprint"}</span>
+            <h1 id="hd-wow-title" data-omni-experiment="hd-hero-2026q4" data-omni-variant={creative} className="hd-wow-title">
+              {isCs
+                ? abCopy(creative, {A:"Objevte svou jedinečnou", B:"Začněte poznávat svou", C:"Prozkoumejte svou"})
+                : abCopy(creative, {A:"Discover your unique", B:"Start exploring your", C:"Explore your"})}
+              <span>{isCs
+                ? abCopy(creative, {A:" energetickou mapu", B:" Human Design mapu", C:" osobní Human Design mapu"})
+                : abCopy(creative, {A:" energy blueprint", B:" Human Design chart", C:" personal Human Design chart"})}</span>
             </h1>
             <p className="hd-wow-description">
               {isCs
@@ -509,7 +518,7 @@ export default function Home() {
             </p>
             <div className="hd-wow-actions">
               <Button asChild size="lg" className="hd-wow-primary">
-                <Link href={localePath("/calculate")}>
+                <Link href={localePath("/calculate")} data-omni-interest="chart_start" data-omni-zone="hero" data-omni-experiment="hd-hero-2026q4" data-omni-variant={creative}>
                   <Sparkles aria-hidden="true" className="h-5 w-5" />
                   {isCs ? "Vytvořit mapu zdarma" : "Create my free chart"}
                   <ArrowRight aria-hidden="true" className="h-5 w-5" />
