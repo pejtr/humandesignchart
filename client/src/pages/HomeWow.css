@@ -197,3 +197,36 @@
   .hd-wow-orbit {animation:none;}
   .hd-wow-actions .hd-wow-primary {transition:none;}
 }
+
+/* OMNI premium motion pilot (2026-11-14): content stays readable and CTA stays static.
+   Uses the existing homepage only; deliberately avoids payment, login and chart flows. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes hd-premium-once {
+    from { opacity: .9; transform: translate3d(0, 7px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+  .hd-wow-hero .hd-wow-eyebrow {
+    animation: hd-premium-once 500ms cubic-bezier(.2,.75,.25,1) both;
+  }
+  .hd-wow-hero .hd-wow-title {
+    animation: hd-premium-once 590ms cubic-bezier(.2,.75,.25,1) 70ms both;
+  }
+  .hd-wow-hero .hd-wow-description {
+    animation: hd-premium-once 590ms cubic-bezier(.2,.75,.25,1) 115ms both;
+  }
+}
+.hd-wow-actions .hd-wow-primary:focus-visible,
+.hd-wow-actions .hd-wow-secondary:focus-visible {
+  outline: 3px solid #4c2389;
+  outline-offset: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hd-wow-hero .hd-wow-eyebrow,
+  .hd-wow-hero .hd-wow-title,
+  .hd-wow-hero .hd-wow-description {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .hd-wow-actions .hd-wow-primary:hover { transform: none !important; }
+}
