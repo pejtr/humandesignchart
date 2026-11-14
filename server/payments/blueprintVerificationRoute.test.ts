@@ -9,7 +9,7 @@ const local = { payment_status: "CREATED", fulfillment_status: "PENDING", offer_
 async function verify(
   order: typeof local | null,
   payment: Record<string, unknown>,
-  options: { s2sKey?: string | null; writeSuccess?: boolean; statusHttp?: number } = {},
+  options: { s2sKey?: string | null; writeSuccess?: boolean; writeChanges?: number; statusHttp?: number } = {},
 ) {
   const writes: string[] = [];
   const db = {
@@ -20,7 +20,7 @@ async function verify(
             first: async () => order,
             run: async () => {
               writes.push(sql);
-              return { success: options.writeSuccess !== false };
+              return { success: options.writeSuccess !== false, ...(options.writeChanges === undefined ? {} : { meta: { changes: options.writeChanges } }) };
             },
           };
         },
@@ -68,6 +68,12 @@ describe("subscription.verifyPayment production safety gate", () => {
   it("does not mark a captured payment verified until the D1 paid state persists", async () => {
     const { gateway, response, writes } = await verify(local, paid, { writeSuccess: false });
     expect(gateway).toHaveBeenCalledTimes(1);
+    expect(writes).toHaveLength(1);
+    expect(response.verified).toBe(false);
+    expect(response.status).toBe("PAYMENT_CONFIRMATION_PENDING");
+  });
+  it("treats a no-op D1 write as pending unless a fresh PAID row is confirmed", async () => {
+    const { response, writes } = await verify(local, paid, { writeChanges: 0 });
     expect(writes).toHaveLength(1);
     expect(response.verified).toBe(false);
     expect(response.status).toBe("PAYMENT_CONFIRMATION_PENDING");

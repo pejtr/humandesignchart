@@ -848,10 +848,19 @@ export const appRouter = router({
               .bind(input.refId)
               .run();
             if (!saved?.success) throw new Error("PAID_STATUS_PERSISTENCE_FAILED");
-            // A successfully completed write is required before we tell the
-            // browser the payment is verified and emit a purchase event.
-            // Do not report a captured-but-unpersisted order as delivered.
-            locallyConfirmed = true;
+            // The order may have disappeared, or another callback may have
+            // updated it between our read and write. On a no-op, verify the
+            // committed state rather than treating success=true as evidence
+            // that a PAID order now exists.
+            if (saved.meta?.changes === 0) {
+              const committed = await d1
+                .prepare("SELECT payment_status FROM hd_orders WHERE payment_ref = ? LIMIT 1")
+                .bind(input.refId)
+                .first();
+              locallyConfirmed = committed?.payment_status === "PAID";
+            } else {
+              locallyConfirmed = true;
+            }
           } catch (err) {
             console.warn("[verifyPayment] failed to persist payment_status:", err);
           }
