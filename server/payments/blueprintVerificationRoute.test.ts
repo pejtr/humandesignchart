@@ -9,18 +9,42 @@ const local = { payment_status: "CREATED", fulfillment_status: "PENDING", offer_
 async function verify(
   order: typeof local | null,
   payment: Record<string, unknown>,
-  options: { s2sKey?: string | null; writeSuccess?: boolean; writeChanges?: number; statusHttp?: number } = {},
+  options: {
+    s2sKey?: string | null;
+    writeSuccess?: boolean;
+    writeChanges?: number;
+    writePersists?: boolean;
+    writeMetaAbsent?: boolean;
+    readbackStatus?: string | null;
+    readbackFails?: boolean;
+    statusHttp?: number;
+  } = {},
 ) {
   const writes: string[] = [];
+  const readbacks: string[] = [];
+  let committedStatus = order?.payment_status ?? null;
   const db = {
     prepare(sql: string) {
       return {
         bind() {
           return {
-            first: async () => order,
+            first: async () => {
+              if (sql.startsWith("SELECT payment_status FROM hd_orders WHERE")) {
+                readbacks.push(sql);
+                if (options.readbackFails) throw new Error("READBACK_FAILED");
+                if (options.readbackStatus === null) return null;
+                return { payment_status: options.readbackStatus ?? committedStatus };
+              }
+              return order;
+            },
             run: async () => {
               writes.push(sql);
-              return { success: options.writeSuccess !== false, ...(options.writeChanges === undefined ? {} : { meta: { changes: options.writeChanges } }) };
+              const success = options.writeSuccess !== false;
+              const changes = options.writeChanges ?? (success ? 1 : 0);
+              if (success && changes > 0 && options.writePersists !== false) {
+                committedStatus = "PAID";
+              }
+              return options.writeMetaAbsent ? { success } : { success, meta: { changes } };
             },
           };
         },
@@ -37,7 +61,7 @@ async function verify(
     },
     request: new Request("https://humandesignchart.app/api/trpc"),
   } as any);
-  return { response: await api.subscription.verifyPayment({ refId: "qa_ref" }), writes, gateway };
+  return { response: await api.subscription.verifyPayment({ refId: "qa_ref" }), writes, readbacks, gateway };
 }
 
 describe("subscription.verifyPayment production safety gate", () => {
@@ -95,6 +119,36 @@ describe("subscription.verifyPayment production safety gate", () => {
     expect(response.verified).toBe(false);
     expect(writes).toHaveLength(0);
   });
+  it("rejects an UPDATE reporting success when D1 readback is still CREATED", async () => {
+    const { response, writes, readbacks } = await verify(local, paid, {
+      writeMetaAbsent: true,
+      writePersists: false,
+    });
+    expect(writes).toHaveLength(1);
+    expect(readbacks).toHaveLength(1);
+    expect(response.verified).toBe(false);
+    expect(response.status).toBe("PAYMENT_CONFIRMATION_PENDING");
+  });
+  it("confirms PAID only after a successful D1 readback, regardless of UPDATE metadata", async () => {
+    const { response, readbacks } = await verify(local, paid, { writeMetaAbsent: true });
+    expect(readbacks).toHaveLength(1);
+    expect(response.verified).toBe(true);
+  });
+  it("accepts a concurrent callback that already committed PAID after a no-op update", async () => {
+    const { response, readbacks } = await verify(local, paid, {
+      writeChanges: 0,
+      readbackStatus: "PAID",
+    });
+    expect(readbacks).toHaveLength(1);
+    expect(response.verified).toBe(true);
+  });
+  it("keeps an order pending when the readback fails", async () => {
+    const { response, readbacks } = await verify(local, paid, { readbackFails: true });
+    expect(readbacks).toHaveLength(1);
+    expect(response.verified).toBe(false);
+    expect(response.status).toBe("PAYMENT_CONFIRMATION_PENDING");
+  });
+
   it("confirms matching price and offer and persists payment verification", async () => {
     const { response, writes } = await verify(local, paid);
     expect(response.verified).toBe(true);
