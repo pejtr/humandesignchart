@@ -1,5 +1,16 @@
 # HDCHART — P0 revenue / QA release gate (2026-11-13)
 
+> **CURRENT HANDOFF — 2026-11-14.** The historical 2026-11-13 paragraphs below describe the state **at audit time**, NOT the current GitHub state. Use this update for release decisions. Do not execute the older pasted 304-line Stripe/PR #84 worktree runbook.
+>
+> - Verified **main**: `47e271b240f9e66c2d30af7f61692ed73c13fc24`. PRs **#84, #89, #85, #86, #88 and #81 are MERGED**. PR **#87** remains a conflicting draft; do not merge a second overlapping WhatsApp/sticky-header implementation.
+> - Current P0 payment hardening: **[PR #90](https://github.com/pejtr/humandesignchart/pull/90)**, draft branch `fix/p0-onyx-pay-durable-verification-20261114`, SHA `b301efc22dcfec99cf527680b88789de76c18d9e`. It fixes missing ONYX PAY server-to-server Bearer authorization in `subscription.verifyPayment`, and requires durable D1 `PAID` confirmation before reporting a verified purchase. Its CI **passed** at SHA `b301efc` (Cloudflare guarded build + marketing measurement). Code is **NOT MERGED and NOT DEPLOYED**.
+> - **Actual payment processor: ONYX PAY** at `https://pay.optimateo.com/api/paygate/checkout-sessions`; fulfillment callback `/api/internal/onyxpay/fulfill`; browser routes `/cs/honorace`, `/en/honorace`. Direct Stripe Checkout, `stripe events resend`, Stripe test cards, `/api/webhooks/stripe`, and assumed `/cs/checkout` **are not valid verification steps for this Pages Blueprint funnel**.
+> - **Actual PDF delivery:** client renders personalized HTML + inline Bodygraph for browser **Print / Save as PDF**; it does not supply a guaranteed server-generated downloadable PDF. Test print output with an authenticated **nonproduction paid order** and never report print-dialog opening as delivered or downloaded.
+> - **No current production release evidence:** the successful `main` run [43504693837](https://github.com/pejtr/humandesignchart/actions/runs/43504693837) had both deploy jobs **SKIPPED**. No exact current-SHA isolated Cloudflare preview URL/deployment ID, no browser/OAuth validation, no verified isolated ONYX PAY capture + webhook/idempotency + nonempty print output, and no verified production rollback ID. Therefore **PRODUCTION NO-GO**.
+> - **Next safe action:** obtain Cloudflare Pages project preview/production binding configuration through an authorized Cloudflare operator/connector, record *real* isolated preview ID + SHA and production rollback ID, run existing read-only `scripts/qa/audit-revenue-preview.mjs`, then test OAuth, ONYX PAY capture and PDF in deliberately isolated nonproduction providers. Never reuse live D1/payment/email secrets in preview. No manual token posting or synthetic PASS claims.
+
+---
+
 ## Verified repo status at audit time
 
 - Repository: `pejtr/humandesignchart` — production: `humandesignchart.app` (EN), `humandesignmapa.cz` (CZ).
