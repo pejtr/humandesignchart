@@ -790,17 +790,30 @@ export const appRouter = router({
         const payBase = (ctx.env?.PAY_BASE_URL || "https://pay.optimateo.com").replace(/\/$/, "");
         const d1 = ctx.env?.HD_ORDERS || ctx.env?.DB;
 
+        // The paygate's server-to-server status endpoint is authenticated.
+        // Without a key we may trust only an already-paid local callback record.
+        // Never issue an anonymous status request or expose this key to the browser.
+        const s2sKey = ctx.env?.PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN?.trim();
         let payData: any = null;
-        try {
-          const res = await fetch(
-            `${payBase}/api/payments/${encodeURIComponent(input.refId)}/status`,
-            { headers: { "cache-control": "no-store" } }
-          );
-          if (res.ok) {
-            payData = await res.json();
+        if (s2sKey) {
+          try {
+            const res = await fetch(
+              `${payBase}/api/payments/${encodeURIComponent(input.refId)}/status`,
+              {
+                headers: {
+                  "cache-control": "no-store",
+                  Authorization: `Bearer ${s2sKey}`,
+                },
+              }
+            );
+            if (res.ok) {
+              payData = await res.json();
+            } else {
+              console.warn("[verifyPayment] ONYX PAY status HTTP", res.status);
+            }
+          } catch (err) {
+            console.warn("[verifyPayment] ONYX PAY status fetch error:", err);
           }
-        } catch (err) {
-          console.warn("[verifyPayment] ONYX PAY status fetch error:", err);
         }
 
         let localOrder: any = null;
@@ -822,30 +835,39 @@ export const appRouter = router({
         // Do not confirm a purchase without an existing, canonical D1 order.
         // A gateway PAID flag is only trusted when amount, currency and offer match.
         const isPaid = isVerifiedBlueprintPayment(localOrder, payData);
+        let locallyConfirmed = localOrder?.payment_status === "PAID";
 
-        if (isPaid && localOrder && localOrder.payment_status !== "PAID" && d1) {
+        if (isPaid && !locallyConfirmed && d1) {
           try {
-            await d1
+            const saved = await d1
               .prepare(
                 `UPDATE hd_orders
                  SET payment_status = 'PAID', updated_at = CURRENT_TIMESTAMP
-                 WHERE payment_ref = ?`
+                 WHERE payment_ref = ? AND payment_status != 'PAID'`
               )
               .bind(input.refId)
               .run();
+            if (!saved?.success) throw new Error("PAID_STATUS_PERSISTENCE_FAILED");
+            // A successfully completed write is required before we tell the
+            // browser the payment is verified and emit a purchase event.
+            // Do not report a captured-but-unpersisted order as delivered.
+            locallyConfirmed = true;
           } catch (err) {
-            console.warn("[verifyPayment] failed to update payment_status:", err);
+            console.warn("[verifyPayment] failed to persist payment_status:", err);
           }
         }
 
-        // Return authoritative status without leaking PII, chart data, or download tokens
+        const verified = isPaid && locallyConfirmed;
+        // Return authoritative status without leaking PII, chart data, or download tokens.
+        // A failed D1 write keeps the browser polling instead of recording a
+        // false "purchase confirmed" while the buyer lacks durable access.
         return {
-          verified: isPaid,
-          status: isPaid ? "PAID" : (localOrder?.payment_status || "NOT_FOUND"),
+          verified,
+          status: verified ? "PAID" : (isPaid ? "PAYMENT_CONFIRMATION_PENDING" : (localOrder?.payment_status || "NOT_FOUND")),
           refId: input.refId,
           amountMinor: localOrder?.amount_minor ?? 0,
           currency: localOrder?.currency || "CZK",
-          paidAt: isPaid ? (payData?.paidAt || null) : null,
+          paidAt: verified ? (payData?.paidAt || null) : null,
           offerKey: localOrder?.offer_key || null,
           hasToken: Boolean(localOrder?.download_token),
         };
