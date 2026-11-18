@@ -20,8 +20,8 @@ export function FloatingChatGuide() {
   const [isLoading, setIsLoading] = useState(false);
 
   const welcomeMessage = isEn
-    ? "Welcome. I am Marie, your personal Human Design guide. Ask me about your chart, decisions, relationships or current energy."
-    : "Vítejte. Jsem Marie, vaše osobní průvodkyně Human Designem. Zeptejte se mě na svou mapu, rozhodování, vztahy nebo dnešní energii.";
+    ? "Welcome. I am ORACULUM+, your Human Design AI guide. Ask me about your chart, decisions, relationships or current energy."
+    : "Vítejte. Jsem ORACULUM+, váš AI průvodce Human Designem. Zeptejte se mě na svou mapu, rozhodování, vztahy nebo dnešní energii.";
 
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: welcomeMessage },
@@ -155,17 +155,11 @@ export function FloatingChatGuide() {
               title={
                 isEn ? "ORACULUM+ — personal guide" : "ORACULUM+ — osobní průvodkyně"
               }
-              className="group relative w-16 h-16 overflow-visible rounded-full border-2 border-amber-100/90 bg-[#160b2f] p-0 text-white shadow-xl ring-4 ring-violet-500/10 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.03]"
+              className="sacral-chat-launcher group relative h-16 w-16 overflow-visible rounded-full border-2 border-violet-200/80 p-0 text-white transition-transform duration-300 hover:-translate-y-0.5 hover:scale-[1.03]"
             >
-              <span
-                className="absolute -inset-2 -z-10 rounded-full bg-violet-500/20 blur-lg transition-opacity group-hover:bg-violet-400/35"
-                aria-hidden="true"
-              />
-              <img
-                src="/images/brand/veleknezka-master-v1.png"
-                alt=""
-                className="h-full w-full rounded-full object-cover object-[center_16%]"
-              />
+              <span className="sacral-ripple-ring sacral-chat-ripple" aria-hidden="true" />
+              <span className="sacral-ripple-ring sacral-chat-ripple sacral-ripple-ring--two" aria-hidden="true" />
+              <span className="oraculum-chat-symbol relative z-10 grid h-full w-full place-items-center rounded-full text-3xl" aria-hidden="true">✧</span>
               <span className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-full border border-violet-200/70 bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-900 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block">
                 {isEn ? "Ask ORACULUM+" : "Zeptat se ORACULUM+"}
               </span>
@@ -188,16 +182,13 @@ export function FloatingChatGuide() {
             }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
-            className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 lg:bottom-10 lg:right-10 z-50 flex flex-col bg-background border border-border shadow-2xl overflow-hidden sm:rounded-2xl w-full h-[100dvh]"
+            className={`sacral-sunset-field sacral-chat-shell ${isLoading ? "is-thinking" : ""} fixed bottom-0 right-0 z-50 flex h-[100dvh] w-full flex-col overflow-hidden border shadow-2xl sm:bottom-6 sm:right-6 sm:rounded-2xl lg:bottom-10 lg:right-10`}
           >
-            <div className="flex items-center justify-between p-3 border-b bg-muted/30">
+            <span className="sacral-ripple-ring" aria-hidden="true" /><span className="sacral-ripple-ring sacral-ripple-ring--two" aria-hidden="true" />
+            <div className="sacral-chat-header flex items-center justify-between border-b p-3">
               <div className="flex items-center gap-2">
-                <div className="w-9 h-9 overflow-hidden rounded-full border border-amber-200/70 bg-[#160b2f] shrink-0">
-                  <img
-                    src="/images/brand/veleknezka-master-v1.png"
-                    alt=""
-                    className="h-full w-full object-cover object-[center_16%]"
-                  />
+                <div className="sacral-popup-orb h-9 w-9 shrink-0 overflow-hidden rounded-full border border-violet-200/70 bg-[#2b1643]">
+                  <span className="oraculum-chat-symbol grid h-full w-full place-items-center text-xl" aria-hidden="true">✧</span>
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold leading-none text-foreground">ORACULUM+</h3>
@@ -231,12 +222,12 @@ export function FloatingChatGuide() {
             </div>
 
             {!isAuthenticated ? (
-              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-card">
-                <Sparkles className="w-12 h-12 text-purple-300 mb-4" />
-                <p className="text-sm text-muted-foreground mb-4">
+              <div className="sacral-chat-body flex flex-1 flex-col items-center justify-center p-6 text-center">
+                <Sparkles className="mb-4 h-12 w-12 text-violet-200" />
+                <p className="mb-4 text-sm text-violet-100/90">
                   {isEn
-                    ? "Please sign in to chat with Marie."
-                    : "Pro rozhovor s Marií se prosím přihlaste."}
+                    ? "Please sign in to chat with ORACULUM+."
+                    : "Pro rozhovor s ORACULUM+ se prosím přihlaste."}
                 </p>
                 <Button onClick={() => (window.location.href = getLoginUrl())}>
                   {isEn ? "Sign in" : "Přihlásit se"}
@@ -247,10 +238,10 @@ export function FloatingChatGuide() {
                 messages={messages}
                 onSendMessage={handleSendMessage}
                 isLoading={isLoading}
-                placeholder={isEn ? "Ask Marie..." : "Zeptejte se Marie..."}
-                className="min-h-0 flex-1 rounded-none border-none shadow-none"
+                placeholder={isEn ? "Ask ORACULUM+..." : "Zeptejte se ORACULUM+..."}
+                className="sacral-chat-body min-h-0 flex-1 rounded-none border-none shadow-none"
                 height="auto"
-                emptyStateMessage={isEn ? "Ask Marie your first question" : "Zeptejte se Marie na první otázku"}
+                emptyStateMessage={isEn ? "Ask ORACULUM+ your first question" : "Položte ORACULUM+ první otázku"}
                 suggestedPrompts={
                   isEn
                     ? [

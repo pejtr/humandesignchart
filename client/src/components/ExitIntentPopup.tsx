@@ -61,15 +61,20 @@ export default function ExitIntentPopup() {
       {/* Soft Backdrop */}
       <div className="absolute inset-0 bg-black/35" />
       
+      {/* Decorative ripples extend past the popup, without blocking dismissal. */}
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[min(95vw,550px)] w-[min(95vw,550px)] -translate-x-1/2 -translate-y-1/2" aria-hidden="true">
+        <span className="sacral-ripple-ring sacral-popup-ripple" />
+        <span className="sacral-ripple-ring sacral-popup-ripple sacral-ripple-ring--two" />
+      </div>
       {/* Modal */}
       <div
-        className="relative w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300"
+        className="sacral-sunset-field sacral-sunset-field--popup relative z-10 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with mystical gradient */}
-        <div className="relative bg-gradient-to-br from-purple-700 via-violet-600 to-indigo-600 p-8 text-center">
+        <div className="sacral-popup-header relative px-8 pb-8 pt-10 text-center">
           {/* Sacred geometry overlay */}
-          <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+          <svg className="sacral-popup-geometry pointer-events-none absolute inset-0 h-full w-full opacity-[.24]" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
             <circle cx="200" cy="100" r="80" fill="none" stroke="white" strokeWidth="0.5" />
             <circle cx="200" cy="100" r="60" fill="none" stroke="white" strokeWidth="0.5" />
             <circle cx="200" cy="100" r="40" fill="none" stroke="white" strokeWidth="0.5" />
@@ -78,7 +83,7 @@ export default function ExitIntentPopup() {
           </svg>
           
           <div className="relative z-10">
-            <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-4">
+            <div className="sacral-popup-orb mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-white/40 bg-white/15 backdrop-blur-sm">
               <Compass className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-2xl font-serif font-bold text-white mb-1">
@@ -91,14 +96,14 @@ export default function ExitIntentPopup() {
         </div>
 
         {/* Content */}
-        <div className="bg-white p-8 text-center">
+        <div className="sacral-popup-content p-8 text-center">
           <div className="mb-6">
-            <h4 className="text-xl font-serif font-bold text-gray-900 mb-2">
+            <h4 className="mb-2 font-serif text-xl font-bold text-white">
               {isCs 
                 ? "Váš chart je zdarma a okamžitě" 
                 : "Your chart is free and instant"}
             </h4>
-            <p className="text-gray-600 text-sm leading-relaxed">
+            <p className="text-sm leading-relaxed text-white/85">
               {isCs
                 ? "Zadejte datum, čas a místo narození. Zjistěte svůj typ, strategii a autoritu — zcela zdarma."
                 : "Enter your birth date, time, and place. Discover your type, strategy, and authority — completely free."}
@@ -109,14 +114,14 @@ export default function ExitIntentPopup() {
             <Link
               href={localePath("/calculate")}
               onClick={dismiss}
-              className="block w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all hover:scale-[1.02] shadow-lg shadow-purple-200/50"
+              className="sacral-popup-cta block w-full rounded-xl px-6 py-3 font-bold transition-all hover:scale-[1.015]"
             >
               {isCs ? "Vytvořit mapu zdarma" : "Create free chart"}
             </Link>
             <button
               type="button"
               onClick={dismiss}
-              className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              className="w-full py-2 text-sm text-white/70 transition-colors hover:text-white"
             >
               {isCs ? "Ne, děkuji" : "No, thanks"}
             </button>
@@ -127,7 +132,7 @@ export default function ExitIntentPopup() {
         <button
           type="button"
           onClick={dismiss}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+          className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition-colors hover:bg-white/30" aria-label={isCs ? "Zavřít nabídku" : "Close offer"}
         >
           <X className="w-4 h-4" />
         </button>

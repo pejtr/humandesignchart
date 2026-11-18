@@ -338,66 +338,62 @@ const projects = [
           </div>
         </div>
 
-        {/* Footer Embedded ORACULUM+ Chatbot */}
-        <div className="mt-10 p-6 rounded-3xl bg-gradient-to-r from-amber-900/10 via-slate-900/10 to-amber-900/10 border border-amber-500/20 backdrop-blur-xl shadow-lg relative overflow-hidden">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#111A2E] text-[#C59235] flex items-center justify-center border border-amber-500/30 font-serif font-bold text-lg">
-                ✦
+        {/* Accessible ORACULUM+ entry point. The assistant is represented by a living orb, not a portrait. */}
+        <section aria-labelledby="oraculum-footer-heading" className="oraculum-footer sacral-sunset-field relative mx-auto mt-12 max-w-[1140px] rounded-[28px] border border-violet-300/60 p-5 shadow-[0_22px_60px_rgba(65,29,112,.11)] sm:p-7 lg:p-9">
+          <span className="sacral-ripple-ring oraculum-footer-ripple" aria-hidden="true" />
+          <span className="sacral-ripple-ring oraculum-footer-ripple sacral-ripple-ring--two" aria-hidden="true" />
+          <div className="relative z-10 grid gap-7 lg:grid-cols-[minmax(0,.75fr)_minmax(0,1.25fr)] lg:items-center lg:gap-10">
+            <div className="flex min-w-0 items-center gap-5">
+              <div className="oraculum-footer-core relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full sm:h-28 sm:w-28" aria-hidden="true">
+                <span className="oraculum-footer-core-ring absolute inset-2 rounded-full border border-violet-300/75" />
+                <span className="oraculum-footer-core-ring oraculum-footer-core-ring--reverse absolute inset-5 rounded-full border border-violet-300/50" />
+                <span className="relative text-[40px] font-light text-violet-100 drop-shadow-[0_0_16px_rgba(221,191,255,.8)]">✧</span>
               </div>
-              <div>
-                <h3 className="font-serif font-bold text-base text-foreground flex items-center gap-2">
-                  <span>{locale === "cs" ? "Zeptat se ORACULUM+" : "Ask ORACULUM+"}</span>
-                  <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 text-[10px] font-mono font-bold border border-amber-500/20">
-                    ORACULUM+
-                  </span>
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {locale === "cs" ? "Ptejte se na svůj typ, tranzity nebo jakýkoliv dotaz k Human Designu" : "Ask about your type, transits, or any Human Design question"}
+              <div className="min-w-0">
+                <p className="mb-2 text-[10px] font-extrabold uppercase tracking-[.24em] text-violet-700">AI Human Design Guide</p>
+                <h2 id="oraculum-footer-heading" className="font-serif text-[clamp(25px,2.5vw,36px)] font-semibold leading-[1.1] text-[#301750]">ORACULUM+</h2>
+                <p className="mt-2 max-w-[380px] text-[13px] leading-6 text-violet-950/75">
+                  {locale === "cs"
+                    ? "Prozkoumejte svůj typ, strategii, autoritu i každodenní otázky s AI průvodcem."
+                    : "Explore your type, strategy, authority and everyday questions with an AI guide."}
                 </p>
               </div>
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              {[
-                locale === "cs" ? "Jaký je můj typ?" : "What is my type?",
-                locale === "cs" ? "Co znamená Sakrál?" : "What is Sacral?",
-                locale === "cs" ? "Jak fungují tranzity?" : "How do transits work?",
-              ].map((q, idx) => (
-                <Link key={idx} href={localePath(`/ai-guide?q=${encodeURIComponent(q)}`)}>
-                  <button className="px-3 py-1.5 rounded-xl bg-background/80 hover:bg-primary/10 border border-border text-xs text-foreground transition-all hover:scale-[1.02]">
-                    ✨ {q}
-                  </button>
-                </Link>
-              ))}
+            <div className="min-w-0">
+              <p className="mb-3 text-[12px] font-semibold text-[#4C2B6B]">
+                {locale === "cs" ? "Vyberte téma, nebo napište vlastní otázku." : "Choose a topic or enter your own question."}
+              </p>
+              <div className="mb-4 flex flex-wrap gap-2">
+                {[
+                  locale === "cs" ? "Jaký je můj typ?" : "What is my type?",
+                  locale === "cs" ? "Co znamená sakrální autorita?" : "What is sacral authority?",
+                  locale === "cs" ? "Jak fungují tranzity?" : "How do transits work?",
+                ].map(question => (
+                  <Link key={question} href={localePath(`/ai-guide?q=${encodeURIComponent(question)}`)}
+                    className="inline-flex min-h-10 items-center gap-2 rounded-full border border-violet-300/70 bg-white/70 px-4 text-[12px] font-medium text-[#41215E] transition-colors hover:border-violet-500 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600">
+                    <span className="text-violet-600" aria-hidden="true">✧</span>{question}
+                  </Link>
+                ))}
+              </div>
+              <form className="flex flex-col gap-2 sm:flex-row" onSubmit={event => {
+                event.preventDefault();
+                const input = event.currentTarget.elements.namedItem("oraculum-question") as HTMLInputElement | null;
+                const question = input?.value.trim();
+                if (question) window.location.assign(localePath(`/ai-guide?q=${encodeURIComponent(question)}`));
+              }}>
+                <label className="sr-only" htmlFor="oraculum-footer-question">
+                  {locale === "cs" ? "Otázka pro ORACULUM+" : "Question for ORACULUM+"}
+                </label>
+                <input id="oraculum-footer-question" name="oraculum-question" required minLength={2}
+                  placeholder={locale === "cs" ? "Na co se chcete zeptat ORACULUM+?" : "What would you like to ask ORACULUM+?"}
+                  className="h-12 min-w-0 flex-1 rounded-xl border border-violet-200 bg-white/90 px-4 text-sm text-[#301750] placeholder:text-violet-900/50 focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                <button type="submit" className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-700 to-violet-600 px-6 text-[13px] font-bold text-white shadow-[0_7px_20px_rgba(93,39,159,.20)] transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600">
+                  {locale === "cs" ? "Zeptat se" : "Ask ORACULUM+"} <Send className="h-4 w-4" />
+                </button>
+              </form>
             </div>
           </div>
-
-          <div className="flex items-center gap-2 pt-2">
-            <input
-              type="text"
-              placeholder={locale === "cs" ? "Zadejte svůj dotaz pro ORACULUM+..." : "Type your question for ORACULUM+..."}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
-                  window.location.href = localePath(`/ai-guide?q=${encodeURIComponent((e.target as HTMLInputElement).value.trim())}`);
-                }
-              }}
-              className="flex-1 px-4 py-3 rounded-2xl bg-background/90 border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/30"
-            />
-            <button
-              onClick={(e) => {
-                const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
-                if (input && input.value.trim()) {
-                  window.location.href = localePath(`/ai-guide?q=${encodeURIComponent(input.value.trim())}`);
-                }
-              }}
-              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-bold shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5"
-            >
-              <span>{locale === "cs" ? "Zeptat se" : "Ask"}</span>
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+        </section>
 
         <div className="mystical-divider mt-8 mb-8" />
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">

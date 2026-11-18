@@ -8,6 +8,7 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import { installStaleChunkRecovery } from "./lib/chunkRecovery";
 import "./index.css";
+import "./styles/sacralSunset.css";
 
 installStaleChunkRecovery();
 
