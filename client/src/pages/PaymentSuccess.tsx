@@ -33,6 +33,11 @@ import Bodygraph from "@/components/Bodygraph";
 import { toast } from "sonner";
 import { generateChartPDF } from "@/lib/pdfExport";
 
+// The annual upgrade has no server-side offer in the ONYX PAY catalog and
+// createCheckout only accepts plan "blueprint". Showing the CTA made paying
+// customers hit an error. Re-enable only after a real catalog offer exists.
+export const ANNUAL_UPGRADE_CHECKOUT_AVAILABLE = false;
+
 export default function PaymentSuccess() {
   const { locale, localePath } = useLanguage();
   const { user } = useAuth();
@@ -586,7 +591,7 @@ export default function PaymentSuccess() {
             ))}
           </motion.div>
 
-          {isBlueprint && (
+          {isBlueprint && ANNUAL_UPGRADE_CHECKOUT_AVAILABLE && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
