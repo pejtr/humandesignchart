@@ -38,6 +38,40 @@ describe("Cloudflare-native Google OAuth release guard", () => {
     expect(response?.status).toBe(404);
   });
 
+  it("serves OAuth readiness for an allowlisted public host proxied through Pages", async () => {
+    const req = new Request("https://humandesignchart-web.pages.dev/api/auth/config", {
+      headers: { "x-forwarded-host": "humandesignmapa.cz" },
+    });
+    const res = await handleGoogleAuth(req, env);
+    expect(res?.status).toBe(200);
+    expect(await res?.json()).toEqual({ google: true });
+  });
+
+  it("uses the public hostname for the Google callback behind a Pages reverse proxy", async () => {
+    const req = new Request("https://humandesignchart-web.pages.dev/api/oauth/login/google", {
+      headers: { "x-forwarded-host": "humandesignchart.app" },
+    });
+    const res = await handleGoogleAuth(req, env);
+    expect(res?.status).toBe(302);
+    const googleUrl = new URL(res!.headers.get("location")!);
+    expect(googleUrl.searchParams.get("redirect_uri")).toBe(
+      "https://humandesignchart.app/api/oauth/callback/google",
+    );
+    expect(res?.headers.get("set-cookie")).toContain("HttpOnly");
+  });
+
+  it("rejects unapproved forwarded OAuth hosts and never trusts them on external direct hosts", async () => {
+    const internal = "https://humandesignchart-web.pages.dev/api/auth/config";
+    const badForwarded = await handleGoogleAuth(new Request(internal, {
+      headers: { "x-forwarded-host": "attacker.invalid" },
+    }), env);
+    expect(badForwarded?.status).toBe(404);
+    const direct = await handleGoogleAuth(new Request("https://attacker.invalid/api/auth/config", {
+      headers: { "x-forwarded-host": "humandesignmapa.cz" },
+    }), env);
+    expect(direct?.status).toBe(404);
+  });
+
   it("returns no authenticated user with missing or malformed cookies", async () => {
     expect(await getSessionUser(new Request(CS + "/"), env)).toBeNull();
     expect(await getSessionUser(new Request(CS + "/", {headers:{"cookie":"__Host-hd_session=bad"}}), env)).toBeNull();

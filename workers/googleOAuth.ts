@@ -1,4 +1,5 @@
 import { createRemoteJWKSet, jwtVerify } from "jose";
+import { publicSeoUrlFromRequest } from "./social-meta";
 
 /** Cloudflare Pages Google OIDC: PKCE, state, nonce, signed ID token, D1 users + hashed sessions. */
 type D1 = any;
@@ -133,7 +134,9 @@ export async function revokeSession(request:Request,env:AuthEnv) {
       .bind(await sha(value)).run();
 }
 export async function handleGoogleAuth(request:Request,env:AuthEnv):Promise<Response|null> {
-  const url=new URL(request.url), path=url.pathname;
+  // Cloudflare Pages can receive an internal *.pages.dev URL behind the branded edge.
+  // Resolve only an allowlisted public hostname before OAuth origin/host validation.
+  const url=publicSeoUrlFromRequest(request), path=url.pathname;
   if (!path.startsWith("/api/oauth/") && path!=="/api/auth/config") return null;
   if (!HOSTS.has(url.hostname))
     return Response.json({error:"UNSUPPORTED_AUTH_HOST"},{status:404,headers:h()});
