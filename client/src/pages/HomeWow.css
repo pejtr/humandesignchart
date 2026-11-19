@@ -18,6 +18,55 @@
     radial-gradient(circle at 36% 97%, rgba(231, 179, 192, .22), transparent 30%),
     radial-gradient(circle at 93% 85%, rgba(181, 153, 244, .18), transparent 25%);
 }
+/* Slow, CSS-only ambient atmosphere behind the Czech homepage hero.
+   Decorative pseudo-elements inherit aria-hidden from .hd-wow-ambient.
+   Animate transforms only: no scroll listeners, JS, filters, or extra requests. */
+.hd-wow-ambient { overflow: hidden; }
+.hd-wow-ambient::before,
+.hd-wow-ambient::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
+}
+.hd-wow-ambient::before {
+  background:
+    radial-gradient(ellipse 35% 31% at 20% 29%, rgba(244, 196, 219, .25), transparent 83%),
+    radial-gradient(ellipse 32% 37% at 78% 31%, rgba(156, 134, 235, .22), transparent 83%),
+    radial-gradient(ellipse 37% 30% at 54% 83%, rgba(255, 221, 164, .28), transparent 83%);
+  animation: hd-wow-ambient-aurora 42s ease-in-out infinite alternate;
+}
+.hd-wow-ambient::after {
+  opacity: .48;
+  background-image:
+    radial-gradient(circle, rgba(177, 132, 209, .47) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(205, 159, 87, .43) 0 .8px, transparent 1.5px),
+    radial-gradient(circle, rgba(140, 121, 197, .32) 0 .7px, transparent 1.4px);
+  background-size: 227px 199px, 317px 269px, 173px 293px;
+  background-position: 30px 35px, 110px 74px, 69px 125px;
+  animation: hd-wow-ambient-stars 65s linear infinite alternate;
+}
+@keyframes hd-wow-ambient-aurora {
+  to { transform: translate3d(3.5%, -2.5%, 0) scale(1.04); }
+}
+@keyframes hd-wow-ambient-stars {
+  to { transform: translate3d(-2%, 2%, 0); }
+}
+@media (max-width: 640px) {
+  /* Battery-friendly static atmosphere on small screens. */
+  .hd-wow-ambient::before,
+  .hd-wow-ambient::after { animation: none; }
+  .hd-wow-ambient::after { opacity: .3; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hd-wow-ambient::before,
+  .hd-wow-ambient::after {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
 .hd-wow-layout {
   position: relative;
   display: grid;
