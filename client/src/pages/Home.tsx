@@ -11,7 +11,7 @@ const SocialProof = lazy(() =>
   import("@/components/SocialProof").then(m => ({ default: m.SocialProof }))
 );
 import { motion } from "framer-motion";
-import { useSEO, OG_IMAGES } from "@/hooks/useSEO";
+import { useSEO } from "@/hooks/useSEO";
 import {
   Compass,
   Brain,
