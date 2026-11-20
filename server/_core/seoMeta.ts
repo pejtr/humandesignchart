@@ -99,7 +99,7 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
     "": {
       title: isEn
         ? "Free Human Design Chart — Calculator & AI Reading | HumanDesignChart.app"
-        : "✨ Human Design Mapa Zdarma — Kalkulátor & AI Výklad 🔮 | HumanDesignMapa.cz",
+        : "Human Design mapa zdarma | Kalkulačka, typy a výklad",
       description: isEn
         ? "Calculate your Human Design chart for free. Discover your type, strategy, authority, and profile. Get a personalized AI reading."
         : "Vypočítejte svou Human Design mapu zdarma. Zjistěte svůj typ, strategii, autoritu a profil. Získejte personalizovaný AI výklad v češtině.",
@@ -122,7 +122,7 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
     calculate: {
       title: isEn
         ? "Human Design Calculator — Free Bodygraph Chart | HumanDesignChart.app"
-        : "Kalkulátor Human Design — Zdarma Tělo Graf 📊 | HumanDesignMapa.cz",
+        : "Human Design kalkulačka zdarma | Bodygraph a osobní mapa",
       description: isEn
         ? "Calculate your Human Design bodygraph for free. Enter your birth data and discover your type, strategy, authority, and profile."
         : "Vypočítejte si svůj Human Design bodygraph zdarma. Zadejte své datum narození a objevte svůj typ, strategii, autoritu a profil.",
@@ -131,10 +131,10 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
     "human-design-kalkulacka": {
       title: isEn
         ? "Human Design Calculator — Free Bodygraph Chart | HumanDesignChart.app"
-        : "Human Design Kalkulačka — Zdarma Výpočet Mapy 🧮 | HumanDesignMapa.cz",
+        : "Human Design kalkulačka zdarma | Výpočet osobní mapy",
       description: isEn
         ? "Calculate your Human Design bodygraph for free. Enter your birth data and discover your type, strategy, authority, and profile."
-        : "Vypočítejte si svůj Human Design zdarma. Zadejte datum, čas a místo narození pro kompletní rozbor vaší energetické mapy.",
+        : "Human Design kalkulačka zdarma: zadejte datum, čas a místo narození, zobrazte si bodygraph, svůj typ, strategii, autoritu a profil.",
       canonical: `${base}/${locale}/human-design-kalkulacka`,
     },
     "human-design-test": {
