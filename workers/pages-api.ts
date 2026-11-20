@@ -22,6 +22,7 @@ import {
 import { BLOG_ARTICLES_EN } from "../server/data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
 import { publicSeoUrlFromRequest, withServerRenderedSeoMeta } from "./social-meta";
+import { agentDiscoveryResponse } from "./agent-discovery";
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
 import { isVerifiedBlueprintPayment } from "../server/payments/blueprintPaymentVerification";
 import { getBlueprintFulfillmentBlocker } from "../server/payments/blueprintFulfillmentGate";
@@ -1479,15 +1480,32 @@ function makeSitemap(requestUrl: URL) {
     <priority>${priority}</priority>
   </url>`;
 
+  // Reciprocal, canonical cross-domain language alternatives for public pages.
+  // URL entries remain scoped to this storefront's own canonical domain.
+  const alternatesFor = (cs: string, en: string) => [
+    '    <xhtml:link rel="alternate" hreflang="cs" href="' + cs + '" />',
+    '    <xhtml:link rel="alternate" hreflang="en" href="' + en + '" />',
+    '    <xhtml:link rel="alternate" hreflang="x-default" href="' + en + '" />',
+  ].join("\n") + "\n";
   for (const page of sitemapStaticPages) {
-    const url = base + (page.loc === "/" ? `/${locale}/` : `/${locale}${page.loc}`);
-    nodes.push(node(url, page.changefreq, page.priority));
+    const suffix = page.loc === "/" ? "/" : page.loc;
+    const cs = "https://humandesignmapa.cz/cs" + suffix;
+    const en = "https://humandesignchart.app/en" + suffix;
+    const url = isEnHost ? en : cs;
+    nodes.push(node(url, page.changefreq, page.priority)
+      .replace("  </url>", alternatesFor(cs, en) + "  </url>"));
   }
 
   const articles = isEnHost ? BLOG_ARTICLES_EN : BLOG_ARTICLES;
   for (const article of articles) {
-    const url = `${base}/${locale}/blog/${article.slug}`;
-    nodes.push(node(url, "monthly", "0.8", article.updatedAt || article.publishedAt || now));
+    const url = base + "/" + locale + "/blog/" + article.slug;
+    const siblingExists = (isEnHost ? BLOG_ARTICLES : BLOG_ARTICLES_EN)
+      .some(other => other.slug === article.slug);
+    const xml = node(url, "monthly", "0.8", article.updatedAt || article.publishedAt);
+    // Different translated slugs are not assumed equivalent without a verified mapping.
+    const cs = "https://humandesignmapa.cz/cs/blog/" + article.slug;
+    const en = "https://humandesignchart.app/en/blog/" + article.slug;
+    nodes.push(siblingExists ? xml.replace("  </url>", alternatesFor(cs, en) + "  </url>") : xml);
   }
 
   if (!isEnHost) {
@@ -1498,7 +1516,7 @@ function makeSitemap(requestUrl: URL) {
   }
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${nodes.join("\n")}
 </urlset>`;
 }
@@ -1845,8 +1863,15 @@ export default {
       }
     }
 
+    // The Pages edge may see *.pages.dev behind our branded reverse proxy.
+    // Use the allowlisted public host for locale-specific discovery surfaces.
+    const discoveryUrl = publicSeoUrlFromRequest(request);
+    if (url.pathname === "/llms.txt" || url.pathname === "/openapi.json") {
+      const result = agentDiscoveryResponse(discoveryUrl);
+      if (result) return result;
+    }
     if (url.pathname === "/sitemap.xml") {
-      return new Response(makeSitemap(url), {
+      return new Response(makeSitemap(discoveryUrl), {
         headers: {
           "content-type": "application/xml; charset=utf-8",
           "cache-control": "public, max-age=3600",
@@ -1855,7 +1880,7 @@ export default {
     }
 
     if (url.pathname === "/robots.txt") {
-      return new Response(makeRobots(url), {
+      return new Response(makeRobots(discoveryUrl), {
         headers: {
           "content-type": "text/plain; charset=utf-8",
           "cache-control": "public, max-age=3600",
