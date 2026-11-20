@@ -149,10 +149,10 @@ export default function Home() {
     isCs
       ? {
           title:
-            "✨ HUMAN DESIGN CZ – Mapa Vašeho Já | Kalkulátor & AI Výklad Zdarma 🔮",
+            "Human Design mapa zdarma | Kalkulačka, typy a výklad",
           description:
-            "🌟 Vypočítejte si svou Human Design mapu zdarma. Přesný kalkulátor, test typu (Generátor, Projektor, Manifestor), denní tranzity a osobitý AI výklad v češtině.",
-          ogImage: OG_IMAGES.homepage,
+            "Vypočítejte Human Design mapu zdarma. Poznejte svůj typ, strategii, autoritu, profil a bodygraph. Český kalkulátor a průvodce výkladem.",
+          ogImage: "https://humandesignmapa.cz/images/og-homepage-cs.png",
           keywords:
             "human design mapa, human design cz, human design kalkulačka, human design zdarma, human design test zdarma, human design typy, bodygraph kalkulátor, human design denní tranzit",
           locale: "cs_CZ",
@@ -205,7 +205,7 @@ export default function Home() {
             "Free Human Design Chart — Type, Authority & Profile | HumanDesignChart.app",
           description:
             "Calculate your Human Design chart free. Discover your type, strategy, authority and profile, then explore deeper personalized insights when you want them.",
-          ogImage: OG_IMAGES.homepage,
+          ogImage: "https://humandesignchart.app/images/og-homepage-en.png",
           keywords:
             "human design calculator free, free human design chart, human design chart calculator, free human design reading, human design map, human design test free, human design transit today, human design chart, human design free, free human design chart reading",
           locale: "en_US",
