@@ -31,13 +31,35 @@ export function safeReturnPath(raw: string | null | undefined, locale: string) {
     !/[\x00-\x1f]/.test(raw) && !/^\/api(\/|$)/i.test(raw)
     ? raw : "/" + locale + "/account";
 }
-export async function googleAvailable(env: AuthEnv): Promise<boolean> {
-  if (!DB(env) || !env.GOOGLE_CLIENT_ID?.trim() || !env.GOOGLE_CLIENT_SECRET?.trim()) return false;
+/** Detailed owner-only log diagnosis. NEVER expose secret values, SQL errors or account data. */
+export type GoogleReadinessCode =
+  | "READY"
+  | "D1_BINDING_MISSING"
+  | "GOOGLE_CLIENT_ID_MISSING"
+  | "GOOGLE_CLIENT_SECRET_MISSING"
+  | "D1_OAUTH_USERS_UNAVAILABLE"
+  | "D1_OAUTH_SESSIONS_UNAVAILABLE";
+
+export async function googleReadinessCode(env: AuthEnv): Promise<GoogleReadinessCode> {
+  const db = DB(env);
+  if (!db || typeof db.prepare !== "function") return "D1_BINDING_MISSING";
+  if (!env.GOOGLE_CLIENT_ID?.trim()) return "GOOGLE_CLIENT_ID_MISSING";
+  if (!env.GOOGLE_CLIENT_SECRET?.trim()) return "GOOGLE_CLIENT_SECRET_MISSING";
   try {
-    await DB(env).prepare("SELECT id FROM hd_oauth_users LIMIT 1").first();
-    await DB(env).prepare("SELECT token_hash FROM hd_oauth_sessions LIMIT 1").first();
-    return true;
-  } catch { return false; }
+    await db.prepare("SELECT id FROM hd_oauth_users LIMIT 1").first();
+  } catch {
+    return "D1_OAUTH_USERS_UNAVAILABLE";
+  }
+  try {
+    await db.prepare("SELECT token_hash FROM hd_oauth_sessions LIMIT 1").first();
+  } catch {
+    return "D1_OAUTH_SESSIONS_UNAVAILABLE";
+  }
+  return "READY";
+}
+
+export async function googleAvailable(env: AuthEnv): Promise<boolean> {
+  return (await googleReadinessCode(env)) === "READY";
 }
 const fail = (url: URL) => {
   const head = h({location: "/" + loc(url.hostname) + "/login?auth=failed"});
@@ -143,7 +165,14 @@ export async function handleGoogleAuth(request:Request,env:AuthEnv):Promise<Resp
   if (path==="/api/auth/config") {
     if (request.method!=="GET" && request.method!=="HEAD")
       return new Response(null,{status:405,headers:h({allow:"GET, HEAD"})});
-    return Response.json({google:await googleAvailable(env)},{headers:h()});
+    const readiness = await googleReadinessCode(env);
+    // On-demand, sanitized Cloudflare Observability breadcrumb for the operator.
+    // Public response remains just {google:boolean}; never log credentials, D1 SQL,
+    // OAuth codes or customer data. Do not expose detailed readiness publicly.
+    if (url.searchParams.get("diagnostic") === "1" && readiness !== "READY") {
+      console.warn("[hd-google-oauth] readiness:", readiness);
+    }
+    return Response.json({google:readiness === "READY"},{headers:h()});
   }
   if (path==="/api/oauth/login" || path==="/api/oauth/login/google") {
     if (request.method!=="GET") return new Response(null,{status:405,headers:h({allow:"GET"})});
