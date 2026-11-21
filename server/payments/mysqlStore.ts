@@ -29,6 +29,8 @@ function purchaseValues(event: NormalizedPaymentEvent) {
         paymentRef: event.paymentRef,
         amountMinor: event.amountMinor,
         expectedAmountMinor: event.offerAmountMinor,
+        minimumAmountMinor: event.minimumAmountMinor ?? null,
+        voluntaryTopUpMinor: event.voluntaryTopUpMinor ?? 0,
         currency: event.currency,
       }
     : { paymentRef: event.paymentRef };

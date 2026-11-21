@@ -52,7 +52,7 @@ export function VipClubBanner() {
             className="bg-amber-400 hover:bg-amber-300 text-purple-950 font-bold text-xs sm:text-sm px-6 py-3 rounded-xl shadow-lg gap-2"
             asChild
           >
-            <Link href={localePath("/pricing") + "#vip"}>
+            <Link href={localePath("/honorace") + "#vip"}>
               <Sparkles className="w-4 h-4 text-purple-950" />
               {isEn ? "Join VIP Club (390 CZK/mo)" : "Vstoupit do VIP Klubu (390 Kč/měs)"}
               <ArrowRight className="w-4 h-4 ml-1" />

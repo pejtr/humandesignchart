@@ -22,13 +22,14 @@ describe("monetization product ladder", () => {
     expect(canGenerateAiReading({ ...freeUser, aiReadingCredits: 1 }, 5).allowed).toBe(true);
   });
 
-  it("credits the Blueprint price toward the annual offer", () => {
+  it("keeps the Blueprint honorarium and existing annual-upgrade contract explicit", () => {
     const blueprint = STRIPE_PRODUCTS.BLUEPRINT.pricesCzk;
     const annualUpgrade = STRIPE_PRODUCTS.BLUEPRINT_ANNUAL_UPGRADE.pricesCzk;
-    expect(blueprint).toBe(39000);
+    expect(blueprint).toBe(29000);
     expect(STRIPE_PRODUCTS.BLUEPRINT_PARTNER_ADDON.pricesCzk).toBe(19000);
     expect(annualUpgrade).toBe(80000);
-    expect(blueprint + annualUpgrade).toBe(STRIPE_PRODUCTS.PREMIUM_ANNUAL.pricesCzk);
+    expect(blueprint + annualUpgrade).toBe(109000);
+    expect(STRIPE_PRODUCTS.PREMIUM_ANNUAL.pricesCzk).toBe(119000);
   });
 
   it("prices the brainwave audio at half of the former 390 CZK offer", () => {

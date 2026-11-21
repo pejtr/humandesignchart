@@ -25,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export default function Navbar() {
+export default function Navbar({ offerMode = false }: { offerMode?: boolean }) {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -115,7 +115,7 @@ export default function Navbar() {
     { ...primaryLinks[1], compactLabel: locale === "cs" ? "Tranzit" : "Transit" },
     { ...primaryLinks[2], compactLabel: locale === "cs" ? "Porovnání" : "Compare" },
     { ...primaryLinks[3], compactLabel: "Blog" },
-    { href: "/pricing", label: locale === "cs" ? "Ceník" : "Pricing", compactLabel: locale === "cs" ? "Ceník" : "Pricing", icon: CreditCard },
+    { href: "/honorace", label: locale === "cs" ? "Honorace" : "Honorarium", compactLabel: locale === "cs" ? "Honorace" : "Honorarium", icon: CreditCard },
   ];
 
   const toolsLinks = [
@@ -165,13 +165,13 @@ export default function Navbar() {
                 Human Design
               </span>
             </Link>
-            <div className="hidden lg:block min-w-0">
+            {!offerMode && <div className="hidden lg:block min-w-0">
               <DailyInsightBadge />
-            </div>
+            </div>}
           </div>
 
           {/* Center: Desktop nav links */}
-          <div className="hidden 2xl:flex flex-1 items-center justify-center gap-1 2xl:gap-2 min-w-0 overflow-hidden">
+          {!offerMode && <div className="hidden 2xl:flex flex-1 items-center justify-center gap-1 2xl:gap-2 min-w-0 overflow-hidden">
             {primaryLinks.map(link => (
               <Link key={link.href} href={localePath(link.href)}>
                 <Button
@@ -233,7 +233,7 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-          </div>
+          </div>}
 
           {/* Compact primary nav: preserve the key actions before opening the menu. */}
           <div className="hidden md:flex 2xl:hidden flex-1 items-center justify-center gap-1 min-w-0">
@@ -258,16 +258,16 @@ export default function Navbar() {
           <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop right section: premium + theme toggle + currency + language + user */}
             <div className="hidden 2xl:flex items-center gap-1.5 shrink-0">
-              <Link href={localePath("/pricing")}>
+              {!offerMode && <Link href={localePath("/honorace")}>
                 <Button
-                  variant={isActive("/pricing") ? "secondary" : "ghost"}
+                  variant={isActive("/honorace") ? "secondary" : "ghost"}
                   size="sm"
                   className="text-xs px-2 gap-1"
                 >
                   <Crown className="w-3.5 h-3.5 text-amber-500" />
                   Premium
                 </Button>
-              </Link>
+              </Link>}
               <div className="w-px h-5 bg-border/50 mx-0.5" />
               <CurrencySelector />
               {/* Theme toggle */}
@@ -348,7 +348,7 @@ export default function Navbar() {
                       {!isPremium && (
                         <>
                           <DropdownMenuSeparator />
-                          <Link href={localePath("/pricing")}>
+                          <Link href={localePath("/honorace")}>
                             <DropdownMenuItem className="text-primary focus:text-primary">
                               <Zap className="w-4 h-4 mr-2" />
                               {locale === "cs" ? "5 výkladů za 49 Kč" : "5 readings – €1.99"}
@@ -518,18 +518,18 @@ export default function Navbar() {
               </Link>
             ))}
             {/* Pricing in main section */}
-            <Link href={localePath("/pricing")}>
+            <Link href={localePath("/honorace")}>
               <button
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-colors mb-1 ${isActive("/pricing")
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-colors mb-1 ${isActive("/honorace")
                   ? "bg-primary/10 text-primary"
                   : "text-foreground hover:bg-muted"
                   }`}
                 onClick={() => setMobileOpen(false)}
               >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive("/pricing") ? "bg-primary/20" : "bg-muted"}`}>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive("/honorace") ? "bg-primary/20" : "bg-muted"}`}>
                   <CreditCard className="w-4 h-4" />
                 </div>
-                <span>{locale === "cs" ? "Ceník" : "Pricing"}</span>
+                <span>{locale === "cs" ? "Honorace" : "Honorarium"}</span>
               </button>
             </Link>
           </div>
@@ -625,7 +625,7 @@ export default function Navbar() {
               </div>
               {/* Upgrade CTA for non-premium users */}
               {!isPremium && (
-                <Link href={localePath("/pricing")}>
+                <Link href={localePath("/honorace")}>
                   <button
                     className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors mb-1"
                     onClick={() => setMobileOpen(false)}

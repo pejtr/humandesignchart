@@ -144,7 +144,7 @@ export function SmartChatWidget() {
             className="w-full bg-gradient-to-r from-amber-500 to-purple-600 text-white font-bold text-xs h-9 rounded-xl gap-1.5"
             asChild
           >
-            <Link href={localePath("/pricing")}>
+            <Link href={localePath("/honorace")}>
               <Crown className="w-3.5 h-3.5 text-amber-300" />
               {isEn ? "Odemknout Neomezené VIP" : "Odemknout Neomezené VIP"}
             </Link>

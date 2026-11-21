@@ -788,7 +788,7 @@ export default function AiGuide() {
                       </p>
                     </div>
                     <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white shrink-0 gap-1.5" asChild>
-              <Link href={localePath("/pricing")}>
+              <Link href={localePath("/honorace")}>
                         <Zap className="w-3.5 h-3.5" />
                         {isEn ? "Upgrade" : "Upgradovat"}
                       </Link>

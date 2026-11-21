@@ -28,7 +28,7 @@ export function SeasonalFlashSaleBanner() {
             : "Sezónní nabídka · Osobní rozbor nyní o 40 % výhodněji"}
         </span>
         <Link
-          href={localePath("/pricing")}
+          href={localePath("/honorace")}
           className="inline-flex shrink-0 items-center gap-1 font-semibold text-purple-700 hover:text-purple-900 dark:text-purple-300 dark:hover:text-white"
         >
           {isEn ? "View offer" : "Zobrazit"}

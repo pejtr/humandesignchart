@@ -15,6 +15,8 @@ export const paymentPurchaseEventSchema = baseEventSchema.extend({
   paymentRef: z.string().min(1).max(255),
   amountMinor: z.number().int().nonnegative(),
   offerAmountMinor: z.number().int().positive(),
+  minimumAmountMinor: z.number().int().positive().optional(),
+  voluntaryTopUpMinor: z.number().int().nonnegative().optional(),
   currency: z.enum(["CZK", "EUR"]),
   partnerAddon: z.boolean().default(false),
   affiliateCode: z.string().max(64).optional(),

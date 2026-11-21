@@ -49,7 +49,7 @@ export default function CustomerPortal() {
             className="bg-amber-400 hover:bg-amber-300 text-purple-950 font-bold text-xs rounded-xl px-4 h-9 gap-1.5 shrink-0"
             asChild
           >
-            <Link href={localePath("/pricing") + "#vip"}>
+            <Link href={localePath("/honorace") + "#vip"}>
               <Crown className="w-4 h-4" />
               {isEn ? "VIP Club Member" : "Spravovat VIP Členství"}
             </Link>
@@ -121,7 +121,7 @@ export default function CustomerPortal() {
               {isEn ? "Redeem or generate gift reading vouchers." : "Uplatněte nebo vytvořte dárkový poukaz na výklad pro své blízké."}
             </p>
             <Button size="sm" variant="outline" className="w-full text-xs h-9 rounded-xl" asChild>
-              <Link href={localePath("/pricing")}>
+              <Link href={localePath("/honorace")}>
                 {isEn ? "Redeem Voucher" : "Uplatnit Dárkový Poukaz"}
               </Link>
             </Button>

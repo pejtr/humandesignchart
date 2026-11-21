@@ -21,7 +21,7 @@ export function PartnerSynergyVisualizer({
   const isEn = locale === "en";
   const destination = isPremium
     ? `${localePath("/compare")}${chartId ? `?chartId=${chartId}` : ""}`
-    : `${localePath("/pricing")}#plans`;
+    : `${localePath("/honorace")}#plans`;
   const hasNamedPartner = Boolean(person2Name && person2Name !== "Partner");
 
   return (

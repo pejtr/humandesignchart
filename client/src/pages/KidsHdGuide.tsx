@@ -124,7 +124,7 @@ export default function KidsHdGuide() {
               className="bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs h-11 px-6 rounded-xl shadow-lg gap-2 shrink-0"
               asChild
             >
-              <Link href={localePath("/pricing")}>
+              <Link href={localePath("/honorace")}>
                 <Sparkles className="w-4 h-4" />
                 {isEn ? "Get Child Blueprint" : "Získat Dětský Blueprint"}
                 <ArrowRight className="w-4 h-4 ml-1" />

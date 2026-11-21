@@ -241,12 +241,12 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
     },
     pricing: {
       title: isEn
-        ? "Pricing — Human Design Plans & Features | HumanDesignChart.app"
-        : "Ceník — Plány a Funkce Human Design 💰 | HumanDesignMapa.cz",
+        ? "Honorarium — Membership and voluntary support | HumanDesignChart.app"
+        : "Honorace — Členství a dobrovolná podpora | HumanDesignMapa.cz",
       description: isEn
-        ? "Choose the right Human Design plan for you. Free, Pro, and Premium options with AI readings, transit alerts, and more."
-        : "Vyberte si správný plán Human Design. Zdarma, Pro a Premium možnosti s AI výklady, upozorněními na tranzity a dalšími.",
-      canonical: `${base}/${locale}/pricing`,
+        ? "Transparent minimum service prices and optional voluntary support for Human Design."
+        : "Transparentní minimální honorace za službu a dobrovolná podpora dalšího rozvoje Human Design.",
+      canonical: `${base}/${locale}/honorace`,
     },
     blog: {
       title: isEn

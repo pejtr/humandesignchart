@@ -80,7 +80,7 @@ export function LockedContentBlurTeaser({
             className="w-full bg-gradient-to-r from-amber-500 via-purple-600 to-indigo-600 hover:from-amber-600 hover:to-indigo-700 text-white font-bold text-sm shadow-lg shadow-purple-900/20 rounded-xl gap-2 transition-all hover:scale-[1.02]"
             asChild
           >
-            <Link href={localePath("/pricing")}>
+            <Link href={localePath("/honorace")}>
               <Sparkles className="w-4 h-4 text-amber-300" />
               {isEn ? "Unlock Full Reading" : "Odemknout plný rozbor s Maríí"}
               <ArrowRight className="w-4 h-4 ml-auto" />

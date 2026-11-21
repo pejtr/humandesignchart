@@ -33,7 +33,7 @@ export function registerSeoRoutes(app: Express) {
       { loc: "/types/manifestor", priority: "0.9", changefreq: "monthly" },
       { loc: "/types/reflector", priority: "0.9", changefreq: "monthly" },
       { loc: "/blog", priority: "0.9", changefreq: "weekly" },
-      { loc: "/pricing", priority: "0.6", changefreq: "monthly" },
+      { loc: "/honorace", priority: "0.6", changefreq: "monthly" },
       { loc: "/human-design-kalkulacka", priority: "0.9", changefreq: "monthly" },
       { loc: "/human-design-test", priority: "0.8", changefreq: "monthly" },
       { loc: "/human-design-typy", priority: "0.8", changefreq: "monthly" },

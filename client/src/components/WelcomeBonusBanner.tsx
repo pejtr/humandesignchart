@@ -61,7 +61,7 @@ export function WelcomeBonusBanner() {
             className="bg-amber-400 hover:bg-amber-300 text-purple-950 font-bold text-xs px-3.5 py-1.5 rounded-lg shadow-sm gap-1 transition-all hover:scale-105"
             asChild
           >
-            <Link href={localePath("/pricing")}>
+            <Link href={localePath("/honorace")}>
               {isEn ? "Claim 30% Off" : "Využít 30% slevu"}
               <ArrowRight className="w-3 h-3" />
             </Link>

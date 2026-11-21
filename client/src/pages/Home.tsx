@@ -770,7 +770,7 @@ export default function Home() {
             asChild
             className="shrink-0 bg-violet-700 text-white hover:bg-violet-800"
           >
-            <Link href={localePath("/pricing") + "#blueprint"}>
+            <Link href={localePath("/honorace") + "#blueprint"}>
               {isCs ? "Poznat svůj Blueprint" : "Discover my Blueprint"}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

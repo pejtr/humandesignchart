@@ -32,7 +32,9 @@ export async function handleComgateWebhook(req: Request, res: Response) {
     const productKey = metadata?.p;
     const currency = info.curr?.toUpperCase();
     const amountMinor = Number(info.price);
-    if (!metadata || !Number.isInteger(userId) || userId <= 0 || !isPaymentProductKey(productKey) || (currency !== "CZK" && currency !== "EUR") || !Number.isInteger(amountMinor) || amountMinor < 0) {
+    const minimumAmountMinor = Number(metadata?.hm);
+    const voluntaryTopUpMinor = Number(metadata?.ht ?? 0);
+    if (!metadata || !Number.isInteger(userId) || userId <= 0 || !isPaymentProductKey(productKey) || (currency !== "CZK" && currency !== "EUR") || !Number.isInteger(amountMinor) || amountMinor < 0 || (productKey === "blueprint" && (!Number.isInteger(minimumAmountMinor) || !Number.isInteger(voluntaryTopUpMinor)))) {
       await recordPaymentAuditEvent({ provider: "comgate", eventId, eventType: "payment.paid", code: "UNMATCHABLE_PAYMENT", message: "Verified Comgate payment has invalid or missing server metadata.", rawPayload, paymentRef: transId });
       return res.status(200).send("code=0&message=OK");
     }
@@ -47,6 +49,8 @@ export async function handleComgateWebhook(req: Request, res: Response) {
       paymentRef: transId,
       amountMinor,
       offerAmountMinor: amountMinor,
+      minimumAmountMinor: productKey === "blueprint" ? minimumAmountMinor : undefined,
+      voluntaryTopUpMinor,
       currency,
       partnerAddon: metadata.partner === 1,
       affiliateCode: typeof metadata.a === "string" ? metadata.a : undefined,

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { protectedProcedure, router } from "../_core/trpc";
+import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import {
     consumeBlueprintPdfCredit,
     countAiReadingsByUser,
@@ -11,8 +11,13 @@ import { getStripe } from "../stripeWebhook";
 import { isPremiumUser, canGenerateAiReading, FREE_TIER } from "../stripeProducts";
 import { ENV } from "../_core/env";
 import { createManagedCheckoutSession } from "../stripeCheckout";
+import { getBlueprintOffer } from "../payments/publicOfferCatalog";
+import { resolveHonorariumSelection } from "../payments/honorarium";
 
 export const subscriptionRouter = router({
+    blueprintOffer: publicProcedure
+        .input(z.object({ locale: z.enum(["cs", "en"]).default("cs") }))
+        .query(({ input }) => getBlueprintOffer(input.locale)),
     status: protectedProcedure.query(async ({ ctx }) => {
         const user = ctx.user;
         const totalReadings = await countAiReadingsByUser(user.id);
@@ -36,6 +41,7 @@ export const subscriptionRouter = router({
             locale: z.string().default("cs"),
             origin: z.string(),
             includePartnerAddon: z.boolean().default(false),
+            voluntaryTopUpMinor: z.number().int().min(0).max(1_000_000).default(0),
             recipientEmail: z.string().email().optional(),
             recipientName: z.string().optional(),
             senderName: z.string().optional(),
@@ -66,25 +72,47 @@ export const subscriptionRouter = router({
                 await updateUserSubscription(user.id, { stripeCustomerId: customerId });
             }
             const priceData = {
-                monthly: { czk: 18800, eur: 749, name: "Human Design Premium - Mesicni", taxCode: "txcd_10103000" },
-                annual: { czk: 118800, eur: 4700, name: "Human Design Premium - Rocni", taxCode: "txcd_10103000" },
+                monthly: { czk: 18900, eur: 790, name: "Human Design Premium - Mesicni", taxCode: "txcd_10103000" },
+                annual: { czk: 119000, eur: 4800, name: "Human Design Premium - Rocni", taxCode: "txcd_10103000" },
                 lifetime: { czk: 288800, eur: 11500, name: "Human Design Premium - Dozivotne", taxCode: "txcd_10103000" },
                 credits: { czk: 7700, eur: 299, name: "Human Design AI Credits (5x)", taxCode: "txcd_10105001" },
                 brainwave_audio: { czk: 19500, eur: 790, name: "12minutove Human Design binauralni audio", taxCode: "txcd_10701411" },
-                blueprint: { czk: 39000, eur: 1590, name: "Osobni Human Design Blueprint", taxCode: "txcd_10701411" },
-                blueprint_annual_upgrade: { czk: 79800, eur: 3190, name: "Rocni Premium - doplatek po Blueprintu", taxCode: "txcd_10103000" },
+                blueprint: { czk: 29000, eur: 1590, name: "Osobni Human Design Blueprint", taxCode: "txcd_10701411" },
+                blueprint_annual_upgrade: { czk: 80000, eur: 3210, name: "Rocni Premium - doplatek po Blueprintu", taxCode: "txcd_10103000" },
                 gift_monthly: { czk: 18800, eur: 749, name: "Darkovy poukaz - Premium Mesic", taxCode: "txcd_10103000" },
                 gift_annual: { czk: 118800, eur: 4700, name: "Darkovy poukaz - Premium Rok", taxCode: "txcd_10103000" },
             }[input.plan];
             const currency = isCzech ? "czk" : "eur";
-            const unitAmount = isCzech ? priceData.czk : priceData.eur;
-            const partnerAddonAmount = isCzech ? 19000 : 790;
+            const paymentCurrency = isCzech ? "CZK" : "EUR";
+            // Blueprint is deliberately read from the canonical offer catalog for
+            // both presentation and both payment providers. Legacy plans retain
+            // their current contract until they are audited independently.
+            const blueprintOffer = input.plan === "blueprint"
+                ? getBlueprintOffer(isCzech ? "cs" : "en")
+                : null;
+            const honorarium = input.plan === "blueprint"
+                ? resolveHonorariumSelection({
+                    productId: input.plan,
+                    currency: paymentCurrency,
+                    partnerAddon: input.includePartnerAddon,
+                    voluntaryTopUpMinor: input.voluntaryTopUpMinor,
+                })
+                : null;
+            // Legacy offers retain their existing price contract. Honorarium is
+            // intentionally confined to Blueprint until every product is audited.
+            const unitAmount = honorarium?.minimumAmountMinor ?? priceData[currency];
+            const partnerAddonAmount = blueprintOffer?.partnerAddon.amountMinor ?? (isCzech ? 19000 : 790);
+            const productName = blueprintOffer?.name ?? priceData.name;
             const metadata: Record<string, string> = {
                 user_id: user.id.toString(),
                 customer_email: user.email || "",
                 customer_name: user.name || "",
                 plan: input.plan,
                 partner_addon: input.plan === "blueprint" && input.includePartnerAddon ? "true" : "false",
+                ...(honorarium ? {
+                    honorarium_minimum_minor: String(honorarium.minimumAmountMinor),
+                    voluntary_top_up_minor: String(honorarium.voluntaryTopUpMinor),
+                } : {}),
             };
             if (input.redditClickId) metadata.rdt_cid = input.redditClickId;
             if (isGift) {
@@ -96,7 +124,7 @@ export const subscriptionRouter = router({
             const successUrl = `${input.origin}/${input.locale}/payment/success?plan=${input.plan}&session_id={CHECKOUT_SESSION_ID}`;
             const cancelUrl = `${input.origin}/${input.locale}/payment/cancel`;
 
-            if (!isSubscription && isCzech && ENV.comgateMerchantId) {
+            if (!isSubscription && isCzech && ENV.comgateMerchantId && (honorarium?.voluntaryTopUpMinor ?? 0) === 0) {
                 const { createComgateCheckoutSession } = await import("../_core/comgate");
                 
                 const rawMeta: any = {
@@ -105,6 +133,7 @@ export const subscriptionRouter = router({
                         email: user.email,
                         name: user.name,
                         partner: input.plan === "blueprint" && input.includePartnerAddon ? 1 : 0,
+                        ...(honorarium ? { hm: honorarium.minimumAmountMinor, ht: honorarium.voluntaryTopUpMinor } : {}),
                 };
                 if (input.recipientEmail) rawMeta.recEmail = input.recipientEmail;
                 if (input.recipientName) rawMeta.recName = input.recipientName;
@@ -114,9 +143,9 @@ export const subscriptionRouter = router({
 
                 try {
                     const comgateRes = await createComgateCheckoutSession({
-                        price: unitAmount + (input.plan === "blueprint" && input.includePartnerAddon ? partnerAddonAmount : 0),
+                        price: honorarium?.totalAmountMinor ?? unitAmount,
                         currency: "CZK",
-                        label: priceData.name,
+                        label: productName,
                         refId: refId,
                         email: user.email || "neznamy@zakaznik.cz",
                         lang: "cs"
@@ -133,7 +162,7 @@ export const subscriptionRouter = router({
                     customer: customerId,
                     client_reference_id: user.id.toString(),
                     metadata,
-                    allow_promotion_codes: true,
+                    allow_promotion_codes: input.plan !== "blueprint",
                     // Stripe Managed Payments selects eligible methods dynamically.
                     // Apple Pay / Google Pay remain available through card wallets;
                     // PayPal appears only when the account, currency and buyer qualify.
@@ -143,7 +172,7 @@ export const subscriptionRouter = router({
                             unit_amount: unitAmount,
                             recurring: { interval: input.plan === "monthly" ? "month" : "year" },
                             product_data: {
-                                name: priceData.name,
+                                name: productName,
                                 tax_code: priceData.taxCode,
                                 metadata: { plan: input.plan },
                             },
@@ -161,7 +190,7 @@ export const subscriptionRouter = router({
                         currency,
                         unit_amount: unitAmount,
                         product_data: {
-                            name: priceData.name,
+                            name: productName,
                             tax_code: priceData.taxCode,
                             metadata: { plan: input.plan },
                         },
@@ -182,12 +211,26 @@ export const subscriptionRouter = router({
                         quantity: 1,
                     });
                 }
+                if (input.plan === "blueprint" && (honorarium?.voluntaryTopUpMinor ?? 0) > 0) {
+                    lineItems.push({
+                        price_data: {
+                            currency,
+                            unit_amount: honorarium.voluntaryTopUpMinor,
+                            product_data: {
+                                tax_code: "txcd_10701411",
+                                name: isCzech ? "Dobrovolné navýšení honorace" : "Voluntary honorarium top-up",
+                                metadata: { plan: "blueprint_voluntary_top_up", non_entitlement: "true" },
+                            },
+                        },
+                        quantity: 1,
+                    });
+                }
                 const session = await createManagedCheckoutSession(stripe, {
                     mode: "payment",
                     customer: customerId,
                     client_reference_id: user.id.toString(),
                     metadata,
-                    allow_promotion_codes: true,
+                    allow_promotion_codes: input.plan !== "blueprint",
                     line_items: lineItems,
                     success_url: successUrl,
                     cancel_url: cancelUrl,

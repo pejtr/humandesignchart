@@ -60,4 +60,37 @@ describe("User-facing copy and visual regression contracts", () => {
     expect(seoRoutes).toContain("# Human Design Mapa");
     expect(vite).toContain('url === "/llms.txt"');
   });
+
+  it("keeps pricing focused on one server-priced Blueprint without fabricated proof", () => {
+    const pricing = source("client/src/pages/Pricing.tsx");
+    const subscription = source("server/routers/subscription.ts");
+    expect(pricing).toContain("subscription.blueprintOffer");
+    expect(pricing).toContain("Personal Human Design Blueprint");
+    expect(pricing).not.toContain("CustomerReviewsWidget");
+    expect(pricing).not.toContain("VipClubBanner");
+    expect(pricing).not.toContain("SmartCouponWidget");
+    expect(pricing).not.toContain("4.9 / 5.0");
+    expect(pricing).not.toContain("48 hodin");
+    expect(subscription).toContain("getBlueprintOffer(isCzech ? \"cs\" : \"en\")");
+    expect(subscription).toContain("resolveHonorariumSelection");
+    expect(subscription).toContain("const unitAmount = honorarium?.minimumAmountMinor ?? priceData[currency]");
+  });
+
+  it("uses Honorace as canonical route while preserving legacy pricing and cenik aliases", () => {
+    const app = source("client/src/App.tsx");
+    const seoRoutes = source("server/_core/routes/seo.ts");
+    expect(app).toContain('path="/:locale/honorace"');
+    expect(app).toContain('path="/:locale/pricing"');
+    expect(app).toContain('path="/:locale/cenik"');
+    expect(app).toContain("HonoraceAliasRedirect");
+    expect(seoRoutes).toContain('"/honorace"');
+  });
+
+  it("changes the calculator hero context with the selected chart recipient", () => {
+    const calculator = source("client/src/pages/ChartCalculator.tsx");
+    expect(calculator).toContain("CALCULATOR_HERO_VISUALS");
+    expect(calculator).toContain("style={{ background: heroVisual.background }}");
+    expect(calculator).toContain("aria-pressed={active}");
+    expect(calculator).not.toContain("opacity-40 pointer-events-none select-none");
+  });
 });

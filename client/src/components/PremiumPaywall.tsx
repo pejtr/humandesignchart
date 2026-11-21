@@ -133,7 +133,7 @@ export default function PremiumPaywall({ variant = "inline", onClose, title, des
               <Zap className="w-4 h-4 mr-2" />
               {isCzech ? "5 kreditů za 49 Kč" : "5 credits for €1.99"}
             </Button>
-            <Link href={`/${locale}/pricing`}>
+            <Link href={`/${locale}/honorace`}>
               <Button variant="ghost" size="sm" className="w-full text-muted-foreground text-xs">
                 {isCzech ? "Zobrazit všechny plány" : "View all plans"}
               </Button>
@@ -187,7 +187,7 @@ export default function PremiumPaywall({ variant = "inline", onClose, title, des
           {isCzech ? "5 kreditů / 49 Kč" : "5 credits / €1.99"}
         </Button>
       </div>
-      <Link href={`/${locale}/pricing`}>
+      <Link href={`/${locale}/honorace`}>
         <p className="text-xs text-muted-foreground mt-3 hover:text-foreground cursor-pointer transition-colors">
           {isCzech ? "Zobrazit všechny plány →" : "View all plans →"}
         </p>

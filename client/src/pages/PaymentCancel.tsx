@@ -23,7 +23,7 @@ export default function PaymentCancel() {
     { q: "Had a technical issue?", a: "Try again with card 4242 4242 4242 4242 (test mode) or contact support." },
     { q: "Not sure if it's worth it?", a: "You still have 5 free AI readings — try them first, then decide." },
   ] : [
-    { q: "Rozmysleli jste si to?", a: "Žádný problém — můžete upgradovat kdykoli ze stránky Ceník." },
+    { q: "Rozmysleli jste si to?", a: "Žádný problém — k nabídce se můžete kdykoli vrátit na stránce Honorace." },
     { q: "Měli jste technický problém?", a: "Zkuste to znovu nebo nás kontaktujte na podpoře." },
     { q: "Nejste si jisti hodnotou?", a: "Stále máte 5 bezplatných AI výkladů — nejprve je vyzkouejte, pak se rozhodněte." },
   ];
@@ -85,7 +85,7 @@ export default function PaymentCancel() {
             transition={{ delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-3 justify-center"
           >
-            <Link href={localePath("/pricing")}>
+            <Link href={localePath("/honorace")}>
               <Button className="gap-2 bg-purple-600 hover:bg-purple-700 text-white">
                 <CreditCard className="w-4 h-4" />
                 {isEn ? "Try again" : "Zkusit znovu"}
