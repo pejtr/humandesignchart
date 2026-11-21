@@ -7,7 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider, useLanguage, isSupportedLocale } from "./contexts/LanguageContext";
 import { CurrencyProvider } from "./contexts/CurrencyContext";
 import { AbTestingProvider } from "./contexts/AbTestingContext";
-import { JsonLdHead } from "./components/JsonLdHead";
+
 import Home from "./pages/Home";
 import { lazy, Suspense, useEffect } from "react";
 import HDLoader from "./components/HDLoader";
@@ -427,7 +427,8 @@ function App() {
           <LanguageProvider>
             <CurrencyProvider>
               <AbTestingProvider>
-                <JsonLdHead />
+                {/* SEO schemas are already supplied by the index shell and route-specific useSEO.
+                     Do not inject legacy Avanito/humandesign.cz WebApplication markup. */}
                 <Toaster />
               <ReferralApplier />
               <WelcomeModalWrapper />
