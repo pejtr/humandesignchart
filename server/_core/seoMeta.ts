@@ -53,6 +53,16 @@ export function buildSeoHead(locale: string, pathname: string): string {
   const suffix = unprefixedPath.startsWith("/") ? unprefixedPath : `/${unprefixedPath}`;
   const csAlt = `${CS}/cs${suffix}`;
   const enAlt = `${EN}/en${suffix}`;
+  // Google hreflang requires equivalent content on both destinations.
+  // CZ and EN blog slugs often differ; only pair identical, published slugs.
+  // Angel-number editorial is currently sourced from the Czech catalog only.
+  const blogMatch = /^\/blog\/([^/]+)$/.exec(suffix);
+  const hasMatchingBlogTranslation = !blogMatch ||
+    (BLOG_ARTICLES.some(item => item.slug === blogMatch[1]) &&
+      BLOG_ARTICLES_EN.some(item => item.slug === blogMatch[1]));
+  const supportsTranslatedAlternate = !meta.noIndex &&
+    !/^\/andelska-cisla(?:\/|$)/.test(suffix) &&
+    hasMatchingBlogTranslation;
 
   return [
     `<title>${escapeHtml(meta.title)}</title>`,
@@ -80,9 +90,9 @@ export function buildSeoHead(locale: string, pathname: string): string {
     `<meta name="twitter:site" content="@humandesignmapa" />`,
     meta.keywords ? `<meta name="keywords" content="${escapeHtml(meta.keywords)}" />` : "",
     `<link rel="canonical" href="${canonical}" />`,
-    `<link rel="alternate" hreflang="cs" href="${csAlt}" />`,
-    `<link rel="alternate" hreflang="en" href="${enAlt}" />`,
-    `<link rel="alternate" hreflang="x-default" href="${enAlt}" />`,
+    supportsTranslatedAlternate ? `<link rel="alternate" hreflang="cs" href="${csAlt}" />` : "",
+    supportsTranslatedAlternate ? `<link rel="alternate" hreflang="en" href="${enAlt}" />` : "",
+    supportsTranslatedAlternate ? `<link rel="alternate" hreflang="x-default" href="${enAlt}" />` : "",
   ]
     .filter(Boolean)
     .join("\n    ");
