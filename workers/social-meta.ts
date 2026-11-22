@@ -4,6 +4,7 @@
  * Never rewrite hreflang alternates after their generation.
  */
 import { buildSeoHead } from "../server/_core/seoMeta";
+import { initialPublicHtml } from "./seo-static-content";
 
 
 // An upstream Cloudflare reverse proxy can make request.url point to the
@@ -69,6 +70,14 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
       ? html.replace("<!--SEO_META-->", meta)
       : html.replace(/<\/head>/i, `  ${meta}\n</head>`);
 
+  // Render a real H1, published article excerpt and crawlable links in
+  // first-paint HTML, not only an empty React root. It is visible to all
+  // visitors until the SPA mounts and replaces the content.
+  const fallback = initialPublicHtml(url);
+  const populated = fallback
+    ? rendered.replace(/<div id="root">\s*<\/div>/, '<div id="root">' + fallback + '</div>')
+    : rendered;
+
   const headers = new Headers(asset.headers);
   headers.delete("content-length");
   headers.delete("content-encoding");
@@ -76,7 +85,18 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
   headers.set("content-type", "text/html; charset=utf-8");
   headers.set("content-language", htmlLang);
 
-  return new Response(rendered, {
+  // Private pages, URLs in the wrong language for this domain and previews
+  // must not compete for canonical indexation. No redirects are introduced,
+  // preserving OAuth same-host callback cookies and checkout sessions.
+  const crossBrandLocale = (enHost && locale === "cs") ||
+    (["humandesignmapa.cz", "www.humandesignmapa.cz"].includes(url.hostname) && locale === "en");
+  const privatePage = /^\/(?:cs\/|en\/)?(?:login|account|dashboard|portal|admin|payment|crm-dashboard|social-scheduler|ugc-factory|vsl|chat-reading|vsl-chat|refer|chart)(?:\/|$)/.test(url.pathname);
+  if (crossBrandLocale || privatePage ||
+      /^\/(?:cs|en)\/motion-preview\/?$/.test(url.pathname)) {
+    headers.set("x-robots-tag", "noindex, follow");
+  }
+
+  return new Response(populated, {
     status: asset.status,
     statusText: asset.statusText,
     headers,
