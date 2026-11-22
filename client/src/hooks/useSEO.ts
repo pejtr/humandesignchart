@@ -53,6 +53,39 @@ function setMeta(selector: string, attr: string, value: string) {
   el.setAttribute(attr, value);
 }
 
+/**
+ * Same canonical URL before and after React hydration. Prevent "www" and
+ * calculator aliases from producing duplicate canonical URLs in Google.
+ */
+export function canonicalPublicUrl(raw: string): string {
+  try {
+    const url = new URL(raw, typeof window !== "undefined" ? window.location.origin : "https://humandesignchart.app");
+    const host = url.hostname.toLowerCase();
+    if (!/^(?:www\.)?(?:humandesignchart\.app|humandesignmapa\.cz)$/.test(host)) {
+      return url.origin + url.pathname;
+    }
+    if (/^\/en(?:\/|$)/.test(url.pathname)) url.hostname = "humandesignchart.app";
+    else if (/^\/cs(?:\/|$)/.test(url.pathname)) url.hostname = "humandesignmapa.cz";
+    else url.hostname = host.replace(/^www\./, "");
+    url.protocol = "https:";
+    url.port = "";
+    if (url.pathname === "/") {
+      url.pathname = url.hostname === "humandesignchart.app" ? "/en/" : "/cs/";
+    } else if (url.pathname === "/en" || url.pathname === "/cs") {
+      url.pathname += "/";
+    } else if (url.pathname === "/en/human-design-kalkulacka") {
+      url.pathname = "/en/calculate";
+    } else if (url.pathname === "/cs/calculate") {
+      url.pathname = "/cs/human-design-kalkulacka";
+    }
+    return url.origin + url.pathname;
+  } catch {
+    // Safe fallback for malformed or older supplied links. Never make an
+    // invalid scheme into an indexable canonical URL.
+    return raw.split(/[?#]/)[0];
+  }
+}
+
 function setCanonical(href: string) {
   let el = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
   if (!el) {
@@ -138,7 +171,7 @@ export function useSEO(options: SEOOptions) {
     setMeta('meta[property="og:title"]', "content", title);
     setMeta('meta[property="og:description"]', "content", description);
     setMeta('meta[property="og:type"]', "content", ogType);
-    setMeta('meta[property="og:url"]', "content", ogUrl);
+    setMeta('meta[property="og:url"]', "content", canonicalPublicUrl(ogUrl));
     setMeta('meta[property="og:image"]', "content", ogImage);
     setMeta('meta[property="og:image:width"]', "content", "1200");
     setMeta('meta[property="og:image:height"]', "content", "630");
@@ -167,7 +200,7 @@ export function useSEO(options: SEOOptions) {
     }
 
     // Canonical URL
-    const canonicalUrl = ogUrl.split("?")[0];
+    const canonicalUrl = canonicalPublicUrl(ogUrl);
     setCanonical(canonicalUrl);
 
     // Hreflang alternate links
