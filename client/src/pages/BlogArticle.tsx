@@ -122,9 +122,11 @@ export default function BlogArticle({ slug: propSlug }: { slug?: string } = {}) 
   const { data: listData } = trpc.content.blogList.useQuery({ locale });
 
   const articleSlug = article?.slug || slug;
-  const csBase = "https://www.humandesignmapa.cz";
-  const enBase = "https://www.humandesignchart.app";
-  const articleUrl = `https://${locale === 'cs' ? csBase : enBase}/${locale}/blog/${articleSlug}`;
+  const csBase = "https://humandesignmapa.cz";
+  const enBase = "https://humandesignchart.app";
+  // The bases already include https://. Never double-prepend the scheme:
+  // https://https://... produced invalid article canonicals and OG URLs.
+  const articleUrl = `${locale === 'cs' ? csBase : enBase}/${locale}/blog/${articleSlug}`;
 
   useSEO(article ? {
     title: article.metaTitle,
@@ -137,10 +139,8 @@ export default function BlogArticle({ slug: propSlug }: { slug?: string } = {}) 
     articlePublishedTime: article.publishedAt,
     articleModifiedTime: article.updatedAt,
     twitterCreator: "@humandesignmapa",
-    alternateLocales: [
-      { lang: 'cs', url: `${csBase}/cs/blog/${articleSlug}` },
-      { lang: 'en', url: `${enBase}/en/blog/${articleSlug}` },
-    ],
+    // Do not invent a translated article at the same slug. The server emits
+    // hreflang only for actual bilingual article pairs.
     jsonLd: [
       {
         "@context": "https://schema.org",
