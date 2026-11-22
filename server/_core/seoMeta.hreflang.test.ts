@@ -36,7 +36,7 @@ describe("localized SEO alternate links", () => {
 
   it("emits hreflang only for production-ready cs, en locales and x-default", () => {
     const html = buildSeoHead("cs", "/cs/calculate");
-    expect(html).toContain('hreflang="cs" href="https://humandesignmapa.cz/cs/calculate"');
+    expect(html).toContain('hreflang="cs" href="https://humandesignmapa.cz/cs/human-design-kalkulacka"');
     expect(html).toContain('hreflang="en" href="https://humandesignchart.app/en/calculate"');
     expect(html).not.toContain('hreflang="de"');
     expect(html).not.toContain('hreflang="fr"');

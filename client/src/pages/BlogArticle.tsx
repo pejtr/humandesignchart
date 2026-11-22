@@ -51,8 +51,9 @@ function renderMarkdown(md: string): string {
 // ─── Social Share Buttons Component ──────────────────────────────────────────
 function ShareButtons({ article, isEn, locale }: { article: { slug: string; title: string; excerpt: string }; isEn: boolean; locale: string }) {
   const [copied, setCopied] = useState(false);
-  const baseUrl = locale === 'en' ? 'https://www.humandesignchart.app' : 'https://www.humandesignmapa.cz';
-  const articleUrl = `${baseUrl}/blog/${article.slug}`;
+  const baseUrl = locale === 'en' ? 'https://humandesignchart.app' : 'https://humandesignmapa.cz';
+  // Share the canonical locale route, not a legacy /blog alias.
+  const articleUrl = `${baseUrl}/${locale}/blog/${article.slug}`;
   const shareText = `${article.title} — ${article.excerpt.slice(0, 100)}...`;
 
   const handleCopy = async () => {
@@ -122,9 +123,11 @@ export default function BlogArticle({ slug: propSlug }: { slug?: string } = {}) 
   const { data: listData } = trpc.content.blogList.useQuery({ locale });
 
   const articleSlug = article?.slug || slug;
-  const csBase = "https://www.humandesignmapa.cz";
-  const enBase = "https://www.humandesignchart.app";
-  const articleUrl = `https://${locale === 'cs' ? csBase : enBase}/${locale}/blog/${articleSlug}`;
+  const csBase = "https://humandesignmapa.cz";
+  const enBase = "https://humandesignchart.app";
+  // The bases already include https://. Never double-prepend the scheme:
+  // https://https://... produced invalid article canonicals and OG URLs.
+  const articleUrl = `${locale === 'cs' ? csBase : enBase}/${locale}/blog/${articleSlug}`;
 
   useSEO(article ? {
     title: article.metaTitle,
@@ -137,10 +140,8 @@ export default function BlogArticle({ slug: propSlug }: { slug?: string } = {}) 
     articlePublishedTime: article.publishedAt,
     articleModifiedTime: article.updatedAt,
     twitterCreator: "@humandesignmapa",
-    alternateLocales: [
-      { lang: 'cs', url: `${csBase}/cs/blog/${articleSlug}` },
-      { lang: 'en', url: `${enBase}/en/blog/${articleSlug}` },
-    ],
+    // Do not invent a translated article at the same slug. The server emits
+    // hreflang only for actual bilingual article pairs.
     jsonLd: [
       {
         "@context": "https://schema.org",

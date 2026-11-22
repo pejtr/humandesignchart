@@ -51,8 +51,21 @@ export function buildSeoHead(locale: string, pathname: string): string {
   // canonical-based concatenation emitted /en/en/ and CZ /en/ URLs.
   const unprefixedPath = pathname.replace(/^\/(?:cs|en|de|fr|es|it)(?=\/|$)/, "") || "/";
   const suffix = unprefixedPath.startsWith("/") ? unprefixedPath : `/${unprefixedPath}`;
-  const csAlt = `${CS}/cs${suffix}`;
-  const enAlt = `${EN}/en${suffix}`;
+  // Only one canonical calculator URL per language; duplicate aliases
+  // retain working SPA routes but cannot compete in Google's index.
+  const isCalculatorAlias = suffix === "/calculate" || suffix === "/human-design-kalkulacka";
+  const csAlt = isCalculatorAlias ? CS + "/cs/human-design-kalkulacka" : `${CS}/cs${suffix}`;
+  const enAlt = isCalculatorAlias ? EN + "/en/calculate" : `${EN}/en${suffix}`;
+  // Google hreflang requires equivalent content on both destinations.
+  // CZ and EN blog slugs often differ; only pair identical, published slugs.
+  // Angel-number editorial is currently sourced from the Czech catalog only.
+  const blogMatch = /^\/blog\/([^/]+)$/.exec(suffix);
+  const hasMatchingBlogTranslation = !blogMatch ||
+    (BLOG_ARTICLES.some(item => item.slug === blogMatch[1]) &&
+      BLOG_ARTICLES_EN.some(item => item.slug === blogMatch[1]));
+  const supportsTranslatedAlternate = !meta.noIndex &&
+    !/^\/andelska-cisla(?:\/|$)/.test(suffix) &&
+    hasMatchingBlogTranslation;
 
   return [
     `<title>${escapeHtml(meta.title)}</title>`,
@@ -80,9 +93,9 @@ export function buildSeoHead(locale: string, pathname: string): string {
     `<meta name="twitter:site" content="@humandesignmapa" />`,
     meta.keywords ? `<meta name="keywords" content="${escapeHtml(meta.keywords)}" />` : "",
     `<link rel="canonical" href="${canonical}" />`,
-    `<link rel="alternate" hreflang="cs" href="${csAlt}" />`,
-    `<link rel="alternate" hreflang="en" href="${enAlt}" />`,
-    `<link rel="alternate" hreflang="x-default" href="${enAlt}" />`,
+    supportsTranslatedAlternate ? `<link rel="alternate" hreflang="cs" href="${csAlt}" />` : "",
+    supportsTranslatedAlternate ? `<link rel="alternate" hreflang="en" href="${enAlt}" />` : "",
+    supportsTranslatedAlternate ? `<link rel="alternate" hreflang="x-default" href="${enAlt}" />` : "",
   ]
     .filter(Boolean)
     .join("\n    ");
@@ -126,7 +139,7 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
       description: isEn
         ? "Calculate your Human Design bodygraph for free. Enter your birth data and discover your type, strategy, authority, and profile."
         : "Vypočítejte si svůj Human Design bodygraph zdarma. Zadejte své datum narození a objevte svůj typ, strategii, autoritu a profil.",
-      canonical: `${base}/${locale}/calculate`,
+      canonical: isEn ? `${EN}/en/calculate` : `${CS}/cs/human-design-kalkulacka`,
     },
     "human-design-kalkulacka": {
       title: isEn
@@ -135,7 +148,7 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
       description: isEn
         ? "Calculate your Human Design bodygraph for free. Enter your birth data and discover your type, strategy, authority, and profile."
         : "Human Design kalkulačka zdarma: zadejte datum, čas a místo narození, zobrazte si bodygraph, svůj typ, strategii, autoritu a profil.",
-      canonical: `${base}/${locale}/human-design-kalkulacka`,
+      canonical: isEn ? `${EN}/en/calculate` : `${CS}/cs/human-design-kalkulacka`,
     },
     "human-design-test": {
       title: isEn
