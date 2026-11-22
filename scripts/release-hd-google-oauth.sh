@@ -79,7 +79,9 @@ echo "Current Cloudflare deployments (read-only):"
 npx --yes wrangler@4.147.0 pages deployment list --project-name=humandesignchart-web
 
 echo "[DEPLOY] Mode=$MODE; branch=$BRANCH; existing Cloudflare Pages project"
-npx --yes wrangler@4.147.0 pages deploy dist/public \
+# Worker already bundled by esbuild during pnpm build:cloudflare.
+# Keep the verified bundle bytes: production incident recovery validated --no-bundle.
+npx --yes wrangler@4.147.0 pages deploy dist/public --no-bundle \
   --project-name=humandesignchart-web --branch="$BRANCH"
 
 echo "Deployed. Verify exact URL, D1 and Google browser E2E before claiming success."
