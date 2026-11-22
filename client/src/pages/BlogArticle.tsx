@@ -51,8 +51,9 @@ function renderMarkdown(md: string): string {
 // ─── Social Share Buttons Component ──────────────────────────────────────────
 function ShareButtons({ article, isEn, locale }: { article: { slug: string; title: string; excerpt: string }; isEn: boolean; locale: string }) {
   const [copied, setCopied] = useState(false);
-  const baseUrl = locale === 'en' ? 'https://www.humandesignchart.app' : 'https://www.humandesignmapa.cz';
-  const articleUrl = `${baseUrl}/blog/${article.slug}`;
+  const baseUrl = locale === 'en' ? 'https://humandesignchart.app' : 'https://humandesignmapa.cz';
+  // Share the canonical locale route, not a legacy /blog alias.
+  const articleUrl = `${baseUrl}/${locale}/blog/${article.slug}`;
   const shareText = `${article.title} — ${article.excerpt.slice(0, 100)}...`;
 
   const handleCopy = async () => {
