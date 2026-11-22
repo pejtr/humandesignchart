@@ -1489,12 +1489,24 @@ function makeSitemap(requestUrl: URL) {
     '    <xhtml:link rel="alternate" hreflang="x-default" href="' + en + '" />',
   ].join("\n") + "\n";
   for (const page of sitemapStaticPages) {
+    // One canonical calculator per storefront. Other aliases remain functional
+    // but should not be advertised as additional unique sitemap pages.
+    if (isEnHost && (page.loc === "/human-design-kalkulacka" ||
+        page.loc === "/andelska-cisla")) continue;
+    if (!isEnHost && page.loc === "/calculate") continue;
+
     const suffix = page.loc === "/" ? "/" : page.loc;
-    const cs = "https://humandesignmapa.cz/cs" + suffix;
-    const en = "https://humandesignchart.app/en" + suffix;
+    const isCalculator = suffix === "/calculate" || suffix === "/human-design-kalkulacka";
+    const cs = "https://humandesignmapa.cz/cs" +
+      (isCalculator ? "/human-design-kalkulacka" : suffix);
+    const en = "https://humandesignchart.app/en" +
+      (isCalculator ? "/calculate" : suffix);
     const url = isEnHost ? en : cs;
-    nodes.push(node(url, page.changefreq, page.priority)
-      .replace("  </url>", alternatesFor(cs, en) + "  </url>"));
+    const xml = node(url, page.changefreq, page.priority);
+    // Angel number articles exist only in the Czech editorial catalog.
+    // Avoid a false English translation that would confuse Google hreflang.
+    nodes.push(suffix === "/andelska-cisla" ? xml :
+      xml.replace("  </url>", alternatesFor(cs, en) + "  </url>"));
   }
 
   const articles = isEnHost ? BLOG_ARTICLES_EN : BLOG_ARTICLES;
