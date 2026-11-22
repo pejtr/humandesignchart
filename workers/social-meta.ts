@@ -91,7 +91,10 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
   const crossBrandLocale = (enHost && locale === "cs") ||
     (["humandesignmapa.cz", "www.humandesignmapa.cz"].includes(url.hostname) && locale === "en");
   const privatePage = /^\/(?:cs\/|en\/)?(?:login|account|dashboard|portal|admin|payment|crm-dashboard|social-scheduler|ugc-factory|vsl|chat-reading|vsl-chat|refer|chart)(?:\/|$)/.test(url.pathname);
-  if (crossBrandLocale || privatePage ||
+  // Angel-number article data is Czech-only; do not claim English
+  // editorial content or feed untranslated content into the EN index.
+  const untranslatedAngel = enHost && /^\/en\/andelska-cisla(?:\/|$)/.test(url.pathname);
+  if (crossBrandLocale || privatePage || untranslatedAngel ||
       /^\/(?:cs|en)\/motion-preview\/?$/.test(url.pathname)) {
     headers.set("x-robots-tag", "noindex, follow");
   }
