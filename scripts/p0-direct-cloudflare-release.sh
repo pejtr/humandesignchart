@@ -78,4 +78,24 @@ fi
 
 echo "[DEPLOY] existing Cloudflare Pages project=humandesignchart-web branch=$cf_branch sha=$head_sha"
 npx --yes wrangler@4.147.0 pages deploy dist/public --project-name=humandesignchart-web --branch="$cf_branch"
+if [[ "$mode" == production ]]; then
+  echo '[P0 SEO] Read-only live HTML, sitemap, robots, and soft-404 regression probes'
+  # Cloudflare custom-domain propagation can be briefly eventual. Never claim
+  # production PASS until the branded-domain content itself passes the probe.
+  seo_pass=NO
+  for attempt in 1 2 3; do
+    if node scripts/qa/hd-seo-live-smoke.mjs; then
+      seo_pass=YES
+      break
+    fi
+    if [[ "$attempt" -lt 3 ]]; then sleep 6; fi
+  done
+  if [[ "$seo_pass" != YES ]]; then
+    echo '[NO-GO] Cloudflare deploy submitted, but live SEO E2E failed.' >&2
+    echo 'Check the latest Cloudflare Pages deployment and use the previous known good rollback if required.' >&2
+    exit 1
+  fi
+  echo '[P0 SEO PASS] Exact deployed branded-domain HTTP smoke passed.'
+fi
+
 echo '[DEPLOY SUBMITTED] Verify deployment URL, /api/health and full paid fulfillment before reporting success.'
