@@ -77,7 +77,10 @@ if [[ "$(git rev-parse refs/remotes/origin/main)" != "$head_sha" ]]; then
 fi
 
 echo "[DEPLOY] existing Cloudflare Pages project=humandesignchart-web branch=$cf_branch sha=$head_sha"
-npx --yes wrangler@4.147.0 pages deploy dist/public --project-name=humandesignchart-web --branch="$cf_branch"
+# The checked-in Pages Worker is already bundled by esbuild; Wrangler
+# re-bundling can exceed upload limits and modify verified bytes.
+# --no-bundle preserves the exact verified dist/public/_worker.js.
+npx --yes wrangler@4.147.0 pages deploy dist/public --no-bundle --project-name=humandesignchart-web --branch="$cf_branch"
 if [[ "$mode" == production ]]; then
   echo '[P0 SEO] Read-only live HTML, sitemap, robots, and soft-404 regression probes'
   # Cloudflare custom-domain propagation can be briefly eventual. Never claim
