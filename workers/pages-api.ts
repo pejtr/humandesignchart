@@ -25,6 +25,8 @@ import { publicSeoUrlFromRequest, withServerRenderedSeoMeta } from "./social-met
 import { isMissingEditorialPage, editorialNotFoundResponse } from "./editorial-indexing";
 import { agentDiscoveryResponse } from "./agent-discovery";
 import { handleDailyAgentMcp } from "./daily-agent-mcp";
+import { buildAgentDailyReading } from "./daily-agent-data";
+import { handleDailyEmail } from "./daily-agent-email";
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
 import { isVerifiedBlueprintPayment } from "../server/payments/blueprintPaymentVerification";
 import { getBlueprintFulfillmentBlocker } from "../server/payments/blueprintFulfillmentGate";
@@ -34,6 +36,8 @@ type D1Database = any;
 
 type Env = {
   HD_DAILY_MCP_ENABLED?: string;
+  HD_DAILY_EMAIL_ENABLED?: string;
+  HD_DAILY_EMAIL_DB?: D1Database;
   HUMAN_DESIGN_FULFILLMENT_API_KEY?: string;
   PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN?: string;
   PAY_BASE_URL?: string;
@@ -1883,6 +1887,15 @@ export default {
     const discoveryUrl = publicSeoUrlFromRequest(request);
     if (url.pathname === "/mcp") {
       return handleDailyAgentMcp(request, env.HD_DAILY_MCP_ENABLED === "true");
+    }
+    if (url.pathname === "/api/daily-agent/today") {
+      if (request.method !== "GET") return Response.json({ error: "METHOD_NOT_ALLOWED" }, { status: 405 });
+      if (env.HD_DAILY_MCP_ENABLED !== "true") return Response.json({ error: "DAILY_AGENT_DISABLED" }, { status: 404, headers: { "cache-control": "no-store" } });
+      const locale = url.searchParams.get("locale") === "cs" ? "cs" : "en";
+      return Response.json(buildAgentDailyReading(locale), { headers: { "cache-control": "public, max-age=60", "x-robots-tag": "noindex" } });
+    }
+    if (url.pathname === "/api/daily-agent/email/preferences" || url.pathname === "/api/daily-agent/email/unsubscribe") {
+      return handleDailyEmail(request, env);
     }
     if (url.pathname === "/llms.txt" || url.pathname === "/openapi.json") {
       const result = agentDiscoveryResponse(discoveryUrl);
