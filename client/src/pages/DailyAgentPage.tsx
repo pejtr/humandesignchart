@@ -70,7 +70,7 @@ export default function DailyAgentPage({ daily }: { daily: DailyAgentView }) {
       if (!Array.isArray(gates) || !gates.length || gates.length > 64 ||
         gates.some(g => !Number.isInteger(g) || g < 1 || g > 64)) throw new Error("No chart");
       // Copy only on explicit user action. No network request or birth data.
-      void copy(prompt + "\n" + (en ? "I choose to share these natal gate numbers: " : "Souhlasím se sdílením těchto nativních bran: ") + [...new Set(gates)].join(", "));
+      void copy(prompt + "\n" + (en ? "I choose to share these natal gate numbers: " : "Souhlasím se sdílením těchto nativních bran: ") + Array.from(new Set(gates)).join(", "));
     } catch { setCopyNotice(en ? "Calculate your own chart first." : "Nejdříve vypočítejte svou mapu."); }
   }
   return <div className="min-h-screen bg-background text-foreground">
