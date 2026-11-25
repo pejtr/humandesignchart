@@ -15,7 +15,35 @@ import { toast } from "sonner";
 import { PLANET_SYMBOLS, PLANET_COLORS } from "@/lib/hdConstants";
 import { useSEO } from "@/hooks/useSEO";
 
+import DailyAgentPage, { type DailyAgentView } from "./DailyAgentPage";
+
 export default function DailyTransit() {
+  const { locale } = useLanguage();
+  const [daily, setDaily] = useState<DailyAgentView | null>(null);
+  const [resolved, setResolved] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [retry, setRetry] = useState(0);
+  useEffect(() => {
+    const controller = new AbortController();
+    setResolved(false); setFailed(false); setDaily(null);
+    fetch("/api/daily-agent/today?locale=" + (locale === "en" ? "en" : "cs"), {
+      credentials: "omit", signal: controller.signal,
+    }).then(async res => {
+      if (res.status === 404 || (res.ok && !res.headers.get("content-type")?.includes("application/json"))) return null;
+      if (!res.ok) throw new Error("Daily data unavailable");
+      const value = await res.json();
+      if (!Array.isArray(value.transitGates) || !Array.isArray(value.themes)) throw new Error("Invalid daily data");
+      return value as DailyAgentView;
+    }).then(value => { if (!controller.signal.aborted) { setDaily(value); setResolved(true); } })
+      .catch(() => { if (!controller.signal.aborted) setFailed(true); });
+    return () => controller.abort();
+  }, [locale, retry]);
+  if (failed) return <main className="mx-auto max-w-xl p-10 text-center"><p>{locale === "en" ? "Daily chart unavailable." : "Denní mapa je nedostupná."}</p><Button onClick={() => setRetry(v => v + 1)}>{locale === "en" ? "Try again" : "Zkusit znovu"}</Button></main>;
+  if (!resolved) return <div className="flex min-h-screen items-center justify-center" role="status"><Loader2 className="h-8 w-8 animate-spin" aria-label={locale === "en" ? "Loading" : "Načítání"} /></div>;
+  return daily ? <DailyAgentPage daily={daily} /> : <LegacyDailyTransit />;
+}
+
+function LegacyDailyTransit() {
   const { t, locale, localePath } = useLanguage();
   const { user, isAuthenticated, loading } = useAuth();
 
