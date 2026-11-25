@@ -17,7 +17,7 @@ export async function deliverDailyBatch(env: DailyEmailEnv, now = new Date(), se
   let sent = 0;
   for (const candidate of candidates.results ?? []) {
     const id = candidate.user_id;
-    const claim = await db.prepare("INSERT OR IGNORE INTO hd_daily_delivery(user_id,day,state) VALUES(?,?,'CLAIMED')").bind(id,day).run();
+    const claim = await db.prepare("INSERT OR IGNORE INTO hd_daily_delivery(user_id,day,state) SELECT ?,?,'CLAIMED' WHERE (SELECT COUNT(*) FROM hd_daily_delivery WHERE day=?) < 80").bind(id,day,day).run();
     if (claim.meta?.changes !== 1) continue;
     let state = "UNKNOWN";
     try {
