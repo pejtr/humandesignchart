@@ -71,7 +71,8 @@ export async function handleDailyEmail(request: Request, env: DailyEmailEnv): Pr
     await db.prepare(`INSERT INTO hd_daily_preferences(user_id,email,locale,enabled,unsubscribe_token,consent_version,consent_at)
       VALUES(?,?,?,1,?,?,CURRENT_TIMESTAMP)
       ON CONFLICT(user_id) DO UPDATE SET email=excluded.email,locale=excluded.locale,enabled=1,
-      unsubscribe_token=excluded.unsubscribe_token,consent_version=excluded.consent_version,consent_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP`)
+      unsubscribe_token=CASE WHEN hd_daily_preferences.email=excluded.email THEN hd_daily_preferences.unsubscribe_token ELSE excluded.unsubscribe_token END,
+      consent_version=excluded.consent_version,consent_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP`)
       .bind(user.id,user.email,locale,token,CONSENT).run();
     return json({ enabled: true, locale });
   } catch { return json({ error: "DAILY_EMAIL_UNAVAILABLE" }, 503); }
