@@ -1,3 +1,5 @@
+import { DatabaseSync } from "node:sqlite";
+import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { handleDailyEmail, dailyEmailMessage } from "../workers/daily-agent-email";
 import { deliverDailyBatch } from "../workers/daily-agent-email-cron";
@@ -107,5 +109,57 @@ describe("Daily delivery cron safety", () => {
     await deliverDailyBatch({...env,HD_DAILY_EMAIL_DB:on.db},now,send as unknown as typeof fetch);
     expect(send).toHaveBeenCalledTimes(1);
     expect(on.writes.some(w=>w.args[0]==="UNKNOWN")).toBe(true);
+  });
+});
+
+
+describe("Daily email full service flow with real SQLite and a simulated Brevo provider", () => {
+  it("preserves old links for the same mailbox, stops sending after opt-out, and isolates changed addresses", async () => {
+    const sqlite = new DatabaseSync(":memory:");
+    try {
+      sqlite.exec(readFileSync("migrations/daily-agent/0001_daily_delivery.sql", "utf8"));
+      const db = { prepare(sql: string) {
+        const statement = sqlite.prepare(sql);
+        let args: any[] = [];
+        const adapter = {
+          bind(...values: any[]) { args = values; return adapter; },
+          async first() { return statement.get(...args); },
+          async all() { return { results: statement.all(...args) }; },
+          async run() { return { success: true, meta: { changes: Number(statement.run(...args).changes) } }; },
+        };
+        return adapter;
+      }};
+      const env = {HD_DAILY_EMAIL_DB:db,HD_DAILY_EMAIL_ENABLED:"true",BREVO_API_KEY:"fixture",BREVO_SENDER_EMAIL:"sender@example.invalid"};
+      const enable = () => handleDailyEmail(prefsRequest({enabled:true,locale:"en",consent:true}),env);
+      const disable = () => handleDailyEmail(prefsRequest({enabled:false,locale:"en",consent:false}),env);
+      const preference = () => sqlite.prepare("SELECT * FROM hd_daily_preferences WHERE user_id=7").get()!;
+      expect((await enable()).status).toBe(200);
+      const original = String(preference().unsubscribe_token);
+      const send = vi.fn(async (_url: string, init: RequestInit) => {
+        const payload = JSON.parse(String(init.body));
+        expect(payload.to).toEqual([{email:user.email}]);
+        expect(payload.textContent).toContain("unsubscribe?token="+original);
+        return Response.json({messageId:"fixture-message"},{status:201});
+      });
+      expect((await deliverDailyBatch(env,now,send as unknown as typeof fetch)).sent).toBe(1);
+      expect((await deliverDailyBatch(env,now,send as unknown as typeof fetch)).sent).toBe(0);
+      expect(send).toHaveBeenCalledTimes(1);
+      expect((await disable()).status).toBe(200);
+      expect((await enable()).status).toBe(200);
+      expect(preference().unsubscribe_token).toBe(original);
+      const oldLink = base+"unsubscribe?token="+original;
+      expect((await handleDailyEmail(new Request(oldLink),env)).status).toBe(200);
+      expect(preference().enabled).toBe(1);
+      expect((await handleDailyEmail(new Request(oldLink,{method:"POST"}),env)).status).toBe(200);
+      expect(preference().enabled).toBe(0);
+      expect((await deliverDailyBatch(env,new Date("2026-11-26T07:15:00Z"),send as unknown as typeof fetch)).sent).toBe(0);
+      expect(send).toHaveBeenCalledTimes(1);
+      vi.mocked(getSessionUser).mockResolvedValue({id:7,email:"changed@example.invalid"} as any);
+      expect((await enable()).status).toBe(200);
+      expect(preference().unsubscribe_token).not.toBe(original);
+      await handleDailyEmail(new Request(oldLink,{method:"POST"}),env);
+      expect(preference().enabled).toBe(1);
+      expect(preference().email).toBe("changed@example.invalid");
+    } finally { sqlite.close(); }
   });
 });
