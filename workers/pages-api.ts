@@ -24,6 +24,7 @@ import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
 import { publicSeoUrlFromRequest, withServerRenderedSeoMeta } from "./social-meta";
 import { isMissingEditorialPage, editorialNotFoundResponse } from "./editorial-indexing";
 import { agentDiscoveryResponse } from "./agent-discovery";
+import { handleDailyAgentMcp } from "./daily-agent-mcp";
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
 import { isVerifiedBlueprintPayment } from "../server/payments/blueprintPaymentVerification";
 import { getBlueprintFulfillmentBlocker } from "../server/payments/blueprintFulfillmentGate";
@@ -32,6 +33,7 @@ import { getReadingPrompt, getSystemPrompt } from "../server/ai/prompts";
 type D1Database = any;
 
 type Env = {
+  HD_DAILY_MCP_ENABLED?: string;
   HUMAN_DESIGN_FULFILLMENT_API_KEY?: string;
   PAYGATE_CHECKOUT_API_KEY_HUMAN_DESIGN?: string;
   PAY_BASE_URL?: string;
@@ -1879,6 +1881,9 @@ export default {
     // The Pages edge may see *.pages.dev behind our branded reverse proxy.
     // Use the allowlisted public host for locale-specific discovery surfaces.
     const discoveryUrl = publicSeoUrlFromRequest(request);
+    if (url.pathname === "/mcp") {
+      return handleDailyAgentMcp(request, env.HD_DAILY_MCP_ENABLED === "true");
+    }
     if (url.pathname === "/llms.txt" || url.pathname === "/openapi.json") {
       const result = agentDiscoveryResponse(discoveryUrl);
       if (result) return result;
