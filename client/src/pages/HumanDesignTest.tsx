@@ -39,7 +39,6 @@ export default function HumanDesignTest() {
     const [gender, setGender] = useState("");
     const [goal, setGoal] = useState("");
     const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
     const [birthDate, setBirthDate] = useState("");
     const [birthTime, setBirthTime] = useState("");
     const [disambiguation, setDisambiguation] = useState<TimeDisambiguation>("");
@@ -50,7 +49,6 @@ export default function HumanDesignTest() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const calculateMutation = trpc.chart.calculate.useMutation();
-    const subscribeMutation = trpc.newsletter.subscribe.useMutation();
 
     const handleNext = () => setStep((s) => Math.min(s + 1, totalSteps));
     const handlePrev = () => setStep((s) => Math.max(s - 1, 1));
@@ -79,20 +77,13 @@ export default function HumanDesignTest() {
 
     const handleFinalSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!email || !name) {
-            toast.error("Vyplňte prosím křestní jméno a e-mail.");
+        if (!name) {
+            toast.error("Vyplňte prosím křestní jméno.");
             return;
         }
 
         setIsSubmitting(true);
         try {
-            // Zapsání e-mailu do trpc newsletter tabulky
-            await subscribeMutation.mutateAsync({
-                email,
-                locale,
-                source: "quiz"
-            });
-
             // Výpočet mapy
             const data = await calculateMutation.mutateAsync({
                 name,
@@ -268,7 +259,7 @@ export default function HumanDesignTest() {
                             <CheckCircle2 className="w-8 h-8" />
                         </div>
                         <h2 className="text-2xl font-serif font-bold text-foreground mb-2">Váš profil je připraven!</h2>
-                        <p className="text-muted-foreground text-sm mb-8">Zadejte své jméno a e-mail, kam vám máme poslat výsledek Human Design Testu a ihned vás přeneseme do analýzy.</p>
+                        <p className="text-muted-foreground text-sm mb-8">Zadejte své jméno a zobrazte si bezplatný výsledek. E-mailový minikurz si můžete vybrat až po výpočtu.</p>
 
                         <div className="max-w-sm mx-auto space-y-4 text-left">
                             <div className="space-y-1.5">
@@ -281,17 +272,6 @@ export default function HumanDesignTest() {
                                     required
                                 />
                             </div>
-                            <div className="space-y-1.5">
-                                <Label>E-mailová adresa</Label>
-                                <Input
-                                    type="email"
-                                    className="h-12"
-                                    placeholder="vas@email.cz"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                            </div>
                             <Button
                                 type="submit"
                                 size="lg"
@@ -301,7 +281,7 @@ export default function HumanDesignTest() {
                                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Zobrazit můj Výsledek"}
                             </Button>
                             <p className="text-xs text-center text-muted-foreground mt-4">
-                                Vyplněním souhlasíte se zpracováním osobních údajů přesně podle GDPR.
+                                Bezplatný výpočet není podmíněn odběrem marketingových e-mailů.
                             </p>
                         </div>
                     </form>
