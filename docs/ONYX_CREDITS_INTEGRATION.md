@@ -1,0 +1,5 @@
+# ONYX CREDITS integration
+Status: planned integration, not a live payment or wallet capability.
+The free chart stays free. Paid personalized interpretations, eligible PDF reports and AI synthesis may use a centrally managed service-credit wallet once the underlying deliverables and payment flow have been verified. Human Design is an interpretive framework, not scientific or medical advice.
+A trusted backend integration must verify user identity, obtain a server-authoritative operation quote, reserve credits, capture once upon successful fulfillment or release on failure. A browser redirect is not payment evidence. Do not maintain a separate spendable local balance, expose service credentials, or share birth/profile data with billing.
+Previously purchased products and subscriptions remain unchanged. Public price/rate information must not be published before approval. Add contract tests for isolation, insufficient balance, duplicate events, failures and refunds before rollout. No new endpoint or checkout is enabled by this document.
