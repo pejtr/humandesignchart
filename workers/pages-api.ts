@@ -1898,7 +1898,7 @@ export default {
       return handleDailyEmail(request, env);
     }
     if (url.pathname === "/llms.txt" || url.pathname === "/openapi.json") {
-      const result = agentDiscoveryResponse(discoveryUrl);
+      const result = agentDiscoveryResponse(discoveryUrl, env.HD_DAILY_MCP_ENABLED === "true");
       if (result) return result;
     }
     if (url.pathname === "/sitemap.xml") {
