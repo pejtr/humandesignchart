@@ -21,7 +21,7 @@ import { TimeDisambiguationField, type TimeDisambiguation } from "@/components/T
 import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { trackGA4Event } from "@/hooks/useGA4";
 import { saveChartDraft } from "@/lib/chartDraft";
-import { measureOpenAIAdsEvent } from "@/hooks/useOpenAIAdsPixel";
+import { measureFreeChartGenerated } from "@/hooks/useOpenAIAdsPixel";
 import "./ChartCalculatorAmbient.css";
 
 const CALCULATOR_HERO_VISUALS = {
@@ -116,7 +116,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
         name, birthDate, birthTime, birthPlace, latitude, longitude, timezone: data.timezone, category,
       });
       trackGA4Event("ChartGenerated", { locale });
-      measureOpenAIAdsEvent("contents_viewed", { type: "contents", contents: [{ id: "free_chart_result", content_type: "page" }] });
+      measureFreeChartGenerated();
       const nextStep = new URLSearchParams(window.location.search).get("next");
       if (nextStep === "honorace" || nextStep === "pricing") {
         navigate(localePath("/honorace"));
