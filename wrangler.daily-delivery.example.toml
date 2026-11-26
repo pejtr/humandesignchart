@@ -1,0 +1,18 @@
+# Copy to a local ignored config, replace the placeholder with the VERIFIED dedicated
+# daily-delivery D1 ID, and use an authorized isolated preview first.
+# Never point this binding to optimateo-paygate or the OAuth/customer database.
+name = "humandesign-daily-delivery"
+main = "workers/daily-agent-email-cron.ts"
+compatibility_date = "2026-11-25"
+workers_dev = false
+
+[vars]
+HD_DAILY_EMAIL_ENABLED = "false"
+
+[triggers]
+crons = ["*/15 * * * *"]
+
+[[d1_databases]]
+binding = "HD_DAILY_EMAIL_DB"
+database_name = "humandesign-daily-delivery"
+database_id = "REPLACE_WITH_VERIFIED_DAILY_D1_UUID"

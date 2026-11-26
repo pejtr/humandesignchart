@@ -6,7 +6,7 @@
 const CS = "https://humandesignmapa.cz";
 const EN = "https://humandesignchart.app";
 
-export function agentDiscoveryResponse(publicUrl: URL): Response | null {
+export function agentDiscoveryResponse(publicUrl: URL, dailyMcpEnabled = false): Response | null {
   const isEnglish = ["humandesignchart.app", "www.humandesignchart.app"].includes(publicUrl.hostname);
   const base = isEnglish ? EN : CS;
   const lang = isEnglish ? "en" : "cs";
@@ -33,7 +33,7 @@ export function agentDiscoveryResponse(publicUrl: URL): Response | null {
       "- Input: birth date, local time and geographic latitude/longitude.",
       "- Output: basic type, strategy, authority and profile, not a purchase or user account.",
       "- Obtain express consent before submitting a person's birth details.",
-      "- OpenAPI is not MCP. No hosted /mcp service is advertised as deployed.",
+      dailyMcpEnabled ? "- Read-only daily transit MCP (Streamable HTTP): " + EN + "/mcp" : "- OpenAPI is not MCP. No hosted /mcp service is advertised as deployed.",
       "",
       "## Languages",
       "- Czech: " + CS + "/cs/",
@@ -61,7 +61,7 @@ export function agentDiscoveryResponse(publicUrl: URL): Response | null {
       "- Vstup: datum a čas narození, zeměpisná šířka a délka.",
       "- Výstup: typ, strategie, autorita a profil; bez platby a založení účtu.",
       "- Údaje o narození neposílejte bez výslovného souhlasu dotyčné osoby.",
-      "- OpenAPI není MCP. Veřejný endpoint /mcp není v této verzi nasazen.",
+      dailyMcpEnabled ? "- Denní tranzity přes MCP (Streamable HTTP, pouze čtení): " + CS + "/mcp" : "- OpenAPI není MCP. Veřejný endpoint /mcp není v této verzi nasazen.",
       "",
       "## Jazyky",
       "- Čeština: " + CS + "/cs/",
