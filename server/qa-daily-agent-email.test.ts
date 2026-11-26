@@ -1,4 +1,6 @@
-import { DatabaseSync } from "node:sqlite";
+import { createRequire } from "node:module";
+// Resolve the Node 22 built-in directly; Vite 5 otherwise rewrites node:sqlite to sqlite.
+const { DatabaseSync } = createRequire(import.meta.url)("node:sqlite") as typeof import("node:sqlite");
 import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { handleDailyEmail, dailyEmailMessage } from "../workers/daily-agent-email";
