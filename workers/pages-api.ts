@@ -1967,6 +1967,6 @@ export default {
       const rendered = await withServerRenderedSeoMeta(publicSeoUrlFromRequest(request), asset);
       return editorialNotFoundResponse(rendered);
     }
-    return withServerRenderedSeoMeta(publicSeoUrlFromRequest(request), asset);
+    return withServerRenderedSeoMeta(publicSeoUrlFromRequest(request), asset, env.OPENAI_ADS_PIXEL_ID);
   },
 };
