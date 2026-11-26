@@ -31,7 +31,7 @@ export function publicSeoUrlFromRequest(request: Request): URL {
   return url;
 }
 
-export async function withServerRenderedSeoMeta(url: URL, asset: Response): Promise<Response> {
+export async function withServerRenderedSeoMeta(url: URL, asset: Response, publicPixelId?: string): Promise<Response> {
   if (!asset.ok || !asset.headers.get("content-type")?.includes("text/html")) {
     return asset;
   }
@@ -78,6 +78,14 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
     ? rendered.replace(/<div id="root">\s*<\/div>/, '<div id="root">' + fallback + '</div>')
     : rendered;
 
+  // The public identifier is not a secret. Never inject API credentials,
+  // arbitrary strings, or production tracking on preview hosts.
+  const safePixelId = PUBLIC_BRAND_HOSTS.has(url.hostname) &&
+    typeof publicPixelId === "string" && /^[A-Za-z0-9_-]{8,128}$/.test(publicPixelId.trim())
+    ? publicPixelId.trim() : null;
+  const finalHtml = safePixelId
+    ? populated.replace(/<\/head>/i, '<meta name="hd-openai-ads-pixel-id" content="' + safePixelId + '">\n</head>')
+    : populated;
   const headers = new Headers(asset.headers);
   headers.delete("content-length");
   headers.delete("content-encoding");
@@ -99,7 +107,7 @@ export async function withServerRenderedSeoMeta(url: URL, asset: Response): Prom
     headers.set("x-robots-tag", "noindex, follow");
   }
 
-  return new Response(populated, {
+  return new Response(finalHtml, {
     status: asset.status,
     statusText: asset.statusText,
     headers,
