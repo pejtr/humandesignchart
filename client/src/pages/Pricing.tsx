@@ -173,7 +173,7 @@ export default function Pricing() {
         });
         measureOpenAIAdsEvent("checkout_started", {
           type: "contents",
-          amount: valueMajor,
+          amount: totalAmountMinor,
           currency: currencyCode,
         });
         if (url) window.location.assign(url);

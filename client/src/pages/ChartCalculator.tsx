@@ -21,6 +21,7 @@ import { TimeDisambiguationField, type TimeDisambiguation } from "@/components/T
 import { useMetaPixel } from "@/hooks/useMetaPixel";
 import { trackGA4Event } from "@/hooks/useGA4";
 import { saveChartDraft } from "@/lib/chartDraft";
+import { measureFreeChartGenerated } from "@/hooks/useOpenAIAdsPixel";
 import "./ChartCalculatorAmbient.css";
 
 const CALCULATOR_HERO_VISUALS = {
@@ -38,6 +39,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
   const { t, localePath, locale } = useLanguage();
   const isEn = locale !== "cs";
   const meta = useMetaPixel();
+  const campaignMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("funnel") === "free";
 
   useSEO(isEn ? {
     title: "✨ Free Human Design Chart Calculator & Reading | Bodygraph Generator 🔮",
@@ -113,12 +115,8 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
       saveChartDraft(data, {
         name, birthDate, birthTime, birthPlace, latitude, longitude, timezone: data.timezone, category,
       });
-      trackGA4Event("ChartGenerated", {
-        chart_type: data.type,
-        profile: data.profile,
-        authority: data.authority,
-        locale,
-      });
+      trackGA4Event("ChartGenerated", { locale });
+      measureFreeChartGenerated();
       const nextStep = new URLSearchParams(window.location.search).get("next");
       if (nextStep === "honorace" || nextStep === "pricing") {
         navigate(localePath("/honorace"));
@@ -141,12 +139,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
   const triggerCalculation = (lat: string, lon: string, place: string) => {
     if (!name || !birthDate || !birthTime) return;
 
-    if (!isAuthenticated) {
-      meta.completeRegistration({
-        content_name: "Chart Calculation Started",
-        status: true,
-      });
-    }
+    // A free chart is not a completed account registration.
 
     calculateMutation.mutate({
       name,
@@ -242,9 +235,9 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
         <span className="hd-calculator-horizon" />
       </div>
 
-      <Navbar />
+      {campaignMode ? <header className="relative z-10 mx-auto w-full max-w-2xl px-5 pt-5 text-center"><a className="font-serif text-lg font-semibold" href={localePath("/")}>{isEn ? "Human Design Chart" : "Human Design Mapa"}</a></header> : <Navbar />}
 
-      <main className="hd-calculator-main flex-1 pt-24 pb-16">
+      <main className={`hd-calculator-main flex-1 pb-16 ${campaignMode ? "pt-6" : "pt-24"}`}>
         <div className="hd-calculator-shell container max-w-2xl relative">
           {/* Top Hero Section */}
           <div className="hd-calculator-intro text-center mb-8">
@@ -253,20 +246,20 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
               {isEn ? heroVisual.eyebrowEn : heroVisual.eyebrowCs}
             </div>
             <h1 className="hd-calculator-title font-serif text-3xl md:text-4xl lg:text-5xl font-bold mb-3 tracking-tight">
-              {seoType === "kalkulacka" && isEn === false ? "Human Design Kalkulačka Zdarma" :
+              {campaignMode ? (isEn ? "Discover your Human Design — free" : "Objevte svou Human Design mapu zdarma") : seoType === "kalkulacka" && isEn === false ? "Human Design Kalkulačka Zdarma" :
                 seoType === "test" && isEn === false ? "Human Design Test Osobnosti Zdarma" :
                   seoType === "typy" && isEn === false ? "Human Design Typy — Vypočítejte svůj typ" :
                     t.calculator.title}
             </h1>
             <p className="hd-calculator-description text-muted-foreground text-sm md:text-base max-w-xl mx-auto leading-relaxed">
-              {seoType === "kalkulacka" && isEn === false ? "Využijte nejkomplexnější přesnou Human Design kalkulačku v češtině. Zjistěte ihned, jak byla vaše energetická mapa poskládána v momentě narození." :
+              {campaignMode ? (isEn ? "Discover your type, strategy and authority from your birth details. Get your symbolic reading instantly, with no account or payment required." : "Poznejte svůj typ, strategii a autoritu podle údajů o narození. Základní symbolický výklad získáte ihned, bez registrace a bez platby.") : seoType === "kalkulacka" && isEn === false ? "Využijte nejkomplexnější přesnou Human Design kalkulačku v češtině. Zjistěte ihned, jak byla vaše energetická mapa poskládána v momentě narození." :
                 seoType === "test" && isEn === false ? "Na rozdíl od jiných psychologických testů vychází Human design z přesného postavení planet a vaší DNA v čase zrození. Získejte svůj rozbor zdarma." :
                   seoType === "typy" && isEn === false ? "Generátor, Projektor, Manifestor nebo Reflektor? Použijte náš výpočet a objevte svůj přesný typ a strategii pro život v lehkosti." :
                     t.calculator.description}
             </p>
 
             {/* Instant Value / Benefit Badges */}
-            <div className="hd-calculator-benefits mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
+            {!campaignMode && <div className="hd-calculator-benefits mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
               <div className="hd-calculator-benefit flex items-center gap-2 p-2 rounded-xl bg-white/80 dark:bg-card/80 border border-border/60 shadow-xs">
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 shrink-0 text-xs font-bold">⚡</span>
                 <span className="text-[11px] font-medium leading-tight text-foreground">{isEn ? "100% Free & Instant" : "100% Zdarma & Ihned"}</span>
@@ -283,10 +276,10 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 shrink-0 text-xs font-bold">🇨🇿</span>
                 <span className="text-[11px] font-medium leading-tight text-foreground">{isEn ? "Deep English Analysis" : "Kompletní výklad v češtině"}</span>
               </div>
-            </div>
+            </div>}
 
             <p className="mt-3 text-xs md:text-sm font-medium transition-colors duration-500" style={{ color: heroVisual.accent }}>
-              {isEn ? heroVisual.headlineEn : heroVisual.headlineCs}
+              {campaignMode ? (isEn ? "Step 1 of 2 · Birth details → your free result" : "Krok 1 ze 2 · Údaje o narození → bezplatný výsledek") : isEn ? heroVisual.headlineEn : heroVisual.headlineCs}
             </p>
           </div>
 
@@ -377,7 +370,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                 />
 
                 {/* Relationship Category */}
-                <div className="space-y-2.5">
+                {!campaignMode && <div className="space-y-2.5">
                   <div className="flex items-center justify-between">
                     <Label className="text-sm font-semibold">
                       {isEn ? "Who is this chart for?" : "Pro koho je tato mapa?"}
@@ -418,7 +411,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                       );
                     })}
                   </div>
-                </div>
+                </div>}
 
                 {/* Birth Place with robust search & auto-resolver */}
                 <div className="space-y-2">
@@ -511,7 +504,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
                   ) : (
                     <>
                       <Compass className="w-5 h-5 mr-2" />
-                      {t.calculator.calculate}
+                      {campaignMode ? (isEn ? "Reveal my free chart" : "Zobrazit můj výklad zdarma") : t.calculator.calculate}
                     </>
                   )}
                 </Button>
@@ -537,6 +530,8 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
             </CardContent>
           </Card>
 
+          {campaignMode && <p className="mx-auto mt-5 max-w-lg text-center text-xs text-muted-foreground">{isEn ? "Human Design is a symbolic framework for self-reflection, not a scientific personality diagnosis. Email lessons and paid reports are optional." : "Human Design je symbolický rámec sebereflexe, nikoli vědecká diagnostika osobnosti. E-mailové lekce i placené reporty jsou volitelné."}</p>}
+          {!campaignMode && <>
           {/* ORACULUM+ Dedicated Smart Assistant Section */}
           <section className="mt-12 rounded-3xl border border-amber-300/40 bg-gradient-to-br from-amber-500/10 via-purple-900/5 to-amber-500/5 backdrop-blur-xl p-6 md:p-8 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
@@ -689,6 +684,7 @@ export default function ChartCalculator({ seoType }: { seoType?: "kalkulacka" | 
               </div>
             )}
           </section>
+          </>}
         </div>
       </main>
 

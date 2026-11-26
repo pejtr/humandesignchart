@@ -12,7 +12,6 @@ import Home from "./pages/Home";
 import { lazy, Suspense, useEffect } from "react";
 import HDLoader from "./components/HDLoader";
 import ReferralApplier from "./components/ReferralApplier";
-import NewsletterPopup from "./components/NewsletterPopup";
 import ExitIntentPopup from "./components/ExitIntentPopup";
 import WelcomeModal, { useWelcomeModal } from "./components/WelcomeModal";
 import PageTransition from "./components/PageTransition";
@@ -410,7 +409,6 @@ function WelcomeModalWrapper() {
 
 const SocialProofTicker = lazy(() => import("./components/SocialProofTicker").then(m => ({ default: m.SocialProofTicker })));
 const SeasonalFlashSaleBanner = lazy(() => import("./components/SeasonalFlashSaleBanner").then(m => ({ default: m.SeasonalFlashSaleBanner })));
-const LeadMagnetExitPopup = lazy(() => import("./components/LeadMagnetExitPopup").then(m => ({ default: m.LeadMagnetExitPopup })));
 const WebPushNotificationModal = lazy(() => import("./components/WebPushNotificationModal").then(m => ({ default: m.WebPushNotificationModal })));
 
 function App() {
@@ -432,12 +430,10 @@ function App() {
                 <Toaster />
               <ReferralApplier />
               <WelcomeModalWrapper />
-              <NewsletterPopup />
               <ExitIntentPopup />
               <Suspense fallback={null}>
                 <SeasonalFlashSaleBanner />
                 <SocialProofTicker />
-                <LeadMagnetExitPopup />
                 <WebPushNotificationModal />
               </Suspense>
               <ScrollToTop />

@@ -33,6 +33,7 @@ import { PLANET_SYMBOLS, TYPE_COLORS, translateCrossName, CROSS_TYPE_CS } from "
 import type { HumanDesignChartData } from "@shared/types";
 import OnboardingModal, { useOnboarding } from "@/components/OnboardingModal";
 import PremiumPaywall from "@/components/PremiumPaywall";
+import FreeReadingEmailSignup from "@/components/FreeReadingEmailSignup";
 import { motion, AnimatePresence } from "framer-motion";
 import { SacredGeometry } from "@/components/SacredGeometry";
 import { TiltCard } from "@/components/TiltCard";
@@ -721,6 +722,8 @@ export default function ChartResult({ id: propId }: { id?: string } = {}) {
                 </div>
               </div>
             </section>
+
+            {!subStatus?.isPremium && <FreeReadingEmailSignup />}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Bodygraph Column */}
