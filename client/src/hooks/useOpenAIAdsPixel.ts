@@ -20,7 +20,10 @@ export function isOpenAIAdsConsentGranted(): boolean {
 }
 
 function pixelId(): string {
-  return String(import.meta.env.VITE_OPENAI_ADS_PIXEL_ID || "").trim();
+  if (typeof window === "undefined" || !["humandesignmapa.cz", "www.humandesignmapa.cz", "humandesignchart.app", "www.humandesignchart.app"].includes(window.location.hostname)) return "";
+  const runtime = document.querySelector<HTMLMetaElement>('meta[name="hd-openai-ads-pixel-id"]')?.content;
+  const candidate = String(runtime || import.meta.env.VITE_OPENAI_ADS_PIXEL_ID || "").trim();
+  return /^[A-Za-z0-9_-]{8,128}$/.test(candidate) ? candidate : "";
 }
 
 /** Capture the OpenAI Ads click reference only AFTER marketing consent.
@@ -71,7 +74,7 @@ export function syncOpenAIAdsPixelConsent(): void {
   if (typeof window === "undefined") return;
   if (isOpenAIAdsConsentGranted()) {
     getOpenAIAdsClickRef();
-    initOpenAIAdsPixelAfterConsent();
+    if (initOpenAIAdsPixelAfterConsent()) (window as WindowWithOaiq).oaiq?.("consent", true);
   } else {
     getOpenAIAdsClickRef(); // Clears persisted click reference on withdrawal.
     (window as WindowWithOaiq).oaiq?.("consent", false);
@@ -97,7 +100,7 @@ export function measureOpenAIAdsEvent(
 
 export function measureOpenAIAdsPage(path: string) {
   if (!measureOpenAIAdsEvent("page_viewed")) return;
-  if (/^\/(?:cs|en)\/(?:calculate|pricing|honorace)(?:\/|$)/.test(path)) {
+  if (/^\/(?:cs|en)\/(?:calculate|human-design-kalkulacka|pricing|honorace)(?:\/|$)/.test(path)) {
     measureOpenAIAdsEvent("contents_viewed", { type: "contents" });
   }
 }
