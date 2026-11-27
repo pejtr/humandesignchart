@@ -31,6 +31,29 @@ export function publicSeoUrlFromRequest(request: Request): URL {
   return url;
 }
 
+/** Redirect only known equivalent public routes within the same brand.
+ * Preserve all query parameters (campaign attribution, partner/ref, funnel).
+ * Do not redirect authentication, checkout, private charts, APIs or previews.
+ */
+export function publicCanonicalAliasRedirect(request: Request): Response | null {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  const url = publicSeoUrlFromRequest(request);
+  if (!PUBLIC_BRAND_HOSTS.has(url.hostname)) return null;
+  const en = url.hostname === "humandesignchart.app" || url.hostname === "www.humandesignchart.app";
+  const locale = en ? "en" : "cs";
+  const calculator = en ? "/en/calculate" : "/cs/human-design-kalkulacka";
+  const path = url.pathname.replace(/\/$/, "");
+  const aliases = new Set(["/calculate", "/human-design-kalkulacka", "/" + locale + "/calculate", "/" + locale + "/human-design-kalkulacka"]);
+  const pricingAliases = new Set(["/pricing", "/cenik", "/honorace", "/" + locale + "/pricing", "/" + locale + "/cenik", "/" + locale + "/honorace"]);
+  const destination = aliases.has(path) ? calculator
+    : pricingAliases.has(path) ? "/" + locale + "/honorace" : null;
+  if (!destination || destination === url.pathname) return null;
+  return new Response(null, {
+    status: 301,
+    headers: { location: destination + url.search, "cache-control": "private, no-store" },
+  });
+}
+
 export async function withServerRenderedSeoMeta(url: URL, asset: Response, publicPixelId?: string): Promise<Response> {
   if (!asset.ok || !asset.headers.get("content-type")?.includes("text/html")) {
     return asset;

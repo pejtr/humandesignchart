@@ -118,3 +118,48 @@ describe("P0 human-design EN / CZ indexing repair", () => {
     expect(result.headers.get("x-robots-tag")).toContain("noindex");
   });
 });
+
+describe("permanent public alias consolidation", () => {
+  it.each([
+    ["https://humandesignchart.app/en/human-design-kalkulacka?funnel=free&utm_source=chatgpt&oppref=test", "/en/calculate?funnel=free&utm_source=chatgpt&oppref=test"],
+    ["https://humandesignmapa.cz/cs/calculate?ref=partner&mode=partner", "/cs/human-design-kalkulacka?ref=partner&mode=partner"],
+    ["https://humandesignchart.app/calculate", "/en/calculate"],
+    ["https://humandesignmapa.cz/cs/cenik?next=blueprint", "/cs/honorace?next=blueprint"],
+    ["https://humandesignchart.app/en/pricing", "/en/honorace"],
+    ["https://humandesignchart.app/en/calculate/", "/en/calculate"],
+  ])("returns a single 301 for %s", async (url, target) => {
+    const response = await worker.fetch(new Request(url), env);
+    expect(response.status).toBe(301);
+    expect(response.headers.get("location")).toBe(target);
+    expect((await worker.fetch(new Request(new URL(target, url)), env)).status).toBe(200);
+  });
+
+  it("preserves canonical acquisition URLs and leaves preview and private routes untouched", async () => {
+    for (const url of [
+      host + "/en/calculate?funnel=free&utm_source=chatgpt",
+      host + "/en/payment/success?refId=test",
+      host + "/en/login",
+      "https://hd-revenue-preview.humandesignchart-web.pages.dev/en/human-design-kalkulacka",
+      host + "/cs/calculate",
+    ]) {
+      const result = await worker.fetch(new Request(url), env);
+      expect(result.status).not.toBe(301);
+    }
+    const post = await worker.fetch(new Request(host + "/en/pricing", { method: "POST" }), env);
+    expect(post.status).not.toBe(301);
+  });
+
+  it("aligns canonical pricing and trailing-slash calculator metadata", () => {
+    for (const [locale, url, expected] of [
+      ["en", host + "/en/pricing", host + "/en/honorace"],
+      ["en", host + "/en/cenik/", host + "/en/honorace"],
+      ["en", host + "/en/human-design-kalkulacka/", host + "/en/calculate"],
+      ["cs", "https://humandesignmapa.cz/cs/calculate/", "https://humandesignmapa.cz/cs/human-design-kalkulacka"],
+    ]) {
+      const html = buildSeoHead(locale, new URL(url).pathname);
+      expect(html).toContain('rel="canonical" href="' + expected + '"');
+      expect(canonicalPublicUrl(url)).toBe(expected);
+      if (expected.endsWith("/honorace")) expect(html).toContain('hreflang="en" href="https://humandesignchart.app/en/honorace"');
+    }
+  });
+});
