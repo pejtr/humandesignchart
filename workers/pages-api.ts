@@ -21,7 +21,7 @@ import {
 } from "../server/data/hdContent";
 import { BLOG_ARTICLES_EN } from "../server/data/blogArticlesEn";
 import { ANGEL_NUMBERS } from "../server/data/angelNumbers";
-import { publicSeoUrlFromRequest, withServerRenderedSeoMeta } from "./social-meta";
+import { publicCanonicalAliasRedirect, publicSeoUrlFromRequest, withServerRenderedSeoMeta } from "./social-meta";
 import { isMissingEditorialPage, editorialNotFoundResponse } from "./editorial-indexing";
 import { agentDiscoveryResponse } from "./agent-discovery";
 import { getBlueprintOffer } from "../server/payments/publicOfferCatalog";
@@ -1958,6 +1958,8 @@ export default {
       );
     }
 
+    const canonicalRedirect = publicCanonicalAliasRedirect(request);
+    if (canonicalRedirect) return canonicalRedirect;
     const asset = await env.ASSETS.fetch(request);
     // Known published editorial pages remain untouched. A nonexistent blog,
     // type or angel-number detail must never be served as a successful SPA shell.
