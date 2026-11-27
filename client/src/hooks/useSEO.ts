@@ -73,9 +73,11 @@ export function canonicalPublicUrl(raw: string): string {
       url.pathname = url.hostname === "humandesignchart.app" ? "/en/" : "/cs/";
     } else if (url.pathname === "/en" || url.pathname === "/cs") {
       url.pathname += "/";
-    } else if (url.pathname === "/en/human-design-kalkulacka") {
+    } else if (/^\/(?:cs|en)\/(?:pricing|cenik|honorace)\/?$/.test(url.pathname)) {
+      url.pathname = "/" + url.pathname.split("/")[1] + "/honorace";
+    } else if (/^\/en\/(?:human-design-kalkulacka|calculate)\/?$/.test(url.pathname)) {
       url.pathname = "/en/calculate";
-    } else if (url.pathname === "/cs/calculate") {
+    } else if (/^\/cs\/(?:calculate|human-design-kalkulacka)\/?$/.test(url.pathname)) {
       url.pathname = "/cs/human-design-kalkulacka";
     }
     return url.origin + url.pathname;
