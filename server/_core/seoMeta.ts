@@ -50,7 +50,9 @@ export function buildSeoHead(locale: string, pathname: string): string {
   // hreflang siblings must have exactly one locale prefix. The old
   // canonical-based concatenation emitted /en/en/ and CZ /en/ URLs.
   const unprefixedPath = pathname.replace(/^\/(?:cs|en|de|fr|es|it)(?=\/|$)/, "") || "/";
-  const suffix = unprefixedPath.startsWith("/") ? unprefixedPath : `/${unprefixedPath}`;
+  const rawSuffix = unprefixedPath.startsWith("/") ? unprefixedPath : `/${unprefixedPath}`;
+  const normalizedSuffix = rawSuffix === "/" ? "/" : rawSuffix.replace(/\/$/, "");
+  const suffix = ["/pricing", "/cenik", "/honorace"].includes(normalizedSuffix) ? "/honorace" : normalizedSuffix;
   // Only one canonical calculator URL per language; duplicate aliases
   // retain working SPA routes but cannot compete in Google's index.
   const isCalculatorAlias = suffix === "/calculate" || suffix === "/human-design-kalkulacka";
@@ -105,7 +107,7 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
   const isCs = locale === "cs";
   const isEn = !isCs;
   const base = isCs ? CS : EN;
-  const slug = pathname.replace(`/${locale}/`, "").replace(`/${locale}`, "").replace(/^\/+/, "");
+  const slug = pathname.replace(`/${locale}/`, "").replace(`/${locale}`, "").replace(/^\/+|\/+$/g, "");
 
   // ── Static routes ──────────────────────────────────────────────────
   const staticRoutes: Record<string, RouteMeta> = {
@@ -324,7 +326,7 @@ function resolveMeta(locale: string, pathname: string): RouteMeta | null {
   };
 
   // Public SEO aliases keep their canonical route but share one metadata source.
-  const staticRouteKey = slug === "honorace" ? "pricing" : slug === "andelska-cisla" ? "andelska" : slug;
+  const staticRouteKey = (slug === "honorace" || slug === "cenik") ? "pricing" : slug === "andelska-cisla" ? "andelska" : slug;
   if (staticRoutes[staticRouteKey]) {
     return staticRoutes[staticRouteKey];
   }
